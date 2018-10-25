@@ -1,0 +1,55 @@
+---
+title: "Chapter 5: OLS Asymptotics"
+author: "Franz X. Mohr"
+date: "2018-10-04"
+---
+
+
+
+<p>Make a histogram of the variable “prate”.</p>
+<pre class="r"><code>data(&quot;k401k&quot;)
+
+hist(k401k$prate)</code></pre>
+<p><img src="/reproduction/wooldridge/wooldridge05_files/figure-html/unnamed-chunk-2-1.png" width="384" /></p>
+<p><strong>Example 5.2</strong></p>
+<pre class="r"><code>data(&quot;bwght&quot;)
+
+lm.1 &lt;- lm(lbwght ~ cigs + lfaminc, data = bwght[1:694,])
+s.1 &lt;- summary(lm.1)
+
+lm.2 &lt;- lm(lbwght ~ cigs + lfaminc, data = bwght)
+s.2 &lt;- summary(lm.2)
+
+s.2$coefficients[2, 2] / s.1$coefficients[2, 2]</code></pre>
+<pre><code>## [1] 0.6443341</code></pre>
+<pre class="r"><code>lm.3 &lt;- lm(cigs ~ lfaminc, data = bwght[1:694,])
+s.3 &lt;- summary(lm.3)
+
+sigma.j &lt;- s.3$coefficients[2, 2]
+sigma &lt;- s.3$sigma
+r2 &lt;- s.3$r.squared
+sigma / (sqrt(1388) * sigma.j * sqrt(1 - r2))</code></pre>
+<pre><code>## [1] 0.6609623</code></pre>
+<p><strong>Example 5.3</strong></p>
+<pre class="r"><code>data(&quot;crime1&quot;)
+     
+lm.1 &lt;- lm(narr86 ~ pcnv + ptime86 + qemp86, data = crime1)
+
+# LM test
+lm.u &lt;- lm(lm.1$residuals ~ pcnv + ptime86 + qemp86 + avgsen + tottime, data = crime1)
+summary(lm.u)$r.squared * 2725</code></pre>
+<pre><code>## [1] 4.070729</code></pre>
+<pre class="r"><code>qchisq(.9, 2)</code></pre>
+<pre><code>## [1] 4.60517</code></pre>
+<pre class="r"><code>1 - pchisq(4.09, 2)</code></pre>
+<pre><code>## [1] 0.1293802</code></pre>
+<p>F-Test</p>
+<pre class="r"><code>lm.2 &lt;- lm(narr86 ~ pcnv + ptime86 + qemp86 + avgsen + tottime, data = crime1)
+anova(lm.1, lm.2)</code></pre>
+<pre><code>## Analysis of Variance Table
+## 
+## Model 1: narr86 ~ pcnv + ptime86 + qemp86
+## Model 2: narr86 ~ pcnv + ptime86 + qemp86 + avgsen + tottime
+##   Res.Df    RSS Df Sum of Sq      F Pr(&gt;F)
+## 1   2721 1927.3                           
+## 2   2719 1924.4  2     2.879 2.0339  0.131</code></pre>

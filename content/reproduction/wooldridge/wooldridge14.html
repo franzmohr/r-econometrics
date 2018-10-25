@@ -1,0 +1,199 @@
+---
+title: "Chapter 14: Advanced Panel Data Methods"
+author: "Franz Mohr"
+date: "2018-02-06"
+---
+
+
+
+<pre class="r"><code>library(wooldridge)</code></pre>
+<p>In order to estimate panel data models, I use the <code>plm</code> function from the <code>plm</code> package. The intuition behind its structure is similar to the ordinary linear model, except that it allows you to specify the panel’s group and time variables and the effects model.</p>
+<div id="example-14.1" class="section level3">
+<h3>Example 14.1</h3>
+<p>Similar to the <code>lm</code> function, you can specify your model’s equation and the sample. Since you want to use panel data methods for you estimation, you also have to specify which variables in your sample contain the information used to distinguish different groups and which variable contains the time measurement. In our example this is done with <code>index = c(&quot;fcode&quot;, &quot;year&quot;)</code>. Note, that the order of the variables is important. The group variable always has to be at the first and the time variable at the second position.</p>
+<p>The specification <code>model = &quot;within&quot;</code> indicates that the effects occur within a group. This is the fixed effects estimator. And the <code>effect = &quot;individual&quot;</code> specifies that we are only interested in effects of the group variable and that there are no time specific effects. (See <code>?plm</code> for further information on this.)</p>
+<pre class="r"><code>data(&quot;jtrain&quot;)
+
+# install.packages(&quot;plm&quot;)
+library(plm)
+
+summary(plm(lscrap ~ d88 + d89 + grant + grant_1,
+            data = jtrain,
+            index= c(&quot;fcode&quot;, &quot;year&quot;),
+            model = &quot;within&quot;,
+            effect = &quot;individual&quot;
+            ))</code></pre>
+<pre><code>## Oneway (individual) effect Within Model
+## 
+## Call:
+## plm(formula = lscrap ~ d88 + d89 + grant + grant_1, data = jtrain, 
+##     effect = &quot;individual&quot;, model = &quot;within&quot;, index = c(&quot;fcode&quot;, 
+##         &quot;year&quot;))
+## 
+## Balanced Panel: n = 54, T = 3, N = 162
+## 
+## Residuals:
+##      Min.   1st Qu.    Median   3rd Qu.      Max. 
+## -2.286936 -0.112387 -0.017841  0.144272  1.426674 
+## 
+## Coefficients:
+##          Estimate Std. Error t-value Pr(&gt;|t|)  
+## d88     -0.080216   0.109475 -0.7327  0.46537  
+## d89     -0.247203   0.133218 -1.8556  0.06634 .
+## grant   -0.252315   0.150629 -1.6751  0.09692 .
+## grant_1 -0.421590   0.210200 -2.0057  0.04749 *
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Total Sum of Squares:    32.25
+## Residual Sum of Squares: 25.766
+## R-Squared:      0.20105
+## Adj. R-Squared: -0.23684
+## F-statistic: 6.54259 on 4 and 104 DF, p-value: 9.7741e-05</code></pre>
+</div>
+<div id="example-14.2" class="section level3">
+<h3>Example 14.2</h3>
+<p>The basic structure of <code>plm</code> remains the same in this example, except that interaction terms are added. Additionally, a specific F-test <code>pFtest(estimatedmodel1, estimatedmodel2)</code> is available to test for joint significance of those terms.</p>
+<pre class="r"><code>data(&quot;wagepan&quot;)
+
+plm.1 &lt;- plm(lwage ~ married + union +
+               d81 + d82 + d83 +d84 + d85 + d86 + d87 +
+               I(d81*educ) + I(d82*educ) + I(d83*educ) + I(d84*educ) + I(d85*educ) +
+               I(d86*educ) + I(d87*educ),
+             data=wagepan,
+             model=&quot;within&quot;,
+             effect=&quot;individual&quot;,
+             index=c(&quot;nr&quot;, &quot;year&quot;))
+
+summary(plm.1)</code></pre>
+<pre><code>## Oneway (individual) effect Within Model
+## 
+## Call:
+## plm(formula = lwage ~ married + union + d81 + d82 + d83 + d84 + 
+##     d85 + d86 + d87 + I(d81 * educ) + I(d82 * educ) + I(d83 * 
+##     educ) + I(d84 * educ) + I(d85 * educ) + I(d86 * educ) + I(d87 * 
+##     educ), data = wagepan, effect = &quot;individual&quot;, model = &quot;within&quot;, 
+##     index = c(&quot;nr&quot;, &quot;year&quot;))
+## 
+## Balanced Panel: n = 545, T = 8, N = 4360
+## 
+## Residuals:
+##      Min.   1st Qu.    Median   3rd Qu.      Max. 
+## -4.152111 -0.125630  0.010897  0.160800  1.483401 
+## 
+## Coefficients:
+##                 Estimate Std. Error t-value  Pr(&gt;|t|)    
+## married        0.0548205  0.0184126  2.9773  0.002926 ** 
+## union          0.0829785  0.0194461  4.2671 2.029e-05 ***
+## d81           -0.0224158  0.1458885 -0.1537  0.877893    
+## d82           -0.0057611  0.1458558 -0.0395  0.968495    
+## d83            0.0104297  0.1458579  0.0715  0.942999    
+## d84            0.0843743  0.1458518  0.5785  0.562965    
+## d85            0.0497253  0.1458602  0.3409  0.733190    
+## d86            0.0656064  0.1458917  0.4497  0.652958    
+## d87            0.0904448  0.1458505  0.6201  0.535216    
+## I(d81 * educ)  0.0115854  0.0122625  0.9448  0.344827    
+## I(d82 * educ)  0.0147905  0.0122635  1.2061  0.227872    
+## I(d83 * educ)  0.0171182  0.0122633  1.3959  0.162830    
+## I(d84 * educ)  0.0165839  0.0122657  1.3521  0.176437    
+## I(d85 * educ)  0.0237085  0.0122738  1.9316  0.053479 .  
+## I(d86 * educ)  0.0274123  0.0122740  2.2334  0.025583 *  
+## I(d87 * educ)  0.0304332  0.0122723  2.4798  0.013188 *  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Total Sum of Squares:    572.05
+## Residual Sum of Squares: 474.35
+## R-Squared:      0.1708
+## Adj. R-Squared: 0.048567
+## F-statistic: 48.9069 on 16 and 3799 DF, p-value: &lt; 2.22e-16</code></pre>
+<pre class="r"><code>plm.2 &lt;- plm(lwage ~ married + union +
+               d81 + d82 + d83 +d84 + d85 + d86 + d87,
+             data = wagepan,
+             model = &quot;within&quot;,
+             effect = &quot;individual&quot;,
+             index = c(&quot;nr&quot;, &quot;year&quot;))
+
+pFtest(plm.1,plm.2)</code></pre>
+<pre><code>## 
+##  F test for individual effects
+## 
+## data:  lwage ~ married + union + d81 + d82 + d83 + d84 + d85 + d86 +  ...
+## F = 1.2365, df1 = 7, df2 = 3799, p-value = 0.2787
+## alternative hypothesis: significant effects</code></pre>
+</div>
+<div id="example-14.3" class="section level3">
+<h3>Example 14.3</h3>
+<p>See example 14.1.</p>
+<pre class="r"><code>summary(plm(lscrap ~ d88 + d89 + grant + grant_1 + lsales + lemploy,
+            data = jtrain,
+            model = &quot;within&quot;,
+            effect = &quot;individual&quot;,
+            index = c(&quot;fcode&quot;, &quot;year&quot;)))</code></pre>
+<pre><code>## Oneway (individual) effect Within Model
+## 
+## Call:
+## plm(formula = lscrap ~ d88 + d89 + grant + grant_1 + lsales + 
+##     lemploy, data = jtrain, effect = &quot;individual&quot;, model = &quot;within&quot;, 
+##     index = c(&quot;fcode&quot;, &quot;year&quot;))
+## 
+## Unbalanced Panel: n = 51, T = 1-3, N = 148
+## 
+## Residuals:
+##      Min.   1st Qu.    Median   3rd Qu.      Max. 
+## -1.858663 -0.133752 -0.021483  0.148632  1.580473 
+## 
+## Coefficients:
+##           Estimate Std. Error t-value Pr(&gt;|t|)  
+## d88     -0.0039609  0.1195487 -0.0331  0.97364  
+## d89     -0.1321930  0.1536863 -0.8601  0.39197  
+## grant   -0.2967542  0.1570861 -1.8891  0.06206 .
+## grant_1 -0.5355783  0.2242060 -2.3888  0.01897 *
+## lsales  -0.0868577  0.2596985 -0.3345  0.73881  
+## lemploy -0.0763679  0.3502902 -0.2180  0.82791  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Total Sum of Squares:    27.934
+## Residual Sum of Squares: 21.982
+## R-Squared:      0.21306
+## Adj. R-Squared: -0.27121
+## F-statistic: 4.10625 on 6 and 91 DF, p-value: 0.0010818</code></pre>
+</div>
+<div id="example-14.4" class="section level3">
+<h3>Example 14.4</h3>
+<p>This example compares the estimated coefficients of an OLS, random effects and fixed effects model with each other. The random effects model is estimated by setting <code>model</code>= “random”`. Note that you do not need to specify the effect option.</p>
+<p>OLS</p>
+<pre class="r"><code># OLS
+lm.1 &lt;- lm(lwage ~ educ + black + hisp + exper + expersq + married + union +
+             d81 + d82 + d83 + d84 + d85 + d86 + d87,
+           data =  wagepan)</code></pre>
+<p>Random effects</p>
+<pre class="r"><code>plm.re &lt;- plm(lwage ~ educ + black + hisp + exper + expersq + married + union +
+                d81 + d82 + d83 + d84 + d85 + d86 + d87,
+              data = wagepan,
+              model = &quot;random&quot;,
+              index = c(&quot;nr&quot;, &quot;year&quot;))</code></pre>
+<p>Fixed effects</p>
+<pre class="r"><code>plm.fe &lt;- plm(lwage ~ expersq + married + union +
+                d81 + d82 + d83 + d84 + d85 + d86 + d87,
+              data = wagepan,
+              effect = &quot;individual&quot;,
+              model = &quot;within&quot;,
+              index = c(&quot;nr&quot;, &quot;year&quot;))</code></pre>
+<p>Table of results (rounded to 3 digits)</p>
+<pre class="r"><code>results &lt;- round(
+  data.frame(&quot;Pooled OLS&quot; = lm.1$coefficients[2:8],
+             &quot;Random Effects&quot; = plm.re$coeff[2:8],
+             &quot;Fixed Effects&quot; = c(NA, NA, NA, NA, plm.re$coeff[2:4])
+             ),3)
+results</code></pre>
+<pre><code>##         Pooled.OLS Random.Effects Fixed.Effects
+## educ         0.091          0.092            NA
+## black       -0.139         -0.139            NA
+## hisp         0.016          0.022            NA
+## exper        0.067          0.106            NA
+## expersq     -0.002         -0.005         0.092
+## married      0.108          0.064        -0.139
+## union        0.182          0.106         0.022</code></pre>
+</div>

@@ -1,0 +1,618 @@
+
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-115075361-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+<!DOCTYPE html>
+<html xmlns="//www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+    <head>
+        
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+
+        <title>Chapter 17: Limited Dependent Variable Models and Sample Selection Corrections &middot; r-econometrics</title>
+        <link rel='stylesheet' href='//fonts.googleapis.com/css?family=Open+Sans:400,300,600' type='text/css'>
+        <link rel="stylesheet" href="https://www.r-econometrics.com//libraries/normalize.3.0.1.css" />
+        <link rel="stylesheet" href="https://www.r-econometrics.com//css/liquorice.css" />
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <link rel="apple-touch-icon-precomposed" href="/apple-touch-icon-144-precomposed.png" sizes="144x144" />
+        <link rel="alternate" href="" type="application/rss+xml" title="r-econometrics" />
+    </head>
+    <body class="li-body">
+
+<header class="li-page-header">
+    <div class="container">
+        <div class="row">
+            <div class="sixteen columns">
+                <div class="li-brand li-left">
+                <a href="https://www.r-econometrics.com/">r-econometrics</a></div>
+                <div class="li-menu li-right">
+                    <span class="li-menu-icon" onclick="javascript:toggle('menu');">&#9776;</span>
+                    <ul id="menu2" class="li-menu-items">
+                        
+                            <li><a href="/rbasicsintro"> R(eal) Basics </a></li>
+                        
+                            <li><a href="/microemetricsintro"> Microeconometric Topics </a></li>
+                        
+                            <li><a href="/timeseriesintro"> Time Series Topics </a></li>
+                        
+                            <li><a href="/links"> Links </a></li>
+                        
+                            <li><a href="/reproductionintro"> Reproduction Projects </a></li>
+                        
+                            <li><a href="/about"> About and Disclaimer </a></li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="sixteen columns">
+                <ul id="menu" class="li-menu-items li-menu-mobile">
+                    
+                        <li><a href="/rbasicsintro"> R(eal) Basics </a></li>
+                    
+                        <li><a href="/microemetricsintro"> Microeconometric Topics </a></li>
+                    
+                        <li><a href="/timeseriesintro"> Time Series Topics </a></li>
+                    
+                        <li><a href="/links"> Links </a></li>
+                    
+                        <li><a href="/reproductionintro"> Reproduction Projects </a></li>
+                    
+                        <li><a href="/about"> About and Disclaimer </a></li>
+                    
+                </ul>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+
+
+
+
+    <div class="container">
+        <div class="row">
+            <div class="sixteen columns">
+                <article class="li-article">
+                    <header class="li-article-header">
+                        <h1 class="li-article-title">Chapter 17: Limited Dependent Variable Models and Sample Selection Corrections</h1>
+                        <span class="li-article-taxonomies">
+                            
+
+                            
+                        </span>
+                        
+                        <time class="li-article-date">Franz X. Mohr, October 7, 2018
+                        </time>
+                    </header>
+                    <section>
+                        <div id="example-17.1" class="section level3">
+<h3>Example 17.1</h3>
+<p>First, look at the linear model.</p>
+<pre class="r"><code>data(&quot;mroz&quot;)
+
+lm.17.1 &lt;- lm(inlf ~ nwifeinc + educ + exper + expersq + age +
+                kidslt6 + kidsge6, data = mroz)
+summary(lm.17.1)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = inlf ~ nwifeinc + educ + exper + expersq + age + 
+##     kidslt6 + kidsge6, data = mroz)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.93432 -0.37526  0.08833  0.34404  0.99417 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  0.5855192  0.1541780   3.798 0.000158 ***
+## nwifeinc    -0.0034052  0.0014485  -2.351 0.018991 *  
+## educ         0.0379953  0.0073760   5.151 3.32e-07 ***
+## exper        0.0394924  0.0056727   6.962 7.38e-12 ***
+## expersq     -0.0005963  0.0001848  -3.227 0.001306 ** 
+## age         -0.0160908  0.0024847  -6.476 1.71e-10 ***
+## kidslt6     -0.2618105  0.0335058  -7.814 1.89e-14 ***
+## kidsge6      0.0130122  0.0131960   0.986 0.324415    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.4271 on 745 degrees of freedom
+## Multiple R-squared:  0.2642, Adjusted R-squared:  0.2573 
+## F-statistic: 38.22 on 7 and 745 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>To calculated the percentage share of correct predictions I create dummy variables, which equal unity when the fitted values are above or equal to 0.5 and zero else. Next, I create a vector of dummies that are unity when both the fitted prediction and the observation of the dependent variable are unity. If they have different values, i.e. (1,0) or (0,1), the dummy is zero. The mean of this latter vector gives the percentage share of correctly predicted observations.</p>
+<pre class="r"><code>lm.fitted &lt;- as.numeric(lm.17.1$fitted.values &gt;= .5)
+corr.pred.lm &lt;- as.numeric(lm.fitted == mroz$inlf)
+
+mean(corr.pred.lm)</code></pre>
+<pre><code>## [1] 0.7343958</code></pre>
+<p>To estimate the Logit model, we cannot use the <code>lm</code> function. Instead, we have to use the <code>glm</code> command. Specify the estimation model, the dataset and the family of the estimation procedure, which in our case is <em>logit</em>. Estimate the model, save it and use the <code>summary</code> command to get an overview of the results.</p>
+<pre class="r"><code>logit.17.1 &lt;- glm(inlf ~ nwifeinc + educ + exper + expersq + age +
+                    kidslt6 + kidsge6,
+                  data = mroz,
+                  family = binomial(link = &quot;logit&quot;))
+summary(logit.17.1)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = inlf ~ nwifeinc + educ + exper + expersq + age + 
+##     kidslt6 + kidsge6, family = binomial(link = &quot;logit&quot;), data = mroz)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -2.1770  -0.9063   0.4473   0.8561   2.4032  
+## 
+## Coefficients:
+##              Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  0.425452   0.860365   0.495  0.62095    
+## nwifeinc    -0.021345   0.008421  -2.535  0.01126 *  
+## educ         0.221170   0.043439   5.091 3.55e-07 ***
+## exper        0.205870   0.032057   6.422 1.34e-10 ***
+## expersq     -0.003154   0.001016  -3.104  0.00191 ** 
+## age         -0.088024   0.014573  -6.040 1.54e-09 ***
+## kidslt6     -1.443354   0.203583  -7.090 1.34e-12 ***
+## kidsge6      0.060112   0.074789   0.804  0.42154    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 1029.75  on 752  degrees of freedom
+## Residual deviance:  803.53  on 745  degrees of freedom
+## AIC: 819.53
+## 
+## Number of Fisher Scoring iterations: 4</code></pre>
+<p>The share of correctly predicted observations is retrieved in the same way as it was done with the linear model.</p>
+<pre class="r"><code>logit.fitted &lt;- as.numeric(logit.17.1$fitted.values &gt;= .5)
+corr.pred.logit &lt;- as.numeric(logit.fitted==mroz$inlf)
+
+mean(corr.pred.logit)</code></pre>
+<pre><code>## [1] 0.7357238</code></pre>
+<p>To get the log-likelihood, there is simple command, which just needs the estimated model output.</p>
+<pre class="r"><code>logLik(logit.17.1)</code></pre>
+<pre><code>## &#39;log Lik.&#39; -401.7652 (df=8)</code></pre>
+<p>Probit estimation works in the same way as Logit, except that you have to specify a different estimation procedure in the family argument.</p>
+<pre class="r"><code>probit.17.1 &lt;- glm(inlf ~ nwifeinc + educ + exper + expersq + age +
+                     kidslt6 + kidsge6,
+                   data = mroz,
+                   family = binomial(link = &quot;probit&quot;))
+summary(probit.17.1)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = inlf ~ nwifeinc + educ + exper + expersq + age + 
+##     kidslt6 + kidsge6, family = binomial(link = &quot;probit&quot;), data = mroz)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -2.2156  -0.9151   0.4315   0.8653   2.4553  
+## 
+## Coefficients:
+##               Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  0.2700736  0.5080782   0.532  0.59503    
+## nwifeinc    -0.0120236  0.0049392  -2.434  0.01492 *  
+## educ         0.1309040  0.0253987   5.154 2.55e-07 ***
+## exper        0.1233472  0.0187587   6.575 4.85e-11 ***
+## expersq     -0.0018871  0.0005999  -3.145  0.00166 ** 
+## age         -0.0528524  0.0084624  -6.246 4.22e-10 ***
+## kidslt6     -0.8683247  0.1183773  -7.335 2.21e-13 ***
+## kidsge6      0.0360056  0.0440303   0.818  0.41350    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 1029.7  on 752  degrees of freedom
+## Residual deviance:  802.6  on 745  degrees of freedom
+## AIC: 818.6
+## 
+## Number of Fisher Scoring iterations: 4</code></pre>
+<pre class="r"><code>probit.fitted &lt;- as.numeric(probit.17.1$fitted.values &gt;= .5)
+corr.pred.probit &lt;- as.numeric(probit.fitted==mroz$inlf)
+
+mean(corr.pred.probit)</code></pre>
+<pre><code>## [1] 0.7343958</code></pre>
+<p>Log-likelihood</p>
+<pre class="r"><code>logLik(probit.17.1)</code></pre>
+<pre><code>## &#39;log Lik.&#39; -401.3022 (df=8)</code></pre>
+</div>
+<div id="example-17.2" class="section level3">
+<h3>Example 17.2</h3>
+<pre class="r"><code>data(&quot;mroz&quot;)
+
+lm.17.2 &lt;- lm.1 &lt;- lm(hours ~ nwifeinc + educ + exper + expersq + age +
+                        kidslt6 + kidsge6,
+                      data = mroz)
+summary(lm.17.2)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = hours ~ nwifeinc + educ + exper + expersq + age + 
+##     kidslt6 + kidsge6, data = mroz)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -1511.3  -537.8  -146.9   538.1  3555.6 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 1330.4824   270.7846   4.913 1.10e-06 ***
+## nwifeinc      -3.4466     2.5440  -1.355   0.1759    
+## educ          28.7611    12.9546   2.220   0.0267 *  
+## exper         65.6725     9.9630   6.592 8.23e-11 ***
+## expersq       -0.7005     0.3246  -2.158   0.0312 *  
+## age          -30.5116     4.3639  -6.992 6.04e-12 ***
+## kidslt6     -442.0899    58.8466  -7.513 1.66e-13 ***
+## kidsge6      -32.7792    23.1762  -1.414   0.1577    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 750.2 on 745 degrees of freedom
+## Multiple R-squared:  0.2656, Adjusted R-squared:  0.2587 
+## F-statistic:  38.5 on 7 and 745 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>For some reason, my results for sigma are slightly different from the results in Wooldridge (2013).</p>
+<pre class="r"><code>sd(lm.17.2$residuals)</code></pre>
+<pre><code>## [1] 746.6789</code></pre>
+<p>To estimate a Tobit model, we have to load the <code>AER</code> package. The rest is similar to linear regression methods. Just enter the formula and the data set and you will get your estimates.</p>
+<pre class="r"><code>tobit.17.2 &lt;- tobit(hours ~ nwifeinc + educ + exper + expersq + age +
+                      kidslt6 + kidsge6,
+                    data = mroz)
+summary(tobit.17.2)</code></pre>
+<pre><code>## 
+## Call:
+## tobit(formula = hours ~ nwifeinc + educ + exper + expersq + age + 
+##     kidslt6 + kidsge6, data = mroz)
+## 
+## Observations:
+##          Total  Left-censored     Uncensored Right-censored 
+##            753            325            428              0 
+## 
+## Coefficients:
+##               Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  965.30528  446.43614   2.162 0.030599 *  
+## nwifeinc      -8.81424    4.45910  -1.977 0.048077 *  
+## educ          80.64561   21.58324   3.736 0.000187 ***
+## exper        131.56430   17.27939   7.614 2.66e-14 ***
+## expersq       -1.86416    0.53766  -3.467 0.000526 ***
+## age          -54.40501    7.41850  -7.334 2.24e-13 ***
+## kidslt6     -894.02174  111.87804  -7.991 1.34e-15 ***
+## kidsge6      -16.21800   38.64139  -0.420 0.674701    
+## Log(scale)     7.02289    0.03706 189.514  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Scale: 1122 
+## 
+## Gaussian distribution
+## Number of Newton-Raphson Iterations: 4 
+## Log-likelihood: -3819 on 9 Df
+## Wald-statistic: 253.9 on 7 Df, p-value: &lt; 2.22e-16</code></pre>
+<p>To obtain an R-squared value, calculate fitted values by inserting the (scaled 1122) linear predictors that are contained in the estimation results into equation 17.25 and calculate the square of the correlation between those fitted values and the real observations.</p>
+<pre class="r"><code>fitted &lt;- pnorm(tobit.17.2$linear.predictors / 1122) * tobit.17.2$linear.predictors +
+  1122 * dnorm(tobit.17.2$linear.predictors / 1122)
+
+cor(mroz$hours,fitted)^2</code></pre>
+<pre><code>## [1] 0.274244</code></pre>
+<p>To get the <strong>average partial effect</strong> calculate the mean of the vector, which contains the values of the cumulative normal distribution function depending on the scaled linear predictors of the estimation:</p>
+<pre class="r"><code>ape &lt;- mean(pnorm(tobit.17.2$linear.predictors / 1122))
+ape * 80.65</code></pre>
+<pre><code>## [1] 47.4758</code></pre>
+<p>For the <strong>partial effect at the average</strong> we generate a vector with unity as the first value and the means of all the independent variables in the model. Then, multiply this vector with the coefficients of the model to get linear predictions, scale them and calculate the value of the cumulative normal distribution function.</p>
+<pre class="r"><code># PEA
+means &lt;- c(1, mean(mroz$nwifeinc), mean(mroz$educ), mean(mroz$exper), mean(mroz$exper)^2,
+           mean(mroz$age), mean(mroz$kidslt6), mean(mroz$kidsge6))
+pea &lt;- pnorm(tobit.17.2$coefficients %*% means / 1122)
+pea * 80.65</code></pre>
+<pre><code>##          [,1]
+## [1,] 52.03955</code></pre>
+</div>
+<div id="example-17.3" class="section level3">
+<h3>Example 17.3</h3>
+<p>Estimate the linear model</p>
+<pre class="r"><code>data(&quot;crime1&quot;)
+
+lm.17.3 &lt;- lm(narr86 ~ pcnv + avgsen + tottime + ptime86 + 
+                qemp86 + inc86 + black + hispan + born60,
+              data = crime1)
+summary(lm.17.3)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = narr86 ~ pcnv + avgsen + tottime + ptime86 + qemp86 + 
+##     inc86 + black + hispan + born60, data = crime1)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -1.0210 -0.4544 -0.2389  0.2686 11.5207 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  0.576566   0.037894  15.215  &lt; 2e-16 ***
+## pcnv        -0.131886   0.040404  -3.264 0.001111 ** 
+## avgsen      -0.011332   0.012241  -0.926 0.354693    
+## tottime      0.012069   0.009436   1.279 0.201003    
+## ptime86     -0.040874   0.008813  -4.638 3.69e-06 ***
+## qemp86      -0.051310   0.014486  -3.542 0.000404 ***
+## inc86       -0.001462   0.000343  -4.261 2.10e-05 ***
+## black        0.327010   0.045426   7.199 7.83e-13 ***
+## hispan       0.193809   0.039716   4.880 1.12e-06 ***
+## born60      -0.022465   0.033294  -0.675 0.499902    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.8287 on 2715 degrees of freedom
+## Multiple R-squared:  0.07248,    Adjusted R-squared:  0.0694 
+## F-statistic: 23.57 on 9 and 2715 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>Again, the standard error deviates from the book.</p>
+<pre class="r"><code>sd(lm.17.3$residuals)</code></pre>
+<pre><code>## [1] 0.8273599</code></pre>
+<p>To estimate the Poisson model we use the <code>glm</code> function and specify the formula, dataset and the family of the estimation procedure, i.e. Poisson. After the estimation we get the summary of the results and the log-likelihood. The R-squared of the estimation is the squared correlation of the Poisson model’s fitted values and the real observations.</p>
+<pre class="r"><code>poisson.17.3 &lt;- glm(narr86 ~ pcnv + avgsen + tottime + ptime86 + 
+                      qemp86 + inc86 + black + hispan + born60,
+                    data = crime1,
+                    family = poisson)
+summary(poisson.17.3)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = narr86 ~ pcnv + avgsen + tottime + ptime86 + qemp86 + 
+##     inc86 + black + hispan + born60, family = poisson, data = crime1)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -1.5731  -0.9076  -0.6651   0.2183   7.4609  
+## 
+## Coefficients:
+##              Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept) -0.599589   0.067250  -8.916  &lt; 2e-16 ***
+## pcnv        -0.401571   0.084971  -4.726 2.29e-06 ***
+## avgsen      -0.023772   0.019946  -1.192   0.2333    
+## tottime      0.024490   0.014750   1.660   0.0969 .  
+## ptime86     -0.098558   0.020695  -4.763 1.91e-06 ***
+## qemp86      -0.038019   0.029024  -1.310   0.1902    
+## inc86       -0.008081   0.001041  -7.762 8.34e-15 ***
+## black        0.660838   0.073834   8.950  &lt; 2e-16 ***
+## hispan       0.499813   0.073927   6.761 1.37e-11 ***
+## born60      -0.051029   0.064052  -0.797   0.4256    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for poisson family taken to be 1)
+## 
+##     Null deviance: 3208.5  on 2724  degrees of freedom
+## Residual deviance: 2822.2  on 2715  degrees of freedom
+## AIC: 4517.5
+## 
+## Number of Fisher Scoring iterations: 6</code></pre>
+<p>Log-likelihood</p>
+<pre class="r"><code>logLik(poisson.17.3)</code></pre>
+<pre><code>## &#39;log Lik.&#39; -2248.761 (df=10)</code></pre>
+<pre class="r"><code>cor(poisson.17.3$fitted.values, crime1$narr86)^2</code></pre>
+<pre><code>## [1] 0.07700391</code></pre>
+<p>The standard errors can be scaled either manually by multiplying the variance of the coefficient (squared standard error) by the scale factor and taking the square root or by specifying the dispersion factor in the <code>summary</code> command.</p>
+<pre class="r"><code>(0.014750^2 * 1.232)^0.5</code></pre>
+<pre><code>## [1] 0.01637184</code></pre>
+<pre class="r"><code>summary(poisson.17.3, dispersion = 1.232)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = narr86 ~ pcnv + avgsen + tottime + ptime86 + qemp86 + 
+##     inc86 + black + hispan + born60, family = poisson, data = crime1)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -1.5731  -0.9076  -0.6651   0.2183   7.4609  
+## 
+## Coefficients:
+##              Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept) -0.599589   0.074645  -8.033 9.54e-16 ***
+## pcnv        -0.401571   0.094314  -4.258 2.06e-05 ***
+## avgsen      -0.023772   0.022139  -1.074    0.283    
+## tottime      0.024490   0.016372   1.496    0.135    
+## ptime86     -0.098558   0.022970  -4.291 1.78e-05 ***
+## qemp86      -0.038019   0.032216  -1.180    0.238    
+## inc86       -0.008081   0.001155  -6.993 2.68e-12 ***
+## black        0.660838   0.081953   8.064 7.40e-16 ***
+## hispan       0.499813   0.082055   6.091 1.12e-09 ***
+## born60      -0.051029   0.071095  -0.718    0.473    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for poisson family taken to be 1.232)
+## 
+##     Null deviance: 3208.5  on 2724  degrees of freedom
+## Residual deviance: 2822.2  on 2715  degrees of freedom
+## AIC: 4517.5
+## 
+## Number of Fisher Scoring iterations: 6</code></pre>
+</div>
+<div id="example-17.4" class="section level3">
+<h3>Example 17.4</h3>
+<p>For censored regression models we have to use the <code>survival</code> package. The command <code>Surv</code> prepares the dependent variable to be used in <code>survreg</code>. It takes the variable “ldurat” as the interval. The argument <code>event</code> tells <code>Surv</code> whether a command is censored or not. I had to revert the variable <em>cens</em>, which is why I generated a further vector of dummies. The last option in <code>Surv</code> tells if the data are censored to the left or to the right.</p>
+<p>The independent variables and the data set are specified in the usual way. The distribution usually used is the Gaussian (referred to as “normal”) distribution.</p>
+<pre class="r"><code>data(&quot;recid&quot;)
+
+surv.17.4 &lt;- survreg(Surv(ldurat, event = as.numeric(cens!=1), type = &quot;right&quot;) ~ 
+                       workprg + priors + tserved + felon + alcohol + drugs +
+                       black + married + educ + age,
+                     dist = &quot;gaussian&quot;,
+                     data = recid)
+summary(surv.17.4)</code></pre>
+<pre><code>## 
+## Call:
+## survreg(formula = Surv(ldurat, event = as.numeric(cens != 1), 
+##     type = &quot;right&quot;) ~ workprg + priors + tserved + felon + alcohol + 
+##     drugs + black + married + educ + age, data = recid, dist = &quot;gaussian&quot;)
+##                 Value Std. Error     z       p
+## (Intercept)  4.099386   0.347535 11.80 &lt; 2e-16
+## workprg     -0.062572   0.120037 -0.52  0.6022
+## priors      -0.137253   0.021459 -6.40 1.6e-10
+## tserved     -0.019331   0.002978 -6.49 8.5e-11
+## felon        0.443995   0.145087  3.06  0.0022
+## alcohol     -0.634909   0.144217 -4.40 1.1e-05
+## drugs       -0.298160   0.132736 -2.25  0.0247
+## black       -0.542718   0.117443 -4.62 3.8e-06
+## married      0.340684   0.139843  2.44  0.0148
+## educ         0.022920   0.025397  0.90  0.3668
+## age          0.003910   0.000606  6.45 1.1e-10
+## Log(scale)   0.593586   0.034412 17.25 &lt; 2e-16
+## 
+## Scale= 1.81 
+## 
+## Gaussian distribution
+## Loglik(model)= -1597.1   Loglik(intercept only)= -1680.4
+##  Chisq= 166.74 on 10 degrees of freedom, p= 1.3e-30 
+## Number of Newton-Raphson Iterations: 4 
+## n= 1445</code></pre>
+</div>
+<div id="example-17.5" class="section level3">
+<h3>Example 17.5</h3>
+<p>Estimate the OLS model</p>
+<pre class="r"><code>data(&quot;mroz&quot;)
+
+lm.17.5 &lt;- lm(lwage ~ educ + exper + expersq, data = mroz)
+summary(lm.17.5)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = lwage ~ educ + exper + expersq, data = mroz)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -3.08404 -0.30627  0.04952  0.37498  2.37115 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -0.5220406  0.1986321  -2.628  0.00890 ** 
+## educ         0.1074896  0.0141465   7.598 1.94e-13 ***
+## exper        0.0415665  0.0131752   3.155  0.00172 ** 
+## expersq     -0.0008112  0.0003932  -2.063  0.03974 *  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.6664 on 424 degrees of freedom
+##   (325 observations deleted due to missingness)
+## Multiple R-squared:  0.1568, Adjusted R-squared:  0.1509 
+## F-statistic: 26.29 on 3 and 424 DF,  p-value: 1.302e-15</code></pre>
+<p>To estimate the Heckit model we have to install the <code>sampleSelection</code> package. It contains a neat function called <code>heckit</code>, where we specify the formula for the model describing the causes of sample selection (first line) and the formula for the model of interest. Next, we specify the method used for estimation (two steps) and the sample.</p>
+<pre class="r"><code>heckit.17.5 &lt;- heckit(inlf ~ educ + exper + expersq + nwifeinc + age + kidslt6 + kidsge6,
+                      lwage ~ educ + exper + expersq,
+                      method = &quot;2step&quot;,
+                      data = mroz)
+summary(heckit.17.5)</code></pre>
+<pre><code>## --------------------------------------------
+## Tobit 2 model (sample selection model)
+## 2-step Heckman / heckit estimation
+## 753 observations (325 censored and 428 observed)
+## 15 free parameters (df = 739)
+## Probit selection equation:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  0.270077   0.508593   0.531  0.59556    
+## educ         0.130905   0.025254   5.183 2.81e-07 ***
+## exper        0.123348   0.018716   6.590 8.34e-11 ***
+## expersq     -0.001887   0.000600  -3.145  0.00173 ** 
+## nwifeinc    -0.012024   0.004840  -2.484  0.01320 *  
+## age         -0.052853   0.008477  -6.235 7.61e-10 ***
+## kidslt6     -0.868328   0.118522  -7.326 6.21e-13 ***
+## kidsge6      0.036005   0.043477   0.828  0.40786    
+## Outcome equation:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -0.5781032  0.3050062  -1.895  0.05843 .  
+## educ         0.1090655  0.0155230   7.026 4.83e-12 ***
+## exper        0.0438873  0.0162611   2.699  0.00712 ** 
+## expersq     -0.0008591  0.0004389  -1.957  0.05068 .  
+## Multiple R-Squared:0.1569,   Adjusted R-Squared:0.149
+##    Error terms:
+##               Estimate Std. Error t value Pr(&gt;|t|)
+## invMillsRatio  0.03226    0.13362   0.241    0.809
+## sigma          0.66363         NA      NA       NA
+## rho            0.04861         NA      NA       NA
+## --------------------------------------------</code></pre>
+</div>
+
+                    </section>
+                </article>
+                <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5a9c6c9b8a39890d"></script>
+                <div class="container">
+  <div class="row">
+    <div class="sixteen columns center">
+      <div class="addthis_inline_share_toolbox"></div>
+      
+    </div>
+  </div>
+</div>
+
+                <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+<footer class="li-page-footer">
+    <div class="container">
+        <div class="row">
+            <div class="sixteen columns center">
+              <div id="disqus_thread"></div>
+                <script type="text/javascript">
+                  (function() { 
+                  if (window.location.hostname == "localhost") return;
+                  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                  var disqus_shortname = 'r-econometrics';
+                  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                  })();
+                  </script>
+                  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+            </div>
+        </div>
+    </div>
+</footer>
+            </div>
+        </div>
+        
+    </div>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+<footer class="li-page-footer">
+    <div class="container">
+        <div class="row">
+            <div class="sixteen columns center">
+              <div class="li-page-footer-legal">
+                &copy; Franz X. Mohr. Powered by <a href="https://github.com/rstudio/blogdown" target="_blank" >Blogdown</a> and hosted by <a href="https://www.netlify.com/" target="_blank" >Netlify</a>. Source available on <a href="https://github.com/FranzMohr/r-econometrics" target="_blank" >Github</a>.
+              </div>
+              <div class="li-page-footer-theme">
+                <span class=""><a href="https://github.com/eliasson/liquorice/">liquorice</a> is a theme for <a href="http://hugo.spf13.com">hugo</a>
+                </span>
+              </div>
+            </div>
+        </div>
+    </div>
+</footer>
+    <script type="text/javascript">
+    <!--
+    function toggle(id) {
+        var e = document.getElementById(id);
+        e.style.display == 'block' ? e.style.display = 'none' : e.style.display = 'block';
+    }
+    
+    </script>
+    
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-115075361-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+    </body>
+</html>
+

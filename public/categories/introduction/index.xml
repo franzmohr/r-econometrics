@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Introduction on r-econometrics</title>
+    <link>/categories/introduction/</link>
+    <description>Recent content in Introduction on r-econometrics</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 04 Feb 2018 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/categories/introduction/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>R(eal) Basics</title>
+      <link>/rbasicsintro/</link>
+      <pubDate>Sun, 04 Feb 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/rbasicsintro/</guid>
+      <description>This section should help you to
+ get R and RStudio started on your computer understand the structure of the program prepare your workspace for an analysis [import data and get help] [manipulate data with the dplyr package] create graphics with the ggplot2 package.  Recently, I have finished the first version of a below 30 pages introduction to R. It uses an exemplary workflow to explain some basics of the language and the application of the packages dplyr, ggplot2 and openxlsx.</description>
+    </item>
+    
+  </channel>
+</rss>

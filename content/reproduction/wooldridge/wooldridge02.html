@@ -1,0 +1,262 @@
+---
+title: "Chapter 2: Simple OLS"
+author: "Franz X. Mohr"
+date: "2018-10-04"
+---
+
+
+
+<p>In R the function for basic linear regression models is <code>lm</code>, which is short for <em>linear model</em>. Its first argument is a formula of the regression model, which has the form <code>y ~ a</code>. The tilde between <em>y</em> and <em>a</em> indicates that <em>y</em> is the dependent variable and <em>a</em> is the explanatory variable. It is also possible to add a further explanatory variable - for example <em>b</em> - to the regression by adding a plus sign followed by the the name of the additional variable to the formula. In our example this would result in <code>y ~ a + b</code>. But since this chapter only covers models with a single explanatory variable, we postpone this issue to the next chapter.</p>
+<p>Beside the formula, the <code>lm</code> function also requires you to specify the data used for the estimation. This can be done in multiple ways, but it is quite common practise to specify a data frame as the <em>data</em> argument, e.g. <code>data = my_data_frame</code>, which contains the variables that are mentioned in the model formula.</p>
+<p>With this knowledge we can already estimate a simple model. In the textbook this is a regression of the variable <em>salary</em> on the variable <em>roe</em>, where both variables are contained in the <em>ceosal1</em> data set. We can access this data set by loading the <em>wooldridge</em> data package with <code>library(wooldridge</code> and then load the sample with <code>data(&quot;ceosal1&quot;)</code>:</p>
+<pre class="r"><code>library(wooldridge) # Load the data package
+data(&quot;ceosal1&quot;) # Load the data</code></pre>
+<p>Then we can proceed with the model estimation:</p>
+<pre class="r"><code>lm(salary ~ roe, data = ceosal1)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = salary ~ roe, data = ceosal1)
+## 
+## Coefficients:
+## (Intercept)          roe  
+##       963.2         18.5</code></pre>
+<p>This yields the values for a constant and the coefficient on <em>roe</em> as they are given in the textbook. Note also that R automatically adds a constant term to the model, since linear regression models usually contain such a term. However, if it is appropriate to drop such a constant, this can be done by adding <code>0</code> or <code>-1</code> to the formula in <code>lm</code>. More information on this topic will be given in the next chapter. For now it is just sufficient to know that the constant term is included automatically and, hence, it should not come as a surpise that it is shown in the estimation results.</p>
+<p>However, the results shown above are not very conclusive, since we only see the estiamtes of the coefficients, but no test statistics or other information. In order to change this execute</p>
+<pre class="r"><code>summary(lm(salary ~ roe, data = ceosal1))</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = salary ~ roe, data = ceosal1)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -1160.2  -526.0  -254.0   138.8 13499.9 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)   963.19     213.24   4.517 1.05e-05 ***
+## roe            18.50      11.12   1.663   0.0978 .  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1367 on 207 degrees of freedom
+## Multiple R-squared:  0.01319,    Adjusted R-squared:  0.008421 
+## F-statistic: 2.767 on 1 and 207 DF,  p-value: 0.09777</code></pre>
+<p>She <code>summary</code> functions takes the output of <code>lm</code> and transforms its contents so that the estimation results are more informative. This is helpful, since you can get information on the significants of your parameters as well as the general fit of you model as indicated by the <em>Multiple R-squared</em> value. But more on this in later chapters.</p>
+<p><strong>Digression (you can skip this rather technical part)</strong></p>
+<p>Note that the <code>lm</code> function, basically, does nothing else than generating a vector of values of the dependent variable y and a matrix of explanatory variables x. If the model contains a constant, a vector of ones will be added to the matrix x. After that the function uses the standard estimation formula <span class="math inline">\((x&#39;x)^{-1}x&#39;y\)</span> to estimate the coefficients. To see that this is true, compare the result of the following code to the model results from above. They should be exactly the same.</p>
+<pre class="r"><code># Extract y values and store them as a matrix
+y &lt;- matrix(ceosal1[,&quot;salary&quot;], ncol = 1)
+
+# Extract x values and store them as a matrix
+x &lt;- as.matrix(cbind(1, ceosal1[,&quot;roe&quot;]))
+
+# Apply the esimation formula
+solve(t(x) %*%x) %*% t(x) %*% y</code></pre>
+<pre><code>##           [,1]
+## [1,] 963.19134
+## [2,]  18.50119</code></pre>
+<p><code>%*%</code> tells R that it has to multiply vectors/matrices with each other. <code>t(x)</code> generates the transposed matrix of x and the <code>solve</code> function calculates the inverse of a square matrix. And as you can see, the values are the same.</p>
+<p><strong>…continued…</strong></p>
+<p>A very common way to do econometric analyses in R is to estimate a model, save it and let R give you the summary of the saved results. This looks like the following:</p>
+<pre class="r"><code># Estimate and save the model as object lm_1
+lm_1 &lt;- lm(salary ~ roe, data = ceosal1)
+
+# Show summary statistics
+summary(lm_1)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = salary ~ roe, data = ceosal1)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -1160.2  -526.0  -254.0   138.8 13499.9 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)   963.19     213.24   4.517 1.05e-05 ***
+## roe            18.50      11.12   1.663   0.0978 .  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1367 on 207 degrees of freedom
+## Multiple R-squared:  0.01319,    Adjusted R-squared:  0.008421 
+## F-statistic: 2.767 on 1 and 207 DF,  p-value: 0.09777</code></pre>
+<p>The first command generates a new item in the upper right window of RStudio and the <code>summary</code> function gives the same values as before, except that it provides additional values like standard errors and R-squared.</p>
+<p><strong>Example 2.4</strong></p>
+<p>Example 2.4 works exactly in the same way as the last example. Load the data set <em>wage1</em> from the already loaded <em>wooldridge</em> package and regress <em>wage</em> on <em>educ</em>:</p>
+<pre class="r"><code># Load data
+data(&quot;wage1&quot;)
+
+# Estimate
+lm_1 &lt;- lm(wage ~ educ, data = wage1)
+summary(lm_1)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = wage ~ educ, data = wage1)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -5.3396 -2.1501 -0.9674  1.1921 16.6085 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -0.90485    0.68497  -1.321    0.187    
+## educ         0.54136    0.05325  10.167   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 3.378 on 524 degrees of freedom
+## Multiple R-squared:  0.1648, Adjusted R-squared:  0.1632 
+## F-statistic: 103.4 on 1 and 524 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p><strong>Example 2.5</strong></p>
+<pre class="r"><code>data(&quot;vote1&quot;)
+
+lm_1 &lt;- lm(voteA ~ shareA, data = vote1)
+summary(lm_1)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = voteA ~ shareA, data = vote1)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -16.8919  -4.0660  -0.1682   3.4965  29.9772 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 26.81221    0.88721   30.22   &lt;2e-16 ***
+## shareA       0.46383    0.01454   31.90   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 6.385 on 171 degrees of freedom
+## Multiple R-squared:  0.8561, Adjusted R-squared:  0.8553 
+## F-statistic:  1018 on 1 and 171 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p><strong>Example 2.6</strong></p>
+<p>To get the results for table 2.2 redo the script from example 2.3. R does not only save the coefficients, but also some other important values. Type in <code>names(lm_1)</code> to get a list of variables that are saved under <code>lm_._1</code> as well. Among them are <em>fitted.values</em> and <em>residuals</em> which represent <em>salaryhat</em> and <em>uhat</em> from the textbook, respectively.</p>
+<p>In order to make a table we generate a data frame with the first two colums containing the first 15 observersations from the original dataset and two additional columns into which we later will paste the estimated values. We define the data frame with</p>
+<pre class="r"><code>df_1 &lt;- data.frame(roe = ceosal1$roe[1:15],
+                   salary = ceosal1$salary[1:15],
+                   salaryhat = NA,
+                   uhat = NA)</code></pre>
+<p><code>data.frame</code> is the function which generates the frame. <em>roe</em> is the label of the column which is defined as the value of <em>ceosal1$salary</em> at the positions 1 to 15, i.e. <code>[1:15]</code>. The structure is the same for the following part with <em>salary</em>. <em>salaryhat</em> and <em>uhat</em> are not defined and <code>NA</code> (<strong>n</strong>ot <strong>a</strong>vailable) is used to indicate that. <code>NA</code> is in general the indicator of missing values in R.</p>
+<p>As a next step we paste the fitted values and the residuals from the regression into the data frame. Therefore, we seperately paste the first 15 fitted values (<code>lm_1$fitted.values[1:15]</code>) from the regression into the column <em>salaryhat</em> (<code>df_1$salaryhat</code>). The same method applies to the resudials. Finally, display the table with <em>df_1</em></p>
+<pre class="r"><code>df_1$salaryhat &lt;- lm_1$fitted.values[1:15]
+df_1$uhat &lt;- lm_1$resid[1:15]
+df_1</code></pre>
+<pre><code>##     roe salary salaryhat       uhat
+## 1  14.1   1095  71.99251 -3.9925125
+## 2  10.9   1001  55.05048  6.9495217
+## 3  23.5   1122  71.81027  1.1897280
+## 4   5.9    578  69.67154 -0.6715378
+## 5  13.8   1368  60.49183 14.5081669
+## 6  20.0   1145  71.51750 -2.5174997
+## 7  16.4   1078  63.09647 -4.0964750
+## 8  16.3   1094  72.64273 -1.6427343
+## 9  10.5   1237  71.79179  4.2082107
+## 10 26.3    833  67.36770  5.6322953
+## 11 25.9    567  70.79752 -2.7975191
+## 12 26.8    933  61.05246  9.9475419
+## 13 14.8   1339  53.22138 -1.2213819
+## 14 22.3    937  63.17152 15.8284830
+## 15 56.3   2011  49.40805  0.5919517</code></pre>
+<p><strong>Example 2.7</strong></p>
+<p>For example 2.7 we have to make R recall the coefficients from the regression of wage on education. Thus, we save the regression and access the saved results via the <code>$</code> operator.</p>
+<pre class="r"><code>data(&quot;wage1&quot;)
+
+lm_1 &lt;- lm(wage ~ educ, data = wage1)
+lm_1$coefficients</code></pre>
+<pre><code>## (Intercept)        educ 
+##  -0.9048516   0.5413593</code></pre>
+<p>Since <code>lm_1$coefficients</code> is a vector, we can access each position by “[#]”, where “#” is the position of the element. So, to get the intercept value we have to access the first position and to get the coefficient of educ we have to take the second position.</p>
+<pre class="r"><code># Get value for &quot;(Intercept)&quot;
+lm_1$coefficients[1]</code></pre>
+<pre><code>## (Intercept) 
+##  -0.9048516</code></pre>
+<pre class="r"><code># Get value for educ
+lm_1$coefficients[2]</code></pre>
+<pre><code>##      educ 
+## 0.5413593</code></pre>
+<p>Example 2.7 calculates the fittet value for a person with an average amount of years of education. Recall the function <code>mean</code> from the chapter on summary statistics and take into account what you have learned so far about obtaining the coefficient values of an estimation. This allows us to calculate the fitted values by typing</p>
+<pre class="r"><code>lm_1$coefficients[1] + lm_1$coefficients[2] * mean(wage1$educ)</code></pre>
+<pre><code>## (Intercept) 
+##    5.896103</code></pre>
+<p><strong>Example 2.8</strong></p>
+<p>This is the same example as 2.3. But this time it is about the R-squared. Repeat the command from above and let R display <code>summary(lm_1)</code>. You will find the R-squared in the second line from the bottom called “Multiple R-squared”. Rounded it should be the same value as in [2.39] in the book.</p>
+<p><strong>Example 2.9</strong></p>
+<p>Repeat the script from example 2.5 and check the multiple R-squared. It states 0.8561, just like in the book.</p>
+<p><strong>Example 2.10 (taking logs)</strong></p>
+<p>The example uses logged values as dependend variable. How do we get them? Just type</p>
+<pre class="r"><code>data(&quot;wage1&quot;)
+
+lwage &lt;- log(wage1$wage)</code></pre>
+<p>The last line is what we are looking for. <code>log</code> takes the natural logarithm of the variable in parentheses. In this example R calculates this value for each position in <em>wage</em> and saves it as a separate object, which I named <em>lwage</em>.</p>
+<p>Now we can proceed with the regression which works in the usual manner, except that <em>lwage</em> is the dependent variable now:</p>
+<pre class="r"><code>lm_1 &lt;- lm(lwage ~ wage1$educ)
+summary(lm_1)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = lwage ~ wage1$educ)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -2.21158 -0.36393 -0.07263  0.29712  1.52339 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 0.583773   0.097336   5.998 3.74e-09 ***
+## wage1$educ  0.082744   0.007567  10.935  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.4801 on 524 degrees of freedom
+## Multiple R-squared:  0.1858, Adjusted R-squared:  0.1843 
+## F-statistic: 119.6 on 1 and 524 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p><strong>Example 2.11</strong></p>
+<p>In 2.11 we proceed the same way as in 2.10. We generate the log values of salary and sales in the same manner and estimate the model to obtain the elasticities.</p>
+<pre class="r"><code>lsalary &lt;- log(ceosal1$salary)
+lsales &lt;- log(ceosal1$sales)
+lm_1 &lt;- lm(lsalary ~ lsales)
+summary(lm_1)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = lsalary ~ lsales)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -1.01038 -0.28140 -0.02723  0.21222  2.81128 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  4.82200    0.28834  16.723  &lt; 2e-16 ***
+## lsales       0.25667    0.03452   7.436  2.7e-12 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.5044 on 207 degrees of freedom
+## Multiple R-squared:  0.2108, Adjusted R-squared:  0.207 
+## F-statistic:  55.3 on 1 and 207 DF,  p-value: 2.703e-12</code></pre>
+<p><strong>Example 2.12</strong></p>
+<p>The only new thing in this expamle is the sample. So load it and estimate the model:</p>
+<pre class="r"><code>data(&quot;meap93&quot;)
+
+lm_1 &lt;- lm(math10 ~ lnchprg, data = meap93)
+summary(lm_1)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = math10 ~ lnchprg, data = meap93)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -24.386  -5.979  -1.207   4.865  45.845 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 32.14271    0.99758  32.221   &lt;2e-16 ***
+## lnchprg     -0.31886    0.03484  -9.152   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 9.566 on 406 degrees of freedom
+## Multiple R-squared:  0.171,  Adjusted R-squared:  0.169 
+## F-statistic: 83.77 on 1 and 406 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>So, this was chapter 2, where we estimated simple OLS models. But since we would like to introduce more independent variabels in order to get better estimates and to avoid spurious correlation we move on to chapter 3 on <a href="/reproduction/wooldridge/wooldridge03">multiple regression analysis</a>.</p>

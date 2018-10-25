@@ -1,0 +1,794 @@
+
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-115075361-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+<!DOCTYPE html>
+<html xmlns="//www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+    <head>
+        
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+
+        <title>Chapter 7: Multiple Regression Analysis with Qualitative Information &middot; r-econometrics</title>
+        <link rel='stylesheet' href='//fonts.googleapis.com/css?family=Open+Sans:400,300,600' type='text/css'>
+        <link rel="stylesheet" href="https://www.r-econometrics.com//libraries/normalize.3.0.1.css" />
+        <link rel="stylesheet" href="https://www.r-econometrics.com//css/liquorice.css" />
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <link rel="apple-touch-icon-precomposed" href="/apple-touch-icon-144-precomposed.png" sizes="144x144" />
+        <link rel="alternate" href="" type="application/rss+xml" title="r-econometrics" />
+    </head>
+    <body class="li-body">
+
+<header class="li-page-header">
+    <div class="container">
+        <div class="row">
+            <div class="sixteen columns">
+                <div class="li-brand li-left">
+                <a href="https://www.r-econometrics.com/">r-econometrics</a></div>
+                <div class="li-menu li-right">
+                    <span class="li-menu-icon" onclick="javascript:toggle('menu');">&#9776;</span>
+                    <ul id="menu2" class="li-menu-items">
+                        
+                            <li><a href="/rbasicsintro"> R(eal) Basics </a></li>
+                        
+                            <li><a href="/microemetricsintro"> Microeconometric Topics </a></li>
+                        
+                            <li><a href="/timeseriesintro"> Time Series Topics </a></li>
+                        
+                            <li><a href="/links"> Links </a></li>
+                        
+                            <li><a href="/reproductionintro"> Reproduction Projects </a></li>
+                        
+                            <li><a href="/about"> About and Disclaimer </a></li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="sixteen columns">
+                <ul id="menu" class="li-menu-items li-menu-mobile">
+                    
+                        <li><a href="/rbasicsintro"> R(eal) Basics </a></li>
+                    
+                        <li><a href="/microemetricsintro"> Microeconometric Topics </a></li>
+                    
+                        <li><a href="/timeseriesintro"> Time Series Topics </a></li>
+                    
+                        <li><a href="/links"> Links </a></li>
+                    
+                        <li><a href="/reproductionintro"> Reproduction Projects </a></li>
+                    
+                        <li><a href="/about"> About and Disclaimer </a></li>
+                    
+                </ul>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+
+
+
+
+    <div class="container">
+        <div class="row">
+            <div class="sixteen columns">
+                <article class="li-article">
+                    <header class="li-article-header">
+                        <h1 class="li-article-title">Chapter 7: Multiple Regression Analysis with Qualitative Information</h1>
+                        <span class="li-article-taxonomies">
+                            
+
+                            
+                        </span>
+                        
+                        <time class="li-article-date">Franz Mohr, February 4, 2018
+                        </time>
+                    </header>
+                    <section>
+                        <pre class="r"><code>library(wooldridge)</code></pre>
+<p>Estimating dummy variables that reflect qualitative information works quite the same way in R as it does with quantitative variables. You just add it as an independent variable into the formula of the model.</p>
+<pre class="r"><code># Example 7.1
+data(&quot;wage1&quot;)
+
+lm.7.1.1 &lt;- lm(wage ~ female + educ + exper + tenure, data = wage1)
+summary(lm.7.1.1)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = wage ~ female + educ + exper + tenure, data = wage1)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -7.7675 -1.8080 -0.4229  1.0467 14.0075 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -1.56794    0.72455  -2.164   0.0309 *  
+## female      -1.81085    0.26483  -6.838 2.26e-11 ***
+## educ         0.57150    0.04934  11.584  &lt; 2e-16 ***
+## exper        0.02540    0.01157   2.195   0.0286 *  
+## tenure       0.14101    0.02116   6.663 6.83e-11 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 2.958 on 521 degrees of freedom
+## Multiple R-squared:  0.3635, Adjusted R-squared:  0.3587 
+## F-statistic:  74.4 on 4 and 521 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>lm.7.1.2 &lt;- lm(wage ~ female, data = wage1)
+summary(lm.7.1.2)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = wage ~ female, data = wage1)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -5.5995 -1.8495 -0.9877  1.4260 17.8805 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)   7.0995     0.2100  33.806  &lt; 2e-16 ***
+## female       -2.5118     0.3034  -8.279 1.04e-15 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 3.476 on 524 degrees of freedom
+## Multiple R-squared:  0.1157, Adjusted R-squared:  0.114 
+## F-statistic: 68.54 on 1 and 524 DF,  p-value: 1.042e-15</code></pre>
+<pre class="r"><code># Example 7.2
+data(&quot;gpa1&quot;)
+
+lm.7.2 &lt;- lm(colGPA ~ PC + hsGPA + ACT, data = gpa1)
+summary(lm.7.2)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = colGPA ~ PC + hsGPA + ACT, data = gpa1)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -0.7901 -0.2622 -0.0107  0.2334  0.7570 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 1.263520   0.333125   3.793 0.000223 ***
+## PC          0.157309   0.057287   2.746 0.006844 ** 
+## hsGPA       0.447242   0.093647   4.776 4.54e-06 ***
+## ACT         0.008659   0.010534   0.822 0.412513    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.3325 on 137 degrees of freedom
+## Multiple R-squared:  0.2194, Adjusted R-squared:  0.2023 
+## F-statistic: 12.83 on 3 and 137 DF,  p-value: 1.932e-07</code></pre>
+<pre class="r"><code># Example 7.3
+data(&quot;jtrain&quot;)
+  # Since we do not use the whole data, but just observations from 1988
+  # we have to manipulate the sampe
+jtrain &lt;- jtrain[jtrain$d88==1,]
+  # We choose those observation, where in each row of the sampel it holds
+  # that jtrain$d88==1.
+  # Then we estimate the usual regression.
+lm.7.3 &lt;- lm(hrsemp ~ grant + lsales + lemploy, data = jtrain)
+summary(lm.7.3)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = hrsemp ~ grant + lsales + lemploy, data = jtrain)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -36.874 -13.128  -3.642   4.770 119.618 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  46.6651    43.4121   1.075    0.285    
+## grant        26.2545     5.5918   4.695  8.4e-06 ***
+## lsales       -0.9846     3.5399  -0.278    0.781    
+## lemploy      -6.0699     3.8829  -1.563    0.121    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 24.38 on 101 degrees of freedom
+##   (52 observations deleted due to missingness)
+## Multiple R-squared:  0.2368, Adjusted R-squared:  0.2141 
+## F-statistic: 10.44 on 3 and 101 DF,  p-value: 4.804e-06</code></pre>
+<pre class="r"><code># Example 7.4
+data(&quot;hprice1&quot;)
+lm.7.4 &lt;- lm(lprice ~ llotsize + lsqrft + bdrms + colonial, data = hprice1)
+summary(lm.7.4)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = lprice ~ llotsize + lsqrft + bdrms + colonial, data = hprice1)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.69479 -0.09750 -0.01619  0.09151  0.70228 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -1.34959    0.65104  -2.073   0.0413 *  
+## llotsize     0.16782    0.03818   4.395 3.25e-05 ***
+## lsqrft       0.70719    0.09280   7.620 3.69e-11 ***
+## bdrms        0.02683    0.02872   0.934   0.3530    
+## colonial     0.05380    0.04477   1.202   0.2330    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.1841 on 83 degrees of freedom
+## Multiple R-squared:  0.6491, Adjusted R-squared:  0.6322 
+## F-statistic: 38.38 on 4 and 83 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code># Example 7.5
+lm.7.5 &lt;- lm(lwage ~ female + educ + exper + expersq + tenure + tenursq, data = wage1)
+summary(lm.7.5)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = lwage ~ female + educ + exper + expersq + tenure + 
+##     tenursq, data = wage1)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -1.83160 -0.25658 -0.02126  0.25500  1.13370 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  0.4166910  0.0989279   4.212 2.98e-05 ***
+## female      -0.2965110  0.0358055  -8.281 1.04e-15 ***
+## educ         0.0801967  0.0067573  11.868  &lt; 2e-16 ***
+## exper        0.0294324  0.0049752   5.916 6.00e-09 ***
+## expersq     -0.0005827  0.0001073  -5.431 8.65e-08 ***
+## tenure       0.0317139  0.0068452   4.633 4.56e-06 ***
+## tenursq     -0.0005852  0.0002347  -2.493    0.013 *  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.3998 on 519 degrees of freedom
+## Multiple R-squared:  0.4408, Adjusted R-squared:  0.4343 
+## F-statistic: 68.18 on 6 and 519 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>For the more accurate estimate extract the coefficient on female from the summary function, paste it into the <code>exp</code> function and subract 1.</p>
+<pre class="r"><code>exp(summary(lm.7.5)$coeff[2,1])-1</code></pre>
+<pre><code>## [1] -0.2565925</code></pre>
+<p>For the estimate of the percentage by which a man’s wage exceed a compareable woman’s wage we just put a minus sign in front of the coefficient.</p>
+<pre class="r"><code>exp(-summary(lm.7.5)$coeff[2,1])-1</code></pre>
+<pre><code>## [1] 0.3451573</code></pre>
+<p>The central command that allows you to create dummy variables is <code>as.numeric</code>. It gives a vector which is one if the conditions that are stated in parentheses are true and zero otherwise.</p>
+<pre class="r"><code># Example 7.6
+# Generate the subgroup dummies
+marrmale &lt;- as.numeric(wage1$female==0 &amp; wage1$married==1)
+marrfem  &lt;- as.numeric(wage1$female==1 &amp; wage1$married==1)
+singfem &lt;- as.numeric(wage1$female==1 &amp; wage1$married==0)
+
+lm.7.6.1 &lt;- lm(lwage ~ marrmale + marrfem + singfem + educ + exper + expersq + tenure + tenursq, data = wage1)
+summary(lm.7.6.1)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = lwage ~ marrmale + marrfem + singfem + educ + exper + 
+##     expersq + tenure + tenursq, data = wage1)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -1.89697 -0.24060 -0.02689  0.23144  1.09197 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  0.3213781  0.1000090   3.213 0.001393 ** 
+## marrmale     0.2126757  0.0553572   3.842 0.000137 ***
+## marrfem     -0.1982676  0.0578355  -3.428 0.000656 ***
+## singfem     -0.1103502  0.0557421  -1.980 0.048272 *  
+## educ         0.0789103  0.0066945  11.787  &lt; 2e-16 ***
+## exper        0.0268006  0.0052428   5.112 4.50e-07 ***
+## expersq     -0.0005352  0.0001104  -4.847 1.66e-06 ***
+## tenure       0.0290875  0.0067620   4.302 2.03e-05 ***
+## tenursq     -0.0005331  0.0002312  -2.306 0.021531 *  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.3933 on 517 degrees of freedom
+## Multiple R-squared:  0.4609, Adjusted R-squared:  0.4525 
+## F-statistic: 55.25 on 8 and 517 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>singmale &lt;- as.numeric(wage1$female==0)*as.numeric(wage1$married==0)
+lm.7.6.2 &lt;- lm(lwage ~ marrmale + singmale + singfem + educ + exper + expersq + tenure + tenursq, data=wage1)
+summary(lm.7.6.2)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = lwage ~ marrmale + singmale + singfem + educ + exper + 
+##     expersq + tenure + tenursq, data = wage1)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -1.89697 -0.24060 -0.02689  0.23144  1.09197 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  0.1231105  0.1057937   1.164 0.245089    
+## marrmale     0.4109433  0.0457709   8.978  &lt; 2e-16 ***
+## singmale     0.1982676  0.0578355   3.428 0.000656 ***
+## singfem      0.0879174  0.0523481   1.679 0.093664 .  
+## educ         0.0789103  0.0066945  11.787  &lt; 2e-16 ***
+## exper        0.0268006  0.0052428   5.112 4.50e-07 ***
+## expersq     -0.0005352  0.0001104  -4.847 1.66e-06 ***
+## tenure       0.0290875  0.0067620   4.302 2.03e-05 ***
+## tenursq     -0.0005331  0.0002312  -2.306 0.021531 *  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.3933 on 517 degrees of freedom
+## Multiple R-squared:  0.4609, Adjusted R-squared:  0.4525 
+## F-statistic: 55.25 on 8 and 517 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code># Example 7.7
+data(&quot;beauty&quot;)
+lm.7.7 &lt;- lm(lwage ~ belavg + abvavg + educ + exper + expersq + service + married + black, data = beauty)
+summary(lm.7.7)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = lwage ~ belavg + abvavg + educ + exper + expersq + 
+##     service + married + black, data = beauty)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -1.74211 -0.29201  0.01702  0.30052  3.04504 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  0.1353690  0.0856441   1.581 0.114222    
+## belavg      -0.1610574  0.0447131  -3.602 0.000328 ***
+## abvavg      -0.0065951  0.0323216  -0.204 0.838350    
+## educ         0.0822901  0.0059115  13.920  &lt; 2e-16 ***
+## exper        0.0446750  0.0047555   9.394  &lt; 2e-16 ***
+## expersq     -0.0006421  0.0001056  -6.079 1.61e-09 ***
+## service     -0.2772843  0.0335089  -8.275 3.26e-16 ***
+## married      0.1229036  0.0325837   3.772 0.000170 ***
+## black       -0.0861601  0.0554701  -1.553 0.120611    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.5025 on 1251 degrees of freedom
+## Multiple R-squared:  0.2901, Adjusted R-squared:  0.2856 
+## F-statistic: 63.91 on 8 and 1251 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>Unfortunatly, the results are not the same as in the book, resp. the paper by Hamermesh and Biddle (1994)</p>
+<p>In the next example the conditions used in the are a bit more sophisticated, but follow the same logic as above.</p>
+<pre class="r"><code># Example 7.8
+data(&quot;lawsch85&quot;)
+
+# Generate dummies which is not necessary here, but I
+# wanted to show you how it is done.
+# However, you must create the last (r61.100) since it is not contained
+# in the downloaded data.
+top10 &lt;- as.numeric(lawsch85$rank &lt;= 10)
+r11.25 &lt;- as.numeric(lawsch85$rank &gt;= 11 &amp; lawsch85$rank &lt;= 25)
+r26.40 &lt;- as.numeric(lawsch85$rank &gt;= 26 &amp; lawsch85$rank &lt;= 40)
+r41.60 &lt;- as.numeric(lawsch85$rank &gt;= 41 &amp; lawsch85$rank &lt;= 60)
+r61.100 &lt;- as.numeric(lawsch85$rank &gt;= 61 &amp; lawsch85$rank &lt;= 100)
+
+lm.7.8 &lt;- lm(lsalary ~ top10 + r11_25 + r26_40 + r41_60 + r61.100 + LSAT + GPA + llibvol + lcost, data = lawsch85)
+summary(lm.7.8)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = lsalary ~ top10 + r11_25 + r26_40 + r41_60 + r61.100 + 
+##     LSAT + GPA + llibvol + lcost, data = lawsch85)
+## 
+## Residuals:
+##       Min        1Q    Median        3Q       Max 
+## -0.294888 -0.039691 -0.001683  0.043888  0.277497 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 9.1652942  0.4114243  22.277  &lt; 2e-16 ***
+## top10       0.6995659  0.0534920  13.078  &lt; 2e-16 ***
+## r11_25      0.5935433  0.0394400  15.049  &lt; 2e-16 ***
+## r26_40      0.3750763  0.0340812  11.005  &lt; 2e-16 ***
+## r41_60      0.2628190  0.0279621   9.399 3.18e-16 ***
+## r61.100     0.1315949  0.0210419   6.254 5.71e-09 ***
+## LSAT        0.0056909  0.0030630   1.858   0.0655 .  
+## GPA         0.0137257  0.0741919   0.185   0.8535    
+## llibvol     0.0363619  0.0260165   1.398   0.1647    
+## lcost       0.0008411  0.0251360   0.033   0.9734    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.08564 on 126 degrees of freedom
+##   (20 observations deleted due to missingness)
+## Multiple R-squared:  0.9109, Adjusted R-squared:  0.9046 
+## F-statistic: 143.2 on 9 and 126 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code># Equation 7.14
+# Generate the interaction term
+femmarr &lt;- wage1$female*wage1$married
+
+lm.e7.14 &lt;- lm(lwage ~ female + married + femmarr  + educ + exper + expersq + tenure + tenursq, data = wage1)
+summary(lm.e7.14)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = lwage ~ female + married + femmarr + educ + exper + 
+##     expersq + tenure + tenursq, data = wage1)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -1.89697 -0.24060 -0.02689  0.23144  1.09197 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  0.3213781  0.1000090   3.213 0.001393 ** 
+## female      -0.1103502  0.0557421  -1.980 0.048272 *  
+## married      0.2126757  0.0553572   3.842 0.000137 ***
+## femmarr     -0.3005931  0.0717670  -4.188 3.30e-05 ***
+## educ         0.0789103  0.0066945  11.787  &lt; 2e-16 ***
+## exper        0.0268006  0.0052428   5.112 4.50e-07 ***
+## expersq     -0.0005352  0.0001104  -4.847 1.66e-06 ***
+## tenure       0.0290875  0.0067620   4.302 2.03e-05 ***
+## tenursq     -0.0005331  0.0002312  -2.306 0.021531 *  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.3933 on 517 degrees of freedom
+## Multiple R-squared:  0.4609, Adjusted R-squared:  0.4525 
+## F-statistic: 55.25 on 8 and 517 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code># Example 7.9
+# No data found
+
+# Example 7.10
+femmarr &lt;- wage1$female*wage1$married
+lm.7.10 &lt;- lm(lwage ~ female + educ + femmarr + exper + expersq + tenure + tenursq, data = wage1)
+# Yields slightly different results
+summary(lm.7.10)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = lwage ~ female + educ + femmarr + exper + expersq + 
+##     tenure + tenursq, data = wage1)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -1.87420 -0.24795 -0.01231  0.24709  1.12173 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  0.3799992  0.1001423   3.795 0.000165 ***
+## female      -0.2373598  0.0454727  -5.220 2.60e-07 ***
+## educ         0.0812642  0.0067544  12.031  &lt; 2e-16 ***
+## femmarr     -0.1106204  0.0526998  -2.099 0.036295 *  
+## exper        0.0321299  0.0051227   6.272 7.52e-10 ***
+## expersq     -0.0006285  0.0001091  -5.758 1.46e-08 ***
+## tenure       0.0313651  0.0068248   4.596 5.42e-06 ***
+## tenursq     -0.0005820  0.0002339  -2.488 0.013170 *  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.3985 on 518 degrees of freedom
+## Multiple R-squared:  0.4455, Adjusted R-squared:  0.438 
+## F-statistic: 59.45 on 7 and 518 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code># Test for d0 and d1
+lm.7.10.t &lt;- lm(lwage ~ + educ + exper + expersq + tenure + tenursq, data = wage1)
+# F= 36.717. The book&#39;s value is a bit lower.
+anova(lm.7.10,lm.7.10.t)</code></pre>
+<pre><code>## Analysis of Variance Table
+## 
+## Model 1: lwage ~ female + educ + femmarr + exper + expersq + tenure + 
+##     tenursq
+## Model 2: lwage ~ +educ + exper + expersq + tenure + tenursq
+##   Res.Df    RSS Df Sum of Sq      F    Pr(&gt;F)    
+## 1    518 82.251                                  
+## 2    520 93.911 -2    -11.66 36.717 1.224e-15 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code># Example 7.11
+data(&quot;mlb1&quot;)
+
+lm.7.11 &lt;- lm(lsalary ~ years + gamesyr + bavg + hrunsyr + rbisyr + runsyr + fldperc + allstar + black + hispan + blckpb + hispph, data = mlb1)
+summary(lm.7.11)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = lsalary ~ years + gamesyr + bavg + hrunsyr + rbisyr + 
+##     runsyr + fldperc + allstar + black + hispan + blckpb + hispph, 
+##     data = mlb1)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -2.6762 -0.4397 -0.0699  0.4891  2.1993 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 10.3436845  2.1825380   4.739 3.24e-06 ***
+## years        0.0673458  0.0128915   5.224 3.18e-07 ***
+## gamesyr      0.0088778  0.0033837   2.624  0.00912 ** 
+## bavg         0.0009451  0.0015133   0.625  0.53271    
+## hrunsyr      0.0146206  0.0164522   0.889  0.37486    
+## rbisyr       0.0044938  0.0075750   0.593  0.55344    
+## runsyr       0.0072029  0.0045671   1.577  0.11576    
+## fldperc      0.0010865  0.0021195   0.513  0.60857    
+## allstar      0.0075307  0.0028735   2.621  0.00920 ** 
+## black       -0.1980080  0.1254968  -1.578  0.11561    
+## hispan      -0.1900089  0.1530902  -1.241  0.21547    
+## blckpb       0.0124513  0.0049628   2.509  0.01261 *  
+## hispph       0.0200863  0.0097933   2.051  0.04109 *  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.7133 on 317 degrees of freedom
+##   (23 observations deleted due to missingness)
+## Multiple R-squared:  0.6376, Adjusted R-squared:  0.6239 
+## F-statistic: 46.48 on 12 and 317 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code># Equation 7.22
+data(&quot;gpa3&quot;)
+
+lm.e7.22 &lt;- lm(cumgpa ~ female + sat + I(female*sat) + hsperc + I(female*hsperc) + tothrs + I(female*tothrs), data = gpa3[gpa3$term==2,])
+
+summary(lm.e7.22)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = cumgpa ~ female + sat + I(female * sat) + hsperc + 
+##     I(female * hsperc) + tothrs + I(female * tothrs), data = gpa3[gpa3$term == 
+##     2, ])
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -1.51370 -0.28645 -0.02306  0.27555  1.24760 
+## 
+## Coefficients:
+##                      Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)         1.4808117  0.2073336   7.142 5.17e-12 ***
+## female             -0.3534862  0.4105293  -0.861  0.38979    
+## sat                 0.0010516  0.0001811   5.807 1.40e-08 ***
+## I(female * sat)     0.0007506  0.0003852   1.949  0.05211 .  
+## hsperc             -0.0084516  0.0013704  -6.167 1.88e-09 ***
+## I(female * hsperc) -0.0005498  0.0031617  -0.174  0.86206    
+## tothrs              0.0023441  0.0008624   2.718  0.00688 ** 
+## I(female * tothrs) -0.0001158  0.0016277  -0.071  0.94331    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.4678 on 358 degrees of freedom
+## Multiple R-squared:  0.4059, Adjusted R-squared:  0.3943 
+## F-statistic: 34.95 on 7 and 358 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code># Equation 7.29
+data(&quot;mroz&quot;)
+
+lm.e7.29 &lt;- lm(inlf ~ nwifeinc + educ + exper + expersq + age + kidslt6 + kidsge6, data = mroz)
+
+summary(lm.e7.29)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = inlf ~ nwifeinc + educ + exper + expersq + age + 
+##     kidslt6 + kidsge6, data = mroz)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.93432 -0.37526  0.08833  0.34404  0.99417 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  0.5855192  0.1541780   3.798 0.000158 ***
+## nwifeinc    -0.0034052  0.0014485  -2.351 0.018991 *  
+## educ         0.0379953  0.0073760   5.151 3.32e-07 ***
+## exper        0.0394924  0.0056727   6.962 7.38e-12 ***
+## expersq     -0.0005963  0.0001848  -3.227 0.001306 ** 
+## age         -0.0160908  0.0024847  -6.476 1.71e-10 ***
+## kidslt6     -0.2618105  0.0335058  -7.814 1.89e-14 ***
+## kidsge6      0.0130122  0.0131960   0.986 0.324415    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.4271 on 745 degrees of freedom
+## Multiple R-squared:  0.2642, Adjusted R-squared:  0.2573 
+## F-statistic: 38.22 on 7 and 745 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code># Example 7.12
+data(&quot;crime1&quot;)
+# Generate arr86
+arr86 &lt;- as.numeric(crime1$narr86 &gt; 0)
+
+lm.7.12 &lt;- lm(arr86 ~ pcnv + avgsen + tottime + ptime86 + qemp86, data = crime1)
+summary(lm.7.12)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = arr86 ~ pcnv + avgsen + tottime + ptime86 + qemp86, 
+##     data = crime1)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -0.5577 -0.2889 -0.2157  0.5734  0.8931 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  0.440615   0.017233  25.568  &lt; 2e-16 ***
+## pcnv        -0.162445   0.021237  -7.649 2.79e-14 ***
+## avgsen       0.006113   0.006452   0.947    0.344    
+## tottime     -0.002262   0.004978  -0.454    0.650    
+## ptime86     -0.021966   0.004635  -4.739 2.25e-06 ***
+## qemp86      -0.042829   0.005405  -7.925 3.31e-15 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.4373 on 2719 degrees of freedom
+## Multiple R-squared:  0.04735,    Adjusted R-squared:  0.0456 
+## F-statistic: 27.03 on 5 and 2719 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code># Equation 7.23
+lm.e7.23 &lt;- lm(arr86 ~ pcnv + avgsen + tottime + ptime86 + qemp86 + black + hispan, data = crime1)
+summary(lm.e7.23)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = arr86 ~ pcnv + avgsen + tottime + ptime86 + qemp86 + 
+##     black + hispan, data = crime1)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -0.6127 -0.3035 -0.2208  0.5258  0.9255 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  0.380428   0.018727  20.314  &lt; 2e-16 ***
+## pcnv        -0.152062   0.021065  -7.219 6.79e-13 ***
+## avgsen       0.004619   0.006389   0.723    0.470    
+## tottime     -0.002562   0.004926  -0.520    0.603    
+## ptime86     -0.023695   0.004595  -5.157 2.69e-07 ***
+## qemp86      -0.038474   0.005402  -7.123 1.35e-12 ***
+## black        0.169763   0.023674   7.171 9.56e-13 ***
+## hispan       0.096187   0.020710   4.644 3.57e-06 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.4327 on 2717 degrees of freedom
+## Multiple R-squared:  0.06819,    Adjusted R-squared:  0.06579 
+## F-statistic: 28.41 on 7 and 2717 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code># Equation 7.33
+lm.e7.33 &lt;- lm(lscrap ~ grant + lsales + lemploy, data = jtrain[jtrain$d88 == 1,])
+summary(lm.e7.33)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = lscrap ~ grant + lsales + lemploy, data = jtrain[jtrain$d88 == 
+##     1, ])
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -3.4487 -0.9809  0.0621  0.8589  2.8299 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)  
+## (Intercept)  4.98678    4.65559   1.071   0.2897  
+## grant       -0.05178    0.43129  -0.120   0.9050  
+## lsales      -0.45484    0.37332  -1.218   0.2293  
+## lemploy      0.63943    0.36514   1.751   0.0866 .
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.385 on 46 degrees of freedom
+##   (107 observations deleted due to missingness)
+## Multiple R-squared:  0.07157,    Adjusted R-squared:  0.01102 
+## F-statistic: 1.182 on 3 and 46 DF,  p-value: 0.327</code></pre>
+<pre class="r"><code># Equation 7.35
+data(&quot;fertil2&quot;)
+
+lm.e7.35 &lt;- lm(children ~ age + educ, data = fertil2)
+summary(lm.e7.35)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = children ~ age + educ, data = fertil2)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -6.5700 -0.6955 -0.0760  0.7412  7.1294 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -1.996750   0.093969  -21.25   &lt;2e-16 ***
+## age          0.174831   0.002705   64.63   &lt;2e-16 ***
+## educ        -0.089940   0.005983  -15.03   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.475 on 4358 degrees of freedom
+## Multiple R-squared:  0.5595, Adjusted R-squared:  0.5593 
+## F-statistic:  2768 on 2 and 4358 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code># Equation 7.37
+lm.e7.37 &lt;- lm(children ~ age + educ + electric, data = fertil2)
+summary(lm.e7.37)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = children ~ age + educ + electric, data = fertil2)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -6.6019 -0.6814 -0.0619  0.7476  7.1061 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -2.071091   0.094741 -21.861  &lt; 2e-16 ***
+## age          0.176999   0.002729  64.855  &lt; 2e-16 ***
+## educ        -0.078751   0.006319 -12.462  &lt; 2e-16 ***
+## electric    -0.361758   0.068032  -5.317  1.1e-07 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.471 on 4354 degrees of freedom
+##   (3 observations deleted due to missingness)
+## Multiple R-squared:  0.5621, Adjusted R-squared:  0.5618 
+## F-statistic:  1863 on 3 and 4354 DF,  p-value: &lt; 2.2e-16</code></pre>
+
+                    </section>
+                </article>
+                <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5a9c6c9b8a39890d"></script>
+                <div class="container">
+  <div class="row">
+    <div class="sixteen columns center">
+      <div class="addthis_inline_share_toolbox"></div>
+      
+    </div>
+  </div>
+</div>
+
+                <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+<footer class="li-page-footer">
+    <div class="container">
+        <div class="row">
+            <div class="sixteen columns center">
+              <div id="disqus_thread"></div>
+                <script type="text/javascript">
+                  (function() { 
+                  if (window.location.hostname == "localhost") return;
+                  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                  var disqus_shortname = 'r-econometrics';
+                  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                  })();
+                  </script>
+                  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+            </div>
+        </div>
+    </div>
+</footer>
+            </div>
+        </div>
+        
+    </div>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+<footer class="li-page-footer">
+    <div class="container">
+        <div class="row">
+            <div class="sixteen columns center">
+              <div class="li-page-footer-legal">
+                &copy; Franz X. Mohr. Powered by <a href="https://github.com/rstudio/blogdown" target="_blank" >Blogdown</a> and hosted by <a href="https://www.netlify.com/" target="_blank" >Netlify</a>. Source available on <a href="https://github.com/FranzMohr/r-econometrics" target="_blank" >Github</a>.
+              </div>
+              <div class="li-page-footer-theme">
+                <span class=""><a href="https://github.com/eliasson/liquorice/">liquorice</a> is a theme for <a href="http://hugo.spf13.com">hugo</a>
+                </span>
+              </div>
+            </div>
+        </div>
+    </div>
+</footer>
+    <script type="text/javascript">
+    <!--
+    function toggle(id) {
+        var e = document.getElementById(id);
+        e.style.display == 'block' ? e.style.display = 'none' : e.style.display = 'block';
+    }
+    
+    </script>
+    
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-115075361-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+    </body>
+</html>
+

@@ -1,0 +1,46 @@
+baseURL = "https://www.r-econometrics.com/"
+languageCode = "en-us"
+title = "r-econometrics"
+theme = "liquorice"
+ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$", "\\.dta$", "\\.gitignore$"]
+uglyURLs = false
+pygmentsUseClassic = true
+disqusShortname = "r-econometrics"
+googleAnalytics = "UA-115075361-1"
+
+[permalinks]
+    post = "/:year/:month/:day/:slug/"
+
+[[menu.main]]
+    name = "R(eal) Basics"
+    url = "/rbasicsintro"
+    weight = 10
+[[menu.main]]
+    name = "Microeconometric Topics"
+    url = "/microemetricsintro"
+    weight = 20
+[[menu.main]]
+    name = "Time Series Topics"
+    url = "/timeseriesintro"
+    weight = 30
+[[menu.main]]
+    name = "Links"
+    url = "/links"
+    weight = 40
+#[[menu.main]]
+#    name = "Blog"
+#    url = "/post"
+#    weight = 45
+[[menu.main]]
+    name = "Reproduction Projects"
+    url = "/reproductionintro"
+    weight = 47
+[[menu.main]]
+    name = "About and Disclaimer"
+    url = "/about"
+    weight = 50
+
+[params]
+  author = "Franz X. Mohr"
+  description = "A website on using R for econometric analysis."
+  addThis = "ra-5a9c6c9b8a39890d"

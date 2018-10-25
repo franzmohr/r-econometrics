@@ -1,0 +1,241 @@
+---
+title: "Chapter 3: Multiple Regression Analysis"
+author: "Franz Mohr"
+date: "2018-02-04"
+---
+
+
+
+<p>Below you find the script for all examples in chapter 3 of Wooldridge (2013). The only difference to the last chapter is how to use multiple independent variables in the <code>lm</code> function. This is easily achieved by separating each exogenous variable that should enter the model with a plus sign, e.g. <code>lm(colGPA ~ hsGPA + ACT)</code>.</p>
+<p>The other commands that appear new are quite helpful and you should take a minute to think about them:</p>
+<ul>
+<li><code>rm(list = ls())</code>: Sometimes it might be helpful to keep your memory clean in order to keep an overview of the data you use. This command <strong>r</strong>e<strong>m</strong>oves positions from the window in the upper right, i.e. it deletes data that R temporarily stored in your memory. <code>list</code> tells R that you are going to delete more than one items. <code>ls()</code> is the so-called <em>environment</em> that you want to delete. In our case this is a quite big one. If you are interested type <code>ls(1)</code>, <code>ls(2)</code>, etc. to see what happens.</li>
+<li><code>#</code>: This is the sign which you put in front of a script line to indicate that the rest of the line is a comment. R takes it as text which is not executed. Whenever you work with scripts you should always comment what you do in order to make it easier for others to understand how your script works and for yourself to know what you did when you wrote the code.</li>
+</ul>
+<p>Before we estimate the models of the chapter we clear the memory and load the <em>wooldridge</em> package.</p>
+<pre class="r"><code>rm(list = ls())
+
+library(wooldridge)</code></pre>
+<p><strong>Example 3.1</strong></p>
+<pre class="r"><code>data(&quot;gpa1&quot;)
+
+lm_1 &lt;- lm(colGPA ~ hsGPA + ACT, data = gpa1)
+summary(lm_1)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = colGPA ~ hsGPA + ACT, data = gpa1)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.85442 -0.24666 -0.02614  0.28127  0.85357 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 1.286328   0.340822   3.774 0.000238 ***
+## hsGPA       0.453456   0.095813   4.733 5.42e-06 ***
+## ACT         0.009426   0.010777   0.875 0.383297    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.3403 on 138 degrees of freedom
+## Multiple R-squared:  0.1764, Adjusted R-squared:  0.1645 
+## F-statistic: 14.78 on 2 and 138 DF,  p-value: 1.526e-06</code></pre>
+<pre class="r"><code>lm_2 &lt;- lm(colGPA ~ ACT, data = gpa1)
+summary(lm_2)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = colGPA ~ ACT, data = gpa1)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.85251 -0.25251 -0.04426  0.26400  0.89336 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  2.40298    0.26420   9.095  8.8e-16 ***
+## ACT          0.02706    0.01086   2.491   0.0139 *  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.3656 on 139 degrees of freedom
+## Multiple R-squared:  0.04275,    Adjusted R-squared:  0.03586 
+## F-statistic: 6.207 on 1 and 139 DF,  p-value: 0.0139</code></pre>
+<p><strong>Example 3.2</strong></p>
+<pre class="r"><code>data(&quot;wage1&quot;)
+
+lm_3_2 &lt;- lm(lwage ~ educ + exper + tenure, data = wage1)
+summary(lm_3_2)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = lwage ~ educ + exper + tenure, data = wage1)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -2.05802 -0.29645 -0.03265  0.28788  1.42809 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 0.284360   0.104190   2.729  0.00656 ** 
+## educ        0.092029   0.007330  12.555  &lt; 2e-16 ***
+## exper       0.004121   0.001723   2.391  0.01714 *  
+## tenure      0.022067   0.003094   7.133 3.29e-12 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.4409 on 522 degrees of freedom
+## Multiple R-squared:  0.316,  Adjusted R-squared:  0.3121 
+## F-statistic: 80.39 on 3 and 522 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p><strong>Example 3.3</strong></p>
+<pre class="r"><code>data(&quot;k401k&quot;)
+
+lm_3_3 &lt;- lm(prate ~ mrate + age, data = k401k)
+summary(lm_3_3)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = prate ~ mrate + age, data = k401k)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -81.162  -8.067   4.787  12.474  18.256 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  80.1191     0.7790  102.85  &lt; 2e-16 ***
+## mrate         5.5213     0.5259   10.50  &lt; 2e-16 ***
+## age           0.2432     0.0447    5.44 6.21e-08 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 15.94 on 1531 degrees of freedom
+## Multiple R-squared:  0.09225,    Adjusted R-squared:  0.09106 
+## F-statistic: 77.79 on 2 and 1531 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p><strong>Example 3.4</strong></p>
+<pre class="r"><code>data(&quot;gpa1&quot;)
+
+lm_3_4 &lt;- lm(colGPA ~ hsGPA + ACT, data = gpa1)
+summary(lm_3_4)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = colGPA ~ hsGPA + ACT, data = gpa1)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.85442 -0.24666 -0.02614  0.28127  0.85357 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 1.286328   0.340822   3.774 0.000238 ***
+## hsGPA       0.453456   0.095813   4.733 5.42e-06 ***
+## ACT         0.009426   0.010777   0.875 0.383297    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.3403 on 138 degrees of freedom
+## Multiple R-squared:  0.1764, Adjusted R-squared:  0.1645 
+## F-statistic: 14.78 on 2 and 138 DF,  p-value: 1.526e-06</code></pre>
+<p><strong>Example 3.5</strong></p>
+<pre class="r"><code>data(&quot;crime1&quot;)
+
+lm_3_5_1 &lt;- lm(narr86 ~ pcnv + ptime86 + qemp86, data = crime1)
+lm_3_5_2 &lt;- lm(narr86 ~ pcnv + avgsen + ptime86 + qemp86, data = crime1)
+summary(lm_3_5_1)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = narr86 ~ pcnv + ptime86 + qemp86, data = crime1)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -0.7118 -0.4031 -0.2953  0.3452 11.4358 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  0.711772   0.033007  21.565  &lt; 2e-16 ***
+## pcnv        -0.149927   0.040865  -3.669 0.000248 ***
+## ptime86     -0.034420   0.008591  -4.007 6.33e-05 ***
+## qemp86      -0.104113   0.010388 -10.023  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.8416 on 2721 degrees of freedom
+## Multiple R-squared:  0.04132,    Adjusted R-squared:  0.04027 
+## F-statistic:  39.1 on 3 and 2721 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>summary(lm_3_5_2)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = narr86 ~ pcnv + avgsen + ptime86 + qemp86, data = crime1)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -0.9330 -0.4247 -0.2934  0.3506 11.4403 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  0.706756   0.033151  21.319  &lt; 2e-16 ***
+## pcnv        -0.150832   0.040858  -3.692 0.000227 ***
+## avgsen       0.007443   0.004734   1.572 0.115993    
+## ptime86     -0.037391   0.008794  -4.252 2.19e-05 ***
+## qemp86      -0.103341   0.010396  -9.940  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.8414 on 2720 degrees of freedom
+## Multiple R-squared:  0.04219,    Adjusted R-squared:  0.04079 
+## F-statistic: 29.96 on 4 and 2720 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p><strong>Example 3.6</strong></p>
+<pre class="r"><code>data(&quot;wage1&quot;)
+
+lm_3_6 &lt;- lm(lwage ~ educ, data = wage1)
+summary(lm_3_6)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = lwage ~ educ, data = wage1)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -2.21158 -0.36393 -0.07263  0.29712  1.52339 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 0.583773   0.097336   5.998 3.74e-09 ***
+## educ        0.082744   0.007567  10.935  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.4801 on 524 degrees of freedom
+## Multiple R-squared:  0.1858, Adjusted R-squared:  0.1843 
+## F-statistic: 119.6 on 1 and 524 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p><strong>Regression through the origin (no intercept)</strong></p>
+<p>This is achieved by adding <code>-1</code> to the formula of the <code>lm</code> function. But only do this if you have a good reason for that, e.g. the population model goes through the origin.</p>
+<pre class="r"><code>data(&quot;crime1&quot;)
+
+lm_no_intercept &lt;- lm(narr86 ~ pcnv + ptime86 + qemp86 - 1, data = crime1)</code></pre>
+<p><strong>An “alternative” way to obtain slope coefficients</strong></p>
+<p>The textbook (p. 74) mentions an additional way to get slope coefficients: Dividing the sum of the residuals of the regression of x1 on all the other independent variables multiplied by the outcome variable (dep. variable) through the sum of those squared residuals. To express and check this in R should pose no problem since we already know the necessary commands for that:</p>
+<pre class="r"><code>data(&quot;gpa1&quot;)
+
+lm_alt &lt;- lm(colGPA ~ hsGPA + ACT, data = gpa1)
+summary(lm_alt)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = colGPA ~ hsGPA + ACT, data = gpa1)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.85442 -0.24666 -0.02614  0.28127  0.85357 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 1.286328   0.340822   3.774 0.000238 ***
+## hsGPA       0.453456   0.095813   4.733 5.42e-06 ***
+## ACT         0.009426   0.010777   0.875 0.383297    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.3403 on 138 degrees of freedom
+## Multiple R-squared:  0.1764, Adjusted R-squared:  0.1645 
+## F-statistic: 14.78 on 2 and 138 DF,  p-value: 1.526e-06</code></pre>
+<pre class="r"><code>lm_x &lt;- lm(hsGPA ~ ACT, data = gpa1)
+sum(lm_x$residuals * gpa1$colGPA) / sum(lm_x$residuals^2)</code></pre>
+<pre><code>## [1] 0.4534559</code></pre>
+<p>Compare the coefficients on hsGPA and you will find them to be the same.</p>
+<p>Admittedly, this was kind of boring. Let’s see if <a href="/reproduction/wooldridge/wooldridge04">chapter 4 on statistical inference</a> is more exciting.</p>

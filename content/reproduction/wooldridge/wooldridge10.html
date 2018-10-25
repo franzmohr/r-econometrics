@@ -1,0 +1,465 @@
+---
+title: "Chapter 10: Basic Regression Analysis with Time Series Data"
+author: "Franz X. Mohr"
+date: "2018-10-07"
+---
+
+
+
+<pre class="r"><code>library(wooldridge)</code></pre>
+<div id="example-10.1" class="section level3">
+<h3>Example 10.1</h3>
+<pre class="r"><code>data(&quot;phillips&quot;)
+
+lm.10.1 &lt;- lm(inf ~ unem, data = phillips)
+summary(lm.10.1)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = inf ~ unem, data = phillips)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -5.2176 -1.7812 -0.6659  1.1473  8.8795 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)  
+## (Intercept)   1.0536     1.5480   0.681   0.4990  
+## unem          0.5024     0.2656   1.892   0.0639 .
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 2.972 on 54 degrees of freedom
+## Multiple R-squared:  0.06215,    Adjusted R-squared:  0.04479 
+## F-statistic: 3.579 on 1 and 54 DF,  p-value: 0.06389</code></pre>
+</div>
+<div id="example-10.2" class="section level3">
+<h3>Example 10.2</h3>
+<pre class="r"><code>data(&quot;intdef&quot;)
+
+lm.10.2 &lt;- lm(i3 ~ inf + def, data = intdef)
+summary(lm.10.2)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = i3 ~ inf + def, data = intdef)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -3.9948 -1.1694  0.1959  0.9602  4.7224 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  1.73327    0.43197   4.012  0.00019 ***
+## inf          0.60587    0.08213   7.376 1.12e-09 ***
+## def          0.51306    0.11838   4.334 6.57e-05 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.843 on 53 degrees of freedom
+## Multiple R-squared:  0.6021, Adjusted R-squared:  0.5871 
+## F-statistic: 40.09 on 2 and 53 DF,  p-value: 2.483e-11</code></pre>
+</div>
+<div id="example-10.3" class="section level3">
+<h3>Example 10.3</h3>
+<pre class="r"><code>data(&quot;prminwge&quot;)
+
+lm.10.3 &lt;- lm(lprepop ~ lmincov + lusgnp, data = prminwge)
+summary(lm.10.3)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = lprepop ~ lmincov + lusgnp, data = prminwge)
+## 
+## Residuals:
+##       Min        1Q    Median        3Q       Max 
+## -0.117133 -0.036998 -0.005943  0.028182  0.113938 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)  
+## (Intercept) -1.05442    0.76541  -1.378   0.1771  
+## lmincov     -0.15444    0.06490  -2.380   0.0229 *
+## lusgnp      -0.01219    0.08851  -0.138   0.8913  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.0557 on 35 degrees of freedom
+## Multiple R-squared:  0.6605, Adjusted R-squared:  0.6411 
+## F-statistic: 34.04 on 2 and 35 DF,  p-value: 6.17e-09</code></pre>
+</div>
+<div id="example-10.4" class="section level3">
+<h3>Example 10.4</h3>
+<pre class="r"><code>data(&quot;fertil3&quot;)
+
+lm.10.4.1 &lt;- lm(gfr ~ pe + ww2 + pill, data = fertil3)
+summary(lm.10.4.1)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = gfr ~ pe + ww2 + pill, data = fertil3)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -27.0187  -9.6195   0.3393   9.4746  28.0730 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  98.68176    3.20813  30.760  &lt; 2e-16 ***
+## pe            0.08254    0.02965   2.784  0.00694 ** 
+## ww2         -24.23840    7.45825  -3.250  0.00180 ** 
+## pill        -31.59403    4.08107  -7.742 6.46e-11 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 14.69 on 68 degrees of freedom
+## Multiple R-squared:  0.4734, Adjusted R-squared:  0.4502 
+## F-statistic: 20.38 on 3 and 68 DF,  p-value: 1.575e-09</code></pre>
+<pre class="r"><code>lm.10.4.2 &lt;- lm(gfr ~ pe + pe_1 + pe_2 + ww2 + pill, data = fertil3)
+summary(lm.10.4.2)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = gfr ~ pe + pe_1 + pe_2 + ww2 + pill, data = fertil3)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -24.6461  -9.5409  -0.0312   8.3378  29.1295 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  95.87050    3.28196  29.211  &lt; 2e-16 ***
+## pe            0.07267    0.12553   0.579   0.5647    
+## pe_1         -0.00578    0.15566  -0.037   0.9705    
+## pe_2          0.03383    0.12626   0.268   0.7896    
+## ww2         -22.12650   10.73197  -2.062   0.0433 *  
+## pill        -31.30499    3.98156  -7.862 5.63e-11 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 14.27 on 64 degrees of freedom
+##   (2 observations deleted due to missingness)
+## Multiple R-squared:  0.4986, Adjusted R-squared:  0.4594 
+## F-statistic: 12.73 on 5 and 64 DF,  p-value: 1.353e-08</code></pre>
+<pre class="r"><code># Joint significance of pe values
+lm.10.4.2res &lt;- lm(gfr ~ ww2 + pill, data = fertil3, subset = (is.na(pe_2) == FALSE))
+anova(lm.10.4.2, lm.10.4.2res)</code></pre>
+<pre><code>## Analysis of Variance Table
+## 
+## Model 1: gfr ~ pe + pe_1 + pe_2 + ww2 + pill
+## Model 2: gfr ~ ww2 + pill
+##   Res.Df   RSS Df Sum of Sq     F  Pr(&gt;F)  
+## 1     64 13033                             
+## 2     67 15460 -3   -2427.1 3.973 0.01165 *
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code># Joint significance of lagged pe values
+lm.10.4.2res2 &lt;- lm(gfr ~ pe + ww2 + pill, data = fertil3, subset = (is.na(pe_2) == FALSE))
+anova(lm.10.4.2, lm.10.4.2res2)</code></pre>
+<pre><code>## Analysis of Variance Table
+## 
+## Model 1: gfr ~ pe + pe_1 + pe_2 + ww2 + pill
+## Model 2: gfr ~ pe + ww2 + pill
+##   Res.Df   RSS Df Sum of Sq      F Pr(&gt;F)
+## 1     64 13033                           
+## 2     66 13054 -2   -21.761 0.0534  0.948</code></pre>
+<pre class="r"><code># Standard error of the long run propensity
+summary(lm(gfr ~ pe + I(pe_1 - pe) + I(pe_2 - pe_1) + ww2 + pill, data = fertil3))</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = gfr ~ pe + I(pe_1 - pe) + I(pe_2 - pe_1) + ww2 + 
+##     pill, data = fertil3)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -24.6461  -9.5409  -0.0312   8.3378  29.1295 
+## 
+## Coefficients:
+##                 Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)     95.87050    3.28196  29.211  &lt; 2e-16 ***
+## pe               0.10072    0.02980   3.380  0.00124 ** 
+## I(pe_1 - pe)     0.02805    0.11890   0.236  0.81427    
+## I(pe_2 - pe_1)   0.03383    0.12626   0.268  0.78962    
+## ww2            -22.12650   10.73197  -2.062  0.04330 *  
+## pill           -31.30499    3.98156  -7.862 5.63e-11 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 14.27 on 64 degrees of freedom
+##   (2 observations deleted due to missingness)
+## Multiple R-squared:  0.4986, Adjusted R-squared:  0.4594 
+## F-statistic: 12.73 on 5 and 64 DF,  p-value: 1.353e-08</code></pre>
+</div>
+<div id="example-10.5" class="section level3">
+<h3>Example 10.5</h3>
+<pre class="r"><code>data(&quot;barium&quot;)
+
+lm.10.5 &lt;- lm(lchnimp ~ lchempi + lgas + lrtwex + befile6 + affile6 + afdec6, data = barium)
+summary(lm.10.5)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = lchnimp ~ lchempi + lgas + lrtwex + befile6 + affile6 + 
+##     afdec6, data = barium)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -2.03356 -0.39080  0.03048  0.40248  1.51719 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -17.80300   21.04537  -0.846   0.3992    
+## lchempi       3.11719    0.47920   6.505 1.72e-09 ***
+## lgas          0.19635    0.90662   0.217   0.8289    
+## lrtwex        0.98302    0.40015   2.457   0.0154 *  
+## befile6       0.05957    0.26097   0.228   0.8198    
+## affile6      -0.03241    0.26430  -0.123   0.9026    
+## afdec6       -0.56524    0.28584  -1.978   0.0502 .  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.5974 on 124 degrees of freedom
+## Multiple R-squared:  0.3049, Adjusted R-squared:  0.2712 
+## F-statistic: 9.064 on 6 and 124 DF,  p-value: 3.255e-08</code></pre>
+</div>
+<div id="example-10.6" class="section level3">
+<h3>Example 10.6</h3>
+<pre class="r"><code>data(&quot;fair&quot;)
+
+lm.10.6 &lt;- lm(demvote ~ partyWH + incum + I(partyWH*gnews) + I(partyWH*inf), data = fair)
+summary(lm.10.6)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = demvote ~ partyWH + incum + I(partyWH * gnews) + 
+##     I(partyWH * inf), data = fair)
+## 
+## Residuals:
+##       Min        1Q    Median        3Q       Max 
+## -0.059843 -0.035554 -0.001095  0.015049  0.104859 
+## 
+## Coefficients:
+##                     Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)         0.484219   0.011472  42.210   &lt;2e-16 ***
+## partyWH            -0.032380   0.037550  -0.862   0.4013    
+## incum               0.056369   0.023017   2.449   0.0262 *  
+## I(partyWH * gnews)  0.009666   0.003807   2.539   0.0219 *  
+## I(partyWH * inf)   -0.008338   0.003121  -2.672   0.0167 *  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.049 on 16 degrees of freedom
+## Multiple R-squared:  0.6588, Adjusted R-squared:  0.5735 
+## F-statistic: 7.725 on 4 and 16 DF,  p-value: 0.001151</code></pre>
+<p>Slightly different results since the book uses 20 observations to 1992. But the results are the same when we drop the last observation.</p>
+<pre class="r"><code>lm.10.6 &lt;- lm(demvote ~ partyWH + incum + I(partyWH * gnews) + I(partyWH * inf), data = fair, subset = (year != 1996))
+summary(lm.10.6)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = demvote ~ partyWH + incum + I(partyWH * gnews) + 
+##     I(partyWH * inf), data = fair, subset = (year != 1996))
+## 
+## Residuals:
+##       Min        1Q    Median        3Q       Max 
+## -0.059643 -0.036072 -0.005397  0.018386  0.102723 
+## 
+## Coefficients:
+##                     Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)         0.481062   0.012263  39.228   &lt;2e-16 ***
+## partyWH            -0.043475   0.040459  -1.075   0.2996    
+## incum               0.054390   0.023417   2.323   0.0347 *  
+## I(partyWH * gnews)  0.010847   0.004127   2.628   0.0190 *  
+## I(partyWH * inf)   -0.007702   0.003257  -2.365   0.0319 *  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.04957 on 15 degrees of freedom
+## Multiple R-squared:  0.6629, Adjusted R-squared:  0.573 
+## F-statistic: 7.374 on 4 and 15 DF,  p-value: 0.001716</code></pre>
+</div>
+<div id="example-10.7" class="section level3">
+<h3>Example 10.7</h3>
+<pre class="r"><code>data(&quot;hseinv&quot;)
+
+lm.10.7.1 &lt;- lm(linvpc ~ lprice, data = hseinv)
+summary(lm.10.7.1)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = linvpc ~ lprice, data = hseinv)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.45991 -0.08694 -0.01264  0.08651  0.34672 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -0.55023    0.04303 -12.788 1.03e-15 ***
+## lprice       1.24094    0.38242   3.245  0.00238 ** 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.1554 on 40 degrees of freedom
+## Multiple R-squared:  0.2084, Adjusted R-squared:  0.1886 
+## F-statistic: 10.53 on 1 and 40 DF,  p-value: 0.002376</code></pre>
+<p>Add a time trend</p>
+<pre class="r"><code>lm.10.7.2 &lt;- lm(linvpc ~ lprice + t, data = hseinv)
+summary(lm.10.7.2)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = linvpc ~ lprice + t, data = hseinv)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.45092 -0.08583 -0.01734  0.08517  0.26024 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -0.913060   0.135613  -6.733    5e-08 ***
+## lprice      -0.380961   0.678835  -0.561  0.57787    
+## t            0.009829   0.003512   2.798  0.00794 ** 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.1436 on 39 degrees of freedom
+## Multiple R-squared:  0.3408, Adjusted R-squared:  0.307 
+## F-statistic: 10.08 on 2 and 39 DF,  p-value: 0.000296</code></pre>
+</div>
+<div id="example-10.8" class="section level3">
+<h3>Example 10.8</h3>
+<pre class="r"><code>data(&quot;fertil3&quot;)
+
+lm.10.8.1 &lt;- lm(gfr ~ pe + ww2 + pill + t, data = fertil3)
+summary(lm.10.8.1)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = gfr ~ pe + ww2 + pill + t, data = fertil3)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -24.6418  -8.4574   0.2445   9.3819  17.2837 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 111.76943    3.35777  33.287  &lt; 2e-16 ***
+## pe            0.27888    0.04002   6.968 1.72e-09 ***
+## ww2         -35.59228    6.29738  -5.652 3.53e-07 ***
+## pill          0.99745    6.26163   0.159    0.874    
+## t            -1.14987    0.18790  -6.119 5.49e-08 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 11.85 on 67 degrees of freedom
+## Multiple R-squared:  0.6622, Adjusted R-squared:  0.642 
+## F-statistic: 32.84 on 4 and 67 DF,  p-value: 3.756e-15</code></pre>
+<pre class="r"><code>lm.10.8.2 &lt;- lm(gfr ~ pe + ww2 + pill + t + tsq, data = fertil3)
+summary(lm.10.8.2)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = gfr ~ pe + ww2 + pill + t + tsq, data = fertil3)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -25.9791  -6.9775  -0.2713   7.7975  19.9861 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 124.091935   4.360738  28.457  &lt; 2e-16 ***
+## pe            0.347813   0.040260   8.639 1.91e-12 ***
+## ww2         -35.880277   5.707921  -6.286 2.95e-08 ***
+## pill        -10.119723   6.336094  -1.597 0.115008    
+## t            -2.531426   0.389386  -6.501 1.24e-08 ***
+## tsq           0.019613   0.004971   3.945 0.000196 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 10.74 on 66 degrees of freedom
+## Multiple R-squared:  0.7267, Adjusted R-squared:  0.706 
+## F-statistic: 35.09 on 5 and 66 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+<div id="example-10.9" class="section level3">
+<h3>Example 10.9</h3>
+<pre class="r"><code>data(&quot;prminwge&quot;)
+
+lm.10.9 &lt;- lm(lprepop ~ lmincov + lusgnp + t, data = prminwge)
+summary(lm.10.9)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = lprepop ~ lmincov + lusgnp + t, data = prminwge)
+## 
+## Residuals:
+##       Min        1Q    Median        3Q       Max 
+## -0.049493 -0.024425 -0.009596  0.017055  0.086354 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -8.696298   1.295764  -6.711 1.04e-07 ***
+## lmincov     -0.168695   0.044246  -3.813 0.000552 ***
+## lusgnp       1.057351   0.176637   5.986 8.98e-07 ***
+## t           -0.032354   0.005023  -6.442 2.31e-07 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.03793 on 34 degrees of freedom
+## Multiple R-squared:  0.8471, Adjusted R-squared:  0.8336 
+## F-statistic: 62.78 on 3 and 34 DF,  p-value: 6.007e-14</code></pre>
+<pre class="r"><code># Obtain results by detrending
+lprepop.detrend &lt;- lm(lprepop ~ t, data = prminwge)$resid
+lmincov.detrend &lt;- lm(lmincov ~ t, data = prminwge)$resid
+lusgnp.detrend &lt;- lm(lusgnp ~ t, data = prminwge)$resid
+
+summary(lm(lprepop.detrend ~ lmincov.detrend + lusgnp.detrend - 1))</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = lprepop.detrend ~ lmincov.detrend + lusgnp.detrend - 
+##     1)
+## 
+## Residuals:
+##       Min        1Q    Median        3Q       Max 
+## -0.049493 -0.024425 -0.009596  0.017055  0.086354 
+## 
+## Coefficients:
+##                 Estimate Std. Error t value Pr(&gt;|t|)    
+## lmincov.detrend  -0.1687     0.0430  -3.923 0.000377 ***
+## lusgnp.detrend    1.0574     0.1717   6.160 4.26e-07 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.03686 on 36 degrees of freedom
+## Multiple R-squared:  0.5327, Adjusted R-squared:  0.5067 
+## F-statistic: 20.52 on 2 and 36 DF,  p-value: 1.129e-06</code></pre>
+</div>
+<div id="example-10.10" class="section level3">
+<h3>Example 10.10</h3>
+<pre class="r"><code>data(&quot;hseinv&quot;)
+
+dtr.linvpc &lt;- lm(linvpc ~ t, data = hseinv)$resid
+summary(lm(dtr.linvpc ~ lprice + t, data = hseinv))</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = dtr.linvpc ~ lprice + t, data = hseinv)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.45092 -0.08583 -0.01734  0.08517  0.26024 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)
+## (Intercept) -0.071768   0.135613  -0.529    0.600
+## lprice      -0.380961   0.678835  -0.561    0.578
+## t            0.001683   0.003512   0.479    0.635
+## 
+## Residual standard error: 0.1436 on 39 degrees of freedom
+## Multiple R-squared:  0.008011,   Adjusted R-squared:  -0.04286 
+## F-statistic: 0.1575 on 2 and 39 DF,  p-value: 0.8548</code></pre>
+</div>
+<div id="example-10.11" class="section level3">
+<h3>Example 10.11</h3>
+<pre class="r"><code>data(&quot;barium&quot;)
+
+lm.10.11 &lt;- lm(lchnimp ~ lchempi + lgas + lrtwex + befile6 + affile6 + afdec6 +
+ feb + mar + apr + may + jun + jul + aug + sep + oct + nov + dec, data = barium)
+lm.10.11res &lt;- lm(lchnimp ~ lchempi + lgas + lrtwex + befile6 + affile6 + afdec6, data = barium)
+
+anova(lm.10.11, lm.10.11res)</code></pre>
+<pre><code>## Analysis of Variance Table
+## 
+## Model 1: lchnimp ~ lchempi + lgas + lrtwex + befile6 + affile6 + afdec6 + 
+##     feb + mar + apr + may + jun + jul + aug + sep + oct + nov + 
+##     dec
+## Model 2: lchnimp ~ lchempi + lgas + lrtwex + befile6 + affile6 + afdec6
+##   Res.Df    RSS  Df Sum of Sq      F Pr(&gt;F)
+## 1    113 40.844                            
+## 2    124 44.247 -11   -3.4032 0.8559 0.5852</code></pre>
+</div>

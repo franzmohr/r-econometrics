@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>r-econometrics</title>
+    <link>https://www.r-econometrics.com/</link>
+    <description>Recent content on r-econometrics</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 08 Oct 2018 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://www.r-econometrics.com/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Microeconometric Topics</title>
+      <link>https://www.r-econometrics.com/microemetricsintro/</link>
+      <pubDate>Mon, 08 Oct 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/microemetricsintro/</guid>
+      <description>This section is intended to get you through your undergraduate (and maybe graduate) studies in econometrics. It is based on examples from Wooldridge, J.M. (2013). Introductory econometrics: A modern approach (5thed.). I have also reproduced the examples of the main text, which you can find in the reproduction section of the site. Alternatively, Heiss, F. (2016) Using R for Introductory Econometrics is a standalone textbook, which covers the same topics as Wooldridge (2013) and provides an introduction to R as well.</description>
+    </item>
+    
+    <item>
+      <title>An Introduction to Ordinary Least Squares (OLS) in R</title>
+      <link>https://www.r-econometrics.com/microemetrics/ols/</link>
+      <pubDate>Sun, 07 Oct 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/microemetrics/ols/</guid>
+      <description>Formulated at the beginning of the 19th century by Legendre and Gauss the method of least squares is a standard tool in econometrics to assess the relationships between different variables. This site gives a short introduction to the basic idea behind the method and describes how to estimate simple linear models with OLS in R.
+The method of least squares To understand the basic idea of the method of least squares, imagine you were an astronomer at the beginning of the 19th century, who faced the challenge of combining a series of observations, which were made with imperfect instruments and at different points in time.</description>
+    </item>
+    
+    <item>
+      <title>Chapter 10: Basic Regression Analysis with Time Series Data</title>
+      <link>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge10/</link>
+      <pubDate>Sun, 07 Oct 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge10/</guid>
+      <description>library(wooldridge) Example 10.1 data(&amp;quot;phillips&amp;quot;) lm.10.1 &amp;lt;- lm(inf ~ unem, data = phillips) summary(lm.10.1) ## ## Call: ## lm(formula = inf ~ unem, data = phillips) ## ## Residuals: ## Min 1Q Median 3Q Max ## -5.2176 -1.7812 -0.6659 1.1473 8.8795 ## ## Coefficients: ## Estimate Std. Error t value Pr(&amp;gt;|t|) ## (Intercept) 1.0536 1.5480 0.681 0.4990 ## unem 0.5024 0.2656 1.892 0.0639 . ## --- ## Signif. codes: 0 &amp;#39;***&amp;#39; 0.</description>
+    </item>
+    
+    <item>
+      <title>Chapter 11: Further Issues in Using OLS with Time Series Data</title>
+      <link>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge11/</link>
+      <pubDate>Sun, 07 Oct 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge11/</guid>
+      <description>library(wooldridge) Example 11.4 For this regression the lagged values of return are already contained in the dataset. Thus, we do not have to calculated them ourselves and can simply run the regression.
+data(&amp;quot;nyse&amp;quot;) lm.11.4 &amp;lt;- lm(return ~ return_1, data = nyse) summary(lm.11.4) ## ## Call: ## lm(formula = return ~ return_1, data = nyse) ## ## Residuals: ## Min 1Q Median 3Q Max ## -15.261 -1.302 0.098 1.316 8.065 ## ## Coefficients: ## Estimate Std.</description>
+    </item>
+    
+    <item>
+      <title>Chapter 16: Simultaneous Equations Models</title>
+      <link>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge16/</link>
+      <pubDate>Sun, 07 Oct 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge16/</guid>
+      <description>library(AER) library(wooldridge) Example 16.5 data(&amp;quot;mroz&amp;quot;) s.iv.1 &amp;lt;- summary(iv.1 &amp;lt;- ivreg(hours ~ lwage + educ + age + kidslt6 + nwifeinc | educ + age + kidslt6 + nwifeinc + exper + expersq, data = mroz)) s.iv.1 ## ## Call: ## ivreg(formula = hours ~ lwage + educ + age + kidslt6 + nwifeinc | ## educ + age + kidslt6 + nwifeinc + exper + expersq, data = mroz) ## ## Residuals: ## Min 1Q Median 3Q Max ## -4570.</description>
+    </item>
+    
+    <item>
+      <title>Chapter 17: Limited Dependent Variable Models and Sample Selection Corrections</title>
+      <link>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge17/</link>
+      <pubDate>Sun, 07 Oct 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge17/</guid>
+      <description>Example 17.1 First, look at the linear model.
+data(&amp;quot;mroz&amp;quot;) lm.17.1 &amp;lt;- lm(inlf ~ nwifeinc + educ + exper + expersq + age + kidslt6 + kidsge6, data = mroz) summary(lm.17.1) ## ## Call: ## lm(formula = inlf ~ nwifeinc + educ + exper + expersq + age + ## kidslt6 + kidsge6, data = mroz) ## ## Residuals: ## Min 1Q Median 3Q Max ## -0.93432 -0.37526 0.08833 0.34404 0.99417 ## ## Coefficients: ## Estimate Std.</description>
+    </item>
+    
+    <item>
+      <title>Chapter12: Serial Correlation and Heteroskedasticity in Time Series Regressions</title>
+      <link>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge12/</link>
+      <pubDate>Sun, 07 Oct 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge12/</guid>
+      <description>library(lmtest) library(sandwich) library(tseries) library(wooldridge) Example 12.1 data(&amp;quot;phillips&amp;quot;) Static Phillips curve
+lm.12.1.1 &amp;lt;- lm(inf ~ unem, data = phillips) res.static &amp;lt;- lm.12.1.1$res res.static_1 &amp;lt;- c(NA, lm.12.1.1$res[-(length(res.static))]) lm.12.1.1.test &amp;lt;- lm(res.static ~ res.static_1) summary(lm.12.1.1.test) ## ## Call: ## lm(formula = res.static ~ res.static_1) ## ## Residuals: ## Min 1Q Median 3Q Max ## -8.047 -1.104 -0.248 1.028 6.684 ## ## Coefficients: ## Estimate Std. Error t value Pr(&amp;gt;|t|) ## (Intercept) -0.1118 0.3180 -0.352 0.</description>
+    </item>
+    
+    <item>
+      <title>Reproduction Projects</title>
+      <link>https://www.r-econometrics.com/reproductionintro/</link>
+      <pubDate>Sun, 07 Oct 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/reproductionintro/</guid>
+      <description>Cincera, M. (1997). Patents, R&amp;amp;D, and technological spillovers at the firm level. 12, 265-280.
+Sheperd, B. (2016) The gravity model of international trade: A user guide.
+Wooldridge, J. M. (2013) Introductory econometrics.</description>
+    </item>
+    
+    <item>
+      <title>Chapter 2: Simple OLS</title>
+      <link>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge02/</link>
+      <pubDate>Thu, 04 Oct 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge02/</guid>
+      <description>In R the function for basic linear regression models is lm, which is short for linear model. Its first argument is a formula of the regression model, which has the form y ~ a. The tilde between y and a indicates that y is the dependent variable and a is the explanatory variable. It is also possible to add a further explanatory variable - for example b - to the regression by adding a plus sign followed by the the name of the additional variable to the formula.</description>
+    </item>
+    
+    <item>
+      <title>Chapter 5: OLS Asymptotics</title>
+      <link>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge05/</link>
+      <pubDate>Thu, 04 Oct 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge05/</guid>
+      <description>Make a histogram of the variable “prate”.
+data(&amp;quot;k401k&amp;quot;) hist(k401k$prate) Example 5.2
+data(&amp;quot;bwght&amp;quot;) lm.1 &amp;lt;- lm(lbwght ~ cigs + lfaminc, data = bwght[1:694,]) s.1 &amp;lt;- summary(lm.1) lm.2 &amp;lt;- lm(lbwght ~ cigs + lfaminc, data = bwght) s.2 &amp;lt;- summary(lm.2) s.2$coefficients[2, 2] / s.1$coefficients[2, 2] ## [1] 0.6443341 lm.3 &amp;lt;- lm(cigs ~ lfaminc, data = bwght[1:694,]) s.3 &amp;lt;- summary(lm.3) sigma.j &amp;lt;- s.3$coefficients[2, 2] sigma &amp;lt;- s.3$sigma r2 &amp;lt;- s.3$r.squared sigma / (sqrt(1388) * sigma.</description>
+    </item>
+    
+    <item>
+      <title>Wooldridge (2013): Introductory Econometrics</title>
+      <link>https://www.r-econometrics.com/reproduction/wooldridge/wooldridgeintro/</link>
+      <pubDate>Thu, 04 Oct 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/reproduction/wooldridge/wooldridgeintro/</guid>
+      <description>This section is based on Wooldridge, J.M. (2013). Introductory econometrics: A modern approach (5thed.). The following links contain examples in the main text of the book and use R to estimate the models. Alternatively, Heiss, F. (2016) Using R for Introductory Econometrics is a standalone textbook, which covers the same topics as Wooldridge (2013) and provides an introduction to R as well.
+The data sets are from the wooldridge package, which is a collection of all data sets used in the Wooldridge textbook.</description>
+    </item>
+    
+    <item>
+      <title>An Introduction to Vector Autoregression (VAR)</title>
+      <link>https://www.r-econometrics.com/timeseries/varintro/</link>
+      <pubDate>Fri, 31 Aug 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/timeseries/varintro/</guid>
+      <description>Since the seminal paper of Sims (1980) vector autoregressive models have become a key instrument in macroeconomic research. This post presents the basic concept of VAR analysis and guides through the estimation procedure of a simple model. When I started my undergraduate program in economics I occasionally encountered the abbreviation VAR in some macro papers. I was fascinated by those waves in the boxes titled impulse responses and wondered how difficult it would be to do such reseach on my own.</description>
+    </item>
+    
+    <item>
+      <title>The Structure of R</title>
+      <link>https://www.r-econometrics.com/rbasics/rstructure/</link>
+      <pubDate>Fri, 20 Jul 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/rbasics/rstructure/</guid>
+      <description>R can be comprehended as a language that provides the basis for a system of code chunks, which have been developed by many people across the globe, who wanted to share their work. These code chunks are called packages. And each of those packages usually consist of at least one function.1 This structure is presented in the following graph. Beside a schematic description of a package and its functions in the upper part of the graph it also contains some real world examples using the packages ggplot2 and dplyr.</description>
+    </item>
+    
+    <item>
+      <title>Links</title>
+      <link>https://www.r-econometrics.com/links/</link>
+      <pubDate>Sun, 03 Jun 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/links/</guid>
+      <description>Resources for learning R R-Project
+RStudio
+DataCamp: Courses on data analysis with R
+Selva Prabhakaran’s r-statistics.co also provides very good intros to R
+Nice intro to R basics packed into exercises
+OnePageR: Compact intro to many methods of data science
+Codeschool: R-Tutorials
+Endmemo: R-Tutorials
+Wikibook on R Programming
+ Data Financial portfolio and benchmark data provided by Kenneth R. French
+Financial data and benchmarks
+Quandl: Data source
+UC Irvine Machine Learning Repository: Collection of interesting data</description>
+    </item>
+    
+    <item>
+      <title>Reproduction: Cincera, M. (1997). Patents, R&amp;D, and technological spillovers at the firm level.</title>
+      <link>https://www.r-econometrics.com/reproduction/1997_cincera_patents/</link>
+      <pubDate>Tue, 08 May 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/reproduction/1997_cincera_patents/</guid>
+      <description>Get the data The data set can be downloaded from the Journal of Applied Econometrics Data Archive.
+download.file(&amp;quot;http://qed.econ.queensu.ca/jae/1997-v12.3/cincera/mc-data.zip&amp;quot;, destfile = &amp;quot;1997_cincera_data.zip&amp;quot;) unzip(&amp;quot;1997_cincera_data.zip&amp;quot;) data &amp;lt;- read.delim(&amp;quot;data.mc&amp;quot;, header = FALSE) names(data) &amp;lt;- c(&amp;quot;fi&amp;quot;, &amp;quot;s&amp;quot;, &amp;quot;g&amp;quot;, &amp;quot;p83&amp;quot;, &amp;quot;p84&amp;quot;, &amp;quot;p85&amp;quot;, &amp;quot;p86&amp;quot;, &amp;quot;p87&amp;quot;, &amp;quot;p88&amp;quot;, &amp;quot;p89&amp;quot;, &amp;quot;p90&amp;quot;, &amp;quot;p91&amp;quot;, &amp;quot;lr83&amp;quot;, &amp;quot;lr84&amp;quot;, &amp;quot;lr85&amp;quot;, &amp;quot;lr86&amp;quot;, &amp;quot;lr87&amp;quot;, &amp;quot;lr88&amp;quot;, &amp;quot;lr89&amp;quot;, &amp;quot;lr90&amp;quot;, &amp;quot;lr91&amp;quot;, &amp;quot;ls83&amp;quot;, &amp;quot;ls84&amp;quot;, &amp;quot;ls85&amp;quot;, &amp;quot;ls86&amp;quot;, &amp;quot;ls87&amp;quot;, &amp;quot;ls88&amp;quot;, &amp;quot;ls89&amp;quot;, &amp;quot;ls90&amp;quot;, &amp;quot;ls91&amp;quot;) p &amp;lt;- matrix(as.matrix(data[, c(&amp;quot;p83&amp;quot;, &amp;quot;p84&amp;quot;, &amp;quot;p85&amp;quot;, &amp;quot;p86&amp;quot;, &amp;quot;p87&amp;quot;, &amp;quot;p88&amp;quot;, &amp;quot;p89&amp;quot;, &amp;quot;p90&amp;quot;, &amp;quot;p91&amp;quot;)])) k &amp;lt;- matrix(as.</description>
+    </item>
+    
+    <item>
+      <title>Time Series Topics</title>
+      <link>https://www.r-econometrics.com/timeseriesintro/</link>
+      <pubDate>Tue, 27 Mar 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/timeseriesintro/</guid>
+      <description>Work in progress (March 2018). I will try to update this page over the next few months.
+This section is intended to provide an overview of the relevant issues in (macro)economic time series analysis. Again the standard disclaimer: This site does not replace a good textbook, but it should help you to get a grasp of the basic concepts more quickly than if you learned it on your own.
+The intended structure of this site is:</description>
+    </item>
+    
+    <item>
+      <title>Chapter 14: Advanced Panel Data Methods</title>
+      <link>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge14/</link>
+      <pubDate>Tue, 06 Feb 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge14/</guid>
+      <description>library(wooldridge) In order to estimate panel data models, I use the plm function from the plm package. The intuition behind its structure is similar to the ordinary linear model, except that it allows you to specify the panel’s group and time variables and the effects model.
+Example 14.1 Similar to the lm function, you can specify your model’s equation and the sample. Since you want to use panel data methods for you estimation, you also have to specify which variables in your sample contain the information used to distinguish different groups and which variable contains the time measurement.</description>
+    </item>
+    
+    <item>
+      <title>Chapter 15: Instrumental Variables Estimation and Two Stage Least Squares</title>
+      <link>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge15/</link>
+      <pubDate>Tue, 06 Feb 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge15/</guid>
+      <description>library(AER) library(wooldridge) Example 15.1 data(&amp;quot;mroz&amp;quot;) OLS
+s.lm.1 &amp;lt;- summary(lm(lwage ~ educ, data = mroz)) s.lm.1 ## ## Call: ## lm(formula = lwage ~ educ, data = mroz) ## ## Residuals: ## Min 1Q Median 3Q Max ## -3.10256 -0.31473 0.06434 0.40081 2.10029 ## ## Coefficients: ## Estimate Std. Error t value Pr(&amp;gt;|t|) ## (Intercept) -0.1852 0.1852 -1.000 0.318 ## educ 0.1086 0.0144 7.545 2.76e-13 *** ## --- ## Signif. codes: 0 &amp;#39;***&amp;#39; 0.</description>
+    </item>
+    
+    <item>
+      <title>Chapter13: Simple Panel Data Methods</title>
+      <link>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge13/</link>
+      <pubDate>Mon, 05 Feb 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge13/</guid>
+      <description>library(wooldridge) Example 13.1 data(&amp;quot;fertil1&amp;quot;) s.lm.1 &amp;lt;- summary(lm.1 &amp;lt;- lm(kids ~ educ + age + agesq + black + east + northcen + west + farm + othrural + town + smcity + y74 + y76 + y78 + y80 + y82 + y84, data = fertil1)) s.lm.1 ## ## Call: ## lm(formula = kids ~ educ + age + agesq + black + east + northcen + ## west + farm + othrural + town + smcity + y74 + y76 + y78 + ## y80 + y82 + y84, data = fertil1) ## ## Residuals: ## Min 1Q Median 3Q Max ## -3.</description>
+    </item>
+    
+    <item>
+      <title>Chapter 3: Multiple Regression Analysis</title>
+      <link>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge03/</link>
+      <pubDate>Sun, 04 Feb 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge03/</guid>
+      <description>Below you find the script for all examples in chapter 3 of Wooldridge (2013). The only difference to the last chapter is how to use multiple independent variables in the lm function. This is easily achieved by separating each exogenous variable that should enter the model with a plus sign, e.g. lm(colGPA ~ hsGPA + ACT).
+The other commands that appear new are quite helpful and you should take a minute to think about them:</description>
+    </item>
+    
+    <item>
+      <title>Chapter 6: Further Issues</title>
+      <link>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge06/</link>
+      <pubDate>Sun, 04 Feb 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge06/</guid>
+      <description>Chapter 6 in Wooldridge (2013) deals with some more issues that might have an impact on your estimates. Among these are a change in the scale of your variables, so-called beta-factors and the interpretation of variables that appear together with their squared values, i.e. interaction terms.
+Before you start, set your working directory, load the foreign library and download the data we are going to use in this chapter.
+library(QuantPsyc) library(wooldridge) The impact of scales on the estimated coefficients</description>
+    </item>
+    
+    <item>
+      <title>Chapter 7: Multiple Regression Analysis with Qualitative Information</title>
+      <link>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge07/</link>
+      <pubDate>Sun, 04 Feb 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge07/</guid>
+      <description>library(wooldridge) Estimating dummy variables that reflect qualitative information works quite the same way in R as it does with quantitative variables. You just add it as an independent variable into the formula of the model.
+# Example 7.1 data(&amp;quot;wage1&amp;quot;) lm.7.1.1 &amp;lt;- lm(wage ~ female + educ + exper + tenure, data = wage1) summary(lm.7.1.1) ## ## Call: ## lm(formula = wage ~ female + educ + exper + tenure, data = wage1) ## ## Residuals: ## Min 1Q Median 3Q Max ## -7.</description>
+    </item>
+    
+    <item>
+      <title>Chapter 9: More on Specification and Data Issues</title>
+      <link>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge09/</link>
+      <pubDate>Sun, 04 Feb 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge09/</guid>
+      <description>library(wooldridge) Example 9.1 data(&amp;quot;crime1&amp;quot;) lm.9.1.1 &amp;lt;- lm(narr86 ~ pcnv + avgsen + tottime + ptime86 + qemp86 + inc86 + black + hispan, data = crime1) summary(lm.9.1.1) ## ## Call: ## lm(formula = narr86 ~ pcnv + avgsen + tottime + ptime86 + qemp86 + ## inc86 + black + hispan, data = crime1) ## ## Residuals: ## Min 1Q Median 3Q Max ## -1.0108 -0.4518 -0.2392 0.2707 11.5284 ## ## Coefficients: ## Estimate Std.</description>
+    </item>
+    
+    <item>
+      <title>Graphics with ggplot2</title>
+      <link>https://www.r-econometrics.com/rbasics/ggplotintro/</link>
+      <pubDate>Sun, 04 Feb 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/rbasics/ggplotintro/</guid>
+      <description>A major challenge in data analysis is to summarise and present data with informative graphs. The ggplot2 package was specifically designed to help with this task. Since it is a very powerful and well documented package1, this introduction will only focus on its basic syntax, so that the user gets a better understanding of how to read the supporting material on the internet.
+ggplot graphs are built with some kind of blocks, which usually start with the function ggplot.</description>
+    </item>
+    
+    <item>
+      <title>Installing R and RStudio</title>
+      <link>https://www.r-econometrics.com/rbasics/installation/</link>
+      <pubDate>Sun, 04 Feb 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/rbasics/installation/</guid>
+      <description>For this introduction I recommend to install two software packages on your system:
+ R: The software, which does all the calculations. RStudio: The working environment, where all the code will developed.  Note that the instructions of this section were written for a standard installation on a private computer. If you work on a corporate machine, the installation could be different due to different IT requirements of your company.</description>
+    </item>
+    
+    <item>
+      <title>Preparing Your Workplace for an Analysis</title>
+      <link>https://www.r-econometrics.com/rbasics/beforestart/</link>
+      <pubDate>Sun, 04 Feb 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/rbasics/beforestart/</guid>
+      <description>Create a working directory Usually, people want to keep the folder structure on their computers tidy, so that they and their co-workers understand, which documents and data were used for a particular project – even if that project was finished months ago. This should also be the case when you work with R. Therefore, I recommend to create a new folder for every new project, which becomes the so-called working directory.</description>
+    </item>
+    
+    <item>
+      <title>R(eal) Basics</title>
+      <link>https://www.r-econometrics.com/rbasicsintro/</link>
+      <pubDate>Sun, 04 Feb 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/rbasicsintro/</guid>
+      <description>This section should help you to
+ get R and RStudio started on your computer understand the structure of the program prepare your workspace for an analysis [import data and get help] [manipulate data with the dplyr package] create graphics with the ggplot2 package.  Recently, I have finished the first version of a below 30 pages introduction to R. It uses an exemplary workflow to explain some basics of the language and the application of the packages dplyr, ggplot2 and openxlsx.</description>
+    </item>
+    
+    <item>
+      <title>Statistical Inference</title>
+      <link>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge04/</link>
+      <pubDate>Sun, 04 Feb 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge04/</guid>
+      <description>Before we start, let’s clear our memory, set the working directory and load the wooldridge data package.
+rm(list = ls()) setwd(&amp;quot;C:/path/to/the/working/directory&amp;quot;) library(wooldridge) data(wage1) lm.1 &amp;lt;- lm(lwage ~ educ + exper + tenure, data = wage1) s.1 &amp;lt;- summary(lm.1) s.1 ## ## Call: ## lm(formula = lwage ~ educ + exper + tenure, data = wage1) ## ## Residuals: ## Min 1Q Median 3Q Max ## -2.05802 -0.29645 -0.03265 0.28788 1.42809 ## ## Coefficients: ## Estimate Std.</description>
+    </item>
+    
+    <item>
+      <title>Reproduction: Sheperd, B. (2016). The gravity model of international trade: A user guide.</title>
+      <link>https://www.r-econometrics.com/reproduction/2016_sheperd_gravity/</link>
+      <pubDate>Tue, 30 Jan 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/reproduction/2016_sheperd_gravity/</guid>
+      <description>The updated paper and dataset can be downloaded from UNESCAP.
+Load libraries and read data library(AER) library(dplyr) library(foreign) library(ggplot2) library(lmtest) library(multiwayvcov) library(sampleSelection) data &amp;lt;- read.dta(&amp;quot;servicesdataset_2016.dta&amp;quot;)  Correlations Table 1
+data &amp;lt;- data %&amp;gt;% mutate(ln_trade = log(trade), ln_distance = log(dist), ln_gdp_exp = log(gdp_exp), ln_gdp_imp = log(gdp_imp)) cor.data &amp;lt;- data %&amp;gt;% filter(sector == &amp;quot;SER&amp;quot;) %&amp;gt;% select(ln_trade, ln_gdp_exp, ln_gdp_imp, ln_distance) %&amp;gt;% na.omit %&amp;gt;% filter(ln_trade &amp;gt; -Inf) round(cor(cor.data), 4) ## ln_trade ln_gdp_exp ln_gdp_imp ln_distance ## ln_trade 1.</description>
+    </item>
+    
+    <item>
+      <title>About and Disclaimer</title>
+      <link>https://www.r-econometrics.com/about/</link>
+      <pubDate>Mon, 15 Jan 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/about/</guid>
+      <description>My name is Franz Mohr and I am an Austrian graduate from Johannes Kepler University Linz, where I also worked as a TA at the department of economics (public finance and macro-related fields). After working for the Oesterreichische Nationalbank (OeNB) - the Austrian central bank - I am currently employed at the Austrian Financial Market Authority (FMA).
+Disclaimer: The opinions expressed on this website are those of the author and do not necessarily reflect the official viewpoint of the Austrian Financial Market Authority.</description>
+    </item>
+    
+    <item>
+      <title>Chapter 8: Heteroskedasticity</title>
+      <link>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge08/</link>
+      <pubDate>Mon, 04 Feb 2008 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge08/</guid>
+      <description>library(wooldridge) Example 8.1 After loading the data and generating the dummy variables from chapter 7 estimate the model in the already familiar way.
+data(&amp;quot;wage1&amp;quot;) marrmale &amp;lt;- as.numeric(wage1$female==0 | wage1$married==1) marrfem &amp;lt;- as.numeric(wage1$female==1 | wage1$married==1) singfem &amp;lt;- as.numeric(wage1$female==1 | wage1$married==0) lm.8.1 &amp;lt;- lm(lwage ~ marrmale + marrfem + singfem + educ + exper + expersq + tenure + tenursq, data = wage1) summary(lm.8.1) ## ## Call: ## lm(formula = lwage ~ marrmale + marrfem + singfem + educ + exper + ## expersq + tenure + tenursq, data = wage1) ## ## Residuals: ## Min 1Q Median 3Q Max ## -1.</description>
+    </item>
+    
+  </channel>
+</rss>
