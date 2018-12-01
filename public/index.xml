@@ -179,6 +179,15 @@ The intended structure of this site is:</description>
     </item>
     
     <item>
+      <title>r-econometrics</title>
+      <link>https://www.r-econometrics.com/index_dummy/</link>
+      <pubDate>Tue, 27 Mar 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/index_dummy/</guid>
+      <description>You want to learn the basics of the R programming language and how to use the software for econometric analyses? Great! This site could be useful for you. It is about learning how to use the free statistical software R for basic econometric applications and shall provide an intuition of the basic structure of the program and the basic statistical functions, which are needed to pass introductory or intermediate courses in econometrics.</description>
+    </item>
+    
+    <item>
       <title>Chapter 14: Advanced Panel Data Methods</title>
       <link>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge14/</link>
       <pubDate>Tue, 06 Feb 2018 00:00:00 +0000</pubDate>
