@@ -16,8 +16,8 @@ googleAnalytics = "UA-115075361-1"
     url = "/rbasicsintro"
     weight = 10
 [[menu.main]]
-    name = "Microeconometric Topics"
-    url = "/microemetricsintro"
+    name = "Econometric Methods"
+    url = "/methodsintro"
     weight = 20
 [[menu.main]]
     name = "Time Series Topics"
@@ -42,5 +42,5 @@ googleAnalytics = "UA-115075361-1"
 
 [params]
   author = "Franz X. Mohr"
-  description = "A website on using R for econometric analysis."
+  description = "Using R for econometric analysis."
   addThis = "ra-5a9c6c9b8a39890d"

@@ -13,19 +13,19 @@
     
     <item>
       <title>Microeconometric Topics</title>
-      <link>https://www.r-econometrics.com/microemetricsintro/</link>
+      <link>https://www.r-econometrics.com/methodsintro/</link>
       <pubDate>Mon, 08 Oct 2018 00:00:00 +0000</pubDate>
       
-      <guid>https://www.r-econometrics.com/microemetricsintro/</guid>
+      <guid>https://www.r-econometrics.com/methodsintro/</guid>
       <description>This section is intended to get you through your undergraduate (and maybe graduate) studies in econometrics. It is based on examples from Wooldridge, J.M. (2013). Introductory econometrics: A modern approach (5thed.). I have also reproduced the examples of the main text, which you can find in the reproduction section of the site. Alternatively, Heiss, F. (2016) Using R for Introductory Econometrics is a standalone textbook, which covers the same topics as Wooldridge (2013) and provides an introduction to R as well.</description>
     </item>
     
     <item>
       <title>An Introduction to Ordinary Least Squares (OLS) in R</title>
-      <link>https://www.r-econometrics.com/microemetrics/ols/</link>
+      <link>https://www.r-econometrics.com/methods/ols/</link>
       <pubDate>Sun, 07 Oct 2018 00:00:00 +0000</pubDate>
       
-      <guid>https://www.r-econometrics.com/microemetrics/ols/</guid>
+      <guid>https://www.r-econometrics.com/methods/ols/</guid>
       <description>Formulated at the beginning of the 19th century by Legendre and Gauss the method of least squares is a standard tool in econometrics to assess the relationships between different variables. This site gives a short introduction to the basic idea behind the method and describes how to estimate simple linear models with OLS in R.
 The method of least squares To understand the basic idea of the method of least squares, imagine you were an astronomer at the beginning of the 19th century, who faced the challenge of combining a series of observations, which were made with imperfect instruments and at different points in time.</description>
     </item>
@@ -152,10 +152,9 @@ OnePageR: Compact intro to many methods of data science
 Codeschool: R-Tutorials
 Endmemo: R-Tutorials
 Wikibook on R Programming
- Data Financial portfolio and benchmark data provided by Kenneth R. French
-Financial data and benchmarks
-Quandl: Data source
-UC Irvine Machine Learning Repository: Collection of interesting data</description>
+Wikibook on R Programming
+MastersInDataScience.org: A website listing data science programs at U.S. universities
+ Data Financial portfolio and benchmark data provided by Kenneth R.</description>
     </item>
     
     <item>
