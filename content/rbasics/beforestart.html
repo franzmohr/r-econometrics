@@ -1,0 +1,39 @@
+---
+title: "Preparing Your Workplace for an Analysis"
+author: "Franz Mohr"
+date: "2018-02-04"
+---
+
+
+
+<div id="create-a-working-directory" class="section level2">
+<h2>Create a working directory</h2>
+<p>Usually, people want to keep the folder structure on their computers tidy, so that they and their co-workers understand, which documents and data were used for a particular project – even if that project was finished months ago. This should also be the case when you work with R. Therefore, I recommend to create a new folder for every new project, which becomes the so-called working directory. There you put all the files, which are necessary for a project. For example, for this introduction I created the folder <em>r_intro</em> in my file explorer and I recommend to do the same on your computer now.</p>
+</div>
+<div id="obtain-the-original-data" class="section level2">
+<h2>Obtain the original data</h2>
+<p>The data should be downloaded from the website and saved in the working directory now.</p>
+</div>
+<div id="create-a-new-r-script" class="section level2">
+<h2>Create a new R script</h2>
+<p>You can either use the script you have already open from the <code>1+2</code> example above or click on the button with the plus sign on the top left of the editor window and then choose <em>R Script</em> to create a new script. Eventually, you should save that script in your working directory by clicking on the blue save button or on <em>File</em> – <em>Save As…</em>. It is recommended that the file has a telling name. For this intro the name <em>my_first_r_experience</em> will do. After clicking on <em>Save</em> the script saved in the .R format.</p>
+</div>
+<div id="set-the-working-directory-in-r" class="section level2">
+<h2>Set the working directory in R</h2>
+<p>Before we start our analysis, we should set the path to the working directory in R. The reason for this is a bit technical. Let’s suppose that we want to use R to access a certain file on our computer. There is no way, that R would automatically know in which folder this file is located, if we only specified its name. Therefore, we would not only have to provide the filename, but also the path to it. This can become cumbersome if we want to access many files with R. But given that we have put all the necessary data for our project in the folder <em>r_intro</em>, we only have to enter the path once by setting the working directory. Basically, it tells R to access this directory by default, whenever it has to use a file on the hard drive.<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a> The working directory of R can be set with the <code>setwd</code> function:</p>
+<pre class="r"><code>setwd(&quot;C:/path/to/your/working/directory/r_intro&quot;)</code></pre>
+<p>Recall that a function in R has a name and at least one argument. In the previous line <code>setwd</code> is the name of the function and the path to the working directory is the argument. Note that the path to the working directory has to be in quotation marks <code>&quot;path/to/your/working/directory&quot;</code> and the folders have to be separated by slashes <code>/</code> and <em>not backslashes</em> <code>\</code> as they would be inserted when you directly copy a path from the Windows explorer into R.</p>
+</div>
+<div id="load-the-packages-you-need" class="section level2">
+<h2>Load the packages you need</h2>
+<p>Having installed all the necessary packages does not mean, that we can use them without any further action. Before we use the functions of a particular package, we have to load the package whenever R is started.<a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a> This is commonly done with the <code>library(packagename)</code> function.<a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a></p>
+<pre class="r"><code>library(foreign)</code></pre>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>However, you can also import data from different folders than your working directory, if you provide the full path to a file. This can be useful if you have a common data base, which should not be copied too often in order to save memory or to ensure that you always access the most recent data.<a href="#fnref1">↩</a></p></li>
+<li id="fn2"><p>Note that you have to install a package only once, whereas you have to load a package every time you start R.<a href="#fnref2">↩</a></p></li>
+<li id="fn3"><p>There is also a function called <code>require</code> which, basically, does the same as <code>library</code>. However, it also gives out the value <code>TRUE</code> if the package was loaded successfully and <code>FALSE</code> if not. This can be useful when you want your script to check, whether a certain package is installed on a machine. For example, if a co-worker uses the script and misses a certain package, <code>require</code> can be used to indicate this.<a href="#fnref3">↩</a></p></li>
+</ol>
+</div>

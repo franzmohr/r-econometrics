@@ -1,0 +1,39 @@
+---
+title: "The Structure of R"
+author: "Franz Mohr"
+date: "2018-07-20"
+---
+
+
+
+<p>R can be comprehended as a language that provides the basis for a system of code chunks, which have been developed by many people across the globe, who wanted to share their work. These code chunks are called <em>packages</em>. And each of those packages usually consist of at least one <em>function</em>.<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a> This structure is presented in the following graph. Beside a schematic description of a package and its functions in the upper part of the graph it also contains some real world examples using the packages <code>ggplot2</code> and <code>dplyr</code>.</p>
+<div class="figure">
+<img src="/package_structure.png" alt="Figure 1: Packages and functions in R." />
+<p class="caption">Figure 1: Packages and functions in R.</p>
+</div>
+<p><strong>Functions</strong></p>
+<p>Functions are what makes R work. So it is necessary to understand what inputs they require from the user in order to work properly. Usually, a function has a <em>name</em> and can contain further <em>arguments</em>, which are additional options the function should consider when it is executed. In R, the syntax of a function is as follows:</p>
+<p><code>name_of_the_function(argument 1, argument 2, ...)</code>.<a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a></p>
+<p>Basically, a function requires the right arguments as inputs to produce some sort of output. In this introduction functions will usually require data and additional arguments, which determine the operations that should be applied to the data, e.g., <code>name_of_function(data = your_data, argument1 = 1, argument2 = &quot;something&quot;, argument2 = &quot;somethingelse&quot;)</code>. This rather abstract depiction should become clearer when we start with the examples.</p>
+<p><strong>Packages</strong></p>
+<p>A package can be comprehended as a collection of functions. Usually, a package serves a distinct purpose. For example, there are packages which are designed to generate nice graphics like the <code>ggplot2</code> package. There are packages, which implement certain statistical methods such as <code>igraph</code> or <code>sna</code> that were developed for network analysis. And the packages <code>foreign</code> and <code>haven</code> can be used to load data files, which were originally stored in the file format of a different statistics software such as SAS, SPSS or Stata.</p>
+<p>The basic installation of R comes with a relatively small amount of pre-installed packages. Therefore, most packages must be installed by the user manually, before they can be used. This is a relatively simple process in RStudio. If you wanted to install, for example, the <code>dplyr</code> package, you would just have to do the following:</p>
+<ul>
+<li>Click on the tap <em>Packages</em> of the bottom right window</li>
+<li>Click <em>Install</em></li>
+<li>Make sure that the field <em>Install from</em> says <em>Repository (CRAN, CRANextra)</em><a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a></li>
+<li>Enter <em>dplyr</em> into the field <em>Packages</em></li>
+<li>Check the box <em>Install dependencies</em></li>
+<li>Sometimes – for example when using a corporate computer – it can be necessary to check whether the path in <em>Install to library</em> is the right one. But this should be of less concern when working on a private computer.</li>
+<li>Click <em>Install</em></li>
+</ul>
+<p>The progress of the installation is shown in the console. During the installation of those packages, you will probably notice that some additional packages are installed, which you did not explicitly specify. This is because packages can depend on functions of other packages and, hence, they have to be installed as well. By checking the box <em>Install dependencies</em> R takes care of that and installs all the required packages automatically.</p>
+<p>During the installation process R might also occasionally state that the <em>Source</em> package is newer than the <em>Binary</em> version and ask <code>Do you want to install from sources the package which needs compilation?</code>. This decision should not be of great importance for this guide. However, I recommend to answer this question buy typing <code>n</code> into the console, press <code>Return</code> and install the <em>Binary</em> version, since it seems to cause less problems.</p>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>R specialists may forgive me the slightly sloppy terminology. However, I have found it informative and just right for beginners with no previous knowledge of the topic.<a href="#fnref1">↩</a></p></li>
+<li id="fn2"><p>Note that this form resembles the mathematical way to write a function such as <span class="math inline">\(F(a, b)\)</span>.<a href="#fnref2">↩</a></p></li>
+<li id="fn3"><p>CRAN is a server structure, where approved R packages are stored and can be downloaded for free. Beside <em>Bioconductor</em> it is the most imporatant source of R packages.<a href="#fnref3">↩</a></p></li>
+</ol>
+</div>
