@@ -1,7 +1,6 @@
 # Redirects from what the browser requests to what we serve
-/real-basics/*                          /rbasicsintro
-#/real-basics/first-steps              /rbasicsintro
+/real-basics/*                        /rbasicsintro
 /author                               /about
-/wooldridge-2013                      /reproduction/wooldridge/wooldridgeintro
+/wooldridge-2013/*                    /reproduction/wooldridge/wooldridgeintro
 /2015/10/27/extracting-business-cycles-from-raw-data-in-r   /
 /finance                              /
