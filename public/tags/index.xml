@@ -2,57 +2,57 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Tags on r-econometrics</title>
-    <link>/tags/</link>
+    <link>https://www.r-econometrics.com/tags/</link>
     <description>Recent content in Tags on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Sun, 04 Feb 2018 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://www.r-econometrics.com/tags/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Ggplot2</title>
-      <link>/tags/ggplot2/</link>
+      <link>https://www.r-econometrics.com/tags/ggplot2/</link>
       <pubDate>Sun, 04 Feb 2018 00:00:00 +0000</pubDate>
       
-      <guid>/tags/ggplot2/</guid>
+      <guid>https://www.r-econometrics.com/tags/ggplot2/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Graphics</title>
-      <link>/tags/graphics/</link>
+      <link>https://www.r-econometrics.com/tags/graphics/</link>
       <pubDate>Sun, 04 Feb 2018 00:00:00 +0000</pubDate>
       
-      <guid>/tags/graphics/</guid>
+      <guid>https://www.r-econometrics.com/tags/graphics/</guid>
       <description></description>
     </item>
     
     <item>
       <title>R</title>
-      <link>/tags/r/</link>
+      <link>https://www.r-econometrics.com/tags/r/</link>
       <pubDate>Fri, 31 Aug 2018 00:00:00 +0000</pubDate>
       
-      <guid>/tags/r/</guid>
+      <guid>https://www.r-econometrics.com/tags/r/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Var</title>
-      <link>/tags/var/</link>
+      <link>https://www.r-econometrics.com/tags/var/</link>
       <pubDate>Fri, 31 Aug 2018 00:00:00 +0000</pubDate>
       
-      <guid>/tags/var/</guid>
+      <guid>https://www.r-econometrics.com/tags/var/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Vector Autoregression</title>
-      <link>/tags/vector-autoregression/</link>
+      <link>https://www.r-econometrics.com/tags/vector-autoregression/</link>
       <pubDate>Fri, 31 Aug 2018 00:00:00 +0000</pubDate>
       
-      <guid>/tags/vector-autoregression/</guid>
+      <guid>https://www.r-econometrics.com/tags/vector-autoregression/</guid>
       <description></description>
     </item>
     

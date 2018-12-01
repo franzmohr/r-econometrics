@@ -2,50 +2,50 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Rbasics on r-econometrics</title>
-    <link>/rbasics/</link>
+    <link>https://www.r-econometrics.com/rbasics/</link>
     <description>Recent content in Rbasics on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Fri, 20 Jul 2018 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="/rbasics/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://www.r-econometrics.com/rbasics/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>The Structure of R</title>
-      <link>/rbasics/rstructure/</link>
+      <link>https://www.r-econometrics.com/rbasics/rstructure/</link>
       <pubDate>Fri, 20 Jul 2018 00:00:00 +0000</pubDate>
       
-      <guid>/rbasics/rstructure/</guid>
+      <guid>https://www.r-econometrics.com/rbasics/rstructure/</guid>
       <description>R can be comprehended as a language that provides the basis for a system of code chunks, which have been developed by many people across the globe, who wanted to share their work. These code chunks are called packages. And each of those packages usually consist of at least one function.1 This structure is presented in the following graph. Beside a schematic description of a package and its functions in the upper part of the graph it also contains some real world examples using the packages ggplot2 and dplyr.</description>
     </item>
     
     <item>
       <title>Graphics with ggplot2</title>
-      <link>/rbasics/ggplotintro/</link>
+      <link>https://www.r-econometrics.com/rbasics/ggplotintro/</link>
       <pubDate>Sun, 04 Feb 2018 00:00:00 +0000</pubDate>
       
-      <guid>/rbasics/ggplotintro/</guid>
+      <guid>https://www.r-econometrics.com/rbasics/ggplotintro/</guid>
       <description>A major challenge in data analysis is to summarise and present data with informative graphs. The ggplot2 package was specifically designed to help with this task. Since it is a very powerful and well documented package1, this introduction will only focus on its basic syntax, so that the user gets a better understanding of how to read the supporting material on the internet.
 ggplot graphs are built with some kind of blocks, which usually start with the function ggplot.</description>
     </item>
     
     <item>
       <title>Installing R and RStudio</title>
-      <link>/rbasics/installation/</link>
+      <link>https://www.r-econometrics.com/rbasics/installation/</link>
       <pubDate>Sun, 04 Feb 2018 00:00:00 +0000</pubDate>
       
-      <guid>/rbasics/installation/</guid>
+      <guid>https://www.r-econometrics.com/rbasics/installation/</guid>
       <description>For this introduction I recommend to install two software packages on your system:
  R: The software, which does all the calculations. RStudio: The working environment, where all the code will developed.  Note that the instructions of this section were written for a standard installation on a private computer. If you work on a corporate machine, the installation could be different due to different IT requirements of your company.</description>
     </item>
     
     <item>
       <title>Preparing Your Workplace for an Analysis</title>
-      <link>/rbasics/beforestart/</link>
+      <link>https://www.r-econometrics.com/rbasics/beforestart/</link>
       <pubDate>Sun, 04 Feb 2018 00:00:00 +0000</pubDate>
       
-      <guid>/rbasics/beforestart/</guid>
+      <guid>https://www.r-econometrics.com/rbasics/beforestart/</guid>
       <description>Create a working directory Usually, people want to keep the folder structure on their computers tidy, so that they and their co-workers understand, which documents and data were used for a particular project – even if that project was finished months ago. This should also be the case when you work with R. Therefore, I recommend to create a new folder for every new project, which becomes the so-called working directory.</description>
     </item>
     
