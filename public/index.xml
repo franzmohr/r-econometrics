@@ -79,17 +79,6 @@ lm.12.1.1 &amp;lt;- lm(inf ~ unem, data = phillips) res.static &amp;lt;- lm.12.1
     </item>
     
     <item>
-      <title>Reproduction Projects</title>
-      <link>https://www.r-econometrics.com/reproductionintro/</link>
-      <pubDate>Sun, 07 Oct 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://www.r-econometrics.com/reproductionintro/</guid>
-      <description>Cincera, M. (1997). Patents, R&amp;amp;D, and technological spillovers at the firm level. 12, 265-280.
-Sheperd, B. (2016) The gravity model of international trade: A user guide.
-Wooldridge, J. M. (2013) Introductory econometrics.</description>
-    </item>
-    
-    <item>
       <title>Chapter 2: Simple OLS</title>
       <link>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge02/</link>
       <pubDate>Thu, 04 Oct 2018 00:00:00 +0000</pubDate>
@@ -120,15 +109,6 @@ The data sets are from the wooldridge package, which is a collection of all data
     </item>
     
     <item>
-      <title>An Introduction to Vector Autoregression (VAR)</title>
-      <link>https://www.r-econometrics.com/timeseries/varintro/</link>
-      <pubDate>Fri, 31 Aug 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://www.r-econometrics.com/timeseries/varintro/</guid>
-      <description>Since the seminal paper of Sims (1980) vector autoregressive models have become a key instrument in macroeconomic research. This post presents the basic concept of VAR analysis and guides through the estimation procedure of a simple model. When I started my undergraduate program in economics I occasionally encountered the abbreviation VAR in some macro papers. I was fascinated by those waves in the boxes titled impulse responses and wondered how difficult it would be to do such reseach on my own.</description>
-    </item>
-    
-    <item>
       <title>The Structure of R</title>
       <link>https://www.r-econometrics.com/rbasics/rstructure/</link>
       <pubDate>Fri, 20 Jul 2018 00:00:00 +0000</pubDate>
@@ -155,27 +135,6 @@ Wikibook on R Programming
 Wikibook on R Programming
 MastersInDataScience.org: A website listing data science programs at U.S. universities
  Data Financial portfolio and benchmark data provided by Kenneth R.</description>
-    </item>
-    
-    <item>
-      <title>Reproduction: Cincera, M. (1997). Patents, R&amp;D, and technological spillovers at the firm level.</title>
-      <link>https://www.r-econometrics.com/reproduction/1997_cincera_patents/</link>
-      <pubDate>Tue, 08 May 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://www.r-econometrics.com/reproduction/1997_cincera_patents/</guid>
-      <description>Get the data The data set can be downloaded from the Journal of Applied Econometrics Data Archive.
-download.file(&amp;quot;http://qed.econ.queensu.ca/jae/1997-v12.3/cincera/mc-data.zip&amp;quot;, destfile = &amp;quot;1997_cincera_data.zip&amp;quot;) unzip(&amp;quot;1997_cincera_data.zip&amp;quot;) data &amp;lt;- read.delim(&amp;quot;data.mc&amp;quot;, header = FALSE) names(data) &amp;lt;- c(&amp;quot;fi&amp;quot;, &amp;quot;s&amp;quot;, &amp;quot;g&amp;quot;, &amp;quot;p83&amp;quot;, &amp;quot;p84&amp;quot;, &amp;quot;p85&amp;quot;, &amp;quot;p86&amp;quot;, &amp;quot;p87&amp;quot;, &amp;quot;p88&amp;quot;, &amp;quot;p89&amp;quot;, &amp;quot;p90&amp;quot;, &amp;quot;p91&amp;quot;, &amp;quot;lr83&amp;quot;, &amp;quot;lr84&amp;quot;, &amp;quot;lr85&amp;quot;, &amp;quot;lr86&amp;quot;, &amp;quot;lr87&amp;quot;, &amp;quot;lr88&amp;quot;, &amp;quot;lr89&amp;quot;, &amp;quot;lr90&amp;quot;, &amp;quot;lr91&amp;quot;, &amp;quot;ls83&amp;quot;, &amp;quot;ls84&amp;quot;, &amp;quot;ls85&amp;quot;, &amp;quot;ls86&amp;quot;, &amp;quot;ls87&amp;quot;, &amp;quot;ls88&amp;quot;, &amp;quot;ls89&amp;quot;, &amp;quot;ls90&amp;quot;, &amp;quot;ls91&amp;quot;) p &amp;lt;- matrix(as.matrix(data[, c(&amp;quot;p83&amp;quot;, &amp;quot;p84&amp;quot;, &amp;quot;p85&amp;quot;, &amp;quot;p86&amp;quot;, &amp;quot;p87&amp;quot;, &amp;quot;p88&amp;quot;, &amp;quot;p89&amp;quot;, &amp;quot;p90&amp;quot;, &amp;quot;p91&amp;quot;)])) k &amp;lt;- matrix(as.</description>
-    </item>
-    
-    <item>
-      <title>Time Series Topics</title>
-      <link>https://www.r-econometrics.com/timeseriesintro/</link>
-      <pubDate>Tue, 27 Mar 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://www.r-econometrics.com/timeseriesintro/</guid>
-      <description>Work in progress (March 2018). I will try to update this page over the next few months.
-This section is intended to provide an overview of the relevant issues in (macro)economic time series analysis. Again the standard disclaimer: This site does not replace a good textbook, but it should help you to get a grasp of the basic concepts more quickly than if you learned it on your own.
-The intended structure of this site is:</description>
     </item>
     
     <item>
@@ -294,17 +253,6 @@ ggplot graphs are built with some kind of blocks, which usually start with the f
       <guid>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge04/</guid>
       <description>Before we start, let’s clear our memory, set the working directory and load the wooldridge data package.
 rm(list = ls()) setwd(&amp;quot;C:/path/to/the/working/directory&amp;quot;) library(wooldridge) data(wage1) lm.1 &amp;lt;- lm(lwage ~ educ + exper + tenure, data = wage1) s.1 &amp;lt;- summary(lm.1) s.1 ## ## Call: ## lm(formula = lwage ~ educ + exper + tenure, data = wage1) ## ## Residuals: ## Min 1Q Median 3Q Max ## -2.05802 -0.29645 -0.03265 0.28788 1.42809 ## ## Coefficients: ## Estimate Std.</description>
-    </item>
-    
-    <item>
-      <title>Reproduction: Sheperd, B. (2016). The gravity model of international trade: A user guide.</title>
-      <link>https://www.r-econometrics.com/reproduction/2016_sheperd_gravity/</link>
-      <pubDate>Tue, 30 Jan 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://www.r-econometrics.com/reproduction/2016_sheperd_gravity/</guid>
-      <description>The updated paper and dataset can be downloaded from UNESCAP.
-Load libraries and read data library(AER) library(dplyr) library(foreign) library(ggplot2) library(lmtest) library(multiwayvcov) library(sampleSelection) data &amp;lt;- read.dta(&amp;quot;servicesdataset_2016.dta&amp;quot;)  Correlations Table 1
-data &amp;lt;- data %&amp;gt;% mutate(ln_trade = log(trade), ln_distance = log(dist), ln_gdp_exp = log(gdp_exp), ln_gdp_imp = log(gdp_imp)) cor.data &amp;lt;- data %&amp;gt;% filter(sector == &amp;quot;SER&amp;quot;) %&amp;gt;% select(ln_trade, ln_gdp_exp, ln_gdp_imp, ln_distance) %&amp;gt;% na.omit %&amp;gt;% filter(ln_trade &amp;gt; -Inf) round(cor(cor.data), 4) ## ln_trade ln_gdp_exp ln_gdp_imp ln_distance ## ln_trade 1.</description>
     </item>
     
     <item>

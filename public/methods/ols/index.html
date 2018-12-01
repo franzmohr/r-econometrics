@@ -102,7 +102,7 @@ if (!doNotTrack) {
 <div id="the-method-of-least-squares" class="section level2">
 <h2>The method of least squares</h2>
 <p>To understand the basic idea of the method of least squares, imagine you were an astronomer at the beginning of the 19th century, who faced the challenge of combining a series of observations, which were made with imperfect instruments and at different points in time.<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a> One day you draw a scatter plot, which looks similar to the following:</p>
-<p><img src="/microemetrics/ols_files/figure-html/unnamed-chunk-1-1.png" width="336" style="display: block; margin: auto;" /></p>
+<p><img src="/methods/ols_files/figure-html/unnamed-chunk-1-1.png" width="336" style="display: block; margin: auto;" /></p>
 <p>As you look at the plot, you notice a clear pattern in the data: The higher the value of variable <span class="math inline">\(x\)</span>, the higher the value of variable <span class="math inline">\(y\)</span>. But the points do not lie on a single line, although we would expect that behaviour from an astronomical law of nature, because such a law should be invariant to any unrelated factors such as when, where, or how we look at it. But since we made our observations under imperfect conditions, measurement errors prevent the points from lying on the expected straight line. Instead, they seem to be scatterd around an imaginary straight line, which goes from the bottom-left to the top-right of the plot.</p>
 <p>From an astronomical perspective, our main interest in the graph is the slope of that imaginary line, because it describes the strength of the relationship between the variables. If the slope is steep <span class="math inline">\(y\)</span> will change considerably after a change in <span class="math inline">\(x\)</span>. If the slope is rather flat, <span class="math inline">\(y\)</span> will change only moderately. Under perfect conditions with no measurement errors we could just connect the points in the graph and directly measure the slope of the resulting line. But since there are errors in the data, this approach is not feasible.</p>
 <p>This is where the method of least squares comes in. Basically, this method is nothing else than a mathematical tool, which helps in finding the imaginary line through the point cloud. You could think of it as trying out all possible ways to draw a line through the scatter plot until you have found the line, which describes the data in the best way. But what does <em>best</em> mean in this context? You would need some kind of normative criterium to describe which line fits the data better than another.</p>
@@ -178,7 +178,7 @@ ggplot(data, aes(x = x, y = y)) +
   geom_smooth(method = &quot;lm&quot;, se = FALSE) +
   scale_x_continuous(limits = c(0, 45), expand = c(0, 0)) +
   theme_bw()</code></pre>
-<p><img src="/microemetrics/ols_files/figure-html/plot%20data-1.png" width="336" style="display: block; margin: auto;" /></p>
+<p><img src="/methods/ols_files/figure-html/plot%20data-1.png" width="336" style="display: block; margin: auto;" /></p>
 </div>
 <div id="annex-excluding-the-intercept-term" class="section level2">
 <h2>Annex: Excluding the intercept term</h2>
