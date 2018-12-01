@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>R on r-econometrics</title>
+    <link>https://www.r-econometrics.com/tags/r/</link>
+    <description>Recent content in R on r-econometrics</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 31 Aug 2018 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://www.r-econometrics.com/tags/r/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>An Introduction to Vector Autoregression (VAR)</title>
+      <link>https://www.r-econometrics.com/timeseries/varintro/</link>
+      <pubDate>Fri, 31 Aug 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/timeseries/varintro/</guid>
+      <description>Since the seminal paper of Sims (1980) vector autoregressive models have become a key instrument in macroeconomic research. This post presents the basic concept of VAR analysis and guides through the estimation procedure of a simple model. When I started my undergraduate program in economics I occasionally encountered the abbreviation VAR in some macro papers. I was fascinated by those waves in the boxes titled impulse responses and wondered how difficult it would be to do such reseach on my own.</description>
+    </item>
+    
+    <item>
+      <title>Graphics with ggplot2</title>
+      <link>https://www.r-econometrics.com/rbasics/ggplotintro/</link>
+      <pubDate>Sun, 04 Feb 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/rbasics/ggplotintro/</guid>
+      <description>A major challenge in data analysis is to summarise and present data with informative graphs. The ggplot2 package was specifically designed to help with this task. Since it is a very powerful and well documented package1, this introduction will only focus on its basic syntax, so that the user gets a better understanding of how to read the supporting material on the internet.
+ggplot graphs are built with some kind of blocks, which usually start with the function ggplot.</description>
+    </item>
+    
+  </channel>
+</rss>

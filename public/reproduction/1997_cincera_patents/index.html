@@ -1,0 +1,376 @@
+
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-115075361-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+<!DOCTYPE html>
+<html xmlns="//www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+    <head>
+        
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+
+        <title>Reproduction: Cincera, M. (1997). Patents, R&amp;D, and technological spillovers at the firm level. &middot; r-econometrics</title>
+        <link rel='stylesheet' href='//fonts.googleapis.com/css?family=Open+Sans:400,300,600' type='text/css'>
+        <link rel="stylesheet" href="https://www.r-econometrics.com//libraries/normalize.3.0.1.css" />
+        <link rel="stylesheet" href="https://www.r-econometrics.com//css/liquorice.css" />
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <link rel="apple-touch-icon-precomposed" href="/apple-touch-icon-144-precomposed.png" sizes="144x144" />
+        <link rel="alternate" href="" type="application/rss+xml" title="r-econometrics" />
+    </head>
+    <body class="li-body">
+
+<header class="li-page-header">
+    <div class="container">
+        <div class="row">
+            <div class="sixteen columns">
+                <div class="li-brand li-left">
+                <a href="https://www.r-econometrics.com/">r-econometrics</a></div>
+                <div class="li-menu li-right">
+                    <span class="li-menu-icon" onclick="javascript:toggle('menu');">&#9776;</span>
+                    <ul id="menu2" class="li-menu-items">
+                        
+                            <li><a href="/rbasicsintro"> R(eal) Basics </a></li>
+                        
+                            <li><a href="/methodsintro"> Econometric Methods </a></li>
+                        
+                            <li><a href="/timeseriesintro"> Time Series Topics </a></li>
+                        
+                            <li><a href="/links"> Links </a></li>
+                        
+                            <li><a href="/reproductionintro"> Reproduction Projects </a></li>
+                        
+                            <li><a href="/about"> About and Disclaimer </a></li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="sixteen columns">
+                <ul id="menu" class="li-menu-items li-menu-mobile">
+                    
+                        <li><a href="/rbasicsintro"> R(eal) Basics </a></li>
+                    
+                        <li><a href="/methodsintro"> Econometric Methods </a></li>
+                    
+                        <li><a href="/timeseriesintro"> Time Series Topics </a></li>
+                    
+                        <li><a href="/links"> Links </a></li>
+                    
+                        <li><a href="/reproductionintro"> Reproduction Projects </a></li>
+                    
+                        <li><a href="/about"> About and Disclaimer </a></li>
+                    
+                </ul>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+
+
+
+
+    <div class="container">
+        <div class="row">
+            <div class="sixteen columns">
+                <article class="li-article">
+                    <header class="li-article-header">
+                        <h1 class="li-article-title">Reproduction: Cincera, M. (1997). Patents, R&amp;D, and technological spillovers at the firm level.</h1>
+                        <span class="li-article-taxonomies">
+                            
+
+                            
+                        </span>
+                        
+                        <time class="li-article-date">Franz Mohr, May 8, 2018
+                        </time>
+                    </header>
+                    <section>
+                        <div id="get-the-data" class="section level2">
+<h2>Get the data</h2>
+<p>The data set can be downloaded from the <a href="http://qed.econ.queensu.ca/jae/1997-v12.3/cincera/" target="_blank">Journal of Applied Econometrics Data Archive</a>.</p>
+<pre class="r"><code>download.file(&quot;http://qed.econ.queensu.ca/jae/1997-v12.3/cincera/mc-data.zip&quot;, destfile = &quot;1997_cincera_data.zip&quot;)
+unzip(&quot;1997_cincera_data.zip&quot;)
+
+data &lt;- read.delim(&quot;data.mc&quot;, header = FALSE)</code></pre>
+<pre class="r"><code>names(data) &lt;- c(&quot;fi&quot;, &quot;s&quot;, &quot;g&quot;,
+                 &quot;p83&quot;, &quot;p84&quot;, &quot;p85&quot;, &quot;p86&quot;, &quot;p87&quot;, &quot;p88&quot;, &quot;p89&quot;, &quot;p90&quot;, &quot;p91&quot;,
+                 &quot;lr83&quot;, &quot;lr84&quot;, &quot;lr85&quot;, &quot;lr86&quot;, &quot;lr87&quot;, &quot;lr88&quot;, &quot;lr89&quot;, &quot;lr90&quot;, &quot;lr91&quot;,
+                 &quot;ls83&quot;, &quot;ls84&quot;, &quot;ls85&quot;, &quot;ls86&quot;, &quot;ls87&quot;, &quot;ls88&quot;, &quot;ls89&quot;, &quot;ls90&quot;, &quot;ls91&quot;)
+
+p &lt;- matrix(as.matrix(data[, c(&quot;p83&quot;, &quot;p84&quot;, &quot;p85&quot;, &quot;p86&quot;, &quot;p87&quot;, &quot;p88&quot;, &quot;p89&quot;, &quot;p90&quot;, &quot;p91&quot;)]))
+k &lt;- matrix(as.matrix(data[, c(&quot;lr83&quot;, &quot;lr84&quot;, &quot;lr85&quot;, &quot;lr86&quot;, &quot;lr87&quot;, &quot;lr88&quot;, &quot;lr89&quot;, &quot;lr90&quot;, &quot;lr91&quot;)]))
+spill &lt;- matrix(as.matrix(data[, c(&quot;ls83&quot;, &quot;ls84&quot;, &quot;ls85&quot;, &quot;ls86&quot;, &quot;ls87&quot;, &quot;ls88&quot;, &quot;ls89&quot;, &quot;ls90&quot;, &quot;ls91&quot;)]))
+
+# Firm IDs
+fi &lt;- rep(1:181, 9)
+
+# Years
+year &lt;- c()
+for (i in 1983:1991){
+  year &lt;- append(year, rep(i, 181))
+}
+ 
+# Geographic dummies
+g &lt;- rep(data$g, 9)
+
+g.1 &lt;- as.numeric(g == 1)
+g.2 &lt;- as.numeric(g == 2)
+g.3 &lt;- as.numeric(g == 3)
+g.4 &lt;- as.numeric(g == 4)
+ 
+# Technological dummies
+s &lt;- rep(data$s, 9)
+ 
+s.1 &lt;- as.numeric(s == 1)
+s.2 &lt;- as.numeric(s == 2)
+s.3 &lt;- as.numeric(s == 3)
+s.4 &lt;- as.numeric(s == 4)
+s.5 &lt;- as.numeric(s == 5)
+s.6 &lt;- as.numeric(s == 6)
+s.7 &lt;- as.numeric(s == 7)
+s.8 &lt;- as.numeric(s == 8)
+s.9 &lt;- as.numeric(s == 9)
+s.10 &lt;- as.numeric(s == 10)
+s.11 &lt;- as.numeric(s == 11)
+s.12 &lt;- as.numeric(s == 12)
+s.13 &lt;- as.numeric(s == 13)
+s.14 &lt;- as.numeric(s == 14)
+s.15 &lt;- as.numeric(s == 15)
+ 
+# Lags of R&amp;D Spending
+k.1 &lt;- as.vector(c(rep(NA, 181), k[1:(length(k) - 181)]))
+k.2 &lt;- as.vector(c(rep(NA, 2 * 181), k[1:(length(k) - 2 * 181)]))
+k.3 &lt;- as.vector(c(rep(NA, 3 * 181), k[1:(length(k) - 3 * 181)]))
+k.4 &lt;- as.vector(c(rep(NA, 4 * 181), k[1:(length(k) - 4 * 181)]))
+ 
+# Lags of spillovers
+spill.1 &lt;- as.vector(c(rep(NA, 181), spill[1:(length(spill) - 181)]))
+spill.2 &lt;- as.vector(c(rep(NA, 2 * 181), spill[1:(length(spill) - 2 * 181)]))
+spill.3 &lt;- as.vector(c(rep(NA, 3 * 181), spill[1:(length(spill) - 3 * 181)]))
+spill.4 &lt;- as.vector(c(rep(NA, 4 * 181), spill[1:(length(spill) - 4 * 181)]))
+ 
+# Generate the finale data frame
+data &lt;- data.frame(year, fi, p, k, k.1, k.2, k.3, k.4, spill, spill.1, spill.2, spill.3, spill.4,
+                   g.1, g.2, g.3, g.4, s.1, s.2, s.3, s.4, s.5, s.6, s.7, s.8, s.9, s.10,
+                   s.11, s.12, s.13, s.14, s.15)
+ 
+# Give labels to the variables
+attributes(data)$var.labels &lt;-c(&#39;Year&#39;,&#39;FirmID&#39;,&#39;# of patents&#39;,&#39;R&amp;D spending&#39;,&#39;Lag R&amp;D 1&#39;,
+                               &#39;Lag R&amp;D 2&#39;,&#39;Lag R&amp;D 3&#39;,&#39;Lag R&amp;D 4&#39;,&#39;Spillover&#39;,&#39;Lag spillover 1&#39;,
+                               &#39;Lag spillover 2&#39;,&#39;Lag spillover 3&#39;,&#39;Lag spillover 4&#39;,
+                               &#39;Geographic dummy 1&#39;,&#39;Geographic dummy 2&#39;,&#39;Geographic dummy 3&#39;,
+                               &#39;Geographic dummy 4&#39;,&#39;Sector dummy 1&#39;,&#39;Sector dummy 2&#39;,
+                               &#39;Sector dummy 3&#39;,&#39;Sector dummy 4&#39;,&#39;Sector dummy 5&#39;,
+                               &#39;Sector dummy 6&#39;,&#39;Sector dummy 7&#39;,&#39;Sector dummy 8&#39;,
+                               &#39;Sector dummy 9&#39;,&#39;Sector dummy 10&#39;,&#39;Sector dummy 11&#39;,
+                               &#39;Sector dummy 12&#39;,&#39;Sector dummy 13&#39;,&#39;Sector dummy 14&#39;,
+                               &#39;Sector dummy 15&#39;)</code></pre>
+<p>If you want, you can save the modified data on your disk:</p>
+<pre class="r"><code>save(data, file = &quot;1997_cincera_patents.rda&quot;)
+write.csv(data, file = &quot;1997_cincera_patents.csv&quot;, row.names = FALSE)</code></pre>
+</div>
+<div id="tables" class="section level2">
+<h2>Tables</h2>
+<p><em>Summary statistics</em></p>
+<pre class="r"><code>table.1a &lt;- data.frame(Mean = NA, Standard.error = NA, Minimum.value = NA, Maximum.value = NA)
+ 
+table.1a[1, 1]&lt;-round(mean(data$p), 2)
+table.1a[1, 2]&lt;-round(sqrt(var(data$p)), 2)
+table.1a[1, 3]&lt;-round(min(data$p), 2)
+table.1a[1, 4]&lt;-round(max(data$p), 2)
+table.1a[2, 1]&lt;-round(mean(data$k), 2)
+table.1a[2, 2]&lt;-round(sqrt(var(data$k)), 2)
+table.1a[2, 3]&lt;-round(min(data$k), 2)
+table.1a[2, 4]&lt;-round(max(data$k), 2)
+table.1a[3, 1]&lt;-round(mean(data$spill), 2)
+table.1a[3, 2]&lt;-round(sqrt(var(data$spill)), 2)
+table.1a[3, 3]&lt;-round(min(data$spill), 2)
+table.1a[3, 4]&lt;-round(max(data$spill), 2)
+
+table.1a</code></pre>
+<pre><code>##    Mean Standard.error Minimum.value Maximum.value
+## 1 60.79         121.56          0.00        925.00
+## 2  5.20           1.26          0.87          8.70
+## 3  9.40           0.93          6.82         10.76</code></pre>
+<p><em>Correlations</em></p>
+<pre class="r"><code>table.1b &lt;- data.frame(P = NA, k = NA, k.1 = NA, k.2 = NA, k.3 = NA)
+ 
+table.1b[1,1] &lt;- round(cor(data$k, data$p), 2)
+table.1b[2,1] &lt;- round(cor(data$k.1, data$p, &quot;complete.obs&quot;), 2)
+table.1b[3,1] &lt;- round(cor(data$k.2, data$p, &quot;complete.obs&quot;), 2)
+table.1b[4,1] &lt;- round(cor(data$k.3, data$p, &quot;complete.obs&quot;), 2)
+table.1b[5,1] &lt;- round(cor(data$k.4, data$p, &quot;complete.obs&quot;), 2)
+ 
+# The &quot;complete.obs&quot; option tells R that despite there are missing values it should procide
+# with the evaluation. Ultimately, it will only use observations that are complete, i.e.
+# where both columns of an observation contain values.
+ 
+table.1b[2,2] &lt;- round(cor(data$k.1, data$k, &quot;complete.obs&quot;), 2)
+table.1b[3,2] &lt;- round(cor(data$k.2, data$k, &quot;complete.obs&quot;), 2)
+table.1b[4,2] &lt;- round(cor(data$k.3, data$k, &quot;complete.obs&quot;), 2)
+table.1b[5,2] &lt;- round(cor(data$k.4, data$k, &quot;complete.obs&quot;), 2)
+ 
+table.1b[3,3] &lt;- round(cor(data$k.2, data$k.1, &quot;complete.obs&quot;), 2)
+table.1b[4,3] &lt;- round(cor(data$k.3, data$k.1, &quot;complete.obs&quot;), 2)
+table.1b[5,3] &lt;- round(cor(data$k.4, data$k.1, &quot;complete.obs&quot;), 2)
+ 
+table.1b[4,4] &lt;- round(cor(data$k.3, data$k.2, &quot;complete.obs&quot;), 2)
+table.1b[5,4] &lt;- round(cor(data$k.4, data$k.2, &quot;complete.obs&quot;), 2)
+ 
+table.1b[5,5] &lt;- round(cor(data$k.4, data$k.3, &quot;complete.obs&quot;), 2)
+
+table.1b</code></pre>
+<pre><code>##      P    k  k.1  k.2  k.3
+## 1 0.55   NA   NA   NA   NA
+## 2 0.55 0.99   NA   NA   NA
+## 3 0.55 0.98 0.99   NA   NA
+## 4 0.55 0.97 0.98 0.99   NA
+## 5 0.55 0.95 0.96 0.97 0.99</code></pre>
+</div>
+<div id="panel-estimates" class="section level2">
+<h2>Panel estimates</h2>
+<div id="poisson" class="section level3">
+<h3>Poisson</h3>
+<p>Cincera (1997) estimates a simple Poisson model for panel data as a benchmark. In R this can be done with the <code>pglm</code> package for general linear models for panel data.</p>
+<pre class="r"><code>library(pglm)
+
+# Table 2
+# (3) Conditional Poisson
+poisson &lt;- pglm(p ~ k + k.1 + k.2 + k.3 + k.4 +
+                  spill + spill.1 + spill.2 + spill.3 + spill.4,
+                data = data,
+                index = c(&quot;fi&quot;, &quot;year&quot;),
+                model = &quot;within&quot;,
+                effect = &quot;individual&quot;,
+                family = poisson())</code></pre>
+<pre><code>## Warning in pglm(formula = p ~ k + k.1 + k.2 + k.3 + k.4 + spill + spill.1
+## + : the index argument is ignored because data is a pdata.frame</code></pre>
+<pre class="r"><code>summary(poisson)</code></pre>
+<pre><code>## --------------------------------------------
+## Maximum Likelihood estimation
+## Newton-Raphson maximisation, 3 iterations
+## Return code 2: successive function values within tolerance limit
+## Log-Likelihood: -3535.462 
+## 10  free parameters
+## Estimates:
+##         Estimate Std. error t value  Pr(&gt; t)    
+## k        0.29167    0.04189   6.962 3.35e-12 ***
+## k.1      0.06220    0.03892   1.598 0.110036    
+## k.2      0.06857    0.04107   1.670 0.094978 .  
+## k.3     -0.17790    0.05400  -3.294 0.000986 ***
+## k.4      0.10442    0.04378   2.385 0.017068 *  
+## spill    1.26935    0.12924   9.822  &lt; 2e-16 ***
+## spill.1 -0.10592    0.15052  -0.704 0.481604    
+## spill.2  0.81296    0.13908   5.845 5.06e-09 ***
+## spill.3 -0.73816    0.12936  -5.706 1.15e-08 ***
+## spill.4  0.21929    0.10421   2.104 0.035353 *  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## --------------------------------------------</code></pre>
+</div>
+</div>
+<div id="annex" class="section level2">
+<h2>Annex</h2>
+<div id="a2" class="section level3">
+<h3>A2</h3>
+<pre class="r"><code>colSums(data[data$year == 1983, c(&quot;s.1&quot;, &quot;s.2&quot;, &quot;s.3&quot;, &quot;s.4&quot;, &quot;s.5&quot;, &quot;s.6&quot;, &quot;s.7&quot;, &quot;s.8&quot;, &quot;s.9&quot;, &quot;s.10&quot;, &quot;s.11&quot;, &quot;s.12&quot;, &quot;s.13&quot;, &quot;s.14&quot;, &quot;s.15&quot;)])</code></pre>
+<pre><code>##  s.1  s.2  s.3  s.4  s.5  s.6  s.7  s.8  s.9 s.10 s.11 s.12 s.13 s.14 s.15 
+##   12   28   20   13   29    9   11    3   13   10    3    8    5    2   15</code></pre>
+</div>
+</div>
+
+                    </section>
+                </article>
+                <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5a9c6c9b8a39890d"></script>
+                <div class="container">
+  <div class="row">
+    <div class="sixteen columns center">
+      <div class="addthis_inline_share_toolbox"></div>
+      
+    </div>
+  </div>
+</div>
+
+                <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+<footer class="li-page-footer">
+    <div class="container">
+        <div class="row">
+            <div class="sixteen columns center">
+              <div id="disqus_thread"></div>
+                <script type="text/javascript">
+                  (function() { 
+                  if (window.location.hostname == "localhost") return;
+                  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                  var disqus_shortname = 'r-econometrics';
+                  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                  })();
+                  </script>
+                  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+            </div>
+        </div>
+    </div>
+</footer>
+            </div>
+        </div>
+        
+    </div>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+<footer class="li-page-footer">
+    <div class="container">
+        <div class="row">
+            <div class="sixteen columns center">
+              <div class="li-page-footer-legal">
+                &copy; Franz X. Mohr. Powered by <a href="https://github.com/rstudio/blogdown" target="_blank" >Blogdown</a> and hosted by <a href="https://www.netlify.com/" target="_blank" >Netlify</a>. Source available on <a href="https://github.com/FranzMohr/r-econometrics" target="_blank" >Github</a>.
+              </div>
+              <div class="li-page-footer-theme">
+                <span class=""><a href="https://github.com/eliasson/liquorice/">liquorice</a> is a theme for <a href="http://hugo.spf13.com">hugo</a>
+                </span>
+              </div>
+            </div>
+        </div>
+    </div>
+</footer>
+    <script type="text/javascript">
+    <!--
+    function toggle(id) {
+        var e = document.getElementById(id);
+        e.style.display == 'block' ? e.style.display = 'none' : e.style.display = 'block';
+    }
+    
+    </script>
+    
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-115075361-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+    </body>
+</html>
+
