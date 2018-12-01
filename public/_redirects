@@ -3,4 +3,6 @@
 /author                               /about
 /wooldridge-2013/*                    /reproduction/wooldridge/wooldridgeintro
 /2015/10/27/extracting-business-cycles-from-raw-data-in-r   /
-/finance                              /
+/finance/*                            /
+/time-series/an-introduction-to-vector-autoregression-var   /timeseries/varintro
+/crash-courses                        /rbasicsintro
