@@ -6,10 +6,20 @@
     <description>Recent content in Reproductions on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 07 Oct 2018 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 01 Dec 2018 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://www.r-econometrics.com/reproduction/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Chapter 8: Heteroskedasticity</title>
+      <link>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge08/</link>
+      <pubDate>Sat, 01 Dec 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge08/</guid>
+      <description>library(wooldridge) Example 8.1 After loading the data and generating the dummy variables from chapter 7 estimate the model in the already familiar way.
+data(&amp;quot;wage1&amp;quot;) marrmale &amp;lt;- as.numeric(wage1$female == 0 &amp;amp; wage1$married == 1) marrfem &amp;lt;- as.numeric(wage1$female == 1 &amp;amp; wage1$married == 1) singfem &amp;lt;- as.numeric(wage1$female == 1 &amp;amp; wage1$married == 0) lm.8.1 &amp;lt;- lm(lwage ~ marrmale + marrfem + singfem + educ + exper + expersq + tenure + tenursq, data = wage1) summary(lm.</description>
+    </item>
     
     <item>
       <title>Chapter 10: Basic Regression Analysis with Time Series Data</title>
@@ -187,16 +197,6 @@ rm(list = ls()) setwd(&amp;quot;C:/path/to/the/working/directory&amp;quot;) libr
       <description>The updated paper and dataset can be downloaded from UNESCAP.
 Load libraries and read data library(AER) library(dplyr) library(foreign) library(ggplot2) library(lmtest) library(multiwayvcov) library(sampleSelection) data &amp;lt;- read.dta(&amp;quot;servicesdataset_2016.dta&amp;quot;)  Correlations Table 1
 data &amp;lt;- data %&amp;gt;% mutate(ln_trade = log(trade), ln_distance = log(dist), ln_gdp_exp = log(gdp_exp), ln_gdp_imp = log(gdp_imp)) cor.data &amp;lt;- data %&amp;gt;% filter(sector == &amp;quot;SER&amp;quot;) %&amp;gt;% select(ln_trade, ln_gdp_exp, ln_gdp_imp, ln_distance) %&amp;gt;% na.omit %&amp;gt;% filter(ln_trade &amp;gt; -Inf) round(cor(cor.data), 4) ## ln_trade ln_gdp_exp ln_gdp_imp ln_distance ## ln_trade 1.</description>
-    </item>
-    
-    <item>
-      <title>Chapter 8: Heteroskedasticity</title>
-      <link>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge08/</link>
-      <pubDate>Mon, 04 Feb 2008 00:00:00 +0000</pubDate>
-      
-      <guid>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge08/</guid>
-      <description>library(wooldridge) Example 8.1 After loading the data and generating the dummy variables from chapter 7 estimate the model in the already familiar way.
-data(&amp;quot;wage1&amp;quot;) marrmale &amp;lt;- as.numeric(wage1$female==0 | wage1$married==1) marrfem &amp;lt;- as.numeric(wage1$female==1 | wage1$married==1) singfem &amp;lt;- as.numeric(wage1$female==1 | wage1$married==0) lm.8.1 &amp;lt;- lm(lwage ~ marrmale + marrfem + singfem + educ + exper + expersq + tenure + tenursq, data = wage1) summary(lm.8.1) ## ## Call: ## lm(formula = lwage ~ marrmale + marrfem + singfem + educ + exper + ## expersq + tenure + tenursq, data = wage1) ## ## Residuals: ## Min 1Q Median 3Q Max ## -1.</description>
     </item>
     
   </channel>

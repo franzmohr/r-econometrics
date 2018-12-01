@@ -6,10 +6,20 @@
     <description>Recent content on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 08 Oct 2018 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 01 Dec 2018 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://www.r-econometrics.com/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Chapter 8: Heteroskedasticity</title>
+      <link>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge08/</link>
+      <pubDate>Sat, 01 Dec 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge08/</guid>
+      <description>library(wooldridge) Example 8.1 After loading the data and generating the dummy variables from chapter 7 estimate the model in the already familiar way.
+data(&amp;quot;wage1&amp;quot;) marrmale &amp;lt;- as.numeric(wage1$female == 0 &amp;amp; wage1$married == 1) marrfem &amp;lt;- as.numeric(wage1$female == 1 &amp;amp; wage1$married == 1) singfem &amp;lt;- as.numeric(wage1$female == 1 &amp;amp; wage1$married == 0) lm.8.1 &amp;lt;- lm(lwage ~ marrmale + marrfem + singfem + educ + exper + expersq + tenure + tenursq, data = wage1) summary(lm.</description>
+    </item>
     
     <item>
       <title>Econometric Methods</title>
@@ -324,16 +334,6 @@ data &amp;lt;- data %&amp;gt;% mutate(ln_trade = log(trade), ln_distance = log(d
       <guid>https://www.r-econometrics.com/about/</guid>
       <description>My name is Franz Mohr and I am an Austrian graduate from Johannes Kepler University Linz, where I also worked as a TA at the department of economics (public finance and macro-related fields). After working for the Oesterreichische Nationalbank (OeNB) - the Austrian central bank - I am currently employed at the Austrian Financial Market Authority (FMA).
 Disclaimer: The opinions expressed on this website are those of the author and do not necessarily reflect the official viewpoint of the Austrian Financial Market Authority.</description>
-    </item>
-    
-    <item>
-      <title>Chapter 8: Heteroskedasticity</title>
-      <link>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge08/</link>
-      <pubDate>Mon, 04 Feb 2008 00:00:00 +0000</pubDate>
-      
-      <guid>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge08/</guid>
-      <description>library(wooldridge) Example 8.1 After loading the data and generating the dummy variables from chapter 7 estimate the model in the already familiar way.
-data(&amp;quot;wage1&amp;quot;) marrmale &amp;lt;- as.numeric(wage1$female==0 | wage1$married==1) marrfem &amp;lt;- as.numeric(wage1$female==1 | wage1$married==1) singfem &amp;lt;- as.numeric(wage1$female==1 | wage1$married==0) lm.8.1 &amp;lt;- lm(lwage ~ marrmale + marrfem + singfem + educ + exper + expersq + tenure + tenursq, data = wage1) summary(lm.8.1) ## ## Call: ## lm(formula = lwage ~ marrmale + marrfem + singfem + educ + exper + ## expersq + tenure + tenursq, data = wage1) ## ## Residuals: ## Min 1Q Median 3Q Max ## -1.</description>
     </item>
     
   </channel>

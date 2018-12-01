@@ -3,6 +3,11 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge08/</loc>
+    <lastmod>2018-12-01T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://www.r-econometrics.com/methodsintro/</loc>
     <lastmod>2018-10-08T00:00:00+00:00</lastmod>
   </url>
@@ -158,11 +163,6 @@
   </url>
   
   <url>
-    <loc>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge08/</loc>
-    <lastmod>2008-02-04T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://www.r-econometrics.com/categories/</loc>
     <priority>0</priority>
   </url>
@@ -205,7 +205,7 @@
   
   <url>
     <loc>https://www.r-econometrics.com/reproduction/</loc>
-    <lastmod>2018-10-07T00:00:00+00:00</lastmod>
+    <lastmod>2018-12-01T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -241,7 +241,7 @@
   
   <url>
     <loc>https://www.r-econometrics.com/</loc>
-    <lastmod>2018-10-08T00:00:00+00:00</lastmod>
+    <lastmod>2018-12-01T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   

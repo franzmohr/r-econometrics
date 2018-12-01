@@ -94,7 +94,7 @@ if (!doNotTrack) {
                             
                         </span>
                         
-                        <time class="li-article-date">Franz Mohr, February 4, 2008
+                        <time class="li-article-date">Franz Mohr, December 1, 2018
                         </time>
                     </header>
                     <section>
@@ -104,9 +104,9 @@ if (!doNotTrack) {
 <p>After loading the data and generating the dummy variables from chapter 7 estimate the model in the already familiar way.</p>
 <pre class="r"><code>data(&quot;wage1&quot;)
 
-marrmale &lt;- as.numeric(wage1$female==0 | wage1$married==1)
-marrfem &lt;- as.numeric(wage1$female==1 | wage1$married==1)
-singfem &lt;- as.numeric(wage1$female==1 | wage1$married==0)
+marrmale &lt;- as.numeric(wage1$female == 0 &amp; wage1$married == 1)
+marrfem &lt;- as.numeric(wage1$female == 1 &amp; wage1$married == 1)
+singfem &lt;- as.numeric(wage1$female == 1 &amp; wage1$married == 0)
 
 lm.8.1 &lt;- lm(lwage ~ marrmale + marrfem + singfem + educ + exper + expersq + tenure + tenursq, data = wage1)
 
@@ -122,10 +122,10 @@ summary(lm.8.1)</code></pre>
 ## 
 ## Coefficients:
 ##               Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)  0.8202388  0.1265372   6.482 2.11e-10 ***
-## marrmale    -0.0879174  0.0523481  -1.679 0.093664 .  
+## (Intercept)  0.3213781  0.1000090   3.213 0.001393 ** 
+## marrmale     0.2126757  0.0553572   3.842 0.000137 ***
 ## marrfem     -0.1982676  0.0578355  -3.428 0.000656 ***
-## singfem     -0.4109433  0.0457709  -8.978  &lt; 2e-16 ***
+## singfem     -0.1103502  0.0557421  -1.980 0.048272 *  
 ## educ         0.0789103  0.0066945  11.787  &lt; 2e-16 ***
 ## exper        0.0268006  0.0052428   5.112 4.50e-07 ***
 ## expersq     -0.0005352  0.0001104  -4.847 1.66e-06 ***
@@ -152,10 +152,10 @@ coeftest(lm.8.1, vcov=vcovHC(lm.8.1, type = &quot;HC0&quot;))</code></pre>
 ## t test of coefficients:
 ## 
 ##                Estimate  Std. Error t value  Pr(&gt;|t|)    
-## (Intercept)  0.82023876  0.12595077  6.5124 1.755e-10 ***
-## marrmale    -0.08791739  0.05182528 -1.6964 0.0904085 .  
+## (Intercept)  0.32137808  0.10852843  2.9612 0.0032049 ** 
+## marrmale     0.21267568  0.05665095  3.7541 0.0001937 ***
 ## marrfem     -0.19826760  0.05826505 -3.4029 0.0007186 ***
-## singfem     -0.41094328  0.04503862 -9.1242 &lt; 2.2e-16 ***
+## singfem     -0.11035021  0.05662551 -1.9488 0.0518632 .  
 ## educ         0.07891028  0.00735096 10.7347 &lt; 2.2e-16 ***
 ## exper        0.02680057  0.00509497  5.2602 2.111e-07 ***
 ## expersq     -0.00053525  0.00010543 -5.0770 5.360e-07 ***
@@ -168,7 +168,8 @@ coeftest(lm.8.1, vcov=vcovHC(lm.8.1, type = &quot;HC0&quot;))</code></pre>
 <h3>Example 8.2</h3>
 <pre class="r"><code>data(&quot;gpa3&quot;)
 
-lm.8.2 &lt;- lm(cumgpa ~ sat + hsperc + tothrs + female + black + white, data = gpa3, subset = (term==2))
+lm.8.2 &lt;- lm(cumgpa ~ sat + hsperc + tothrs + female + black + white,
+             data = gpa3, subset = (term == 2))
 
 summary(lm.8.2)</code></pre>
 <pre><code>## 
@@ -195,7 +196,7 @@ summary(lm.8.2)</code></pre>
 ## Residual standard error: 0.4693 on 359 degrees of freedom
 ## Multiple R-squared:  0.4006, Adjusted R-squared:  0.3905 
 ## F-statistic: 39.98 on 6 and 359 DF,  p-value: &lt; 2.2e-16</code></pre>
-<pre class="r"><code>coeftest(lm.8.2, vcov=vcovHC(lm.8.2, type = &quot;HC0&quot;))</code></pre>
+<pre class="r"><code>coeftest(lm.8.2, vcov = vcovHC(lm.8.2, type = &quot;HC0&quot;))</code></pre>
 <pre><code>## 
 ## t test of coefficients:
 ## 
@@ -222,7 +223,7 @@ anova(lm.8.2, lm.8.2.2)</code></pre>
 ## 1    359 79.062                           
 ## 2    361 79.362 -2  -0.29934 0.6796 0.5075</code></pre>
 <p>Heteroskedasticity robust F-statistic</p>
-<pre class="r"><code>waldtest(lm.8.2, lm.8.2.2, vcov = vcovHC(lm.8.2, type=&#39;HC0&#39;))</code></pre>
+<pre class="r"><code>waldtest(lm.8.2, lm.8.2.2, vcov = vcovHC(lm.8.2, type = &quot;HC0&quot;))</code></pre>
 <pre><code>## Wald test
 ## 
 ## Model 1: cumgpa ~ sat + hsperc + tothrs + female + black + white
@@ -239,7 +240,8 @@ data(&quot;crime1&quot;)
 
 avgsensq &lt;- crime1$avgsen^2
 
-lm.8.3 &lt;- lm(narr86 ~ pcnv + avgsen + avgsensq + ptime86 + qemp86 + inc86 + black + hispan, data = crime1)
+lm.8.3 &lt;- lm(narr86 ~ pcnv + avgsen + avgsensq + ptime86 + qemp86 +
+               inc86 + black + hispan, data = crime1)
 
 summary(lm.8.3)</code></pre>
 <pre><code>## 
@@ -268,7 +270,7 @@ summary(lm.8.3)</code></pre>
 ## Residual standard error: 0.8284 on 2716 degrees of freedom
 ## Multiple R-squared:  0.0728, Adjusted R-squared:  0.07007 
 ## F-statistic: 26.66 on 8 and 2716 DF,  p-value: &lt; 2.2e-16</code></pre>
-<pre class="r"><code>coeftest(lm.8.3, vcov = vcovHC(lm.8.3,type = &quot;HC0&quot;))</code></pre>
+<pre class="r"><code>coeftest(lm.8.3, vcov = vcovHC(lm.8.3, type = &quot;HC0&quot;))</code></pre>
 <pre><code>## 
 ## t test of coefficients:
 ## 
@@ -285,8 +287,11 @@ summary(lm.8.3)</code></pre>
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <p>For the LM-test estimate the restricted model and regress its residuals on the variables of the unrestricted model. Obtain R-Squared and multiply it by the number of used observations to get the LM-value. Last, get the p-value.</p>
-<pre class="r"><code>lm.8.3.2 &lt;- lm(narr86 ~ pcnv + ptime86 + qemp86 + inc86 + black + hispan, data = crime1)
-lm.8.3.2u &lt;- lm(lm.8.3.2$residuals ~ pcnv + avgsen + avgsensq + ptime86 + qemp86 + inc86 + black + hispan, data = crime1)
+<pre class="r"><code>lm.8.3.2 &lt;- lm(narr86 ~ pcnv + ptime86 + qemp86 + inc86 +
+                 black + hispan, data = crime1)
+
+lm.8.3.2u &lt;- lm(lm.8.3.2$residuals ~ pcnv + avgsen + avgsensq + 
+                  ptime86 + qemp86 + inc86 + black + hispan, data = crime1)
 
 summary(lm.8.3.2u)$r.squared * 2725</code></pre>
 <pre><code>## [1] 3.462601</code></pre>
@@ -347,9 +352,10 @@ summary(lm.e8.17u)</code></pre>
 <pre class="r"><code># LM-test
 lm.e8.17u.2 &lt;- lm(usq.17 ~ 1, data = hprice1)
 lm.e8.17u.2u &lt;- lm(summary(lm.e8.17u.2)$residuals ~ lotsize + sqrft + bdrms, data = hprice1)
-summary(lm.e8.17u.2u)$r.squared*88</code></pre>
+
+summary(lm.e8.17u.2u)$r.squared * 88</code></pre>
 <pre><code>## [1] 14.09239</code></pre>
-<pre class="r"><code>1-pchisq(14.09239, 3)</code></pre>
+<pre class="r"><code>1 - pchisq(14.09239, 3)</code></pre>
 <pre><code>## [1] 0.002782054</code></pre>
 <pre class="r"><code># Using logarithms
 lm.e8.18 &lt;- lm(lprice ~ llotsize + lsqrft + bdrms, data = hprice1)
@@ -399,9 +405,9 @@ summary(lm.e8.18u)</code></pre>
 ## Multiple R-squared:  0.04799,    Adjusted R-squared:  0.01399 
 ## F-statistic: 1.412 on 3 and 84 DF,  p-value: 0.2451</code></pre>
 <pre class="r"><code># LM-test
-summary(lm.e8.18u)$r.squared*88</code></pre>
+summary(lm.e8.18u)$r.squared * 88</code></pre>
 <pre><code>## [1] 4.223248</code></pre>
-<pre class="r"><code>1-pchisq(4.223248, 3)</code></pre>
+<pre class="r"><code>1 - pchisq(4.223248, 3)</code></pre>
 <pre><code>## [1] 0.2383446</code></pre>
 </div>
 <div id="example-8.5" class="section level3">
@@ -457,7 +463,9 @@ summary(lm.8.6.2)</code></pre>
 ## Multiple R-squared:  0.07088,    Adjusted R-squared:  0.07042 
 ## F-statistic: 153.7 on 1 and 2015 DF,  p-value: &lt; 2.2e-16</code></pre>
 <pre class="r"><code>age.25sq &lt;- (k401ksubs$age - 25)^2
-lm.8.6.3 &lt;- lm(nettfa ~ age.25sq + male + e401k, data = k401ksubs, subset = (fsize == 1))
+lm.8.6.3 &lt;- lm(nettfa ~ age.25sq + male + e401k,
+               data = k401ksubs, subset = (fsize == 1))
+
 coeftest(lm.8.6.3, vcov = vcovHC(lm.8.6.3, type = &quot;HC0&quot;))</code></pre>
 <pre><code>## 
 ## t test of coefficients:
@@ -469,7 +477,8 @@ coeftest(lm.8.6.3, vcov = vcovHC(lm.8.6.3, type = &quot;HC0&quot;))</code></pre>
 ## e401k       13.1199818  2.4341139  5.3900 7.870e-08 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<pre class="r"><code>lm.8.6.4 &lt;- lm(nettfa ~ inc + age.25sq + male + e401k, weights = 1/inc, data = k401ksubs, subset = (fsize == 1))
+<pre class="r"><code>lm.8.6.4 &lt;- lm(nettfa ~ inc + age.25sq + male + e401k, weights = 1 / inc,
+               data = k401ksubs, subset = (fsize == 1))
 summary(lm.8.6.4)</code></pre>
 <pre><code>## 
 ## Call:
@@ -524,7 +533,8 @@ summary(lm.8.7)</code></pre>
 ## Multiple R-squared:  0.05274,    Adjusted R-squared:  0.04563 
 ## F-statistic: 7.423 on 6 and 800 DF,  p-value: 9.499e-08</code></pre>
 <pre class="r"><code># Breusch-Pagan
-summary(lm.8.7u &lt;-lm(lm.8.7$residuals^2 ~ lincome + lcigpric + educ + age + agesq + restaurn, data = smoke))</code></pre>
+summary(lm.8.7u &lt;-lm(lm.8.7$residuals^2 ~ lincome + lcigpric +
+                       educ + age + agesq + restaurn, data = smoke))</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = lm.8.7$residuals^2 ~ lincome + lcigpric + educ + 
@@ -555,9 +565,11 @@ summary(lm.8.7u &lt;-lm(lm.8.7$residuals^2 ~ lincome + lcigpric + educ + age + a
 <pre><code>## [1] 1.455779e-05</code></pre>
 <p>For feasible GLS you obtain the logarithm of squared residuals from the basic model. Then you regress it on the model’s independent variables and calculate the exponential of fitted values from that regression which gives hhat. Then you estimate the basic model again, but with the weights 1/hhat.</p>
 <pre class="r"><code>lres.u &lt;- log(lm.8.7$residuals^2)
-lm.8.7gls.u &lt;- lm(lres.u ~ lincome + lcigpric + educ + age + agesq + restaurn, data = smoke)
+lm.8.7gls.u &lt;- lm(lres.u ~ lincome + lcigpric + educ + age +
+                    agesq + restaurn, data = smoke)
 hhat &lt;- exp(lm.8.7gls.u$fitted.values)</code></pre>
-<pre class="r"><code>lm.8.7gls &lt;- lm(cigs ~ lincome + lcigpric + educ + age + agesq + restaurn, weights = 1 / hhat, data = smoke)
+<pre class="r"><code>lm.8.7gls &lt;- lm(cigs ~ lincome + lcigpric + educ + age + 
+                  agesq + restaurn, weights = 1 / hhat, data = smoke)
 summary(lm.8.7gls)</code></pre>
 <pre><code>## 
 ## Call:
@@ -612,7 +624,7 @@ summary(lm.8.6.4)</code></pre>
 ## Multiple R-squared:  0.1115, Adjusted R-squared:  0.1097 
 ## F-statistic: 63.13 on 4 and 2012 DF,  p-value: &lt; 2.2e-16</code></pre>
 <pre class="r"><code># Column 2
-coeftest(lm.8.6.4, vcov=vcovHC(lm.8.6.4, type = &quot;HC0&quot;))</code></pre>
+coeftest(lm.8.6.4, vcov = vcovHC(lm.8.6.4, type = &quot;HC0&quot;))</code></pre>
 <pre><code>## 
 ## t test of coefficients:
 ## 
@@ -630,7 +642,8 @@ coeftest(lm.8.6.4, vcov=vcovHC(lm.8.6.4, type = &quot;HC0&quot;))</code></pre>
 <p>With respect to linear probability models the procedure is rather similar to the first examples: estimate the model and use <code>coeftest</code> to get heteroskedasticity robust estimates of the standard errors.</p>
 <pre class="r"><code>data(&quot;mroz&quot;)
 
-lm.8.8 &lt;- lm(inlf ~ nwifeinc + educ + exper + expersq + age + kidslt6 + kidsge6, data = mroz)
+lm.8.8 &lt;- lm(inlf ~ nwifeinc + educ + exper + expersq +
+               age + kidslt6 + kidsge6, data = mroz)
 
 summary(lm.8.8)</code></pre>
 <pre><code>## 
@@ -681,7 +694,7 @@ summary(lm.8.8)</code></pre>
 
 # Generate dummy variable vector which is 1 when either the 
 # father or the mother or both were at college.
-parcoll &lt;- as.numeric(gpa1$fathcoll==1 | gpa1$mothcoll)
+parcoll &lt;- as.numeric(gpa1$fathcoll == 1 | gpa1$mothcoll)
 
 lm.8.9 &lt;- lm(PC ~ hsGPA + ACT + parcoll, data = gpa1)
 
