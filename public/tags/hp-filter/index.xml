@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Timeseries on r-econometrics</title>
-    <link>https://www.r-econometrics.com/timeseries/</link>
-    <description>Recent content in Timeseries on r-econometrics</description>
+    <title>Hp Filter on r-econometrics</title>
+    <link>https://www.r-econometrics.com/tags/hp-filter/</link>
+    <description>Recent content in Hp Filter on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Sun, 02 Dec 2018 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="https://www.r-econometrics.com/timeseries/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://www.r-econometrics.com/tags/hp-filter/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
@@ -18,15 +18,6 @@
       
       <guid>https://www.r-econometrics.com/timeseries/execonomic-cycle-extraction/</guid>
       <description>The analysis of economic time series often requires the extraction of their cyclical components. This post presents some methods, which can be used to decompose time series into their different components. It is based on the chapter on business cycles by Stock and Watson (1999) in the Handbook of Macroeconomics, but also presents some more recent methods like Hamilton’s (2017) alternative to the HP-filter, wavelet filtering and empirical mode decomposition.</description>
-    </item>
-    
-    <item>
-      <title>An Introduction to Vector Autoregression (VAR)</title>
-      <link>https://www.r-econometrics.com/timeseries/varintro/</link>
-      <pubDate>Fri, 31 Aug 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://www.r-econometrics.com/timeseries/varintro/</guid>
-      <description>Since the seminal paper of Sims (1980) vector autoregressive models have become a key instrument in macroeconomic research. This post presents the basic concept of VAR analysis and guides through the estimation procedure of a simple model. When I started my undergraduate program in economics I occasionally encountered the abbreviation VAR in some macro papers. I was fascinated by those waves in the boxes titled impulse responses and wondered how difficult it would be to do such reseach on my own.</description>
     </item>
     
   </channel>

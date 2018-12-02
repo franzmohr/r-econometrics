@@ -2,7 +2,7 @@
 /real-basics/*                        /rbasicsintro
 /author                               /about
 /wooldridge-2013/*                    /reproduction/wooldridge/wooldridgeintro
-/2015/10/27/extracting-business-cycles-from-raw-data-in-r   /
+/2015/10/27/extracting-business-cycles-from-raw-data-in-r   /timeseries/economic-cycle-extraction
 /finance/*                            /
 /time-series/an-introduction-to-vector-autoregression-var   /timeseries/varintro
 /crash-courses/*                        /rbasicsintro

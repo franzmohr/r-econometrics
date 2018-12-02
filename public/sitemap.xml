@@ -3,6 +3,11 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://www.r-econometrics.com/timeseries/execonomic-cycle-extraction/</loc>
+    <lastmod>2018-12-02T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://www.r-econometrics.com/methods/teststats/</loc>
     <lastmod>2018-12-02T00:00:00+00:00</lastmod>
   </url>
@@ -168,7 +173,25 @@
   </url>
   
   <url>
+    <loc>https://www.r-econometrics.com/tags/baxter-king/</loc>
+    <lastmod>2018-12-02T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>https://www.r-econometrics.com/categories/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/emd/</loc>
+    <lastmod>2018-12-02T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/empirical-mode-decomposition/</loc>
+    <lastmod>2018-12-02T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -187,6 +210,18 @@
   <url>
     <loc>https://www.r-econometrics.com/tags/graphics/</loc>
     <lastmod>2018-02-04T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/hodrick-prescott/</loc>
+    <lastmod>2018-12-02T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/hp-filter/</loc>
+    <lastmod>2018-12-02T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -234,7 +269,7 @@
   
   <url>
     <loc>https://www.r-econometrics.com/timeseries/</loc>
-    <lastmod>2018-08-31T00:00:00+00:00</lastmod>
+    <lastmod>2018-12-02T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -253,6 +288,12 @@
   <url>
     <loc>https://www.r-econometrics.com/tags/vector-autoregression/</loc>
     <lastmod>2018-08-31T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/wavelet/</loc>
+    <lastmod>2018-12-02T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
