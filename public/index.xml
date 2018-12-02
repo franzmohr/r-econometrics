@@ -6,10 +6,20 @@
     <description>Recent content on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 01 Dec 2018 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 02 Dec 2018 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://www.r-econometrics.com/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Model Testing in R</title>
+      <link>https://www.r-econometrics.com/methods/teststats/</link>
+      <pubDate>Sun, 02 Dec 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/methods/teststats/</guid>
+      <description>Model testing belongs to the main tasks of any econometric analysis. This post illustrates how to calculate basic test statistics in R. It also covers the calculation of heteroskedasticy robust standard erros.
+Data To illustrate the calculation of test statistics in R, let’s use the wage1 dataset from the wooldridge package and estimate a basic Mincer earnings function. This standard specification of earnings models explains the natural log of average hourly earnings lwage by years of education educ and experience exper.</description>
+    </item>
     
     <item>
       <title>Chapter 8: Heteroskedasticity</title>
@@ -183,7 +193,7 @@ download.file(&amp;quot;http://qed.econ.queensu.ca/jae/1997-v12.3/cincera/mc-dat
       <pubDate>Tue, 27 Mar 2018 00:00:00 +0000</pubDate>
       
       <guid>https://www.r-econometrics.com/timeseriesintro/</guid>
-      <description>Work in progress (March 2018). I will try to update this page over the next few months.
+      <description>Work in progress (December 2018). I will try to update this page over the next few months.
 This section is intended to provide an overview of the relevant issues in (macro)economic time series analysis. Again the standard disclaimer: This site does not replace a good textbook, but it should help you to get a grasp of the basic concepts more quickly than if you learned it on your own.
 The intended structure of this site is:</description>
     </item>

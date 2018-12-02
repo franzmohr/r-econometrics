@@ -6,10 +6,20 @@
     <description>Recent content in Methods on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 07 Oct 2018 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 02 Dec 2018 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://www.r-econometrics.com/methods/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Model Testing in R</title>
+      <link>https://www.r-econometrics.com/methods/teststats/</link>
+      <pubDate>Sun, 02 Dec 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/methods/teststats/</guid>
+      <description>Model testing belongs to the main tasks of any econometric analysis. This post illustrates how to calculate basic test statistics in R. It also covers the calculation of heteroskedasticy robust standard erros.
+Data To illustrate the calculation of test statistics in R, let’s use the wage1 dataset from the wooldridge package and estimate a basic Mincer earnings function. This standard specification of earnings models explains the natural log of average hourly earnings lwage by years of education educ and experience exper.</description>
+    </item>
     
     <item>
       <title>An Introduction to Ordinary Least Squares (OLS) in R</title>
