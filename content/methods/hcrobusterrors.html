@@ -1,0 +1,113 @@
+---
+title: "Heteroskedasticity Robust Standard Errors in R"
+author: "Franz X. Mohr"
+date: "2018-12-24"
+tags:
+  - heteroskedasticity
+  - t-test
+  - F-test
+  - robust-error
+---
+
+
+
+<p>Although heteroskedasticity does not produce biased <a href="/methods/ols">OLS</a> estimates, it leads to a bias in the variance-covariance matrix. This means that standard model testing methods such as t tests or F tests cannot be relied on any longer. This post provides an intuitive illustration of heteroskedasticity and covers the calculation of standard errors that are robust to it.</p>
+<div id="data" class="section level2">
+<h2>Data</h2>
+<p>A popular illustration of heteroskedasticity is the relationship between saving and income, which is shown in the following graph. The dataset is contained the <em>wooldridge</em> package.<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a></p>
+<pre class="r"><code># Load packages
+library(dplyr)
+library(ggplot2)
+library(wooldridge)
+
+# Load the sample
+data(&quot;saving&quot;)
+
+# Only use positive values of saving, which are smaller than income
+saving &lt;- saving %&gt;%
+  filter(sav &gt; 0,
+         inc &lt; 20000,
+         sav &lt; inc)
+
+# Plot
+ggplot(saving, aes(x = inc, y = sav)) +
+  geom_point() +
+  geom_smooth(method = &quot;lm&quot;, se = FALSE) +
+  labs(x = &quot;Annual income&quot;, y = &quot;Annual savings&quot;)</code></pre>
+<p><img src="/methods/hcrobusterrors_files/figure-html/sav-inc-1.png" width="336" /></p>
+<p>The regression line in the graph shows a clear positive relationship between saving and income. However, as income increases, the differences between the observations and the regression line become larger. This means that there is higher uncertainty about the estimated relationship between the two variables at higher income levels. This is an example of heteroskedasticity.</p>
+<p>Since standard model testing methods rely on the assumption that there is no correlation between the independent variables and the <em>variance</em> of the dependent variable, the usual standard errors are not very reliable in the presence of heteroskedasticity. Fortunately, the calculation of robust standard errors can help to mitigate this problem.</p>
+</div>
+<div id="robust-standard-errors" class="section level2">
+<h2>Robust standard errors</h2>
+<p>The regression line above was derived from the model <span class="math display">\[sav_i = \beta_0 + \beta_1 inc_i + \epsilon_i,\]</span> for which the following code produces the standard R output:</p>
+<pre class="r"><code># Estimate the model
+model &lt;- lm(sav ~ inc, data = saving)
+
+# Print estimates and standard test statistics
+summary(model)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = sav ~ inc, data = saving)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -2667.8  -874.5  -302.7   431.1  4606.6 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)   
+## (Intercept) 316.19835  462.06882   0.684  0.49595   
+## inc           0.14052    0.04672   3.007  0.00361 **
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1413 on 73 degrees of freedom
+## Multiple R-squared:  0.1102, Adjusted R-squared:  0.09805 
+## F-statistic: 9.044 on 1 and 73 DF,  p-value: 0.003613</code></pre>
+<p><strong>t test</strong></p>
+<p>Since we already know that the model above suffers from heteroskedasticity, we want to obtain heteroskedasticity robust standard errors and their corresponding t values. In R the function <code>coeftest</code> from the <em>lmtest</em> package can be used in combination with the function <code>vcovHC</code> from the <em>sandwich</em> package to do this.</p>
+<p>The first argument of the <code>coeftest</code> function contains the output of the <code>lm</code> function and calculates the t test based on the variance-covariance matrix provided in the <code>vcov</code> argument. The <code>vcovHC</code> function produces that matrix and allows to obtain several types of heteroskedasticity robust versions of it. In our case we obtain a simple White standard error, which is indicated by <code>type = &quot;HC0&quot;</code>. Other, more sophisticated methods are described in the documentation of the function, <code>?vcovHC</code>.</p>
+<pre class="r"><code>library(&quot;lmtest&quot;)
+library(&quot;sandwich&quot;)
+
+coeftest(model, vcov = vcovHC(model, type = &quot;HC0&quot;))</code></pre>
+<pre><code>## 
+## t test of coefficients:
+## 
+##               Estimate Std. Error t value Pr(&gt;|t|)   
+## (Intercept) 316.198354 414.728032  0.7624 0.448264   
+## inc           0.140515   0.048805  2.8791 0.005229 **
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p><strong>F test</strong></p>
+<p>In the post on <a href="/methods/teststats">hypothesis testing</a> the F test is presented as a method to test the joint significance of multiple regressors. The following example adds two new regressors on education and age to the above model and calculates the corresponding (non-robust) F test using the <code>anova</code> function.</p>
+<pre class="r"><code>model_unres &lt;- lm(sav ~ inc + size + educ + age, data = saving)
+
+anova(model, model_unres)</code></pre>
+<pre><code>## Analysis of Variance Table
+## 
+## Model 1: sav ~ inc
+## Model 2: sav ~ inc + size + educ + age
+##   Res.Df       RSS Df Sum of Sq      F Pr(&gt;F)
+## 1     73 145846877                           
+## 2     70 144286605  3   1560272 0.2523 0.8594</code></pre>
+<p>For a heteroskedasticity robust F test we perform a Wald test using the <code>waldtest</code> function, which is also contained in the <em>lmtest</em> package. It can be used in a similar way as the <code>anova</code> function, i.e., it uses the output of the restricted and unrestricted model and the robust variance-covariance matrix as argument <code>vcov</code>. Based on the variance-covariance matrix of the unrestriced model we, again, calculate White standard errors.</p>
+<pre class="r"><code>waldtest(model, model_unres, vcov = vcovHC(model_unres, type = &quot;HC0&quot;))</code></pre>
+<pre><code>## Wald test
+## 
+## Model 1: sav ~ inc
+## Model 2: sav ~ inc + size + educ + age
+##   Res.Df Df      F Pr(&gt;F)
+## 1     73                 
+## 2     70  3 0.3625 0.7803</code></pre>
+</div>
+<div id="literature" class="section level2">
+<h2>Literature</h2>
+<p>Kennedy, P. (2014). A Guide to Econometrics. Malden (Mass.): Blackwell Publishing 6th ed.</p>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>Observations, where variable <code>inc</code> is larger than 20,000 or variable <code>sav</code> is negative or larger than <code>inc</code> are dropped from the sample.<a href="#fnref1">↩</a></p></li>
+</ol>
+</div>

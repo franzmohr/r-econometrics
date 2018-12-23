@@ -9,7 +9,7 @@ tags:
 
 
 
-<p>Model testing belongs to the main tasks of any econometric analysis. This post illustrates how to calculate basic test statistics in R. It also covers the calculation of heteroskedasticy robust standard erros.</p>
+<p>Model testing belongs to the main tasks of any econometric analysis. This post illustrates how to calculate basic test statistics such as the t-statistic and the F-test in R.</p>
 <div id="data" class="section level2">
 <h2>Data</h2>
 <p>To illustrate the calculation of test statistics in R, let’s use the <em>wage1</em> dataset from the <code>wooldridge</code> package and estimate a basic <a href="https://en.wikipedia.org/wiki/Mincer_earnings_function" target="_blank">Mincer earnings function</a>. This standard specification of earnings models explains the natural log of average hourly earnings <code>lwage</code> by years of education <code>educ</code> and experience <code>exper</code>. The standard specification also includes the squared values of experience <code>expersq</code> to take into account potential decreasing marginal effects.</p>

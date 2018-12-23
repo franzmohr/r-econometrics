@@ -19,10 +19,10 @@ if (!doNotTrack) {
         <meta http-equiv="content-type" content="text/html; charset=utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
 
-        <title>Model Testing in R &middot; r-econometrics</title>
+        <title>Heteroskedasticity Robust Standard Errors in R &middot; r-econometrics</title>
         <link rel='stylesheet' href='//fonts.googleapis.com/css?family=Open+Sans:400,300,600' type='text/css'>
-        <link rel="stylesheet" href="https://www.r-econometrics.com//libraries/normalize.3.0.1.css" />
-        <link rel="stylesheet" href="https://www.r-econometrics.com//css/liquorice.css" />
+        <link rel="stylesheet" href="//libraries/normalize.3.0.1.css" />
+        <link rel="stylesheet" href="//css/liquorice.css" />
         <link rel="shortcut icon" href="/favicon.ico" />
         <link rel="apple-touch-icon-precomposed" href="/apple-touch-icon-144-precomposed.png" sizes="144x144" />
         <link rel="alternate" href="" type="application/rss+xml" title="r-econometrics" />
@@ -34,7 +34,7 @@ if (!doNotTrack) {
         <div class="row">
             <div class="sixteen columns">
                 <div class="li-brand li-left">
-                <a href="https://www.r-econometrics.com/">r-econometrics</a></div>
+                <a href="/">r-econometrics</a></div>
                 <div class="li-menu li-right">
                     <span class="li-menu-icon" onclick="javascript:toggle('menu');">&#9776;</span>
                     <ul id="menu2" class="li-menu-items">
@@ -87,108 +87,127 @@ if (!doNotTrack) {
             <div class="sixteen columns">
                 <article class="li-article">
                     <header class="li-article-header">
-                        <h1 class="li-article-title">Model Testing in R</h1>
+                        <h1 class="li-article-title">Heteroskedasticity Robust Standard Errors in R</h1>
                         <span class="li-article-taxonomies">
                             
 
                             
                                 with tags
                                 
-                                    <a href="https://www.r-econometrics.com//tags/t-test">t-test</a>
+                                    <a href="//tags/heteroskedasticity">heteroskedasticity</a>
                                 
-                                    <a href="https://www.r-econometrics.com//tags/f-test">f-test</a>
+                                    <a href="//tags/t-test">t-test</a>
+                                
+                                    <a href="//tags/f-test">F-test</a>
+                                
+                                    <a href="//tags/robust-error">robust-error</a>
                                 
                             
                         </span>
                          - 
-                        <time class="li-article-date">Franz X. Mohr, December 2, 2018
+                        <time class="li-article-date">Franz X. Mohr, December 24, 2018
                         </time>
                     </header>
                     <section>
-                        <p>Model testing belongs to the main tasks of any econometric analysis. This post illustrates how to calculate basic test statistics such as the t-statistic and the F-test in R.</p>
+                        <p>Although heteroskedasticity does not produce biased <a href="/methods/ols">OLS</a> estimates, it leads to a bias in the variance-covariance matrix. This means that standard model testing methods such as t tests or F tests cannot be relied on any longer. This post provides an intuitive illustration of heteroskedasticity and covers the calculation of standard errors that are robust to it.</p>
 <div id="data" class="section level2">
 <h2>Data</h2>
-<p>To illustrate the calculation of test statistics in R, let’s use the <em>wage1</em> dataset from the <code>wooldridge</code> package and estimate a basic <a href="https://en.wikipedia.org/wiki/Mincer_earnings_function" target="_blank">Mincer earnings function</a>. This standard specification of earnings models explains the natural log of average hourly earnings <code>lwage</code> by years of education <code>educ</code> and experience <code>exper</code>. The standard specification also includes the squared values of experience <code>expersq</code> to take into account potential decreasing marginal effects.</p>
-<pre class="r"><code># Load dataset
+<p>A popular illustration of heteroskedasticity is the relationship between saving and income, which is shown in the following graph. The dataset is contained the <em>wooldridge</em> package.<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a></p>
+<pre class="r"><code># Load packages
+library(dplyr)
+library(ggplot2)
 library(wooldridge)
-data(&quot;wage1&quot;)
 
-# Estimate a model
-model &lt;- lm(lwage ~ educ + exper + expersq, data = wage1)</code></pre>
+# Load the sample
+data(&quot;saving&quot;)
+
+# Only use positive values of saving, which are smaller than income
+saving &lt;- saving %&gt;%
+  filter(sav &gt; 0,
+         inc &lt; 20000,
+         sav &lt; inc)
+
+# Plot
+ggplot(saving, aes(x = inc, y = sav)) +
+  geom_point() +
+  geom_smooth(method = &quot;lm&quot;, se = FALSE) +
+  labs(x = &quot;Annual income&quot;, y = &quot;Annual savings&quot;)</code></pre>
+<p><img src="/methods/hcrobusterrors_files/figure-html/sav-inc-1.png" width="336" /></p>
+<p>The regression line in the graph shows a clear positive relationship between saving and income. However, as income increases, the differences between the observations and the regression line become larger. This means that there is higher uncertainty about the estimated relationship between the two variables at higher income levels. This is an example of heteroskedasticity.</p>
+<p>Since standard model testing methods rely on the assumption that there is no correlation between the independent variables and the <em>variance</em> of the dependent variable, the usual standard errors are not very reliable in the presence of heteroskedasticity. Fortunately, the calculation of robust standard errors can help to mitigate this problem.</p>
 </div>
-<div id="t-test" class="section level2">
-<h2>t test</h2>
-<p>t tests are used to assess the statistical significance of single variables. In R t values for each variable in a regression model are usually already calculated by the <code>summary</code> function.</p>
-<pre class="r"><code>summary(model)</code></pre>
+<div id="robust-standard-errors" class="section level2">
+<h2>Robust standard errors</h2>
+<p>The regression line above was derived from the model <span class="math display">\[sav_i = \beta_0 + \beta_1 inc_i + \epsilon_i,\]</span> for which the following code produces the standard R output:</p>
+<pre class="r"><code># Estimate the model
+model &lt;- lm(sav ~ inc, data = saving)
+
+# Print estimates and standard test statistics
+summary(model)</code></pre>
 <pre><code>## 
 ## Call:
-## lm(formula = lwage ~ educ + exper + expersq, data = wage1)
+## lm(formula = sav ~ inc, data = saving)
 ## 
 ## Residuals:
-##      Min       1Q   Median       3Q      Max 
-## -1.96387 -0.29375 -0.04009  0.29497  1.30216 
+##     Min      1Q  Median      3Q     Max 
+## -2667.8  -874.5  -302.7   431.1  4606.6 
 ## 
 ## Coefficients:
-##               Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)  0.1279975  0.1059323   1.208    0.227    
-## educ         0.0903658  0.0074680  12.100  &lt; 2e-16 ***
-## exper        0.0410089  0.0051965   7.892 1.77e-14 ***
-## expersq     -0.0007136  0.0001158  -6.164 1.42e-09 ***
+##              Estimate Std. Error t value Pr(&gt;|t|)   
+## (Intercept) 316.19835  462.06882   0.684  0.49595   
+## inc           0.14052    0.04672   3.007  0.00361 **
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Residual standard error: 0.4459 on 522 degrees of freedom
-## Multiple R-squared:  0.3003, Adjusted R-squared:  0.2963 
-## F-statistic: 74.67 on 3 and 522 DF,  p-value: &lt; 2.2e-16</code></pre>
-<p>The t values for our benchmark model indicate that, except for the constant, all variables are statistically significant. You might think about dropping the intercept term at this point, but let’s forget about this for the moment.</p>
-</div>
-<div id="f-test" class="section level2">
-<h2>F test</h2>
-<p>F tests can be used to check, whether one or multiple variables in a model are statistically significant. Basically, the test compares two models with each other, where one model is a special case of the other. This means that we compare a model with more variables - the so-called <em>unrestricted</em> model - to a model with less but otherwise the same variables, i.e. the <em>restriced</em> or nested model. If the additional predictive power of the unrestricted model is sufficiently high, the variables are jointly significant.</p>
-<p>In our example, we add the <code>tenure</code> variable and its square <code>tenuresq</code> to the model equation. This is the unrestricted model, which we have to estimate before we can calculate the F test.</p>
-<pre class="r"><code># Estimate unrestricted model
-model_unres &lt;- lm(lwage ~ educ + exper + expersq + tenure + tenursq, data = wage1)
+## Residual standard error: 1413 on 73 degrees of freedom
+## Multiple R-squared:  0.1102, Adjusted R-squared:  0.09805 
+## F-statistic: 9.044 on 1 and 73 DF,  p-value: 0.003613</code></pre>
+<p><strong>t test</strong></p>
+<p>Since we already know that the model above suffers from heteroskedasticity, we want to obtain heteroskedasticity robust standard errors and their corresponding t values. In R the function <code>coeftest</code> from the <em>lmtest</em> package can be used in combination with the function <code>vcovHC</code> from the <em>sandwich</em> package to do this.</p>
+<p>The first argument of the <code>coeftest</code> function contains the output of the <code>lm</code> function and calculates the t test based on the variance-covariance matrix provided in the <code>vcov</code> argument. The <code>vcovHC</code> function produces that matrix and allows to obtain several types of heteroskedasticity robust versions of it. In our case we obtain a simple White standard error, which is indicated by <code>type = &quot;HC0&quot;</code>. Other, more sophisticated methods are described in the documentation of the function, <code>?vcovHC</code>.</p>
+<pre class="r"><code>library(&quot;lmtest&quot;)
+library(&quot;sandwich&quot;)
 
-summary(model_unres)</code></pre>
+coeftest(model, vcov = vcovHC(model, type = &quot;HC0&quot;))</code></pre>
 <pre><code>## 
-## Call:
-## lm(formula = lwage ~ educ + exper + expersq + tenure + tenursq, 
-##     data = wage1)
+## t test of coefficients:
 ## 
-## Residuals:
-##      Min       1Q   Median       3Q      Max 
-## -1.96984 -0.25313 -0.03204  0.27141  1.28302 
-## 
-## Coefficients:
-##               Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)  0.2015715  0.1014697   1.987   0.0475 *  
-## educ         0.0845258  0.0071614  11.803  &lt; 2e-16 ***
-## exper        0.0293010  0.0052885   5.540 4.80e-08 ***
-## expersq     -0.0005918  0.0001141  -5.189 3.04e-07 ***
-## tenure       0.0371222  0.0072432   5.125 4.20e-07 ***
-## tenursq     -0.0006156  0.0002495  -2.468   0.0139 *  
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-## 
-## Residual standard error: 0.425 on 520 degrees of freedom
-## Multiple R-squared:  0.3669, Adjusted R-squared:  0.3608 
-## F-statistic: 60.26 on 5 and 520 DF,  p-value: &lt; 2.2e-16</code></pre>
-<p>The t values of the new model indicate that all variabes - including the constant - are statistically significant and <code>tenure</code> provides additional explanatory power to the model. Since <code>tenure</code> also enters in its squared form, we are interested in the joint significance of the tenure terms. This can be checked with an F test. In R we can use the <code>anova</code> function for this, where we proved the two estimated models as arguments.</p>
-<pre class="r"><code>anova(model, model_unres)</code></pre>
-<pre><code>## Analysis of Variance Table
-## 
-## Model 1: lwage ~ educ + exper + expersq
-## Model 2: lwage ~ educ + exper + expersq + tenure + tenursq
-##   Res.Df     RSS Df Sum of Sq      F    Pr(&gt;F)    
-## 1    522 103.790                                  
-## 2    520  93.911  2    9.8791 27.351 5.079e-12 ***
+##               Estimate Std. Error t value Pr(&gt;|t|)   
+## (Intercept) 316.198354 414.728032  0.7624 0.448264   
+## inc           0.140515   0.048805  2.8791 0.005229 **
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<p>As you can see from the output, the tenure terms are joinly significant.</p>
+<p><strong>F test</strong></p>
+<p>In the post on <a href="/methods/teststats">hypothesis testing</a> the F test is presented as a method to test the joint significance of multiple regressors. The following example adds two new regressors on education and age to the above model and calculates the corresponding (non-robust) F test using the <code>anova</code> function.</p>
+<pre class="r"><code>model_unres &lt;- lm(sav ~ inc + size + educ + age, data = saving)
+
+anova(model, model_unres)</code></pre>
+<pre><code>## Analysis of Variance Table
+## 
+## Model 1: sav ~ inc
+## Model 2: sav ~ inc + size + educ + age
+##   Res.Df       RSS Df Sum of Sq      F Pr(&gt;F)
+## 1     73 145846877                           
+## 2     70 144286605  3   1560272 0.2523 0.8594</code></pre>
+<p>For a heteroskedasticity robust F test we perform a Wald test using the <code>waldtest</code> function, which is also contained in the <em>lmtest</em> package. It can be used in a similar way as the <code>anova</code> function, i.e., it uses the output of the restricted and unrestricted model and the robust variance-covariance matrix as argument <code>vcov</code>. Based on the variance-covariance matrix of the unrestriced model we, again, calculate White standard errors.</p>
+<pre class="r"><code>waldtest(model, model_unres, vcov = vcovHC(model_unres, type = &quot;HC0&quot;))</code></pre>
+<pre><code>## Wald test
+## 
+## Model 1: sav ~ inc
+## Model 2: sav ~ inc + size + educ + age
+##   Res.Df Df      F Pr(&gt;F)
+## 1     73                 
+## 2     70  3 0.3625 0.7803</code></pre>
 </div>
 <div id="literature" class="section level2">
 <h2>Literature</h2>
 <p>Kennedy, P. (2014). A Guide to Econometrics. Malden (Mass.): Blackwell Publishing 6th ed.</p>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>Observations, where variable <code>inc</code> is larger than 20,000 or variable <code>sav</code> is negative or larger than <code>inc</code> are dropped from the sample.<a href="#fnref1">↩</a></p></li>
+</ol>
 </div>
 
                     </section>
