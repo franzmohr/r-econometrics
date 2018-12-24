@@ -64,12 +64,15 @@ summary(model)</code></pre>
 ## Residual standard error: 1413 on 73 degrees of freedom
 ## Multiple R-squared:  0.1102, Adjusted R-squared:  0.09805 
 ## F-statistic: 9.044 on 1 and 73 DF,  p-value: 0.003613</code></pre>
-<p><strong>t test</strong></p>
+<div id="t-test" class="section level3">
+<h3>t test</h3>
 <p>Since we already know that the model above suffers from heteroskedasticity, we want to obtain heteroskedasticity robust standard errors and their corresponding t values. In R the function <code>coeftest</code> from the <em>lmtest</em> package can be used in combination with the function <code>vcovHC</code> from the <em>sandwich</em> package to do this.</p>
 <p>The first argument of the <code>coeftest</code> function contains the output of the <code>lm</code> function and calculates the t test based on the variance-covariance matrix provided in the <code>vcov</code> argument. The <code>vcovHC</code> function produces that matrix and allows to obtain several types of heteroskedasticity robust versions of it. In our case we obtain a simple White standard error, which is indicated by <code>type = &quot;HC0&quot;</code>. Other, more sophisticated methods are described in the documentation of the function, <code>?vcovHC</code>.</p>
-<pre class="r"><code>library(&quot;lmtest&quot;)
+<pre class="r"><code># Load libraries
+library(&quot;lmtest&quot;)
 library(&quot;sandwich&quot;)
 
+# Robust t test
 coeftest(model, vcov = vcovHC(model, type = &quot;HC0&quot;))</code></pre>
 <pre><code>## 
 ## t test of coefficients:
@@ -79,10 +82,14 @@ coeftest(model, vcov = vcovHC(model, type = &quot;HC0&quot;))</code></pre>
 ## inc           0.140515   0.048805  2.8791 0.005229 **
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<p><strong>F test</strong></p>
+</div>
+<div id="f-test" class="section level3">
+<h3>F test</h3>
 <p>In the post on <a href="/methods/teststats">hypothesis testing</a> the F test is presented as a method to test the joint significance of multiple regressors. The following example adds two new regressors on education and age to the above model and calculates the corresponding (non-robust) F test using the <code>anova</code> function.</p>
-<pre class="r"><code>model_unres &lt;- lm(sav ~ inc + size + educ + age, data = saving)
+<pre class="r"><code># Estimate unrestricted model
+model_unres &lt;- lm(sav ~ inc + size + educ + age, data = saving)
 
+# F test
 anova(model, model_unres)</code></pre>
 <pre><code>## Analysis of Variance Table
 ## 
@@ -100,6 +107,7 @@ anova(model, model_unres)</code></pre>
 ##   Res.Df Df      F Pr(&gt;F)
 ## 1     73                 
 ## 2     70  3 0.3625 0.7803</code></pre>
+</div>
 </div>
 <div id="literature" class="section level2">
 <h2>Literature</h2>

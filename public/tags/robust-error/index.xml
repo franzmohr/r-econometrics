@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Robust Error on r-econometrics</title>
-    <link>/tags/robust-error/</link>
+    <link>https://www.r-econometrics.com/tags/robust-error/</link>
     <description>Recent content in Robust Error on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Mon, 24 Dec 2018 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="/tags/robust-error/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://www.r-econometrics.com/tags/robust-error/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Heteroskedasticity Robust Standard Errors in R</title>
-      <link>/methods/hcrobusterrors/</link>
+      <link>https://www.r-econometrics.com/methods/hcrobusterrors/</link>
       <pubDate>Mon, 24 Dec 2018 00:00:00 +0000</pubDate>
       
-      <guid>/methods/hcrobusterrors/</guid>
+      <guid>https://www.r-econometrics.com/methods/hcrobusterrors/</guid>
       <description>Although heteroskedasticity does not produce biased OLS estimates, it leads to a bias in the variance-covariance matrix. This means that standard model testing methods such as t tests or F tests cannot be relied on any longer. This post provides an intuitive illustration of heteroskedasticity and covers the calculation of standard errors that are robust to it.
 Data A popular illustration of heteroskedasticity is the relationship between saving and income, which is shown in the following graph.</description>
     </item>

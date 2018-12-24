@@ -3,6 +3,11 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://www.r-econometrics.com/methods/hcrobusterrors/</loc>
+    <lastmod>2018-12-24T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://www.r-econometrics.com/timeseries/economic-cycle-extraction/</loc>
     <lastmod>2018-12-02T00:00:00+00:00</lastmod>
   </url>
@@ -197,7 +202,7 @@
   
   <url>
     <loc>https://www.r-econometrics.com/tags/f-test/</loc>
-    <lastmod>2018-12-02T00:00:00+00:00</lastmod>
+    <lastmod>2018-12-24T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -210,6 +215,12 @@
   <url>
     <loc>https://www.r-econometrics.com/tags/graphics/</loc>
     <lastmod>2018-02-04T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/heteroskedasticity/</loc>
+    <lastmod>2018-12-24T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -227,7 +238,7 @@
   
   <url>
     <loc>https://www.r-econometrics.com/methods/</loc>
-    <lastmod>2018-12-02T00:00:00+00:00</lastmod>
+    <lastmod>2018-12-24T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -256,8 +267,14 @@
   </url>
   
   <url>
+    <loc>https://www.r-econometrics.com/tags/robust-error/</loc>
+    <lastmod>2018-12-24T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>https://www.r-econometrics.com/tags/t-test/</loc>
-    <lastmod>2018-12-02T00:00:00+00:00</lastmod>
+    <lastmod>2018-12-24T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -299,7 +316,7 @@
   
   <url>
     <loc>https://www.r-econometrics.com/</loc>
-    <lastmod>2018-12-02T00:00:00+00:00</lastmod>
+    <lastmod>2018-12-24T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
