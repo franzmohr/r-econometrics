@@ -6,10 +6,30 @@
     <description>Recent content on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 24 Dec 2018 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 25 Dec 2018 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://www.r-econometrics.com/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Links</title>
+      <link>https://www.r-econometrics.com/links/</link>
+      <pubDate>Tue, 25 Dec 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/links/</guid>
+      <description>Resources for learning R R-Project
+RStudio
+DataCamp: Courses on data analysis with R
+Selva Prabhakaran’s r-statistics.co also provides very good intros to R
+Great intros to R basics packed into exercises
+Great intro to basic R applications by Ralf Becker and James Lincoln
+OnePageR: Compact intro to many methods of data science
+Codeschool: R-Tutorials
+Endmemo: R-Tutorials
+Wikibook on R Programming
+Wikibook on R Programming
+MastersInDataScience.org: A website listing data science programs at U.</description>
+    </item>
     
     <item>
       <title>Heteroskedasticity Robust Standard Errors in R</title>
@@ -174,26 +194,6 @@ The data sets are from the wooldridge package, which is a collection of all data
       
       <guid>https://www.r-econometrics.com/rbasics/rstructure/</guid>
       <description>R can be comprehended as a language that provides the basis for a system of code chunks, which have been developed by many people across the globe, who wanted to share their work. These code chunks are called packages. And each of those packages usually consist of at least one function.1 This structure is presented in the following graph. Beside a schematic description of a package and its functions in the upper part of the graph it also contains some real world examples using the packages ggplot2 and dplyr.</description>
-    </item>
-    
-    <item>
-      <title>Links</title>
-      <link>https://www.r-econometrics.com/links/</link>
-      <pubDate>Sun, 03 Jun 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://www.r-econometrics.com/links/</guid>
-      <description>Resources for learning R R-Project
-RStudio
-DataCamp: Courses on data analysis with R
-Selva Prabhakaran’s r-statistics.co also provides very good intros to R
-Nice intro to R basics packed into exercises
-OnePageR: Compact intro to many methods of data science
-Codeschool: R-Tutorials
-Endmemo: R-Tutorials
-Wikibook on R Programming
-Wikibook on R Programming
-MastersInDataScience.org: A website listing data science programs at U.S. universities
- Data Financial portfolio and benchmark data provided by Kenneth R.</description>
     </item>
     
     <item>
