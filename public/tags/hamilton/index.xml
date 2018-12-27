@@ -17,7 +17,7 @@
       <pubDate>Thu, 27 Dec 2018 00:00:00 +0000</pubDate>
       
       <guid>https://www.r-econometrics.com/timeseries/economic-cycle-extraction/</guid>
-      <description>The analysis of economic time series often requires the extraction of their cyclical components. This post presents some methods, which can be used to decompose time series into their different components. It is based on the chapter on business cycles by Stock and Watson (1999) in the Handbook of Macroeconomics, but also presents some more recent methods like Hamilton’s (2017) alternative to the HP-filter, wavelet filtering and empirical mode decomposition.</description>
+      <description>The analysis of economic time series often requires the extraction of their cyclical components. This post presents some methods, which can be used to decompose time series into their different components. It is based on the chapter on business cycles by Stock and Watson (1999) in the Handbook of Macroeconomics, but also presents some more recent methods like Hamilton’s (2018) alternative to the HP-filter, wavelet filtering and empirical mode decomposition.</description>
     </item>
     
   </channel>

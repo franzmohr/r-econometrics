@@ -119,7 +119,7 @@ if (!doNotTrack) {
                         </time>
                     </header>
                     <section>
-                        <p>The analysis of economic time series often requires the extraction of their cyclical components. This post presents some methods, which can be used to decompose time series into their different components. It is based on the chapter on business cycles by Stock and Watson (1999) in the Handbook of Macroeconomics, but also presents some more recent methods like Hamilton’s (2017) alternative to the HP-filter, wavelet filtering and empirical mode decomposition.</p>
+                        <p>The analysis of economic time series often requires the extraction of their cyclical components. This post presents some methods, which can be used to decompose time series into their different components. It is based on the chapter on business cycles by Stock and Watson (1999) in the Handbook of Macroeconomics, but also presents some more recent methods like Hamilton’s (2018) alternative to the HP-filter, wavelet filtering and empirical mode decomposition.</p>
 <div id="data" class="section level3">
 <h3>Data</h3>
 <p>I use quarterly data of US log real GDP from 1970Q1 to 2016Q4 for the illustration of the different methods. The time series is obtained via <a href="https://www.quandl.com/data/FRED/GDPC1-Real-Gross-Domestic-Product">Quandl</a> and its respectiv R-package. The original series can be downloaded from the <a href="https://fred.stlouisfed.org/series/GDPC1">FRED database</a>.</p>
@@ -206,36 +206,25 @@ ggplot(temp, aes(x = date, y = value, colour = Variable)) +
   labs(title = &quot;HP filter&quot;,
        x = &quot;Qurarter&quot;, y = &quot;&quot;)</code></pre>
 <p><img src="/timeseries/economic-cycle-extraction_files/figure-html/hodrick%20prescott-1.png" width="432" /></p>
-<p>Although widely used in economics, the HP filter is also heavily criticised for some features. See, for example, a good overview in a <a href="http://bruegel.org/2012/07/blogs-review-hp-filters-and-business-cycles/" target="_blank">Bruegel blog post</a> by Jérémie Cohen-Setton and Yury Yatsynovich and <a href="https://www.nber.org/papers/w23429" target="_blank">here</a> for the working paper version of a critique by James Hamilton.</p>
+<p>Although widely used in economics, the HP filter is also heavily criticised for some features. See, for example, a good overview in a <a href="http://bruegel.org/2012/07/blogs-review-hp-filters-and-business-cycles/" target="_blank">Bruegel blog post</a> by Jérémie Cohen-Setton and Yury Yatsynovich and <a href="https://doi.org/10.1162/rest_a_00706" target="_blank">here</a> for the working paper version of a critique by James Hamilton.</p>
 </div>
 <div id="a-regression-based-alternative-to-the-hp-filter" class="section level2">
 <h2>A regression based alternative to the HP filter</h2>
-<p>Hamilton (forthcoming) also proposes an alternative approach to the HP filter, which boils down to a simple regression model, where the h<em>th</em> lead of the times series is regressed on the most recent p values of the time series. As recommended in the paper I use <span class="math inline">\(h = 8\)</span> and <span class="math inline">\(p = 4\)</span> in the following example.</p>
-<pre class="r"><code># Set lead and lags
-p &lt;- 4
-h &lt;- 8
+<p>Hamilton (2018) also proposes an alternative approach to the HP filter It boils down to a simple regression model, where the h<em>th</em> lead of the times series is regressed on the most recent p values of the time series. As recommended in the paper I use <span class="math inline">\(h = 8\)</span> and <span class="math inline">\(p = 4\)</span> in the following example. The package <code>neverhpfilter</code> by Justin M. Shea contains the function <code>yth_filter</code>, which requires an xts object as input.</p>
+<pre class="r"><code>library(neverhpfilter)
 
 # Get the series
-y &lt;- data$lgdp
+y &lt;- as.xts(ts(data$lgdp, start = 1970, frequency = 4))
 
-# Obtain lags
-temp &lt;- y
-for (i in h + 0:(p - 1)) {
-  temp &lt;- cbind(temp, lag(y, i))
-}
+# Dimnames must be specified, otherwise the function won&#39;t accept the input
+dimnames(y) &lt;- list(NULL, &quot;log_gdp&quot;)
 
-temp &lt;- as.data.frame(na.omit(temp))
-
-# Estimate the model
-lm_temp &lt;- lm(temp ~ . , data = temp)
-
-# Obtain residuals
-residuals &lt;- c(rep(NA,  p + h - 1), residuals(lm_temp))
-names(residuals) &lt;- NULL
+# Estimate
+hamilton_temp &lt;- yth_filter(y, h = 8, p = 4)
 
 # Add residuals to the main data frame
 data &lt;- data %&gt;%
-  mutate(hamilton = residuals)
+  mutate(hamilton = as.numeric(hamilton_temp$log_gdp.cycle))
 
 # Prepare dataset for plot
 temp &lt;- data %&gt;%
@@ -391,6 +380,7 @@ ggplot(temp, aes(x = date, y = value, colour = Variable)) +
 <p>Kim, D. and Oh, H.-S. (2014). EMD: Empirical Mode Decomposition and Hilbert Spectral Analysis. R package version 1.5.7.</p>
 <p>Kožić, I., &amp; Sever, I. (2014). Measuring business cycles: Empirical Mode Decomposition of economic time series. Economics Letters, 123(3), 287–290. <a href="https://doi.org/10.1016/j.econlet.2014.03.009" class="uri">https://doi.org/10.1016/j.econlet.2014.03.009</a></p>
 <p>McTaggart, R., Daroczi, G., &amp; Leung, C. (2018). Quandl: API Wrapper for Quandl.com. R package version 2.9.1. <a href="https://CRAN.R-project.org/package=Quandl" class="uri">https://CRAN.R-project.org/package=Quandl</a></p>
+<p>Shea, J. M. (2018). neverhpfilter: A Better Alternative to the Hodrick-Prescott Filter. R package version 0.2-0. <a href="https://CRAN.R-project.org/package=neverhpfilter" class="uri">https://CRAN.R-project.org/package=neverhpfilter</a></p>
 <p>Stock, J. H., &amp; Watson, M. W. (1999). Business Cycle Fluctuations in US Macroeconomic Time Series. In J. B. Taylor &amp; M. Woodford (Eds.), Handbook of Macroeconomics. Handbook of Macroeconomics (pp. 3–64). Elsevier.</p>
 <p>Whitcher, B. (2015). waveslim: Basic wavelet routines for one-, two- and three-dimensional signal processing. R package version 1.7.5. <a href="https://CRAN.R-project.org/package=waveslim" class="uri">https://CRAN.R-project.org/package=waveslim</a></p>
 <p>Wickham, H. (2016). ggplot2: Elegant Graphics for Data Analysis. Springer-Verlag New York.</p>
