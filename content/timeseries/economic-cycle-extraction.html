@@ -1,11 +1,14 @@
 ---
 title: "Extracting Cyclical Components From Economic Time Series"
 author: "Franz X. Mohr"
-date: "2018-12-02"
+date: "2018-12-27"
 tags:
   - hp-filter
   - hodrick-prescott
   - baxter-king
+  - hamilton
+  - business-cycles
+  - detrend
   - wavelet
   - emd
   - empirical-mode-decomposition
@@ -147,7 +150,7 @@ ggplot(temp, aes(x = date, y = value, colour = Variable)) +
   theme_classic() +
   labs(title = &quot;Hamilton&#39;s alternative to the HP filter&quot;,
        x = &quot;Qurarter&quot;, y = &quot;&quot;, 
-       caption = &quot;Source: Hamilton (Forthcoming).&quot;)</code></pre>
+       caption = &quot;Source: Hamilton (2018).&quot;)</code></pre>
 <p><img src="/timeseries/economic-cycle-extraction_files/figure-html/hp%20augmented-1.png" width="432" /></p>
 </div>
 <div id="baxter-king-filter" class="section level2">
@@ -280,14 +283,14 @@ ggplot(temp, aes(x = date, y = value, colour = Variable)) +
 <div id="references" class="section level2">
 <h2>References</h2>
 <p>Balcilar, M. (2018). mFilter: Miscellaneous Time Series Filters. R package version 0.1-4. <a href="https://CRAN.R-project.org/package=mFilter" class="uri">https://CRAN.R-project.org/package=mFilter</a></p>
-<p>Baxter, M., &amp; King, R. O. (1999). Measuring Business Cycles: Approximate Band-Pass Filters for Economic Time Series. Review of Economics &amp; Statistics, 81(4), 575–593.</p>
-<p>Hamilton, J. D. (Forthcoming), Why you should never use the Hodrick-Prescott filter. Review of Economics and Statistics.</p>
+<p>Baxter, M., &amp; King, R. O. (1999). Measuring Business Cycles: Approximate Band-Pass Filters for Economic Time Series. <em>Review of Economics and Statistics</em>, 81(4), 575–593.</p>
+<p>Hamilton, J. D. (2018), Why you should never use the Hodrick-Prescott filter. <em>Review of Economics and Statistics</em>, 100(5), 831-843. <a href="https://doi.org/10.1162/rest_a_00706" class="uri">https://doi.org/10.1162/rest_a_00706</a></p>
 <p>Kim, D. and Oh, H.-S. (2014). EMD: Empirical Mode Decomposition and Hilbert Spectral Analysis. R package version 1.5.7.</p>
-<p>Kožić, I., &amp; Sever, I. (2014). Measuring business cycles: Empirical Mode Decomposition of economic time series. Economics Letters, 123(3), 287–290. <a href="doi:10.1016/j.econlet.2014.03.009" class="uri">doi:10.1016/j.econlet.2014.03.009</a></p>
+<p>Kožić, I., &amp; Sever, I. (2014). Measuring business cycles: Empirical Mode Decomposition of economic time series. Economics Letters, 123(3), 287–290. <a href="https://doi.org/10.1016/j.econlet.2014.03.009" class="uri">https://doi.org/10.1016/j.econlet.2014.03.009</a></p>
 <p>McTaggart, R., Daroczi, G., &amp; Leung, C. (2018). Quandl: API Wrapper for Quandl.com. R package version 2.9.1. <a href="https://CRAN.R-project.org/package=Quandl" class="uri">https://CRAN.R-project.org/package=Quandl</a></p>
 <p>Stock, J. H., &amp; Watson, M. W. (1999). Business Cycle Fluctuations in US Macroeconomic Time Series. In J. B. Taylor &amp; M. Woodford (Eds.), Handbook of Macroeconomics. Handbook of Macroeconomics (pp. 3–64). Elsevier.</p>
 <p>Whitcher, B. (2015). waveslim: Basic wavelet routines for one-, two- and three-dimensional signal processing. R package version 1.7.5. <a href="https://CRAN.R-project.org/package=waveslim" class="uri">https://CRAN.R-project.org/package=waveslim</a></p>
 <p>Wickham, H. (2016). ggplot2: Elegant Graphics for Data Analysis. Springer-Verlag New York.</p>
 <p>Wickham, H., François, R., Henry, L., &amp; Müller, K. (2018). dplyr: A Grammar of Data Manipulation. R package version 0.7.8. <a href="https://CRAN.R-project.org/package=dplyr" class="uri">https://CRAN.R-project.org/package=dplyr</a></p>
-<p>Yogo, M. (2008). Measuring business cycles: A wavelet analysis of economic time series. Economics Letters, 100(2), 208–212. <a href="doi:10.1016/j.econlet.2008.01.008" class="uri">doi:10.1016/j.econlet.2008.01.008</a></p>
+<p>Yogo, M. (2008). Measuring business cycles: A wavelet analysis of economic time series. Economics Letters, 100(2), 208–212. <a href="https://doi.org/10.1016/j.econlet.2008.01.008" class="uri">https://doi.org/10.1016/j.econlet.2008.01.008</a></p>
 </div>

@@ -3,6 +3,11 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://www.r-econometrics.com/timeseries/economic-cycle-extraction/</loc>
+    <lastmod>2018-12-27T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://www.r-econometrics.com/links/</loc>
     <lastmod>2018-12-25T00:00:00+00:00</lastmod>
   </url>
@@ -10,11 +15,6 @@
   <url>
     <loc>https://www.r-econometrics.com/methods/hcrobusterrors/</loc>
     <lastmod>2018-12-24T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/timeseries/economic-cycle-extraction/</loc>
-    <lastmod>2018-12-02T00:00:00+00:00</lastmod>
   </url>
   
   <url>
@@ -179,7 +179,13 @@
   
   <url>
     <loc>https://www.r-econometrics.com/tags/baxter-king/</loc>
-    <lastmod>2018-12-02T00:00:00+00:00</lastmod>
+    <lastmod>2018-12-27T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/business-cycles/</loc>
+    <lastmod>2018-12-27T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -189,14 +195,20 @@
   </url>
   
   <url>
+    <loc>https://www.r-econometrics.com/tags/detrend/</loc>
+    <lastmod>2018-12-27T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>https://www.r-econometrics.com/tags/emd/</loc>
-    <lastmod>2018-12-02T00:00:00+00:00</lastmod>
+    <lastmod>2018-12-27T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://www.r-econometrics.com/tags/empirical-mode-decomposition/</loc>
-    <lastmod>2018-12-02T00:00:00+00:00</lastmod>
+    <lastmod>2018-12-27T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -219,6 +231,12 @@
   </url>
   
   <url>
+    <loc>https://www.r-econometrics.com/tags/hamilton/</loc>
+    <lastmod>2018-12-27T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>https://www.r-econometrics.com/tags/heteroskedasticity/</loc>
     <lastmod>2018-12-24T00:00:00+00:00</lastmod>
     <priority>0</priority>
@@ -226,13 +244,13 @@
   
   <url>
     <loc>https://www.r-econometrics.com/tags/hodrick-prescott/</loc>
-    <lastmod>2018-12-02T00:00:00+00:00</lastmod>
+    <lastmod>2018-12-27T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://www.r-econometrics.com/tags/hp-filter/</loc>
-    <lastmod>2018-12-02T00:00:00+00:00</lastmod>
+    <lastmod>2018-12-27T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -292,13 +310,13 @@
   
   <url>
     <loc>https://www.r-econometrics.com/tags/</loc>
-    <lastmod>2018-12-02T00:00:00+00:00</lastmod>
+    <lastmod>2018-12-27T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://www.r-econometrics.com/timeseries/</loc>
-    <lastmod>2018-12-02T00:00:00+00:00</lastmod>
+    <lastmod>2018-12-27T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -322,13 +340,13 @@
   
   <url>
     <loc>https://www.r-econometrics.com/tags/wavelet/</loc>
-    <lastmod>2018-12-02T00:00:00+00:00</lastmod>
+    <lastmod>2018-12-27T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://www.r-econometrics.com/</loc>
-    <lastmod>2018-12-25T00:00:00+00:00</lastmod>
+    <lastmod>2018-12-27T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   

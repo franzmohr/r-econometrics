@@ -6,7 +6,7 @@
     <description>Recent content in Tags on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 02 Dec 2018 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 27 Dec 2018 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://www.r-econometrics.com/tags/index.xml" rel="self" type="application/rss+xml" />
     
@@ -14,16 +14,34 @@
     <item>
       <title>Baxter King</title>
       <link>https://www.r-econometrics.com/tags/baxter-king/</link>
-      <pubDate>Sun, 02 Dec 2018 00:00:00 +0000</pubDate>
+      <pubDate>Thu, 27 Dec 2018 00:00:00 +0000</pubDate>
       
       <guid>https://www.r-econometrics.com/tags/baxter-king/</guid>
       <description></description>
     </item>
     
     <item>
+      <title>Business Cycles</title>
+      <link>https://www.r-econometrics.com/tags/business-cycles/</link>
+      <pubDate>Thu, 27 Dec 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/tags/business-cycles/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Detrend</title>
+      <link>https://www.r-econometrics.com/tags/detrend/</link>
+      <pubDate>Thu, 27 Dec 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/tags/detrend/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>Emd</title>
       <link>https://www.r-econometrics.com/tags/emd/</link>
-      <pubDate>Sun, 02 Dec 2018 00:00:00 +0000</pubDate>
+      <pubDate>Thu, 27 Dec 2018 00:00:00 +0000</pubDate>
       
       <guid>https://www.r-econometrics.com/tags/emd/</guid>
       <description></description>
@@ -32,7 +50,7 @@
     <item>
       <title>Empirical Mode Decomposition</title>
       <link>https://www.r-econometrics.com/tags/empirical-mode-decomposition/</link>
-      <pubDate>Sun, 02 Dec 2018 00:00:00 +0000</pubDate>
+      <pubDate>Thu, 27 Dec 2018 00:00:00 +0000</pubDate>
       
       <guid>https://www.r-econometrics.com/tags/empirical-mode-decomposition/</guid>
       <description></description>
@@ -66,6 +84,15 @@
     </item>
     
     <item>
+      <title>Hamilton</title>
+      <link>https://www.r-econometrics.com/tags/hamilton/</link>
+      <pubDate>Thu, 27 Dec 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/tags/hamilton/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>Heteroskedasticity</title>
       <link>https://www.r-econometrics.com/tags/heteroskedasticity/</link>
       <pubDate>Mon, 24 Dec 2018 00:00:00 +0000</pubDate>
@@ -77,7 +104,7 @@
     <item>
       <title>Hodrick Prescott</title>
       <link>https://www.r-econometrics.com/tags/hodrick-prescott/</link>
-      <pubDate>Sun, 02 Dec 2018 00:00:00 +0000</pubDate>
+      <pubDate>Thu, 27 Dec 2018 00:00:00 +0000</pubDate>
       
       <guid>https://www.r-econometrics.com/tags/hodrick-prescott/</guid>
       <description></description>
@@ -86,7 +113,7 @@
     <item>
       <title>Hp Filter</title>
       <link>https://www.r-econometrics.com/tags/hp-filter/</link>
-      <pubDate>Sun, 02 Dec 2018 00:00:00 +0000</pubDate>
+      <pubDate>Thu, 27 Dec 2018 00:00:00 +0000</pubDate>
       
       <guid>https://www.r-econometrics.com/tags/hp-filter/</guid>
       <description></description>
@@ -158,7 +185,7 @@
     <item>
       <title>Wavelet</title>
       <link>https://www.r-econometrics.com/tags/wavelet/</link>
-      <pubDate>Sun, 02 Dec 2018 00:00:00 +0000</pubDate>
+      <pubDate>Thu, 27 Dec 2018 00:00:00 +0000</pubDate>
       
       <guid>https://www.r-econometrics.com/tags/wavelet/</guid>
       <description></description>
