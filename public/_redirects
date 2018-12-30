@@ -5,4 +5,13 @@
 /2015/10/27/extracting-business-cycles-from-raw-data-in-r   /timeseries/economic-cycle-extraction
 /finance/*                            /
 /time-series/an-introduction-to-vector-autoregression-var   /timeseries/varintro
-/crash-courses/*                        /rbasicsintro
+/crash-courses/*                       /rbasicsintro
+/microemetricsintro                    /methodsintro
+/microemetrics/*                  /methodsintro
+/2014/*                           /
+/2015/*                           /
+/2016/*                           /
+/reproductions/*                  /reproduction
+/author                           /about
+/time-series                    /timeseries
+/tag/*                          /tags
