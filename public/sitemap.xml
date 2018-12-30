@@ -8,6 +8,11 @@
   </url>
   
   <url>
+    <loc>https://www.r-econometrics.com/index_dummy/</loc>
+    <lastmod>2018-12-30T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://www.r-econometrics.com/timeseries/economic-cycle-extraction/</loc>
     <lastmod>2018-12-27T00:00:00+00:00</lastmod>
   </url>
@@ -104,11 +109,6 @@
   
   <url>
     <loc>https://www.r-econometrics.com/timeseriesintro/</loc>
-    <lastmod>2018-03-27T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/index_dummy/</loc>
     <lastmod>2018-03-27T00:00:00+00:00</lastmod>
   </url>
   
@@ -290,13 +290,13 @@
   </url>
   
   <url>
-    <loc>https://www.r-econometrics.com/categories/r/</loc>
+    <loc>https://www.r-econometrics.com/tags/r/</loc>
     <lastmod>2018-08-31T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://www.r-econometrics.com/tags/r/</loc>
+    <loc>https://www.r-econometrics.com/categories/r/</loc>
     <lastmod>2018-08-31T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
@@ -344,13 +344,13 @@
   </url>
   
   <url>
-    <loc>https://www.r-econometrics.com/categories/var/</loc>
+    <loc>https://www.r-econometrics.com/tags/var/</loc>
     <lastmod>2018-08-31T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://www.r-econometrics.com/tags/var/</loc>
+    <loc>https://www.r-econometrics.com/categories/var/</loc>
     <lastmod>2018-08-31T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>

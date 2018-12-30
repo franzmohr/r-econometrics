@@ -22,6 +22,15 @@ Theory Based on the growth model of Solow (1957) the discipline of growth accoun
     </item>
     
     <item>
+      <title>r-econometrics</title>
+      <link>https://www.r-econometrics.com/index_dummy/</link>
+      <pubDate>Sun, 30 Dec 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/index_dummy/</guid>
+      <description>You want to learn the basics of the R programming language and how to use the software for econometric analyses? Great! This site could be useful for you. It is about learning how to use the free statistical software R for basic econometric applications and shall provide an intuition of the basic structure of the program and the basic statistical functions, which are needed to pass introductory or intermediate courses in econometrics.</description>
+    </item>
+    
+    <item>
       <title>Extracting Cyclical Components From Economic Time Series</title>
       <link>https://www.r-econometrics.com/timeseries/economic-cycle-extraction/</link>
       <pubDate>Thu, 27 Dec 2018 00:00:00 +0000</pubDate>
@@ -225,15 +234,6 @@ download.file(&amp;quot;http://qed.econ.queensu.ca/jae/1997-v12.3/cincera/mc-dat
       <description>Work in progress (December 2018). I will try to update this page over the next few months.
 This section is intended to provide an overview of the relevant issues in (macro)economic time series analysis. Again the standard disclaimer: This site does not replace a good textbook, but it should help you to get a grasp of the basic concepts more quickly than if you learned it on your own.
 The intended structure of this site is:</description>
-    </item>
-    
-    <item>
-      <title>r-econometrics</title>
-      <link>https://www.r-econometrics.com/index_dummy/</link>
-      <pubDate>Tue, 27 Mar 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://www.r-econometrics.com/index_dummy/</guid>
-      <description>You want to learn the basics of the R programming language and how to use the software for econometric analyses? Great! This site could be useful for you. It is about learning how to use the free statistical software R for basic econometric applications and shall provide an intuition of the basic structure of the program and the basic statistical functions, which are needed to pass introductory or intermediate courses in econometrics.</description>
     </item>
     
     <item>

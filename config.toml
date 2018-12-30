@@ -8,6 +8,8 @@ pygmentsUseClassic = true
 disqusShortname = "r-econometrics"
 googleAnalytics = "UA-115075361-1"
 
+
+
 [permalinks]
     post = "/:year/:month/:day/:slug/"
 
