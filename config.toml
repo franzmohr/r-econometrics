@@ -27,10 +27,10 @@ googleAnalytics = "UA-115075361-1"
     name = "Links"
     url = "/links"
     weight = 40
-#[[menu.main]]
-#    name = "Blog"
-#    url = "/post"
-#    weight = 45
+[[menu.main]]
+    name = "Blog"
+    url = "/post"
+    weight = 45
 [[menu.main]]
     name = "Reproduction Projects"
     url = "/reproductionintro"

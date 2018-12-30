@@ -3,6 +3,11 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://www.r-econometrics.com/2018/12/30/an-exercise-in-growth-accounting/</loc>
+    <lastmod>2018-12-30T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://www.r-econometrics.com/timeseries/economic-cycle-extraction/</loc>
     <lastmod>2018-12-27T00:00:00+00:00</lastmod>
   </url>
@@ -231,6 +236,12 @@
   </url>
   
   <url>
+    <loc>https://www.r-econometrics.com/tags/growth-accounting/</loc>
+    <lastmod>2018-12-30T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>https://www.r-econometrics.com/tags/hamilton/</loc>
     <lastmod>2018-12-27T00:00:00+00:00</lastmod>
     <priority>0</priority>
@@ -273,6 +284,12 @@
   </url>
   
   <url>
+    <loc>https://www.r-econometrics.com/post/</loc>
+    <lastmod>2018-12-30T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>https://www.r-econometrics.com/tags/r/</loc>
     <lastmod>2018-08-31T00:00:00+00:00</lastmod>
     <priority>0</priority>
@@ -299,6 +316,12 @@
   <url>
     <loc>https://www.r-econometrics.com/tags/robust-error/</loc>
     <lastmod>2018-12-24T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/solow-residual/</loc>
+    <lastmod>2018-12-30T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -346,7 +369,7 @@
   
   <url>
     <loc>https://www.r-econometrics.com/</loc>
-    <lastmod>2018-12-27T00:00:00+00:00</lastmod>
+    <lastmod>2018-12-30T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
