@@ -8,11 +8,10 @@
 /crash-courses/*                       /rbasicsintro
 /microemetricsintro                    /methodsintro
 /microemetrics/*                  /methodsintro
-/2014/*                           /
-/2015/*                           /
-/2016/*                           /
+/2014/*                           /post
+/2015/*                           /post
+/2016/*                           /post
 /reproductions/*                  /reproductionintro
 /author                           /about
 /time-series                    /timeseries
 /tag/*                          /tags
-/2015/11/12/an-exercise-in-growth-accounting/     /2018/12/30/an-exercise-in-growth-accounting/
