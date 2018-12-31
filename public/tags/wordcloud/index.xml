@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Wordcloud on r-econometrics</title>
+    <link>https://www.r-econometrics.com/tags/wordcloud/</link>
+    <description>Recent content in Wordcloud on r-econometrics</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 30 Dec 2018 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://www.r-econometrics.com/tags/wordcloud/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>William Shakespeare&#39; Work in a Word Cloud</title>
+      <link>https://www.r-econometrics.com/2018/12/30/william-shakespeare-work-in-a-word-cloud/</link>
+      <pubDate>Sun, 30 Dec 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/2018/12/30/william-shakespeare-work-in-a-word-cloud/</guid>
+      <description>Word or tag clouds seem to be quite popular at the moment. Although their analytical power might be limited, they do serve an aesthetic purpose and, for example, could be put on the cover page of a thesis or a presentation using the content of your work or the literature you went through.
+Inspired by Andrew Collier’s blog post on creating word clouds from multiple PDF-sources I played around with some texts from the Gutenberg project to visualize some of the most prominent pieces of classic literature.</description>
+    </item>
+    
+  </channel>
+</rss>

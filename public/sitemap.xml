@@ -8,6 +8,11 @@
   </url>
   
   <url>
+    <loc>https://www.r-econometrics.com/2018/12/30/william-shakespeare-work-in-a-word-cloud/</loc>
+    <lastmod>2018-12-30T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://www.r-econometrics.com/index_dummy/</loc>
     <lastmod>2018-12-30T00:00:00+00:00</lastmod>
   </url>
@@ -338,6 +343,12 @@
   </url>
   
   <url>
+    <loc>https://www.r-econometrics.com/tags/text-mining/</loc>
+    <lastmod>2018-12-30T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>https://www.r-econometrics.com/timeseries/</loc>
     <lastmod>2018-12-27T00:00:00+00:00</lastmod>
     <priority>0</priority>
@@ -364,6 +375,12 @@
   <url>
     <loc>https://www.r-econometrics.com/tags/wavelet/</loc>
     <lastmod>2018-12-27T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/wordcloud/</loc>
+    <lastmod>2018-12-30T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
