@@ -1,6 +1,6 @@
 ---
 title: "An Introduction to Vector Autoregression (VAR)"
-author: "Franz Mohr"
+author: "Franz X Mohr"
 date: "2018-08-31"
 categories:
   - R
@@ -169,7 +169,7 @@ round(est_coefs, 2)</code></pre>
 </div>
 <div id="impulse-response" class="section level3">
 <h3>Impulse response</h3>
-<p>Once we have decided on a final VAR model its estimated parameter values have to be interpreted. Since in such a model all variables depend on each other, individual parameter values only provide limited information. In order to get a better intuition of the model’s dynamic behaviour, <em>impulse responses</em> (IR) are used. They give the reaction of a response variable to a one-time shock in an impulse variable. The trajectory of the response variable can be plotted, which results in those wavy curves that can be found in many macro papers.</p>
+<p>Once we have decided on a final VAR model its estimated parameter values have to be interpreted. Since all variables in a VAR model depend on each other, individual parameter values only provide limited information on the reaction of the system to a shock. In order to get a better intuition of the model’s dynamic behaviour, <a href="/timeseries/irf" target="_blank">impulse responses (IR)</a> are used. They give the reaction of a response variable to a one-time shock in an impulse variable. The trajectory of the response variable can be plotted, which results in those wavy curves that can be found in many macro papers.</p>
 <p>In R the <code>irf</code> function of the <code>vars</code> package can be used to obtain an impulse response function. In the following example, we want to know how Series 2 behaves after a shock to Series 1. After specifying the model and the variables for which we want an impulse response we set the time horizon <code>n.ahead</code> to 20. The plot gives the response of series 2 for the periods 0 to 20 to a shock in series 1 in period 0. The function also automatically calculates so-called bootstrap confidence bands. (Bootstrapping is a common procedure in impulse response analysis. But you should keep in mind that it has its drawbacks when you work with <em>structural</em> VAR models though.)</p>
 <pre class="r"><code># Calculate the IRF
 ir.1 &lt;- irf(var.1, impulse = &quot;Series.1&quot;, response = &quot;Series.2&quot;, n.ahead = 20, ortho = FALSE)

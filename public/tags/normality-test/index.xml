@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Normality Test on r-econometrics</title>
+    <link>/tags/normality-test/</link>
+    <description>Recent content in Normality Test on r-econometrics</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 02 Dec 2018 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/tags/normality-test/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Model Testing in R</title>
+      <link>/methods/teststats/</link>
+      <pubDate>Sun, 02 Dec 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/methods/teststats/</guid>
+      <description>Model testing belongs to the main tasks of any econometric analysis. This post gives an overview of tests, which should be applied to any OLS regression, and illustrates how to perform them in R.
+Data To illustrate the calculation of test statistics in R, let’s use the wage1 dataset from the wooldridge package and estimate a basic Mincer earnings function. This standard specification of earnings models explains the natural log of average hourly earnings lwage by years of education educ and experience exper.</description>
+    </item>
+    
+  </channel>
+</rss>

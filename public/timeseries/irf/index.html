@@ -1,0 +1,309 @@
+
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-115075361-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+<!DOCTYPE html>
+<html xmlns="//www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+    <head>
+        
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+
+        <title>An Introduction to Impulse Response Analysis of VAR Models &middot; r-econometrics</title>
+        <link rel='stylesheet' href='//fonts.googleapis.com/css?family=Open+Sans:400,300,600' type='text/css'>
+        <link rel="stylesheet" href="https://www.r-econometrics.com//libraries/normalize.3.0.1.css" />
+        <link rel="stylesheet" href="https://www.r-econometrics.com//css/liquorice.css" />
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <link rel="apple-touch-icon-precomposed" href="/apple-touch-icon-144-precomposed.png" sizes="144x144" />
+        <link rel="alternate" href="" type="application/rss+xml" title="r-econometrics" />
+    </head>
+    <body class="li-body">
+
+<header class="li-page-header">
+    <div class="container">
+        <div class="row">
+            <div class="sixteen columns">
+                <div class="li-brand li-left">
+                <a href="https://www.r-econometrics.com/">r-econometrics</a></div>
+                <div class="li-menu li-right">
+                    <span class="li-menu-icon" onclick="javascript:toggle('menu');">&#9776;</span>
+                    <ul id="menu2" class="li-menu-items">
+                        
+                            <li><a href="/rbasicsintro"> R(eal) Basics </a></li>
+                        
+                            <li><a href="/methodsintro"> Econometric Methods </a></li>
+                        
+                            <li><a href="/timeseriesintro"> Time Series Topics </a></li>
+                        
+                            <li><a href="/links"> Links </a></li>
+                        
+                            <li><a href="/post"> Blog </a></li>
+                        
+                            <li><a href="/reproductionintro"> Reproduction Projects </a></li>
+                        
+                            <li><a href="/about"> About and Disclaimer </a></li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="sixteen columns">
+                <ul id="menu" class="li-menu-items li-menu-mobile">
+                    
+                        <li><a href="/rbasicsintro"> R(eal) Basics </a></li>
+                    
+                        <li><a href="/methodsintro"> Econometric Methods </a></li>
+                    
+                        <li><a href="/timeseriesintro"> Time Series Topics </a></li>
+                    
+                        <li><a href="/links"> Links </a></li>
+                    
+                        <li><a href="/post"> Blog </a></li>
+                    
+                        <li><a href="/reproductionintro"> Reproduction Projects </a></li>
+                    
+                        <li><a href="/about"> About and Disclaimer </a></li>
+                    
+                </ul>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+
+
+
+
+    <div class="container">
+        <div class="row">
+            <div class="sixteen columns">
+                <article class="li-article">
+                    <header class="li-article-header">
+                        <h1 class="li-article-title">An Introduction to Impulse Response Analysis of VAR Models</h1>
+                        <span class="li-article-taxonomies">
+                            
+
+                            
+                                with tags
+                                
+                                    <a href="https://www.r-econometrics.com//tags/r">r</a>
+                                
+                                    <a href="https://www.r-econometrics.com//tags/irf">irf</a>
+                                
+                                    <a href="https://www.r-econometrics.com//tags/var">var</a>
+                                
+                                    <a href="https://www.r-econometrics.com//tags/vector-autoregression">vector autoregression</a>
+                                
+                            
+                        </span>
+                         - 
+                        <time class="li-article-date">Franz X. Mohr, March 23, 2019
+                        </time>
+                    </header>
+                    <section>
+                        <p>Impulse response analysis is an important step in econometric analyes, which employ <a href="/timeseries/varintro" target="_blank">vector autoregressive models</a>. Their main purpose is to describe the evolution of a model’s variables in reaction to a shock in one or more variables. This feature allows to trace the transmission of a single shock within an otherwise noisy system of equations and, thus, makes them very useful tools in the assessment of economic policies. This post provides an introduction to the concept and interpretation of impulse response functions as they are commonly used in the VAR literature and provides code for their calculation in R.</p>
+<div id="model-and-data" class="section level3">
+<h3>Model and Data</h3>
+<p>To illustrate the concept of impulse response functions, examples from Lütkepohl (2007) are used. The required dataset can be downloaded from the textbook’s <a href="http://www.jmulti.de/download/datasets/e1.dat" target="_blank">website</a>. It contains quarterly, seasonally adjusted time series for West German fixed investment, disposable income, and consumption expenditures in billions of DM from 1960Q1 to 1982Q4.</p>
+<pre class="r"><code># Download data
+data &lt;- read.table(&quot;http://www.jmulti.de/download/datasets/e1.dat&quot;, skip = 6, header = TRUE)
+
+# Only use the first 76 observations so that there are 73 observations
+# left for the estimated VAR(2) model after taking first differences.
+data &lt;- data[1:76, ]
+
+# Convert to time series object
+data &lt;- ts(data, start = c(1960, 1), frequency = 4)
+
+# Take logs and differences
+data &lt;- diff(log(data))
+
+# Plot data
+plot(data,  main = &quot;Dataset E1 from Lütkepohl (2007)&quot;)</code></pre>
+<p><img src="/timeseries/irf_files/figure-html/data-1.png" width="528" /></p>
+<p>This data is used to estimate a VAR(2) model with a constant term:</p>
+<p><span class="math display">\[ y_t = v + \sum_{i = 1}^{2} A_i y_{t-i} + u_t,\]</span> where <span class="math inline">\(u_t \sim N(0, \Sigma)\)</span>.</p>
+</div>
+<div id="estimation" class="section level3">
+<h3>Estimation</h3>
+<p>The VAR model can be estimated using the <code>vars</code> package of Pfaff (2008):</p>
+<pre class="r"><code># Load package
+library(vars)
+
+# Estimate model
+model &lt;- VAR(data, p = 2, type = &quot;const&quot;)
+
+# Look at summary statistics
+summary(model)</code></pre>
+<p>The results of the code should be identical to the results in section 3.2.3 of Lütkepohl (2007).</p>
+</div>
+<div id="forecast-error-impulse-response" class="section level3">
+<h3>Forecast error impulse response</h3>
+<p>Since all variables in a VAR model depend on each other, individual coefficient estimates only provide limited information on the reaction of the system to a shock. In order to get a better picture of the model’s dynamic behaviour, <em>impulse responses</em> (IR) are used. The departure point of every impluse reponse function for a linear VAR model is its moving average (MA) representation, which is also the forecast error impulse response (FEIR) function. Mathematically, the FEIR <span class="math inline">\(\Phi_i\)</span> for the <span class="math inline">\(i\)</span>th period after the shock is obtained by <span class="math display">\[\Phi_i = \sum_{j = 1}^{i} \Phi_{j-1} A_j, \ \  i = 1, 2, ...\]</span> with <span class="math inline">\(\Phi_0 = I_{K}\)</span> and <span class="math inline">\(A_j = 0 \text{ for } j&gt;p\)</span>, where <span class="math inline">\(K\)</span> is the number of endogenous variables and <span class="math inline">\(p\)</span> is the lag order of the VAR model.</p>
+<p>In R the <code>irf</code> function of the <code>vars</code> package can be used to obtain forecast error impulse responses. The following code calculates and plots the estimated response of consumption to a forecast error impulse in income with bootstrapped error bands<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>:</p>
+<pre class="r"><code>feir &lt;- irf(model, impulse = &quot;income&quot;, response = &quot;cons&quot;,
+             n.ahead = 8, ortho = FALSE, runs = 1000)
+
+plot(feir)</code></pre>
+<p><img src="/timeseries/irf_files/figure-html/feir-1.png" width="576" /></p>
+</div>
+<div id="the-identification-problem" class="section level3">
+<h3>The identification problem</h3>
+<p>A caveat of FEIRs is that they cannot be used to assess contemporaneous reactions of variables. This can be seen in the previous plot, where the FEIR is zero in the first period. Mathematically, this can be explained by the fact that for the construction of <span class="math inline">\(\Phi_i\)</span> only the coefficient matrices <span class="math inline">\(A_j\)</span> are used, which contain no information on contemporaneous relationships. Information no the latter is rather contained in the off-diagonal elements of the symmetric variance-covariance matrix <span class="math inline">\(\Sigma\)</span>. For the used dataset it is estimated to be</p>
+<pre class="r"><code># Calculate summary statistics
+model_summary &lt;- summary(model)
+
+# Obtain variance-covariance matrix
+model_summary$covres</code></pre>
+<pre><code>##              invest       income         cons
+## invest 2.129629e-03 7.161667e-05 1.232404e-04
+## income 7.161667e-05 1.373377e-04 6.145867e-05
+## cons   1.232404e-04 6.145867e-05 8.920351e-05</code></pre>
+<p>Since the off-diagonal elements of the estimated variance-covariance matrix are not zero, we can assume that there is contemporaneous correlation between the variables in the VAR model. This is confirmed by the correlation matrix, which corresponds to <span class="math inline">\(\Sigma\)</span>:</p>
+<pre class="r"><code>model_summary$corres</code></pre>
+<pre><code>##           invest    income      cons
+## invest 1.0000000 0.1324242 0.2827548
+## income 0.1324242 1.0000000 0.5552611
+## cons   0.2827548 0.5552611 1.0000000</code></pre>
+<p>However, those matrices only describe the correlation between the errors, but it remains unclear in which direction the causalities go. <em>Identifying</em> these causal relationships is one of the main challenges of any VAR analysis.</p>
+<p>Regardless of the specific methods used to identify the shocks of a linear VAR model, further information on contemporaneous relationships can be introduced to the FEIR by simply multiplying it by a matrix <span class="math inline">\(F\)</span>:</p>
+<p><span class="math display">\[\Theta_i = \Phi_i F\]</span> for <span class="math inline">\(i = 0, 1, ...\)</span>. In the following some methodes to find <span class="math inline">\(F\)</span> and their corresponding impulse responses are presented.</p>
+</div>
+<div id="orthogonal-impulse-responses" class="section level3">
+<h3>Orthogonal impulse responses</h3>
+<p>A common approach to identify the shocks of a VAR model is to use orthogonal impulse respones (OIR). The basic idea is to decompose the variance-covariance matrix so that <span class="math inline">\(\Sigma = PP^{-1}\)</span>, where <span class="math inline">\(P\)</span> is a lower triangular matrix with positve diagonal elements, which is often obtained by a Choleski decomposition. Given the estimated variance-covariance matrix <span class="math inline">\(P\)</span> the decomposition can be obtained by</p>
+<pre class="r"><code>t(chol(model_summary$covres))</code></pre>
+<pre><code>##             invest      income        cons
+## invest 0.046147903 0.000000000 0.000000000
+## income 0.001551894 0.011615909 0.000000000
+## cons   0.002670552 0.004934117 0.007597773</code></pre>
+<p>From this matrix it can be seen that a shock to income has a contemporaneous effect on consumption, but not vice versa. The corresponding orthongonal impulse response function is then</p>
+<p><span class="math display">\[\Theta^o_i = \Phi_i P.\]</span></p>
+<p>In R the <code>irf</code> function of the <code>vars</code> package can be used to optain OIRs by setting the argument <code>ortho = TRUE</code>:</p>
+<pre class="r"><code>oir &lt;- irf(model, impulse = &quot;income&quot;, response = &quot;cons&quot;,
+           n.ahead = 8, ortho = TRUE, runs = 1000, seed = 12345)
+
+plot(oir)</code></pre>
+<p><img src="/timeseries/irf_files/figure-html/oir-1.png" width="576" /></p>
+<p>Note that the output of the Choleski decomposition is a lower triangular matrix so that the variable in the first row will never be sensitive to a contemporaneous shock of any other variable and the last variable in the system will be sensitive to shocks of all other variables. Therefore, there resuls of an OIR might be sensitive to the order of the variables and it is advised to estimate the above VAR model with different orders to see how strongly the resulting OIRs are affected by that.</p>
+</div>
+<div id="strucual-impulse-responses" class="section level3">
+<h3>Strucual impulse responses</h3>
+<p>Structural impulse responses (SIR) already take the identification problem into account during the estimation of the VAR model. For the structrual vector autoregressive (SVAR) model</p>
+<p><span class="math display">\[ A_0 y_t = v + \sum_{i = 1}^{2} A_i y_{t-i} + \epsilon_t,\]</span> where <span class="math inline">\(\epsilon_t \sim N(0, \Omega)\)</span> with <span class="math inline">\(\Omega\)</span> as a diagonal matrix of variances and <span class="math inline">\(A_0\)</span> as lower triangular matrix with ones on its main diagonal the structural impulse response function becomes</p>
+<p><span class="math display">\[\Theta^s_i = \Phi_i A_0^{-1}\]</span></p>
+</div>
+<div id="generalised-impulse-responses" class="section level3">
+<h3>Generalised impulse responses</h3>
+<p>Both orthogonal and structural impulse responses are constrained either by finding the right order of variables or by the identification of the estimated structural parameters. Koop et al. (1996) and Koop et al. (1998) propose a different kind of impulse response function, so-called generalised impulse responses (GIR). They are independent of the variable order, because they integrate the effects of other shocks out of the response. Mathematically, this is achieved in the following way:</p>
+<p><span class="math display">\[\Theta^g_i = \Phi_i \sigma_{jj}^{-\frac{1}{2}} \Sigma,\]</span> where <span class="math inline">\(\sigma_{jj}\)</span> is the variance of the <span class="math inline">\(j\)</span>th variable.</p>
+<p>GIRs are very useful in the case of large systems, where structual relationships are hard to identify. They cannot really be interpreted as structural impulse responses, but they provide an accurate depiction of the historic development of the variable.</p>
+</div>
+<div id="references" class="section level3">
+<h3>References</h3>
+<p>Koop, G., Pesaran, M. H., Potter, S. M. (1996). Impulse response analysis in nonlinear multivariate models. <em>Journal of Econometrics 74</em>, 119-147. <a href="https://doi.org/10.1016/0304-4076(95)01753-4" target="_blank">doi:10.1016/0304-4076(95)01753-4</a></p>
+<p>Lütkepohl, H. (2007). <em>New introduction to multiple time series analysis</em> (2nd ed.). Berlin: Springer.</p>
+<p>Pesaran, H. H., Shin, Y. (1998). Generalized impulse response analysis in linear multivariate models. <em>Economics Letters 58</em>(1), 17-29. <a href="https://doi.org/10.1016/S0165-1765(97)00214-0" target="_blank">doi:10.1016/S0165-1765(97)00214-0</a></p>
+<p>Pfaff, B. (2008). VAR, SVAR and SVEC Models: Implementation Within R Package vars. <em>Journal of Statistical Software 27</em>(4).</p>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>In chapter 3 of Lütkephol (2007) so-called asymptotic error bounds are presented, which can be calculated analytically. By contrast, <code>vars::irf</code> uses bootstrapped error bands, which is a common method to obtain test statistics and impulse repsonses. Basically, bootstrapping means that the model is repeatedly estimated using artificial samples, which are derived from the original model results. For each round of the bootstrapping algorithm IRFs can be obtained (along with other statistics of interest). The resulting distribution of IRFs can then be cut to obtain the error band of the point estimate. This error band is usually close to the analytical error band.<a href="#fnref1">↩</a></p></li>
+</ol>
+</div>
+
+                    </section>
+                </article>
+                <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5a9c6c9b8a39890d"></script>
+                <div class="container">
+  <div class="row">
+    <div class="sixteen columns center">
+      <div class="addthis_inline_share_toolbox"></div>
+      
+    </div>
+  </div>
+</div>
+
+                <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+<footer class="li-page-footer">
+    <div class="container">
+        <div class="row">
+            <div class="sixteen columns center">
+              <div id="disqus_thread"></div>
+                <script type="text/javascript">
+                  (function() { 
+                  if (window.location.hostname == "localhost") return;
+                  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                  var disqus_shortname = 'r-econometrics';
+                  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                  })();
+                  </script>
+                  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+            </div>
+        </div>
+    </div>
+</footer>
+            </div>
+        </div>
+        
+    </div>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+<footer class="li-page-footer">
+    <div class="container">
+        <div class="row">
+            <div class="sixteen columns center">
+              <div class="li-page-footer-legal">
+                &copy; Franz X. Mohr. Powered by <a href="https://github.com/rstudio/blogdown" target="_blank" >Blogdown</a> and hosted by <a href="https://www.netlify.com/" target="_blank" >Netlify</a>. Source available on <a href="https://github.com/rranzmohr/r-econometrics" target="_blank" >Github</a>.
+              </div>
+              <div class="li-page-footer-theme">
+                <span class=""><a href="https://github.com/eliasson/liquorice/">liquorice</a> is a theme for <a href="https://gohugo.io/">hugo</a>
+                </span>
+              </div>
+            </div>
+        </div>
+    </div>
+</footer>
+    <script type="text/javascript">
+    <!--
+    function toggle(id) {
+        var e = document.getElementById(id);
+        e.style.display == 'block' ? e.style.display = 'none' : e.style.display = 'block';
+    }
+    
+    </script>
+    
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-115075361-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+    </body>
+</html>
+

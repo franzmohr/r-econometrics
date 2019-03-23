@@ -6,10 +6,19 @@
     <description>Recent content on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 30 Dec 2018 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 23 Mar 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://www.r-econometrics.com/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>An Introduction to Impulse Response Analysis of VAR Models</title>
+      <link>https://www.r-econometrics.com/timeseries/irf/</link>
+      <pubDate>Sat, 23 Mar 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/timeseries/irf/</guid>
+      <description>Impulse response analysis is an important step in econometric analyes, which employ vector autoregressive models. Their main purpose is to describe the evolution of a model’s variables in reaction to a shock in one or more variables. This feature allows to trace the transmission of a single shock within an otherwise noisy system of equations and, thus, makes them very useful tools in the assessment of economic policies. This post provides an introduction to the concept and interpretation of impulse response functions as they are commonly used in the VAR literature and provides code for their calculation in R.</description>
+    </item>
     
     <item>
       <title>An Exercise in Growth Accounting</title>
@@ -77,16 +86,6 @@ MastersInDataScience.org: A website listing data science programs at U.</descrip
       <guid>https://www.r-econometrics.com/methods/hcrobusterrors/</guid>
       <description>Although heteroskedasticity does not produce biased OLS estimates, it leads to a bias in the variance-covariance matrix. This means that standard model testing methods such as t tests or F tests cannot be relied on any longer. This post provides an intuitive illustration of heteroskedasticity and covers the calculation of standard errors that are robust to it.
 Data A popular illustration of heteroskedasticity is the relationship between saving and income, which is shown in the following graph.</description>
-    </item>
-    
-    <item>
-      <title>Model Testing in R</title>
-      <link>https://www.r-econometrics.com/methods/teststats/</link>
-      <pubDate>Sun, 02 Dec 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://www.r-econometrics.com/methods/teststats/</guid>
-      <description>Model testing belongs to the main tasks of any econometric analysis. This post illustrates how to calculate basic test statistics such as the t statistic and the F-test in R.
-Data To illustrate the calculation of test statistics in R, let’s use the wage1 dataset from the wooldridge package and estimate a basic Mincer earnings function. This standard specification of earnings models explains the natural log of average hourly earnings lwage by years of education educ and experience exper.</description>
     </item>
     
     <item>
@@ -241,7 +240,7 @@ download.file(&amp;quot;http://qed.econ.queensu.ca/jae/1997-v12.3/cincera/mc-dat
       <pubDate>Tue, 27 Mar 2018 00:00:00 +0000</pubDate>
       
       <guid>https://www.r-econometrics.com/timeseriesintro/</guid>
-      <description>Work in progress (December 2018). I will try to update this page over the next few months.
+      <description>Work in progress (March 2019). I will try to update this page over the next few months.
 This section is intended to provide an overview of the relevant issues in (macro)economic time series analysis. Again the standard disclaimer: This site does not replace a good textbook, but it should help you to get a grasp of the basic concepts more quickly than if you learned it on your own.
 The intended structure of this site is:</description>
     </item>
