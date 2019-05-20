@@ -6,10 +6,21 @@
     <description>Recent content on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 23 Mar 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 20 May 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://www.r-econometrics.com/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Reproduction: Timmer, M. P., Dietzenbacher, E., Los, B., Stehrer, R., &amp; De Vries, G. J. (2015). An illustrated user guide to the world input–output database: the case of global automotive production.</title>
+      <link>https://www.r-econometrics.com/reproduction/2015_timmer_wiod/</link>
+      <pubDate>Mon, 20 May 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/reproduction/2015_timmer_wiod/</guid>
+      <description>Load libraries and data Timmer et al. (2015) use 2013 vintage of world input-output database (WIOD). The following code downloads the data from the homepage, unzips it and loads it into R.
+Before you download the data please note that the file has a size of about 250 MB. So make sure you have enought space on your disc before you download it.
+# Download WIOD 2013 download.file(&amp;quot;http://www.wiod.org/protected3/data13/update_sep12/wiot/wiot_stata_sep12.zip&amp;quot;, destfile = &amp;quot;wiod13.</description>
+    </item>
     
     <item>
       <title>An Introduction to Impulse Response Analysis of VAR Models</title>

@@ -1,0 +1,316 @@
+
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-115075361-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+<!DOCTYPE html>
+<html xmlns="//www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+    <head>
+        
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+
+        <title>Reproduction: Timmer, M. P., Dietzenbacher, E., Los, B., Stehrer, R., &amp; De Vries, G. J. (2015). An illustrated user guide to the world input–output database: the case of global automotive production. &middot; r-econometrics</title>
+        <link rel='stylesheet' href='//fonts.googleapis.com/css?family=Open+Sans:400,300,600' type='text/css'>
+        <link rel="stylesheet" href="https://www.r-econometrics.com//libraries/normalize.3.0.1.css" />
+        <link rel="stylesheet" href="https://www.r-econometrics.com//css/liquorice.css" />
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <link rel="apple-touch-icon-precomposed" href="/apple-touch-icon-144-precomposed.png" sizes="144x144" />
+        <link rel="alternate" href="" type="application/rss+xml" title="r-econometrics" />
+    </head>
+    <body class="li-body">
+
+<header class="li-page-header">
+    <div class="container">
+        <div class="row">
+            <div class="sixteen columns">
+                <div class="li-brand li-left">
+                <a href="https://www.r-econometrics.com/">r-econometrics</a></div>
+                <div class="li-menu li-right">
+                    <span class="li-menu-icon" onclick="javascript:toggle('menu');">&#9776;</span>
+                    <ul id="menu2" class="li-menu-items">
+                        
+                            <li><a href="/rbasicsintro"> R(eal) Basics </a></li>
+                        
+                            <li><a href="/methodsintro"> Econometric Methods </a></li>
+                        
+                            <li><a href="/timeseriesintro"> Time Series Topics </a></li>
+                        
+                            <li><a href="/links"> Links </a></li>
+                        
+                            <li><a href="/post"> Blog </a></li>
+                        
+                            <li><a href="/reproductionintro"> Reproduction Projects </a></li>
+                        
+                            <li><a href="/about"> About and Disclaimer </a></li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="sixteen columns">
+                <ul id="menu" class="li-menu-items li-menu-mobile">
+                    
+                        <li><a href="/rbasicsintro"> R(eal) Basics </a></li>
+                    
+                        <li><a href="/methodsintro"> Econometric Methods </a></li>
+                    
+                        <li><a href="/timeseriesintro"> Time Series Topics </a></li>
+                    
+                        <li><a href="/links"> Links </a></li>
+                    
+                        <li><a href="/post"> Blog </a></li>
+                    
+                        <li><a href="/reproductionintro"> Reproduction Projects </a></li>
+                    
+                        <li><a href="/about"> About and Disclaimer </a></li>
+                    
+                </ul>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+
+
+
+
+    <div class="container">
+        <div class="row">
+            <div class="sixteen columns">
+                <article class="li-article">
+                    <header class="li-article-header">
+                        <h1 class="li-article-title">Reproduction: Timmer, M. P., Dietzenbacher, E., Los, B., Stehrer, R., &amp; De Vries, G. J. (2015). An illustrated user guide to the world input–output database: the case of global automotive production.</h1>
+                        <span class="li-article-taxonomies">
+                            
+
+                            
+                                with tags
+                                
+                                    <a href="https://www.r-econometrics.com//tags/gvc">gvc</a>
+                                
+                                    <a href="https://www.r-econometrics.com//tags/leontief-decomposition">leontief-decomposition</a>
+                                
+                                    <a href="https://www.r-econometrics.com//tags/r">r</a>
+                                
+                            
+                        </span>
+                         - 
+                        <time class="li-article-date">Franz X. Mohr, May 20, 2019
+                        </time>
+                    </header>
+                    <section>
+                        <div id="load-libraries-and-data" class="section level2">
+<h2>Load libraries and data</h2>
+<p>Timmer et al. (2015) use 2013 vintage of world input-output database (<a href="http://www.wiod.org/database/wiots13" target="_blank">WIOD</a>). The following code downloads the data from the homepage, unzips it and loads it into R.</p>
+<p>Before you download the data please note that the file has a size of about 250 MB. So make sure you have enought space on your disc before you download it.</p>
+<pre class="r"><code># Download WIOD 2013
+download.file(&quot;http://www.wiod.org/protected3/data13/update_sep12/wiot/wiot_stata_sep12.zip&quot;,
+              destfile = &quot;wiod13.zip&quot;)
+
+# Unzip the file
+unzip(&quot;wiod13.zip&quot;)
+
+# Read dta file
+library(readstata13)
+data &lt;- read.dta13(&quot;wiot_full.dta&quot;)</code></pre>
+</div>
+<div id="value-added-export-ratios-in-2004" class="section level2">
+<h2>Value added export ratios in 2004</h2>
+<p>Timmer et al. (2015) compare different data sets on international input-output tables by calculating value-added exports (VAX). VAX is a measure of a contry’s domestic value added embodied in final expenditures abroad.</p>
+<pre class="r"><code>library(dplyr)
+library(tidyr)
+
+temp &lt;- data %&gt;%
+  filter(year == 2004) %&gt;%
+  arrange(row_country, col_country, row_item, col_item) %&gt;%
+  mutate(row_item = as.character(row_item),
+         row_item = ifelse(nchar(row_item) == 2, row_item, paste(&quot;0&quot;, row_item, sep = &quot;&quot;)),
+         col_item = as.character(col_item),
+         col_item = ifelse(nchar(col_item) == 2, col_item, paste(&quot;0&quot;, col_item, sep = &quot;&quot;)))
+
+countries &lt;- unique(temp$col_country)
+
+industries &lt;- as.character(1:35)
+industries &lt;- ifelse(nchar(industries) == 2, industries, paste(&quot;0&quot;, industries, sep = &quot;&quot;))
+
+demand &lt;- c(&quot;37&quot;, &quot;38&quot;, &quot;39&quot;, &quot;41&quot;, &quot;42&quot;)</code></pre>
+<pre class="r"><code># Intermediate demand
+interm &lt;- temp %&gt;%
+  filter(row_country %in% countries,
+         row_item %in% industries,
+         col_country %in% countries,
+         col_item %in% industries) %&gt;%
+  mutate(col_country = paste(col_country, col_item, sep = &quot;_&quot;)) %&gt;%
+  select(-col_item) %&gt;%
+  spread(col_country, value)
+interm &lt;- interm[,-(1:3)]</code></pre>
+<pre class="r"><code># Final demand
+final &lt;- temp %&gt;%
+  filter(row_country %in% countries,
+         row_item %in% industries,
+         col_country %in% countries,
+         col_item %in% demand) %&gt;%
+  mutate(col_country = paste(col_country, col_item, sep = &quot;_&quot;)) %&gt;%
+  select(-col_item) %&gt;%
+  spread(col_country, value)
+final &lt;- final[, -(1:3)]</code></pre>
+<pre class="r"><code># Output
+output &lt;- temp %&gt;%
+  filter(row_country %in% countries,
+         row_item %in% industries) %&gt;%
+  group_by(row_country, row_item) %&gt;%
+  summarise(value = sum(value)) %&gt;%
+  ungroup()
+output &lt;- output$value</code></pre>
+<pre class="r"><code>library(decompr)
+
+leon &lt;- decomp(x = interm,
+               y = final,
+               k = countries,
+               i = industries,
+               o = output,
+               method = &quot;leontief&quot;,
+               post = &quot;final_demand&quot;)</code></pre>
+<pre class="r"><code># Total Exports
+tot_exp &lt;- temp %&gt;%
+  filter(row_country %in% countries,
+         row_item %in% industries,
+         col_country %in% countries,
+         col_item %in% c(industries, demand)) %&gt;%
+  filter(row_country != col_country) %&gt;%
+  group_by(row_country) %&gt;%
+  summarise(exports = sum(value)) %&gt;%
+  ungroup()
+
+# VAX ratio
+vax &lt;- leon %&gt;%
+  filter(Source_Country != Importing_Country) %&gt;%
+  group_by(Source_Country) %&gt;%
+  summarise(vax = sum(Final_Demand))%&gt;%
+  ungroup() %&gt;%
+  mutate(row_country = as.character(Source_Country)) %&gt;%
+  select(-Source_Country) %&gt;%
+  full_join(tot_exp, by = &quot;row_country&quot;) %&gt;%
+  mutate(vax = vax / exports) %&gt;%
+  select(row_country, vax) %&gt;%
+  arrange(vax)
+vax$row_country &lt;- factor(vax$row_country, levels = vax$row_country)</code></pre>
+<pre class="r"><code>library(ggplot2)</code></pre>
+<pre><code>## Registered S3 methods overwritten by &#39;ggplot2&#39;:
+##   method         from 
+##   [.quosures     rlang
+##   c.quosures     rlang
+##   print.quosures rlang</code></pre>
+<pre class="r"><code>ggplot(vax, aes(x = row_country, y = vax, colour = &quot;a&quot;)) +
+  geom_point(show.legend = FALSE) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  scale_colour_brewer(palette = &quot;Set1&quot;) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90),
+        axis.title = element_blank()) +
+  labs(title = &quot;Value Added Exports Ratios in 2004&quot;,
+       subtitle = &quot;VAX ratio&quot;,
+       caption = &quot;Source: WIOD.&quot;)</code></pre>
+<p><img src="/reproduction/2015_timmer_wiod_files/figure-html/vax_plot-1.png" width="480" /></p>
+<p><em>To be continued</em></p>
+</div>
+<div id="references" class="section level2">
+<h2>References</h2>
+<p>Quast, B. A. and V. Kummritz (2015). decompr: Global Value Chain decomposition in R. CTEI Working Papers, 1.</p>
+<p>Timmer, M. P., Dietzenbacher, E., Los, B., Stehrer, R., &amp; de Vries, G. J. (2015). An Illustrated User Guide to the World Input–Output Database: the Case of Global Automotive Production. <em>Review of International Economics, 23</em>(3), 575–605. <a href="https://doi.org/10.1111/roie.12178" class="uri">https://doi.org/10.1111/roie.12178</a></p>
+</div>
+
+                    </section>
+                </article>
+                <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5a9c6c9b8a39890d"></script>
+                <div class="container">
+  <div class="row">
+    <div class="sixteen columns center">
+      <div class="addthis_inline_share_toolbox"></div>
+      
+    </div>
+  </div>
+</div>
+
+                <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+<footer class="li-page-footer">
+    <div class="container">
+        <div class="row">
+            <div class="sixteen columns center">
+              <div id="disqus_thread"></div>
+                <script type="text/javascript">
+                  (function() { 
+                  if (window.location.hostname == "localhost") return;
+                  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                  var disqus_shortname = 'r-econometrics';
+                  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                  })();
+                  </script>
+                  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+            </div>
+        </div>
+    </div>
+</footer>
+            </div>
+        </div>
+        
+    </div>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+<footer class="li-page-footer">
+    <div class="container">
+        <div class="row">
+            <div class="sixteen columns center">
+              <div class="li-page-footer-legal">
+                &copy; Franz X. Mohr. Powered by <a href="https://github.com/rstudio/blogdown" target="_blank" >Blogdown</a> and hosted by <a href="https://www.netlify.com/" target="_blank" >Netlify</a>. Source available on <a href="https://github.com/rranzmohr/r-econometrics" target="_blank" >Github</a>.
+              </div>
+              <div class="li-page-footer-theme">
+                <span class=""><a href="https://github.com/eliasson/liquorice/">liquorice</a> is a theme for <a href="https://gohugo.io/">hugo</a>
+                </span>
+              </div>
+            </div>
+        </div>
+    </div>
+</footer>
+    <script type="text/javascript">
+    <!--
+    function toggle(id) {
+        var e = document.getElementById(id);
+        e.style.display == 'block' ? e.style.display = 'none' : e.style.display = 'block';
+    }
+    
+    </script>
+    
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-115075361-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+    </body>
+</html>
+

@@ -1,0 +1,132 @@
+---
+title: "Reproduction: Timmer, M. P., Dietzenbacher, E., Los, B., Stehrer, R., & De Vries, G. J. (2015). An illustrated user guide to the world input–output database: the case of global automotive production."
+date: "2019-05-20"
+author: "Franz X. Mohr"
+tags:
+  - gvc
+  - leontief-decomposition
+  - r
+---
+
+
+
+<div id="load-libraries-and-data" class="section level2">
+<h2>Load libraries and data</h2>
+<p>Timmer et al. (2015) use 2013 vintage of world input-output database (<a href="http://www.wiod.org/database/wiots13" target="_blank">WIOD</a>). The following code downloads the data from the homepage, unzips it and loads it into R.</p>
+<p>Before you download the data please note that the file has a size of about 250 MB. So make sure you have enought space on your disc before you download it.</p>
+<pre class="r"><code># Download WIOD 2013
+download.file(&quot;http://www.wiod.org/protected3/data13/update_sep12/wiot/wiot_stata_sep12.zip&quot;,
+              destfile = &quot;wiod13.zip&quot;)
+
+# Unzip the file
+unzip(&quot;wiod13.zip&quot;)
+
+# Read dta file
+library(readstata13)
+data &lt;- read.dta13(&quot;wiot_full.dta&quot;)</code></pre>
+</div>
+<div id="value-added-export-ratios-in-2004" class="section level2">
+<h2>Value added export ratios in 2004</h2>
+<p>Timmer et al. (2015) compare different data sets on international input-output tables by calculating value-added exports (VAX). VAX is a measure of a contry’s domestic value added embodied in final expenditures abroad.</p>
+<pre class="r"><code>library(dplyr)
+library(tidyr)
+
+temp &lt;- data %&gt;%
+  filter(year == 2004) %&gt;%
+  arrange(row_country, col_country, row_item, col_item) %&gt;%
+  mutate(row_item = as.character(row_item),
+         row_item = ifelse(nchar(row_item) == 2, row_item, paste(&quot;0&quot;, row_item, sep = &quot;&quot;)),
+         col_item = as.character(col_item),
+         col_item = ifelse(nchar(col_item) == 2, col_item, paste(&quot;0&quot;, col_item, sep = &quot;&quot;)))
+
+countries &lt;- unique(temp$col_country)
+
+industries &lt;- as.character(1:35)
+industries &lt;- ifelse(nchar(industries) == 2, industries, paste(&quot;0&quot;, industries, sep = &quot;&quot;))
+
+demand &lt;- c(&quot;37&quot;, &quot;38&quot;, &quot;39&quot;, &quot;41&quot;, &quot;42&quot;)</code></pre>
+<pre class="r"><code># Intermediate demand
+interm &lt;- temp %&gt;%
+  filter(row_country %in% countries,
+         row_item %in% industries,
+         col_country %in% countries,
+         col_item %in% industries) %&gt;%
+  mutate(col_country = paste(col_country, col_item, sep = &quot;_&quot;)) %&gt;%
+  select(-col_item) %&gt;%
+  spread(col_country, value)
+interm &lt;- interm[,-(1:3)]</code></pre>
+<pre class="r"><code># Final demand
+final &lt;- temp %&gt;%
+  filter(row_country %in% countries,
+         row_item %in% industries,
+         col_country %in% countries,
+         col_item %in% demand) %&gt;%
+  mutate(col_country = paste(col_country, col_item, sep = &quot;_&quot;)) %&gt;%
+  select(-col_item) %&gt;%
+  spread(col_country, value)
+final &lt;- final[, -(1:3)]</code></pre>
+<pre class="r"><code># Output
+output &lt;- temp %&gt;%
+  filter(row_country %in% countries,
+         row_item %in% industries) %&gt;%
+  group_by(row_country, row_item) %&gt;%
+  summarise(value = sum(value)) %&gt;%
+  ungroup()
+output &lt;- output$value</code></pre>
+<pre class="r"><code>library(decompr)
+
+leon &lt;- decomp(x = interm,
+               y = final,
+               k = countries,
+               i = industries,
+               o = output,
+               method = &quot;leontief&quot;,
+               post = &quot;final_demand&quot;)</code></pre>
+<pre class="r"><code># Total Exports
+tot_exp &lt;- temp %&gt;%
+  filter(row_country %in% countries,
+         row_item %in% industries,
+         col_country %in% countries,
+         col_item %in% c(industries, demand)) %&gt;%
+  filter(row_country != col_country) %&gt;%
+  group_by(row_country) %&gt;%
+  summarise(exports = sum(value)) %&gt;%
+  ungroup()
+
+# VAX ratio
+vax &lt;- leon %&gt;%
+  filter(Source_Country != Importing_Country) %&gt;%
+  group_by(Source_Country) %&gt;%
+  summarise(vax = sum(Final_Demand))%&gt;%
+  ungroup() %&gt;%
+  mutate(row_country = as.character(Source_Country)) %&gt;%
+  select(-Source_Country) %&gt;%
+  full_join(tot_exp, by = &quot;row_country&quot;) %&gt;%
+  mutate(vax = vax / exports) %&gt;%
+  select(row_country, vax) %&gt;%
+  arrange(vax)
+vax$row_country &lt;- factor(vax$row_country, levels = vax$row_country)</code></pre>
+<pre class="r"><code>library(ggplot2)</code></pre>
+<pre><code>## Registered S3 methods overwritten by &#39;ggplot2&#39;:
+##   method         from 
+##   [.quosures     rlang
+##   c.quosures     rlang
+##   print.quosures rlang</code></pre>
+<pre class="r"><code>ggplot(vax, aes(x = row_country, y = vax, colour = &quot;a&quot;)) +
+  geom_point(show.legend = FALSE) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  scale_colour_brewer(palette = &quot;Set1&quot;) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90),
+        axis.title = element_blank()) +
+  labs(title = &quot;Value Added Exports Ratios in 2004&quot;,
+       subtitle = &quot;VAX ratio&quot;,
+       caption = &quot;Source: WIOD.&quot;)</code></pre>
+<p><img src="/reproduction/2015_timmer_wiod_files/figure-html/vax_plot-1.png" width="480" /></p>
+<p><em>To be continued</em></p>
+</div>
+<div id="references" class="section level2">
+<h2>References</h2>
+<p>Quast, B. A. and V. Kummritz (2015). decompr: Global Value Chain decomposition in R. CTEI Working Papers, 1.</p>
+<p>Timmer, M. P., Dietzenbacher, E., Los, B., Stehrer, R., &amp; de Vries, G. J. (2015). An Illustrated User Guide to the World Input–Output Database: the Case of Global Automotive Production. <em>Review of International Economics, 23</em>(3), 575–605. <a href="https://doi.org/10.1111/roie.12178" class="uri">https://doi.org/10.1111/roie.12178</a></p>
+</div>
