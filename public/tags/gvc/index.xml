@@ -17,9 +17,8 @@
       <pubDate>Mon, 20 May 2019 00:00:00 +0000</pubDate>
       
       <guid>https://www.r-econometrics.com/reproduction/2015_timmer_wiod/</guid>
-      <description>Load libraries and data Timmer et al. (2015) use 2013 vintage of world input-output database (WIOD). The following code downloads the data from the homepage, unzips it and loads it into R.
-Before you download the data please note that the file has a size of about 250 MB. So make sure you have enought space on your disc before you download it.
-# Download WIOD 2013 download.file(&amp;quot;http://www.wiod.org/protected3/data13/update_sep12/wiot/wiot_stata_sep12.zip&amp;quot;, destfile = &amp;quot;wiod13.</description>
+      <description>As international trade has become increasingly fragmented over the past decades the analysis of global value chains (GVC) has gained popularity in economic research. This post reproduces Timmer et al. (2015), who introduce the world input-output database (WIOD) and present basic concepts of GVC analysis.
+Data Timmer et al. (2015) use the 2013 vintage of the world input-output database (WIOD). The following code downloads the data from the project’s website, unzips it and loads the resulting STATA file into R using the readstata13 package.</description>
     </item>
     
   </channel>

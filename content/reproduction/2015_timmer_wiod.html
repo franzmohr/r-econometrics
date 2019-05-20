@@ -4,16 +4,18 @@ date: "2019-05-20"
 author: "Franz X. Mohr"
 tags:
   - gvc
+  - global-value-chain
   - leontief-decomposition
   - r
+description: "As international trade has become increasingly fragmented over the past decades the analysis of global value chains (GVC) has gained popularity in economic research. This post reproduces Timmer et al. (2015), who introduce the world input-output database (WIOD) and present basic concepts of GVC analysis."
 ---
 
 
 
-<div id="load-libraries-and-data" class="section level2">
-<h2>Load libraries and data</h2>
-<p>Timmer et al. (2015) use 2013 vintage of world input-output database (<a href="http://www.wiod.org/database/wiots13" target="_blank">WIOD</a>). The following code downloads the data from the homepage, unzips it and loads it into R.</p>
-<p>Before you download the data please note that the file has a size of about 250 MB. So make sure you have enought space on your disc before you download it.</p>
+<p>As international trade has become increasingly fragmented over the past decades the analysis of global value chains (GVC) has gained popularity in economic research. This post reproduces Timmer et al. (2015), who introduce the world input-output database (WIOD) and present basic concepts of GVC analysis.</p>
+<div id="data" class="section level2">
+<h2>Data</h2>
+<p>Timmer et al. (2015) use the 2013 vintage of the world input-output database (<a href="http://www.wiod.org/database/wiots13" target="_blank">WIOD</a>). The following code downloads the data from the project’s website, unzips it and loads the resulting STATA file into R using the <code>readstata13</code> package.<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a></p>
 <pre class="r"><code># Download WIOD 2013
 download.file(&quot;http://www.wiod.org/protected3/data13/update_sep12/wiot/wiot_stata_sep12.zip&quot;,
               destfile = &quot;wiod13.zip&quot;)
@@ -27,24 +29,33 @@ data &lt;- read.dta13(&quot;wiot_full.dta&quot;)</code></pre>
 </div>
 <div id="value-added-export-ratios-in-2004" class="section level2">
 <h2>Value added export ratios in 2004</h2>
-<p>Timmer et al. (2015) compare different data sets on international input-output tables by calculating value-added exports (VAX). VAX is a measure of a contry’s domestic value added embodied in final expenditures abroad.</p>
-<pre class="r"><code>library(dplyr)
+<p>Timmer et al. (2015) compare different data sets on international input-output tables by calculating value-added exports (VAX) for a series of countries in 2004. VAX is a popular indicator, which measures a contry’s domestic value added embodied in final expenditures abroad.</p>
+<p>In order to calculate VAX the Leontief decomposition is employed. In R this composition is implemented in the <code>decompr</code> package. The function <code>decomp</code> requires several input arguments: intermediate demand, final demand, a vector of country, a vector of industry and a vector of final outputs. The following code chunks can be used to obtain them.</p>
+<pre class="r"><code># Load data manipulation packages
+library(dplyr)
 library(tidyr)
 
 temp &lt;- data %&gt;%
+  # Only use values for 2004
   filter(year == 2004) %&gt;%
+  # Sort by country and industry
   arrange(row_country, col_country, row_item, col_item) %&gt;%
+  # Rename the industry and demand codes
   mutate(row_item = as.character(row_item),
-         row_item = ifelse(nchar(row_item) == 2, row_item, paste(&quot;0&quot;, row_item, sep = &quot;&quot;)),
          col_item = as.character(col_item),
+         row_item = ifelse(nchar(row_item) == 2, row_item, paste(&quot;0&quot;, row_item, sep = &quot;&quot;)),
          col_item = ifelse(nchar(col_item) == 2, col_item, paste(&quot;0&quot;, col_item, sep = &quot;&quot;)))
 
+# Extract country names
 countries &lt;- unique(temp$col_country)
 
+# Codes for intermediate industries
 industries &lt;- as.character(1:35)
 industries &lt;- ifelse(nchar(industries) == 2, industries, paste(&quot;0&quot;, industries, sep = &quot;&quot;))
 
-demand &lt;- c(&quot;37&quot;, &quot;38&quot;, &quot;39&quot;, &quot;41&quot;, &quot;42&quot;)</code></pre>
+# Codes for final demand
+demand &lt;- as.character(c(37, 38, 39, 41, 42))</code></pre>
+<p>The intermediate demand table is calculated by</p>
 <pre class="r"><code># Intermediate demand
 interm &lt;- temp %&gt;%
   filter(row_country %in% countries,
@@ -54,7 +65,10 @@ interm &lt;- temp %&gt;%
   mutate(col_country = paste(col_country, col_item, sep = &quot;_&quot;)) %&gt;%
   select(-col_item) %&gt;%
   spread(col_country, value)
+
+# Drop first three columns
 interm &lt;- interm[,-(1:3)]</code></pre>
+<p>Final demadn is obtained with</p>
 <pre class="r"><code># Final demand
 final &lt;- temp %&gt;%
   filter(row_country %in% countries,
@@ -64,7 +78,10 @@ final &lt;- temp %&gt;%
   mutate(col_country = paste(col_country, col_item, sep = &quot;_&quot;)) %&gt;%
   select(-col_item) %&gt;%
   spread(col_country, value)
+
+# Drop first three columns
 final &lt;- final[, -(1:3)]</code></pre>
+<p>The elements of the final output vector are constructed as the sum of each row of the input-output table.</p>
 <pre class="r"><code># Output
 output &lt;- temp %&gt;%
   filter(row_country %in% countries,
@@ -72,7 +89,9 @@ output &lt;- temp %&gt;%
   group_by(row_country, row_item) %&gt;%
   summarise(value = sum(value)) %&gt;%
   ungroup()
+
 output &lt;- output$value</code></pre>
+<p>Once the required tables have been created, they can be used as input for the Leontief decomposition. Note that by default <code>decomp</code> sets <code>post = &quot;exports&quot;</code>, but in the context of this example <code>post = final_demand</code> is required.</p>
 <pre class="r"><code>library(decompr)
 
 leon &lt;- decomp(x = interm,
@@ -82,8 +101,9 @@ leon &lt;- decomp(x = interm,
                o = output,
                method = &quot;leontief&quot;,
                post = &quot;final_demand&quot;)</code></pre>
-<pre class="r"><code># Total Exports
-tot_exp &lt;- temp %&gt;%
+<p>VAX is calculated as domestic value added relative to gross exports. Using the WIOD gross exports are obtained as the sum over each row of the table, where values corresponding to domestic intermediate and final demand are omitted.</p>
+<pre class="r"><code># Gross Exports
+gross_exp &lt;- temp %&gt;%
   filter(row_country %in% countries,
          row_item %in% industries,
          col_country %in% countries,
@@ -91,9 +111,9 @@ tot_exp &lt;- temp %&gt;%
   filter(row_country != col_country) %&gt;%
   group_by(row_country) %&gt;%
   summarise(exports = sum(value)) %&gt;%
-  ungroup()
-
-# VAX ratio
+  ungroup()</code></pre>
+<p>Merging the results of the Leontief decomposition and gross exports per country allows to calculate value added exports:</p>
+<pre class="r"><code># VAX ratio
 vax &lt;- leon %&gt;%
   filter(Source_Country != Importing_Country) %&gt;%
   group_by(Source_Country) %&gt;%
@@ -101,18 +121,17 @@ vax &lt;- leon %&gt;%
   ungroup() %&gt;%
   mutate(row_country = as.character(Source_Country)) %&gt;%
   select(-Source_Country) %&gt;%
-  full_join(tot_exp, by = &quot;row_country&quot;) %&gt;%
+  full_join(gross_exp, by = &quot;row_country&quot;) %&gt;%
   mutate(vax = vax / exports) %&gt;%
   select(row_country, vax) %&gt;%
   arrange(vax)
+
+# Order observations by using factor
 vax$row_country &lt;- factor(vax$row_country, levels = vax$row_country)</code></pre>
-<pre class="r"><code>library(ggplot2)</code></pre>
-<pre><code>## Registered S3 methods overwritten by &#39;ggplot2&#39;:
-##   method         from 
-##   [.quosures     rlang
-##   c.quosures     rlang
-##   print.quosures rlang</code></pre>
-<pre class="r"><code>ggplot(vax, aes(x = row_country, y = vax, colour = &quot;a&quot;)) +
+<p>The result can be plotted. The folling graph reproduces figure 2 in Timmer et al. (2015).</p>
+<pre class="r"><code>library(ggplot2)
+
+ggplot(vax, aes(x = row_country, y = vax, colour = &quot;a&quot;)) +
   geom_point(show.legend = FALSE) +
   scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
   scale_colour_brewer(palette = &quot;Set1&quot;) +
@@ -127,6 +146,13 @@ vax$row_country &lt;- factor(vax$row_country, levels = vax$row_country)</code></
 </div>
 <div id="references" class="section level2">
 <h2>References</h2>
+<p>Garbuszus, J. M. &amp; Jeworutzki, S. (2018). readstata13: Import ‘Stata’ Data Files. <em>R package version 0.9.2</em>. <a href="https://CRAN.R-project.org/package=readstata13" class="uri">https://CRAN.R-project.org/package=readstata13</a></p>
 <p>Quast, B. A. and V. Kummritz (2015). decompr: Global Value Chain decomposition in R. CTEI Working Papers, 1.</p>
 <p>Timmer, M. P., Dietzenbacher, E., Los, B., Stehrer, R., &amp; de Vries, G. J. (2015). An Illustrated User Guide to the World Input–Output Database: the Case of Global Automotive Production. <em>Review of International Economics, 23</em>(3), 575–605. <a href="https://doi.org/10.1111/roie.12178" class="uri">https://doi.org/10.1111/roie.12178</a></p>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>Before you download the data please note that the file has a size of about 250 MB. So make sure you have enought space on your disc before you download it.<a href="#fnref1">↩</a></p></li>
+</ol>
 </div>
