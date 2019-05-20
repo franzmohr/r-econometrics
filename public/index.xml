@@ -184,6 +184,7 @@ lm.12.1.1 &amp;lt;- lm(inf ~ unem, data = phillips) res.static &amp;lt;- lm.12.1
       <guid>https://www.r-econometrics.com/reproductionintro/</guid>
       <description>Cincera, M. (1997). Patents, R&amp;amp;D, and technological spillovers at the firm level. 12, 265-280.
 Sheperd, B. (2016) The gravity model of international trade: A user guide.
+Timmer, M. P., Dietzenbacher, E., Los, B., Stehrer, R., &amp;amp; de Vries, G. J. (2015). An Illustrated User Guide to the World Input–Output Database: the Case of Global Automotive Production.
 Wooldridge, J. M. (2013) Introductory econometrics.</description>
     </item>
     
