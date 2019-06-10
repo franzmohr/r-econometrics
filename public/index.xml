@@ -6,10 +6,30 @@
     <description>Recent content on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 20 May 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 10 Jun 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://www.r-econometrics.com/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Links</title>
+      <link>https://www.r-econometrics.com/links/</link>
+      <pubDate>Mon, 10 Jun 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/links/</guid>
+      <description>Resources for learning R R-Project
+RStudio
+DataCamp: Courses on data analysis with R
+Selva Prabhakaran’s r-statistics.co also provides very good intros to R
+Great intros to R basics packed into exercises
+Great intro to basic R applications by Ralf Becker and James Lincoln
+OnePageR: Compact intro to many methods of data science
+Codeschool: R-Tutorials
+Endmemo: R-Tutorials
+Wikibook on R Programming
+Wikibook on R Programming
+ Data Financial portfolio and benchmark data provided by Kenneth R.</description>
+    </item>
     
     <item>
       <title>Reproduction: Timmer, M. P., Dietzenbacher, E., Los, B., Stehrer, R., &amp; De Vries, G. J. (2015). An illustrated user guide to the world input–output database: the case of global automotive production.</title>
@@ -66,26 +86,6 @@ Inspired by Andrew Collier’s blog post on creating word clouds from multiple P
       
       <guid>https://www.r-econometrics.com/timeseries/economic-cycle-extraction/</guid>
       <description>The analysis of economic time series often requires the extraction of their cyclical components. This post presents some methods, which can be used to decompose time series into their different components. It is based on the chapter on business cycles by Stock and Watson (1999) in the Handbook of Macroeconomics, but also presents some more recent methods like Hamilton’s (2018) alternative to the HP-filter, wavelet filtering and empirical mode decomposition.</description>
-    </item>
-    
-    <item>
-      <title>Links</title>
-      <link>https://www.r-econometrics.com/links/</link>
-      <pubDate>Tue, 25 Dec 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://www.r-econometrics.com/links/</guid>
-      <description>Resources for learning R R-Project
-RStudio
-DataCamp: Courses on data analysis with R
-Selva Prabhakaran’s r-statistics.co also provides very good intros to R
-Great intros to R basics packed into exercises
-Great intro to basic R applications by Ralf Becker and James Lincoln
-OnePageR: Compact intro to many methods of data science
-Codeschool: R-Tutorials
-Endmemo: R-Tutorials
-Wikibook on R Programming
-Wikibook on R Programming
- Data Financial portfolio and benchmark data provided by Kenneth R.</description>
     </item>
     
     <item>
