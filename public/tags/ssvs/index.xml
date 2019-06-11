@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Ssvs on r-econometrics</title>
+    <link>https://www.r-econometrics.com/tags/ssvs/</link>
+    <description>Recent content in Ssvs on r-econometrics</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 11 Jun 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://www.r-econometrics.com/tags/ssvs/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Stochastic Search Variable Selection</title>
+      <link>https://www.r-econometrics.com/timeseries/ssvs/</link>
+      <pubDate>Tue, 11 Jun 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/timeseries/ssvs/</guid>
+      <description>Introduction A general drawback of vector autoregressive (VAR) models is that the number of estimated coefficients increases disproportionately with the number of lags. Therefore, fewer information per parameter is available for the estimation as the number of lags increases. In the Bayesian VAR literature one approach to mitigate this so-called curse of dimensionality is stochastic search variable selection (SSVS) as proposed by George et al. (2008). The basic idea of SSVS is to assign commonly used prior variances to parameters, which should be included in a model, and prior variances close to zero to irrelevant parameters.</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -6,10 +6,29 @@
     <description>Recent content on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 10 Jun 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 11 Jun 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://www.r-econometrics.com/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Bayesian Error Correction Models with Priors on the Cointegration Space</title>
+      <link>https://www.r-econometrics.com/timeseries/bvec/</link>
+      <pubDate>Tue, 11 Jun 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/timeseries/bvec/</guid>
+      <description>Introduction This post provides the code to set up and estimate a basic Bayesian vector error correction (BVEC) model with the bvartools package. The presented Gibbs sampler is based on the approach of Koop et al. (2010), who propose a prior on the cointegration space.
+ Data To illustrate the estimation process, the dataset E6 from Lütkepohl (2007) is used, which contains data on German long-term interest rates and inflation from 1972Q2 to 1998Q4.</description>
+    </item>
+    
+    <item>
+      <title>Stochastic Search Variable Selection</title>
+      <link>https://www.r-econometrics.com/timeseries/ssvs/</link>
+      <pubDate>Tue, 11 Jun 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/timeseries/ssvs/</guid>
+      <description>Introduction A general drawback of vector autoregressive (VAR) models is that the number of estimated coefficients increases disproportionately with the number of lags. Therefore, fewer information per parameter is available for the estimation as the number of lags increases. In the Bayesian VAR literature one approach to mitigate this so-called curse of dimensionality is stochastic search variable selection (SSVS) as proposed by George et al. (2008). The basic idea of SSVS is to assign commonly used prior variances to parameters, which should be included in a model, and prior variances close to zero to irrelevant parameters.</description>
+    </item>
     
     <item>
       <title>Links</title>
@@ -236,6 +255,17 @@ The data sets are from the wooldridge package, which is a collection of all data
     </item>
     
     <item>
+      <title>Time Series Topics</title>
+      <link>https://www.r-econometrics.com/timeseriesintro/</link>
+      <pubDate>Mon, 11 Jun 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/timeseriesintro/</guid>
+      <description>Work in progress (March 2019). I will try to update this page over the next few months.
+This section is intended to provide an overview of the relevant issues in (macro)economic time series analysis. Again the standard disclaimer: This site does not replace a good textbook, but it should help you to get a grasp of the basic concepts more quickly than if you learned it on your own.
+The intended structure of this site is:</description>
+    </item>
+    
+    <item>
       <title>Reproduction: Cincera, M. (1997). Patents, R&amp;D, and technological spillovers at the firm level.</title>
       <link>https://www.r-econometrics.com/reproduction/1997_cincera_patents/</link>
       <pubDate>Tue, 08 May 2018 00:00:00 +0000</pubDate>
@@ -243,17 +273,6 @@ The data sets are from the wooldridge package, which is a collection of all data
       <guid>https://www.r-econometrics.com/reproduction/1997_cincera_patents/</guid>
       <description>Get the data The data set can be downloaded from the Journal of Applied Econometrics Data Archive.
 download.file(&amp;quot;http://qed.econ.queensu.ca/jae/1997-v12.3/cincera/mc-data.zip&amp;quot;, destfile = &amp;quot;1997_cincera_data.zip&amp;quot;) unzip(&amp;quot;1997_cincera_data.zip&amp;quot;) data &amp;lt;- read.delim(&amp;quot;data.mc&amp;quot;, header = FALSE) names(data) &amp;lt;- c(&amp;quot;fi&amp;quot;, &amp;quot;s&amp;quot;, &amp;quot;g&amp;quot;, &amp;quot;p83&amp;quot;, &amp;quot;p84&amp;quot;, &amp;quot;p85&amp;quot;, &amp;quot;p86&amp;quot;, &amp;quot;p87&amp;quot;, &amp;quot;p88&amp;quot;, &amp;quot;p89&amp;quot;, &amp;quot;p90&amp;quot;, &amp;quot;p91&amp;quot;, &amp;quot;lr83&amp;quot;, &amp;quot;lr84&amp;quot;, &amp;quot;lr85&amp;quot;, &amp;quot;lr86&amp;quot;, &amp;quot;lr87&amp;quot;, &amp;quot;lr88&amp;quot;, &amp;quot;lr89&amp;quot;, &amp;quot;lr90&amp;quot;, &amp;quot;lr91&amp;quot;, &amp;quot;ls83&amp;quot;, &amp;quot;ls84&amp;quot;, &amp;quot;ls85&amp;quot;, &amp;quot;ls86&amp;quot;, &amp;quot;ls87&amp;quot;, &amp;quot;ls88&amp;quot;, &amp;quot;ls89&amp;quot;, &amp;quot;ls90&amp;quot;, &amp;quot;ls91&amp;quot;) p &amp;lt;- matrix(as.matrix(data[, c(&amp;quot;p83&amp;quot;, &amp;quot;p84&amp;quot;, &amp;quot;p85&amp;quot;, &amp;quot;p86&amp;quot;, &amp;quot;p87&amp;quot;, &amp;quot;p88&amp;quot;, &amp;quot;p89&amp;quot;, &amp;quot;p90&amp;quot;, &amp;quot;p91&amp;quot;)])) k &amp;lt;- matrix(as.</description>
-    </item>
-    
-    <item>
-      <title>Time Series Topics</title>
-      <link>https://www.r-econometrics.com/timeseriesintro/</link>
-      <pubDate>Tue, 27 Mar 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://www.r-econometrics.com/timeseriesintro/</guid>
-      <description>Work in progress (March 2019). I will try to update this page over the next few months.
-This section is intended to provide an overview of the relevant issues in (macro)economic time series analysis. Again the standard disclaimer: This site does not replace a good textbook, but it should help you to get a grasp of the basic concepts more quickly than if you learned it on your own.
-The intended structure of this site is:</description>
     </item>
     
     <item>

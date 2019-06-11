@@ -1,0 +1,388 @@
+
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-115075361-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+<!DOCTYPE html>
+<html xmlns="//www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+    <head>
+        
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+
+        <title>Bayesian Error Correction Models with Priors on the Cointegration Space &middot; r-econometrics</title>
+        <link rel='stylesheet' href='//fonts.googleapis.com/css?family=Open+Sans:400,300,600' type='text/css'>
+        <link rel="stylesheet" href="https://www.r-econometrics.com//libraries/normalize.3.0.1.css" />
+        <link rel="stylesheet" href="https://www.r-econometrics.com//css/liquorice.css" />
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <link rel="apple-touch-icon-precomposed" href="/apple-touch-icon-144-precomposed.png" sizes="144x144" />
+        <link rel="alternate" href="" type="application/rss+xml" title="r-econometrics" />
+    </head>
+    <body class="li-body">
+
+<header class="li-page-header">
+    <div class="container">
+        <div class="row">
+            <div class="sixteen columns">
+                <div class="li-brand li-left">
+                <a href="https://www.r-econometrics.com/">r-econometrics</a></div>
+                <div class="li-menu li-right">
+                    <span class="li-menu-icon" onclick="javascript:toggle('menu');">&#9776;</span>
+                    <ul id="menu2" class="li-menu-items">
+                        
+                            <li><a href="/rbasicsintro"> R(eal) Basics </a></li>
+                        
+                            <li><a href="/methodsintro"> Econometric Methods </a></li>
+                        
+                            <li><a href="/timeseriesintro"> Time Series Topics </a></li>
+                        
+                            <li><a href="/links"> Links </a></li>
+                        
+                            <li><a href="/post"> Blog </a></li>
+                        
+                            <li><a href="/reproductionintro"> Reproduction Projects </a></li>
+                        
+                            <li><a href="/about"> About and Disclaimer </a></li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="sixteen columns">
+                <ul id="menu" class="li-menu-items li-menu-mobile">
+                    
+                        <li><a href="/rbasicsintro"> R(eal) Basics </a></li>
+                    
+                        <li><a href="/methodsintro"> Econometric Methods </a></li>
+                    
+                        <li><a href="/timeseriesintro"> Time Series Topics </a></li>
+                    
+                        <li><a href="/links"> Links </a></li>
+                    
+                        <li><a href="/post"> Blog </a></li>
+                    
+                        <li><a href="/reproductionintro"> Reproduction Projects </a></li>
+                    
+                        <li><a href="/about"> About and Disclaimer </a></li>
+                    
+                </ul>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+
+
+
+
+    <div class="container">
+        <div class="row">
+            <div class="sixteen columns">
+                <article class="li-article">
+                    <header class="li-article-header">
+                        <h1 class="li-article-title">Bayesian Error Correction Models with Priors on the Cointegration Space</h1>
+                        <span class="li-article-taxonomies">
+                            
+
+                            
+                                with tags
+                                
+                                    <a href="https://www.r-econometrics.com//tags/r">r</a>
+                                
+                                    <a href="https://www.r-econometrics.com//tags/bvec">bvec</a>
+                                
+                                    <a href="https://www.r-econometrics.com//tags/vec">vec</a>
+                                
+                                    <a href="https://www.r-econometrics.com//tags/cointegration">cointegration</a>
+                                
+                                    <a href="https://www.r-econometrics.com//tags/bvartools">bvartools</a>
+                                
+                            
+                        </span>
+                         - 
+                        <time class="li-article-date">Franz X. Mohr, June 11, 2019
+                        </time>
+                    </header>
+                    <section>
+                        <div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>This post provides the code to set up and estimate a basic Bayesian vector error correction (BVEC) model with the <code>bvartools</code> package. The presented Gibbs sampler is based on the approach of Koop et al. (2010), who propose a prior on the cointegration space.</p>
+</div>
+<div id="data" class="section level2">
+<h2>Data</h2>
+<p>To illustrate the estimation process, the dataset E6 from Lütkepohl (2007) is used, which contains data on German long-term interest rates and inflation from 1972Q2 to 1998Q4.</p>
+<pre class="r"><code>library(bvartools)
+
+data(&quot;e6&quot;)
+
+plot(e6) # Plot the series</code></pre>
+<p><img src="/timeseries/bvec_files/figure-html/data-1.png" width="432" style="display: block; margin: auto;" /></p>
+<p>The <code>gen_vec</code> function produces the inputs <code>Y</code>, <code>W</code> and <code>X</code> for the BVEC estimator, where <code>Y</code> is the matrix of dependent variables, <code>W</code> is a matrix of potentially cointegrated regressors, and <code>X</code> is the matrix of non-cointegration regressors.</p>
+<pre class="r"><code>data &lt;- gen_vec(e6, p = 4, const = &quot;unrestricted&quot;, season = &quot;unrestricted&quot;)
+
+y &lt;- data$Y
+w &lt;- data$W
+x &lt;- data$X</code></pre>
+</div>
+<div id="estimation" class="section level2">
+<h2>Estimation</h2>
+<pre class="r"><code># Reset random number generator for reproducibility
+set.seed(1234567)
+
+iter &lt;- 10000 # Number of iterations of the Gibbs sampler
+burnin &lt;- 5000 # Number of burn-in draws
+store &lt;- iter - burnin
+
+r &lt;- 1 # Set rank
+
+t &lt;- ncol(y) # Number of observations
+k &lt;- nrow(y) # Number of endogenous variables
+k_w &lt;- nrow(w) # Number of regressors in error correction term
+k_x &lt;- nrow(x) # Number of differenced regressors and unrestrictec deterministic terms
+
+k_alpha &lt;- k * r # Number of elements in alpha
+k_beta &lt;- k_w * r # Number of elements in beta
+k_gamma &lt;- k * k_x
+
+# Set uninformative priors
+a_mu_prior &lt;- matrix(0, k_x * k) # Vector of prior parameter means
+a_v_i_prior &lt;- diag(0, k_x * k) # Inverse of the prior covariance matrix
+
+v_i &lt;- 0
+p_tau_i &lt;- diag(1, k_w)
+
+u_sigma_df_prior &lt;- r # Prior degrees of freedom
+u_sigma_scale_prior &lt;- diag(0, k) # Prior covariance matrix
+u_sigma_df_post &lt;- t + u_sigma_df_prior # Posterior degrees of freedom
+
+# Initial values
+beta &lt;- matrix(c(1, -4), k_w, r)
+#beta &lt;- matrix(rnorm(k_w * r), k_w, r)
+
+u_sigma_i &lt;- diag(.0001, k)
+u_sigma &lt;- solve(u_sigma_i)
+
+g_i &lt;- u_sigma_i
+
+# Data containers
+draws_alpha &lt;- matrix(NA, k_alpha, store)
+draws_beta &lt;- matrix(NA, k_beta, store)
+draws_pi &lt;- matrix(NA, k * k_w, store)
+draws_gamma &lt;- matrix(NA, k_gamma, store)
+draws_sigma &lt;- matrix(NA, k^2, store)
+
+# Start Gibbs sampler
+for (draw in 1:iter) {
+  # Draw conditional mean parameters
+  temp &lt;- post_coint_kls(y = y, beta = beta, w = w, x = x, sigma_i = u_sigma_i,
+                           v_i = v_i, p_tau_i = p_tau_i, g_i = g_i,
+                           gamma_mu_prior = a_mu_prior,
+                           gamma_V_i_prior = a_v_i_prior)
+  alpha &lt;- temp$alpha
+  beta &lt;- temp$beta
+  Pi &lt;- temp$Pi
+  gamma &lt;- temp$Gamma
+  
+  # Draw variance-covariance matrix
+  u &lt;- y - Pi %*% w - matrix(gamma, k) %*% x
+  u_sigma_scale_post &lt;- solve(tcrossprod(u) + v_i * alpha %*% tcrossprod(crossprod(beta, p_tau_i) %*% beta, alpha))
+  u_sigma_i &lt;- matrix(rWishart(1, u_sigma_df_post, u_sigma_scale_post)[,, 1], k)
+  u_sigma &lt;- solve(u_sigma_i)
+  
+  # Update g_i
+  g_i &lt;- u_sigma_i
+  
+  # Store draws
+  if (draw &gt; burnin) {
+    draws_alpha[, draw - burnin] &lt;- alpha
+    draws_beta[, draw - burnin] &lt;- beta
+    draws_pi[, draw - burnin] &lt;- Pi
+    draws_gamma[, draw - burnin] &lt;- gamma
+    draws_sigma[, draw - burnin] &lt;- u_sigma
+  }
+}</code></pre>
+<p>Obtain point estimates as the mean of the parameter draws:</p>
+<pre class="r"><code>Gamma &lt;- rowMeans(draws_gamma) # Obtain means for every row
+Gamma &lt;- matrix(Gamma, k) # Transform mean vector into a matrix
+Gamma &lt;- round(Gamma, 3) # Round values
+dimnames(Gamma) &lt;- list(dimnames(y)[[1]], dimnames(x)[[1]]) # Rename matrix dimensions
+
+round(Gamma, 3) # Print</code></pre>
+<pre><code>##      d.R.1 d.Dp.1  d.R.2 d.Dp.2 d.R.3 d.Dp.3 const season.1 season.2
+## d.R  0.262 -0.176 -0.021 -0.199 0.222 -0.096 0.002    0.001    0.009
+## d.Dp 0.079 -0.386  0.005 -0.422 0.024 -0.362 0.011   -0.034   -0.018
+##      season.3
+## d.R     0.000
+## d.Dp   -0.016</code></pre>
+<pre class="r"><code>beta &lt;- rowMeans(t(t(draws_beta) / t(draws_beta)[, 1])) # Obtain means for every row
+beta &lt;- matrix(beta, k_w) # Transform mean vector into a matrix
+beta &lt;- round(beta, 3) # Round values
+dimnames(beta) &lt;- list(dimnames(w)[[1]], NULL) # Rename matrix dimensions
+
+beta # Print</code></pre>
+<pre><code>##        [,1]
+## l.R   1.000
+## l.Dp -8.894</code></pre>
+<pre class="r"><code>Sigma &lt;- rowMeans(draws_sigma) # Obtain means for every row
+Sigma &lt;- matrix(Sigma, k) # Transform mean vector into a matrix
+Sigma &lt;- round(Sigma * 10^4, 2) # Round values
+dimnames(Sigma) &lt;- list(dimnames(y)[[1]], dimnames(y)[[1]]) # Rename matrix dimensions
+
+Sigma # Print</code></pre>
+<pre><code>##        d.R  d.Dp
+## d.R   0.30 -0.02
+## d.Dp -0.02  0.27</code></pre>
+</div>
+<div id="bvec-objects" class="section level2">
+<h2><code>bvec</code> objects</h2>
+<p>The <code>bvec</code> function can be used to collect output of the Gibbs sampler in a standardised object, which can be used further for forecasting, impulse response analysis or forecast error variance decomposition.</p>
+<pre class="r"><code># Number of non-deterministic coefficients
+k_nondet &lt;- (k_x - 4) * k
+
+# Generate bvec object
+bvec_est &lt;- bvec(y = y, w = w, x = x,
+               Pi = draws_pi,
+               Gamma = draws_gamma[1:k_nondet,],
+               C = draws_gamma[(k_nondet + 1):nrow(draws_gamma),],
+               Sigma = draws_sigma)</code></pre>
+<p>Posterior draws can be thinned with function <code>thin</code>:</p>
+<pre class="r"><code>bvec_est &lt;- thin(bvec_est, thin = 5)</code></pre>
+<p>The function <code>bvec_to_bvar</code> can be used to transform the VEC model into a VAR in levels:</p>
+<pre class="r"><code>bvar_form &lt;- bvec_to_bvar(bvec_est)</code></pre>
+</div>
+<div id="forecasts" class="section level2">
+<h2>Forecasts</h2>
+<pre class="r"><code>bvar_pred &lt;- predict(bvar_form, n.ahead = 10, new_D = t(bvar_form$x[9:12, 91:100]))
+
+plot(bvar_pred)</code></pre>
+<p><img src="/timeseries/bvec_files/figure-html/forecast,%20-1.png" width="528" /></p>
+</div>
+<div id="impulse-response-analysis" class="section level2">
+<h2>Impulse response analysis</h2>
+<p>Impulse responses for VECs can be constructed from their VAR respresentations.</p>
+<pre class="r"><code>IR &lt;- irf(bvar_form, impulse = &quot;R&quot;, response = &quot;Dp&quot;, n.ahead = 20)
+
+plot(IR, main = &quot;Forecast Error Impulse Response&quot;, xlab = &quot;Year&quot;, ylab = &quot;Response&quot;)</code></pre>
+<p><img src="/timeseries/bvec_files/figure-html/feir-1.png" width="528" /></p>
+<div id="orthogonalised-impulse-response" class="section level3">
+<h3>Orthogonalised impulse response</h3>
+<pre class="r"><code>OIR &lt;- irf(bvar_form, impulse = &quot;R&quot;, response = &quot;Dp&quot;, n.ahead = 20, type = &quot;oir&quot;)
+
+plot(OIR, main = &quot;Orthogonalised Impulse Response&quot;, xlab = &quot;Year&quot;, ylab = &quot;Response&quot;)</code></pre>
+<p><img src="/timeseries/bvec_files/figure-html/oir-1.png" width="528" /></p>
+</div>
+<div id="generalised-impulse-response" class="section level3">
+<h3>Generalised impulse response</h3>
+<pre class="r"><code>GIR &lt;- irf(bvar_form, impulse = &quot;R&quot;, response = &quot;Dp&quot;, n.ahead = 20, type = &quot;gir&quot;)
+
+plot(GIR, main = &quot;Generalised Impulse Response&quot;, xlab = &quot;Year&quot;, ylab = &quot;Response&quot;)</code></pre>
+<p><img src="/timeseries/bvec_files/figure-html/gir-1.png" width="528" /></p>
+</div>
+<div id="forecast-error-variance-decomposition" class="section level3">
+<h3>Forecast error variance decomposition</h3>
+<pre class="r"><code>bvec_fevd &lt;- fevd(bvar_form, response = &quot;Dp&quot;, n.ahead = 20)
+
+plot(bvec_fevd, main = &quot;FEVD of inflation&quot;)</code></pre>
+<p><img src="/timeseries/bvec_files/figure-html/fevd-1.png" width="528" /></p>
+</div>
+</div>
+<div id="references" class="section level2">
+<h2>References</h2>
+<p>Koop, G., León-González, R., &amp; Strachan R. W. (2010). Efficient posterior simulation for cointegrated models with priors on the cointegration space. <em>Econometric Reviews, 29</em>(2), 224-242. <a href="https://doi.org/10.1080/07474930903382208" class="uri">https://doi.org/10.1080/07474930903382208</a></p>
+<p>Lütkepohl, H. (2007). <em>New introduction to multiple time series analysis</em> (2nd ed.). Berlin: Springer.</p>
+<p>Pesaran, H. H., &amp; Shin, Y. (1998). Generalized impulse response analysis in linear multivariate models, <em>Economics Letters, 58</em>, 17-29. <a href="https://doi.org/10.1016/S0165-1765(97)00214-0" class="uri">https://doi.org/10.1016/S0165-1765(97)00214-0</a></p>
+</div>
+
+                    </section>
+                </article>
+                <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5a9c6c9b8a39890d"></script>
+                <div class="container">
+  <div class="row">
+    <div class="sixteen columns center">
+      <div class="addthis_inline_share_toolbox"></div>
+      
+    </div>
+  </div>
+</div>
+
+                <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+<footer class="li-page-footer">
+    <div class="container">
+        <div class="row">
+            <div class="sixteen columns center">
+              <div id="disqus_thread"></div>
+                <script type="text/javascript">
+                  (function() { 
+                  if (window.location.hostname == "localhost") return;
+                  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                  var disqus_shortname = 'r-econometrics';
+                  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                  })();
+                  </script>
+                  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+            </div>
+        </div>
+    </div>
+</footer>
+            </div>
+        </div>
+        
+    </div>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+<footer class="li-page-footer">
+    <div class="container">
+        <div class="row">
+            <div class="sixteen columns center">
+              <div class="li-page-footer-legal">
+                &copy; Franz X. Mohr. Powered by <a href="https://github.com/rstudio/blogdown" target="_blank" >Blogdown</a> and hosted by <a href="https://www.netlify.com/" target="_blank" >Netlify</a>. Source available on <a href="https://github.com/rranzmohr/r-econometrics" target="_blank" >Github</a>.
+              </div>
+              <div class="li-page-footer-theme">
+                <span class=""><a href="https://github.com/eliasson/liquorice/">liquorice</a> is a theme for <a href="https://gohugo.io/">hugo</a>
+                </span>
+              </div>
+            </div>
+        </div>
+    </div>
+</footer>
+    <script type="text/javascript">
+    <!--
+    function toggle(id) {
+        var e = document.getElementById(id);
+        e.style.display == 'block' ? e.style.display = 'none' : e.style.display = 'block';
+    }
+    
+    </script>
+    
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-115075361-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+    </body>
+</html>
+

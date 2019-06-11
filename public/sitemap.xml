@@ -3,6 +3,16 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://www.r-econometrics.com/timeseries/bvec/</loc>
+    <lastmod>2019-06-11T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/timeseries/ssvs/</loc>
+    <lastmod>2019-06-11T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://www.r-econometrics.com/links/</loc>
     <lastmod>2019-06-10T00:00:00+00:00</lastmod>
   </url>
@@ -113,13 +123,13 @@
   </url>
   
   <url>
-    <loc>https://www.r-econometrics.com/reproduction/1997_cincera_patents/</loc>
-    <lastmod>2018-05-08T00:00:00+00:00</lastmod>
+    <loc>https://www.r-econometrics.com/timeseriesintro/</loc>
+    <lastmod>2018-06-11T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://www.r-econometrics.com/timeseriesintro/</loc>
-    <lastmod>2018-03-27T00:00:00+00:00</lastmod>
+    <loc>https://www.r-econometrics.com/reproduction/1997_cincera_patents/</loc>
+    <lastmod>2018-05-08T00:00:00+00:00</lastmod>
   </url>
   
   <url>
@@ -205,7 +215,31 @@
   </url>
   
   <url>
+    <loc>https://www.r-econometrics.com/tags/bvar/</loc>
+    <lastmod>2019-06-11T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/bvartools/</loc>
+    <lastmod>2019-06-11T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/bvec/</loc>
+    <lastmod>2019-06-11T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>https://www.r-econometrics.com/categories/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/cointegration/</loc>
+    <lastmod>2019-06-11T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -331,7 +365,7 @@
   
   <url>
     <loc>https://www.r-econometrics.com/tags/r/</loc>
-    <lastmod>2019-05-20T00:00:00+00:00</lastmod>
+    <lastmod>2019-06-11T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -366,6 +400,12 @@
   </url>
   
   <url>
+    <loc>https://www.r-econometrics.com/tags/ssvs/</loc>
+    <lastmod>2019-06-11T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>https://www.r-econometrics.com/tags/t-test/</loc>
     <lastmod>2018-12-24T00:00:00+00:00</lastmod>
     <priority>0</priority>
@@ -385,7 +425,7 @@
   
   <url>
     <loc>https://www.r-econometrics.com/timeseries/</loc>
-    <lastmod>2019-03-23T00:00:00+00:00</lastmod>
+    <lastmod>2019-06-11T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -397,13 +437,19 @@
   
   <url>
     <loc>https://www.r-econometrics.com/tags/var/</loc>
-    <lastmod>2019-03-23T00:00:00+00:00</lastmod>
+    <lastmod>2019-06-11T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://www.r-econometrics.com/categories/var/</loc>
     <lastmod>2018-08-31T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/vec/</loc>
+    <lastmod>2019-06-11T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -427,7 +473,7 @@
   
   <url>
     <loc>https://www.r-econometrics.com/</loc>
-    <lastmod>2019-06-10T00:00:00+00:00</lastmod>
+    <lastmod>2019-06-11T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   

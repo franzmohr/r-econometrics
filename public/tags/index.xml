@@ -30,6 +30,42 @@
     </item>
     
     <item>
+      <title>Bvar</title>
+      <link>https://www.r-econometrics.com/tags/bvar/</link>
+      <pubDate>Tue, 11 Jun 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/tags/bvar/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Bvartools</title>
+      <link>https://www.r-econometrics.com/tags/bvartools/</link>
+      <pubDate>Tue, 11 Jun 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/tags/bvartools/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Bvec</title>
+      <link>https://www.r-econometrics.com/tags/bvec/</link>
+      <pubDate>Tue, 11 Jun 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/tags/bvec/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Cointegration</title>
+      <link>https://www.r-econometrics.com/tags/cointegration/</link>
+      <pubDate>Tue, 11 Jun 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/tags/cointegration/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>Detrend</title>
       <link>https://www.r-econometrics.com/tags/detrend/</link>
       <pubDate>Thu, 27 Dec 2018 00:00:00 +0000</pubDate>
@@ -194,7 +230,7 @@
     <item>
       <title>R</title>
       <link>https://www.r-econometrics.com/tags/r/</link>
-      <pubDate>Mon, 20 May 2019 00:00:00 +0000</pubDate>
+      <pubDate>Tue, 11 Jun 2019 00:00:00 +0000</pubDate>
       
       <guid>https://www.r-econometrics.com/tags/r/</guid>
       <description></description>
@@ -215,6 +251,15 @@
       <pubDate>Sun, 30 Dec 2018 00:00:00 +0000</pubDate>
       
       <guid>https://www.r-econometrics.com/tags/solow-residual/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Ssvs</title>
+      <link>https://www.r-econometrics.com/tags/ssvs/</link>
+      <pubDate>Tue, 11 Jun 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/tags/ssvs/</guid>
       <description></description>
     </item>
     
@@ -248,9 +293,18 @@
     <item>
       <title>Var</title>
       <link>https://www.r-econometrics.com/tags/var/</link>
-      <pubDate>Sat, 23 Mar 2019 00:00:00 +0000</pubDate>
+      <pubDate>Tue, 11 Jun 2019 00:00:00 +0000</pubDate>
       
       <guid>https://www.r-econometrics.com/tags/var/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Vec</title>
+      <link>https://www.r-econometrics.com/tags/vec/</link>
+      <pubDate>Tue, 11 Jun 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/tags/vec/</guid>
       <description></description>
     </item>
     
