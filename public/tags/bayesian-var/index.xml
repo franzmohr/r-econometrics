@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Bayesian Var on r-econometrics</title>
+    <link>/tags/bayesian-var/</link>
+    <description>Recent content in Bayesian Var on r-econometrics</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 15 Jul 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/tags/bayesian-var/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>An Introduction to Bayesian VAR (BVAR) Models</title>
+      <link>/timeseries/bvar/</link>
+      <pubDate>Mon, 15 Jul 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/timeseries/bvar/</guid>
+      <description>Bayesian methods have significantly gained in popularity during the last decades as computers have become more powerful and new software has been developed. These methods are also becoming more popular in econometric applications, due to their flexibility and other general features. This post gives a brief introduction to Bayesian VAR (BVAR) models and provides the code to set up and estimate a basic model with the bvartools package.
+ BVAR models Kennedy (2008, ch.</description>
+    </item>
+    
+  </channel>
+</rss>

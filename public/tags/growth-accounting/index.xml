@@ -18,7 +18,7 @@
       
       <guid>https://www.r-econometrics.com/2018/12/30/an-exercise-in-growth-accounting/</guid>
       <description>This post provides a short theoretical introduction to the concept of growth accounting and uses Penn World Table data to calculate total factor productivity (TFP) growth rates for a series of countries using the simple Solow-method.
-Theory Based on the growth model of Solow (1957) the discipline of growth accounting tries to assess the relative contribution of labour, capital and technology to the economic growth of a country. It departs from the idea that the economy can be described by a single production function of the form \[Y= A K^{\alpha}L^{1-\alpha,}\] which becomes \(y=Ak^{\alpha}\) in per-capita terms, where \(y = Y / L\) is output per capita, \(k = K / L\) is capital per capita and \(A\) is total factor productivity (TFP).</description>
+ Theory Based on the growth model of Solow (1957) the discipline of growth accounting tries to assess the relative contribution of labour, capital and technology to the economic growth of a country. It departs from the idea that the economy can be described by a single production function of the form \[Y= A K^{\alpha}L^{1-\alpha,}\] which becomes \(y=Ak^{\alpha}\) in per-capita terms, where \(y = Y / L\) is output per capita, \(k = K / L\) is capital per capita and \(A\) is total factor productivity (TFP).</description>
     </item>
     
   </channel>

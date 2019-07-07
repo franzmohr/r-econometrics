@@ -76,7 +76,7 @@ Data Timmer et al. (2015) use the 2013 vintage of the world input-output databas
       
       <guid>https://www.r-econometrics.com/2018/12/30/an-exercise-in-growth-accounting/</guid>
       <description>This post provides a short theoretical introduction to the concept of growth accounting and uses Penn World Table data to calculate total factor productivity (TFP) growth rates for a series of countries using the simple Solow-method.
-Theory Based on the growth model of Solow (1957) the discipline of growth accounting tries to assess the relative contribution of labour, capital and technology to the economic growth of a country. It departs from the idea that the economy can be described by a single production function of the form \[Y= A K^{\alpha}L^{1-\alpha,}\] which becomes \(y=Ak^{\alpha}\) in per-capita terms, where \(y = Y / L\) is output per capita, \(k = K / L\) is capital per capita and \(A\) is total factor productivity (TFP).</description>
+ Theory Based on the growth model of Solow (1957) the discipline of growth accounting tries to assess the relative contribution of labour, capital and technology to the economic growth of a country. It departs from the idea that the economy can be described by a single production function of the form \[Y= A K^{\alpha}L^{1-\alpha,}\] which becomes \(y=Ak^{\alpha}\) in per-capita terms, where \(y = Y / L\) is output per capita, \(k = K / L\) is capital per capita and \(A\) is total factor productivity (TFP).</description>
     </item>
     
     <item>
@@ -257,10 +257,10 @@ The data sets are from the wooldridge package, which is a collection of all data
     <item>
       <title>Time Series Topics</title>
       <link>https://www.r-econometrics.com/timeseriesintro/</link>
-      <pubDate>Mon, 11 Jun 2018 00:00:00 +0000</pubDate>
+      <pubDate>Sat, 07 Jul 2018 00:00:00 +0000</pubDate>
       
       <guid>https://www.r-econometrics.com/timeseriesintro/</guid>
-      <description>Work in progress (March 2019). I will try to update this page over the next few months.
+      <description>Work in progress (July 2019). I will try to update this page over the next few months.
 This section is intended to provide an overview of the relevant issues in (macro)economic time series analysis. Again the standard disclaimer: This site does not replace a good textbook, but it should help you to get a grasp of the basic concepts more quickly than if you learned it on your own.
 The intended structure of this site is:</description>
     </item>
