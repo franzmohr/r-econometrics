@@ -21,6 +21,24 @@
     </item>
     
     <item>
+      <title>Bayes</title>
+      <link>https://www.r-econometrics.com/tags/bayes/</link>
+      <pubDate>Sun, 07 Jul 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/tags/bayes/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Bayesian Var</title>
+      <link>https://www.r-econometrics.com/tags/bayesian-var/</link>
+      <pubDate>Sun, 07 Jul 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/tags/bayesian-var/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>Business Cycles</title>
       <link>https://www.r-econometrics.com/tags/business-cycles/</link>
       <pubDate>Thu, 27 Dec 2018 00:00:00 +0000</pubDate>
@@ -32,7 +50,7 @@
     <item>
       <title>Bvar</title>
       <link>https://www.r-econometrics.com/tags/bvar/</link>
-      <pubDate>Tue, 11 Jun 2019 00:00:00 +0000</pubDate>
+      <pubDate>Sun, 07 Jul 2019 00:00:00 +0000</pubDate>
       
       <guid>https://www.r-econometrics.com/tags/bvar/</guid>
       <description></description>
@@ -41,7 +59,7 @@
     <item>
       <title>Bvartools</title>
       <link>https://www.r-econometrics.com/tags/bvartools/</link>
-      <pubDate>Tue, 11 Jun 2019 00:00:00 +0000</pubDate>
+      <pubDate>Sun, 07 Jul 2019 00:00:00 +0000</pubDate>
       
       <guid>https://www.r-econometrics.com/tags/bvartools/</guid>
       <description></description>
@@ -107,6 +125,15 @@
       <pubDate>Sun, 04 Feb 2018 00:00:00 +0000</pubDate>
       
       <guid>https://www.r-econometrics.com/tags/ggplot2/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Gibbs Sampler</title>
+      <link>https://www.r-econometrics.com/tags/gibbs-sampler/</link>
+      <pubDate>Sun, 07 Jul 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/tags/gibbs-sampler/</guid>
       <description></description>
     </item>
     
@@ -230,7 +257,7 @@
     <item>
       <title>R</title>
       <link>https://www.r-econometrics.com/tags/r/</link>
-      <pubDate>Tue, 11 Jun 2019 00:00:00 +0000</pubDate>
+      <pubDate>Sun, 07 Jul 2019 00:00:00 +0000</pubDate>
       
       <guid>https://www.r-econometrics.com/tags/r/</guid>
       <description></description>
@@ -293,7 +320,7 @@
     <item>
       <title>Var</title>
       <link>https://www.r-econometrics.com/tags/var/</link>
-      <pubDate>Tue, 11 Jun 2019 00:00:00 +0000</pubDate>
+      <pubDate>Sun, 07 Jul 2019 00:00:00 +0000</pubDate>
       
       <guid>https://www.r-econometrics.com/tags/var/</guid>
       <description></description>

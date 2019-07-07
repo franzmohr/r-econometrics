@@ -2,23 +2,23 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Bayes on r-econometrics</title>
-    <link>/tags/bayes/</link>
+    <link>https://www.r-econometrics.com/tags/bayes/</link>
     <description>Recent content in Bayes on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 15 Jul 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 07 Jul 2019 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="/tags/bayes/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://www.r-econometrics.com/tags/bayes/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>An Introduction to Bayesian VAR (BVAR) Models</title>
-      <link>/timeseries/bvar/</link>
-      <pubDate>Mon, 15 Jul 2019 00:00:00 +0000</pubDate>
+      <link>https://www.r-econometrics.com/timeseries/bvar/</link>
+      <pubDate>Sun, 07 Jul 2019 00:00:00 +0000</pubDate>
       
-      <guid>/timeseries/bvar/</guid>
-      <description>Bayesian methods have significantly gained in popularity during the last decades as computers have become more powerful and new software has been developed. These methods are also becoming more popular in econometric applications, due to their flexibility and other general features. This post gives a brief introduction to Bayesian VAR (BVAR) models and provides the code to set up and estimate a basic model with the bvartools package.
- BVAR models Kennedy (2008, ch.</description>
+      <guid>https://www.r-econometrics.com/timeseries/bvar/</guid>
+      <description>Bayesian methods have significantly gained in popularity during the last decades as computers have become more powerful and new software has been developed. Their flexibility and other advantageous features have made these methods also more popular in econometrics. This post gives a brief introduction to Bayesian VAR (BVAR) models and provides the code to set up and estimate a basic model with the bvartools package.
+ BVAR models Bayesian VAR (BVAR) models have the same mathematical form as any other VAR model, i.</description>
     </item>
     
   </channel>
