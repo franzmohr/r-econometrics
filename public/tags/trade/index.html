@@ -77,9 +77,23 @@
                         <li>
                             <time class="li-article-date">January, 30, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/2016_sheperd_gravity/">Reproduction: Sheperd, B. (2016). The gravity model of international trade: A user guide.</a></h4>
+                            The updated paper and dataset can be downloaded from UNESCAP.
+Load libraries and read data library(AER) library(dplyr) library(foreign) library(ggplot2) library(lmtest) library(multiwayvcov) library(sampleSelection) data &lt;- read.dta(&quot;servicesdataset_2016.dta&quot;)  Correlations Table 1
+data &lt;- data %&gt;% mutate(ln_trade = log(trade), ln_distance = log(dist), ln_gdp_exp = log(gdp_exp), ln_gdp_imp = log(gdp_imp)) cor.data &lt;- data %&gt;% filter(sector == &quot;SER&quot;) %&gt;% select(ln_trade, ln_gdp_exp, ln_gdp_imp, ln_distance) %&gt;% na.omit %&gt;% filter(ln_trade &gt; -Inf) round(cor(cor.data), 4) ## ln_trade ln_gdp_exp ln_gdp_imp ln_distance ## ln_trade 1.
                         </li>
                     
                 </ul>
+                <section>
+                    <div class="container">
+  <div class="row">
+    <div class="sixteen columns center">
+      <div class="addthis_inline_share_toolbox"></div>
+    </div>
+  </div>
+</div>
+
+                    <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5a9c6c9b8a39890d"></script>
+                </section>
             </div>
         </div>
     </div>
@@ -102,13 +116,19 @@
         </div>
     </div>
 </footer>
+
+    <script src="//yihui.name/js/math-code.js"></script>
+    <script async
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
+    </script>
+
     <script type="text/javascript">
-    <!--
+    
     function toggle(id) {
         var e = document.getElementById(id);
         e.style.display == 'block' ? e.style.display = 'none' : e.style.display = 'block';
     }
-    
+
     </script>
     
 <script>

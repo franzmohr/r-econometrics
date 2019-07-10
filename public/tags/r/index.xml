@@ -60,6 +60,17 @@ Data Timmer et al. (2015) use the 2013 vintage of the world input-output databas
     </item>
     
     <item>
+      <title>William Shakespeare&#39;s Work in a Word Cloud</title>
+      <link>https://www.r-econometrics.com/2018/12/30/william-shakespeares-work-in-a-word-cloud/</link>
+      <pubDate>Sun, 30 Dec 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/2018/12/30/william-shakespeares-work-in-a-word-cloud/</guid>
+      <description>&lt;p&gt;Word or tag clouds seem to be quite popular at the moment. Although their analytical power might be limited, they do serve an aesthetic purpose and, for example, could be put on the cover page of a thesis or a presentation using the content of your work or the literature you went through. This post uses text data from the Gutenberg project to give a step-by-step introduction on how to create a wordcould in R.&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
+    
+    <item>
       <title>An Introduction to Vector Autoregression (VAR)</title>
       <link>https://www.r-econometrics.com/timeseries/varintro/</link>
       <pubDate>Fri, 31 Aug 2018 00:00:00 +0000</pubDate>

@@ -77,104 +77,153 @@
                         <li>
                             <time class="li-article-date">May, 20, 2019</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/2015_timmer_wiod/">Reproduction: Timmer, M. P., Dietzenbacher, E., Los, B., Stehrer, R., &amp; De Vries, G. J. (2015). An illustrated user guide to the world input–output database: the case of global automotive production.</a></h4>
+                            As international trade has become increasingly fragmented over the past decades the analysis of global value chains (GVC) has gained popularity in economic research. This post reproduces Timmer et al. (2015), who introduce the world input-output database (WIOD) and present basic concepts of GVC analysis.
+Data Timmer et al. (2015) use the 2013 vintage of the world input-output database (WIOD). The following code downloads the data from the project’s website, unzips it and loads the resulting STATA file into R using the readstata13 package.
                         </li>
                     
                         <li>
                             <time class="li-article-date">December, 1, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/wooldridge/wooldridge08/">Chapter 8: Heteroskedasticity</a></h4>
+                            library(wooldridge) Example 8.1 After loading the data and generating the dummy variables from chapter 7 estimate the model in the already familiar way.
+data(&quot;wage1&quot;) marrmale &lt;- as.numeric(wage1$female == 0 &amp; wage1$married == 1) marrfem &lt;- as.numeric(wage1$female == 1 &amp; wage1$married == 1) singfem &lt;- as.numeric(wage1$female == 1 &amp; wage1$married == 0) lm.8.1 &lt;- lm(lwage ~ marrmale + marrfem + singfem + educ + exper + expersq + tenure + tenursq, data = wage1) summary(lm.
                         </li>
                     
                         <li>
                             <time class="li-article-date">October, 7, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/wooldridge/wooldridge10/">Chapter 10: Basic Regression Analysis with Time Series Data</a></h4>
+                            library(wooldridge) Example 10.1 data(&quot;phillips&quot;) lm.10.1 &lt;- lm(inf ~ unem, data = phillips) summary(lm.10.1) ## ## Call: ## lm(formula = inf ~ unem, data = phillips) ## ## Residuals: ## Min 1Q Median 3Q Max ## -5.2176 -1.7812 -0.6659 1.1473 8.8795 ## ## Coefficients: ## Estimate Std. Error t value Pr(&gt;|t|) ## (Intercept) 1.0536 1.5480 0.681 0.4990 ## unem 0.5024 0.2656 1.892 0.0639 . ## --- ## Signif. codes: 0 &#39;***&#39; 0.
                         </li>
                     
                         <li>
                             <time class="li-article-date">October, 7, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/wooldridge/wooldridge11/">Chapter 11: Further Issues in Using OLS with Time Series Data</a></h4>
+                            library(wooldridge) Example 11.4 For this regression the lagged values of return are already contained in the dataset. Thus, we do not have to calculated them ourselves and can simply run the regression.
+data(&quot;nyse&quot;) lm.11.4 &lt;- lm(return ~ return_1, data = nyse) summary(lm.11.4) ## ## Call: ## lm(formula = return ~ return_1, data = nyse) ## ## Residuals: ## Min 1Q Median 3Q Max ## -15.261 -1.302 0.098 1.316 8.065 ## ## Coefficients: ## Estimate Std.
                         </li>
                     
                         <li>
                             <time class="li-article-date">October, 7, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/wooldridge/wooldridge16/">Chapter 16: Simultaneous Equations Models</a></h4>
+                            library(AER) library(wooldridge) Example 16.5 data(&quot;mroz&quot;) s.iv.1 &lt;- summary(iv.1 &lt;- ivreg(hours ~ lwage + educ + age + kidslt6 + nwifeinc | educ + age + kidslt6 + nwifeinc + exper + expersq, data = mroz)) s.iv.1 ## ## Call: ## ivreg(formula = hours ~ lwage + educ + age + kidslt6 + nwifeinc | ## educ + age + kidslt6 + nwifeinc + exper + expersq, data = mroz) ## ## Residuals: ## Min 1Q Median 3Q Max ## -4570.
                         </li>
                     
                         <li>
                             <time class="li-article-date">October, 7, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/wooldridge/wooldridge17/">Chapter 17: Limited Dependent Variable Models and Sample Selection Corrections</a></h4>
+                            Example 17.1 First, look at the linear model.
+data(&quot;mroz&quot;) lm.17.1 &lt;- lm(inlf ~ nwifeinc + educ + exper + expersq + age + kidslt6 + kidsge6, data = mroz) summary(lm.17.1) ## ## Call: ## lm(formula = inlf ~ nwifeinc + educ + exper + expersq + age + ## kidslt6 + kidsge6, data = mroz) ## ## Residuals: ## Min 1Q Median 3Q Max ## -0.93432 -0.37526 0.08833 0.34404 0.99417 ## ## Coefficients: ## Estimate Std.
                         </li>
                     
                         <li>
                             <time class="li-article-date">October, 7, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/wooldridge/wooldridge12/">Chapter12: Serial Correlation and Heteroskedasticity in Time Series Regressions</a></h4>
+                            library(lmtest) library(sandwich) library(tseries) library(wooldridge) Example 12.1 data(&quot;phillips&quot;) Static Phillips curve
+lm.12.1.1 &lt;- lm(inf ~ unem, data = phillips) res.static &lt;- lm.12.1.1$res res.static_1 &lt;- c(NA, lm.12.1.1$res[-(length(res.static))]) lm.12.1.1.test &lt;- lm(res.static ~ res.static_1) summary(lm.12.1.1.test) ## ## Call: ## lm(formula = res.static ~ res.static_1) ## ## Residuals: ## Min 1Q Median 3Q Max ## -8.047 -1.104 -0.248 1.028 6.684 ## ## Coefficients: ## Estimate Std. Error t value Pr(&gt;|t|) ## (Intercept) -0.1118 0.3180 -0.352 0.
                         </li>
                     
                         <li>
                             <time class="li-article-date">October, 4, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/wooldridge/wooldridge02/">Chapter 2: Simple OLS</a></h4>
+                            In R the function for basic linear regression models is lm, which is short for linear model. Its first argument is a formula of the regression model, which has the form y ~ a. The tilde between y and a indicates that y is the dependent variable and a is the explanatory variable. It is also possible to add a further explanatory variable - for example b - to the regression by adding a plus sign followed by the the name of the additional variable to the formula.
                         </li>
                     
                         <li>
                             <time class="li-article-date">October, 4, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/wooldridge/wooldridge05/">Chapter 5: OLS Asymptotics</a></h4>
+                            Make a histogram of the variable “prate”.
+data(&quot;k401k&quot;) hist(k401k$prate) Example 5.2
+data(&quot;bwght&quot;) lm.1 &lt;- lm(lbwght ~ cigs + lfaminc, data = bwght[1:694,]) s.1 &lt;- summary(lm.1) lm.2 &lt;- lm(lbwght ~ cigs + lfaminc, data = bwght) s.2 &lt;- summary(lm.2) s.2$coefficients[2, 2] / s.1$coefficients[2, 2] ## [1] 0.6443341 lm.3 &lt;- lm(cigs ~ lfaminc, data = bwght[1:694,]) s.3 &lt;- summary(lm.3) sigma.j &lt;- s.3$coefficients[2, 2] sigma &lt;- s.3$sigma r2 &lt;- s.3$r.squared sigma / (sqrt(1388) * sigma.
                         </li>
                     
                         <li>
                             <time class="li-article-date">October, 4, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/wooldridge/wooldridgeintro/">Wooldridge (2013): Introductory Econometrics</a></h4>
+                            This section is based on Wooldridge, J.M. (2013). Introductory econometrics: A modern approach (5thed.). The following links contain examples in the main text of the book and use R to estimate the models. Alternatively, Heiss, F. (2016) Using R for Introductory Econometrics is a standalone textbook, which covers the same topics as Wooldridge (2013) and provides an introduction to R as well.
+The data sets are from the wooldridge package, which is a collection of all data sets used in the Wooldridge textbook.
                         </li>
                     
                         <li>
                             <time class="li-article-date">May, 8, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/1997_cincera_patents/">Reproduction: Cincera, M. (1997). Patents, R&amp;D, and technological spillovers at the firm level.</a></h4>
+                            Get the data The data set can be downloaded from the Journal of Applied Econometrics Data Archive.
+download.file(&quot;http://qed.econ.queensu.ca/jae/1997-v12.3/cincera/mc-data.zip&quot;, destfile = &quot;1997_cincera_data.zip&quot;) unzip(&quot;1997_cincera_data.zip&quot;) data &lt;- read.delim(&quot;data.mc&quot;, header = FALSE) names(data) &lt;- c(&quot;fi&quot;, &quot;s&quot;, &quot;g&quot;, &quot;p83&quot;, &quot;p84&quot;, &quot;p85&quot;, &quot;p86&quot;, &quot;p87&quot;, &quot;p88&quot;, &quot;p89&quot;, &quot;p90&quot;, &quot;p91&quot;, &quot;lr83&quot;, &quot;lr84&quot;, &quot;lr85&quot;, &quot;lr86&quot;, &quot;lr87&quot;, &quot;lr88&quot;, &quot;lr89&quot;, &quot;lr90&quot;, &quot;lr91&quot;, &quot;ls83&quot;, &quot;ls84&quot;, &quot;ls85&quot;, &quot;ls86&quot;, &quot;ls87&quot;, &quot;ls88&quot;, &quot;ls89&quot;, &quot;ls90&quot;, &quot;ls91&quot;) p &lt;- matrix(as.matrix(data[, c(&quot;p83&quot;, &quot;p84&quot;, &quot;p85&quot;, &quot;p86&quot;, &quot;p87&quot;, &quot;p88&quot;, &quot;p89&quot;, &quot;p90&quot;, &quot;p91&quot;)])) k &lt;- matrix(as.
                         </li>
                     
                         <li>
                             <time class="li-article-date">February, 6, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/wooldridge/wooldridge14/">Chapter 14: Advanced Panel Data Methods</a></h4>
+                            library(wooldridge) In order to estimate panel data models, I use the plm function from the plm package. The intuition behind its structure is similar to the ordinary linear model, except that it allows you to specify the panel’s group and time variables and the effects model.
+Example 14.1 Similar to the lm function, you can specify your model’s equation and the sample. Since you want to use panel data methods for you estimation, you also have to specify which variables in your sample contain the information used to distinguish different groups and which variable contains the time measurement.
                         </li>
                     
                         <li>
                             <time class="li-article-date">February, 6, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/wooldridge/wooldridge15/">Chapter 15: Instrumental Variables Estimation and Two Stage Least Squares</a></h4>
+                            library(AER) library(wooldridge) Example 15.1 data(&quot;mroz&quot;) OLS
+s.lm.1 &lt;- summary(lm(lwage ~ educ, data = mroz)) s.lm.1 ## ## Call: ## lm(formula = lwage ~ educ, data = mroz) ## ## Residuals: ## Min 1Q Median 3Q Max ## -3.10256 -0.31473 0.06434 0.40081 2.10029 ## ## Coefficients: ## Estimate Std. Error t value Pr(&gt;|t|) ## (Intercept) -0.1852 0.1852 -1.000 0.318 ## educ 0.1086 0.0144 7.545 2.76e-13 *** ## --- ## Signif. codes: 0 &#39;***&#39; 0.
                         </li>
                     
                         <li>
                             <time class="li-article-date">February, 5, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/wooldridge/wooldridge13/">Chapter13: Simple Panel Data Methods</a></h4>
+                            library(wooldridge) Example 13.1 data(&quot;fertil1&quot;) s.lm.1 &lt;- summary(lm.1 &lt;- lm(kids ~ educ + age + agesq + black + east + northcen + west + farm + othrural + town + smcity + y74 + y76 + y78 + y80 + y82 + y84, data = fertil1)) s.lm.1 ## ## Call: ## lm(formula = kids ~ educ + age + agesq + black + east + northcen + ## west + farm + othrural + town + smcity + y74 + y76 + y78 + ## y80 + y82 + y84, data = fertil1) ## ## Residuals: ## Min 1Q Median 3Q Max ## -3.
                         </li>
                     
                         <li>
                             <time class="li-article-date">February, 4, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/wooldridge/wooldridge03/">Chapter 3: Multiple Regression Analysis</a></h4>
+                            Below you find the script for all examples in chapter 3 of Wooldridge (2013). The only difference to the last chapter is how to use multiple independent variables in the lm function. This is easily achieved by separating each exogenous variable that should enter the model with a plus sign, e.g. lm(colGPA ~ hsGPA + ACT).
+The other commands that appear new are quite helpful and you should take a minute to think about them:
                         </li>
                     
                         <li>
                             <time class="li-article-date">February, 4, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/wooldridge/wooldridge06/">Chapter 6: Further Issues</a></h4>
+                            Chapter 6 in Wooldridge (2013) deals with some more issues that might have an impact on your estimates. Among these are a change in the scale of your variables, so-called beta-factors and the interpretation of variables that appear together with their squared values, i.e. interaction terms.
+Before you start, set your working directory, load the foreign library and download the data we are going to use in this chapter.
+library(QuantPsyc) library(wooldridge) The impact of scales on the estimated coefficients
                         </li>
                     
                         <li>
                             <time class="li-article-date">February, 4, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/wooldridge/wooldridge07/">Chapter 7: Multiple Regression Analysis with Qualitative Information</a></h4>
+                            library(wooldridge) Estimating dummy variables that reflect qualitative information works quite the same way in R as it does with quantitative variables. You just add it as an independent variable into the formula of the model.
+# Example 7.1 data(&quot;wage1&quot;) lm.7.1.1 &lt;- lm(wage ~ female + educ + exper + tenure, data = wage1) summary(lm.7.1.1) ## ## Call: ## lm(formula = wage ~ female + educ + exper + tenure, data = wage1) ## ## Residuals: ## Min 1Q Median 3Q Max ## -7.
                         </li>
                     
                         <li>
                             <time class="li-article-date">February, 4, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/wooldridge/wooldridge09/">Chapter 9: More on Specification and Data Issues</a></h4>
+                            library(wooldridge) Example 9.1 data(&quot;crime1&quot;) lm.9.1.1 &lt;- lm(narr86 ~ pcnv + avgsen + tottime + ptime86 + qemp86 + inc86 + black + hispan, data = crime1) summary(lm.9.1.1) ## ## Call: ## lm(formula = narr86 ~ pcnv + avgsen + tottime + ptime86 + qemp86 + ## inc86 + black + hispan, data = crime1) ## ## Residuals: ## Min 1Q Median 3Q Max ## -1.0108 -0.4518 -0.2392 0.2707 11.5284 ## ## Coefficients: ## Estimate Std.
                         </li>
                     
                         <li>
                             <time class="li-article-date">February, 4, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/wooldridge/wooldridge04/">Statistical Inference</a></h4>
+                            Before we start, let’s clear our memory, set the working directory and load the wooldridge data package.
+rm(list = ls()) setwd(&quot;C:/path/to/the/working/directory&quot;) library(wooldridge) data(wage1) lm.1 &lt;- lm(lwage ~ educ + exper + tenure, data = wage1) s.1 &lt;- summary(lm.1) s.1 ## ## Call: ## lm(formula = lwage ~ educ + exper + tenure, data = wage1) ## ## Residuals: ## Min 1Q Median 3Q Max ## -2.05802 -0.29645 -0.03265 0.28788 1.42809 ## ## Coefficients: ## Estimate Std.
                         </li>
                     
                         <li>
                             <time class="li-article-date">January, 30, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/2016_sheperd_gravity/">Reproduction: Sheperd, B. (2016). The gravity model of international trade: A user guide.</a></h4>
+                            The updated paper and dataset can be downloaded from UNESCAP.
+Load libraries and read data library(AER) library(dplyr) library(foreign) library(ggplot2) library(lmtest) library(multiwayvcov) library(sampleSelection) data &lt;- read.dta(&quot;servicesdataset_2016.dta&quot;)  Correlations Table 1
+data &lt;- data %&gt;% mutate(ln_trade = log(trade), ln_distance = log(dist), ln_gdp_exp = log(gdp_exp), ln_gdp_imp = log(gdp_imp)) cor.data &lt;- data %&gt;% filter(sector == &quot;SER&quot;) %&gt;% select(ln_trade, ln_gdp_exp, ln_gdp_imp, ln_distance) %&gt;% na.omit %&gt;% filter(ln_trade &gt; -Inf) round(cor(cor.data), 4) ## ln_trade ln_gdp_exp ln_gdp_imp ln_distance ## ln_trade 1.
                         </li>
                     
                 </ul>
+                <section>
+                    <div class="container">
+  <div class="row">
+    <div class="sixteen columns center">
+      <div class="addthis_inline_share_toolbox"></div>
+    </div>
+  </div>
+</div>
+
+                    <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5a9c6c9b8a39890d"></script>
+                </section>
             </div>
         </div>
     </div>
@@ -197,13 +246,19 @@
         </div>
     </div>
 </footer>
+
+    <script src="//yihui.name/js/math-code.js"></script>
+    <script async
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
+    </script>
+
     <script type="text/javascript">
-    <!--
+    
     function toggle(id) {
         var e = document.getElementById(id);
         e.style.display == 'block' ? e.style.display = 'none' : e.style.display = 'block';
     }
-    
+
     </script>
     
 <script>
