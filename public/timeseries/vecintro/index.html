@@ -128,24 +128,9 @@ plot(e6) # Plot data</code></pre>
 <h2>Estimation</h2>
 <p>There are multiple ways to estimate VEC models. A first approach would be to use ordinary least squares, which yields accurate result, but does not allow to estimate the cointegrating relations among the variables. The estimated generalised least squares (EGLS) approach would be an alternative. However, the most popular estimator for VECMs seems to be the maximum likelihood estimator of Johansen (1995), which is implemented in R by the <code>ca.jo</code> function of the <code>urca</code> package of Pfaff (2008a).<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a></p>
 <p>But before the VEC model can be estimated, the lag order <span class="math inline">\(p\)</span>, the rank of the cointegration matrix <span class="math inline">\(r\)</span> and deterministic terms have to be specified. A valid strategy to choose the lag order is to estimated the VAR in levels and choose the lag specification that minimises an Information criterion. Since the time series show strong seasonal pattern, we control for this by specifying <code>season = 4</code>, where 4 is the frequency of the data.</p>
-<pre class="r"><code>library(vars) # Load package</code></pre>
-<pre><code>## Loading required package: MASS</code></pre>
-<pre><code>## Loading required package: strucchange</code></pre>
-<pre><code>## Loading required package: zoo</code></pre>
-<pre><code>## 
-## Attaching package: &#39;zoo&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:base&#39;:
-## 
-##     as.Date, as.Date.numeric</code></pre>
-<pre><code>## Loading required package: sandwich</code></pre>
-<pre><code>## Loading required package: urca</code></pre>
-<pre><code>## Loading required package: lmtest</code></pre>
-<pre><code>## 
-## Attaching package: &#39;vars&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:bvartools&#39;:
-## 
-##     fevd, irf</code></pre>
-<pre class="r"><code># Estimate VAR
+<pre class="r"><code>library(vars) # Load package
+
+# Estimate VAR
 var_aic &lt;- VAR(e6, type = &quot;const&quot;, lag.max = 8, ic = &quot;AIC&quot;, season = 4)
 
 # Lag order suggested by AIC
