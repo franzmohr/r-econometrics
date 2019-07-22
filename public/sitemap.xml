@@ -3,6 +3,16 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://www.r-econometrics.com/timeseries/vecintro/</loc>
+    <lastmod>2019-07-22T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/rbasicsintro/</loc>
+    <lastmod>2019-07-21T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://www.r-econometrics.com/timeseries/bvar/</loc>
     <lastmod>2019-07-07T00:00:00+00:00</lastmod>
   </url>
@@ -188,11 +198,6 @@
   </url>
   
   <url>
-    <loc>https://www.r-econometrics.com/rbasicsintro/</loc>
-    <lastmod>2018-02-04T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge04/</loc>
     <lastmod>2018-02-04T00:00:00+00:00</lastmod>
   </url>
@@ -256,7 +261,7 @@
   
   <url>
     <loc>https://www.r-econometrics.com/tags/cointegration/</loc>
-    <lastmod>2019-06-11T00:00:00+00:00</lastmod>
+    <lastmod>2019-07-22T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -394,7 +399,7 @@
   
   <url>
     <loc>https://www.r-econometrics.com/tags/r/</loc>
-    <lastmod>2019-07-07T00:00:00+00:00</lastmod>
+    <lastmod>2019-07-22T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -454,7 +459,7 @@
   
   <url>
     <loc>https://www.r-econometrics.com/timeseries/</loc>
-    <lastmod>2019-07-07T00:00:00+00:00</lastmod>
+    <lastmod>2019-07-22T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -478,7 +483,7 @@
   
   <url>
     <loc>https://www.r-econometrics.com/tags/vec/</loc>
-    <lastmod>2019-06-11T00:00:00+00:00</lastmod>
+    <lastmod>2019-07-22T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -502,7 +507,7 @@
   
   <url>
     <loc>https://www.r-econometrics.com/</loc>
-    <lastmod>2019-07-07T00:00:00+00:00</lastmod>
+    <lastmod>2019-07-22T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   

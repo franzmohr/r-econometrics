@@ -6,10 +6,29 @@
     <description>Recent content on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 07 Jul 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 22 Jul 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://www.r-econometrics.com/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>An Introduction to Vector Error Correction Models (VECMs)</title>
+      <link>https://www.r-econometrics.com/timeseries/vecintro/</link>
+      <pubDate>Mon, 22 Jul 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/timeseries/vecintro/</guid>
+      <description>One of the prerequisits for the estimation of a vector autoregressive (VAR) model is that the analysed time series are stationary. However, economic theory suggests that there exist equilibrium relations between economic variables in their levels, which can render these variables stationary without taking differences. This is called cointegration. Since knowing the size of such relationships can improve the results of an analysis, it would be desireable to have an econometric model, which is able to capture them.</description>
+    </item>
+    
+    <item>
+      <title>R(eal) Basics</title>
+      <link>https://www.r-econometrics.com/rbasicsintro/</link>
+      <pubDate>Sun, 21 Jul 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/rbasicsintro/</guid>
+      <description>This section should help you to
+ get R and RStudio started on your computer understand the structure of the program prepare your workspace for an analysis [import data and get help] [manipulate data with the dplyr package] create graphics with the ggplot2 package.  Recently, I have finished the first version of a below 30 pages introduction to R. It uses an exemplary workflow to explain some basics of the language and the application of the packages dplyr, ggplot2 and openxlsx.</description>
+    </item>
     
     <item>
       <title>An Introduction to Bayesian VAR (BVAR) Models</title>
@@ -383,16 +402,6 @@ ggplot graphs are built with some kind of blocks, which usually start with the f
       
       <guid>https://www.r-econometrics.com/rbasics/beforestart/</guid>
       <description>Create a working directory Usually, people want to keep the folder structure on their computers tidy, so that they and their co-workers understand, which documents and data were used for a particular project – even if that project was finished months ago. This should also be the case when you work with R. Therefore, I recommend to create a new folder for every new project, which becomes the so-called working directory.</description>
-    </item>
-    
-    <item>
-      <title>R(eal) Basics</title>
-      <link>https://www.r-econometrics.com/rbasicsintro/</link>
-      <pubDate>Sun, 04 Feb 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://www.r-econometrics.com/rbasicsintro/</guid>
-      <description>This section should help you to
- get R and RStudio started on your computer understand the structure of the program prepare your workspace for an analysis [import data and get help] [manipulate data with the dplyr package] create graphics with the ggplot2 package.  Recently, I have finished the first version of a below 30 pages introduction to R. It uses an exemplary workflow to explain some basics of the language and the application of the packages dplyr, ggplot2 and openxlsx.</description>
     </item>
     
     <item>

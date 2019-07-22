@@ -1,0 +1,140 @@
+---
+title: "An Introduction to Vector Error Correction Models (VECMs)"
+author: "Franz X. Mohr"
+date: "2019-07-22"
+tags:
+  - r
+  - vec
+  - cointegration
+---
+
+
+
+<p>One of the prerequisits for the estimation of a <a href="/timeseries/varintro">vector autoregressive (VAR)</a> model is that the analysed time series are stationary. However, economic theory suggests that there exist equilibrium relations between economic variables in their levels, which can render these variables stationary without taking differences. This is called <em>cointegration</em>. Since knowing the size of such relationships can improve the results of an analysis, it would be desireable to have an econometric model, which is able to capture them. So-called <em>vector error correction models</em> (VECMs) belong to this class of models. The following text presents the basic concept of VECMs and guides through the estimation of such a model in R.</p>
+<div id="model-and-data" class="section level2">
+<h2>Model and data</h2>
+<p>Vector error correction models are very similar to <a href="/timeseries/varintro">VAR models</a> and can have the following form:</p>
+<p><span class="math display">\[\Delta x_t = \Pi x_{t-1} + \sum_{l = 1}^{p-1} \Gamma_l \Delta x_{t-l} + C d_t + \epsilon_t,\]</span> where <span class="math inline">\(\Delta x\)</span> is the first difference of the variables in vector <span class="math inline">\(x\)</span>, <span class="math inline">\(Pi\)</span> is a coefficient matrix of cointegrating relationships, <span class="math inline">\(\Gamma\)</span> is a coefficient matrix of the lags of differenced variables of <span class="math inline">\(x\)</span>, <span class="math inline">\(d\)</span> is a vector of deterministic terms and <span class="math inline">\(C\)</span> its corresponding coefficient matrix. <span class="math inline">\(p\)</span> is the lag order of the model in its VAR form and <span class="math inline">\(\epsilon\)</span> is an error term with zero mean and variance-covariance matrix <span class="math inline">\(\Sigma\)</span>.</p>
+<p>The above equation shows that the only difference to a VAR model is the error correction term <span class="math inline">\(\Pi x_{t-1}\)</span>, which captures the effect of how the growth rate of a variable in <span class="math inline">\(x\)</span> changes, if one of the variables departs from its equilibrium value. The coefficient matrix <span class="math inline">\(\Pi\)</span> can be written as the matrix product <span class="math inline">\(\Pi = \alpha \beta^{\prime}\)</span> so that the error correction term becomes <span class="math inline">\(\alpha \beta^{\prime} x_{t-1}\)</span>. The cointegration matrix <span class="math inline">\(\beta\)</span> contains information on the equilibrium relationships between the variables in levels. The vector described by <span class="math inline">\(\beta^{\prime} x_{t-1}\)</span> can be interpreted as the distance of the variables form their equilibrium values. <span class="math inline">\(\alpha\)</span> is a so-called loading matrix describing the speed at which a dependent variable converges back to its equilibrium value.</p>
+<p>Note that <span class="math inline">\(\Pi\)</span> is assumed to be of reduced rank, which means that <span class="math inline">\(\alpha\)</span> is a <span class="math inline">\(K \times r\)</span> matrix and <span class="math inline">\(\beta\)</span> is a <span class="math inline">\(K^{co} \times r\)</span> matrix, where <span class="math inline">\(K\)</span> is the number of endogenous variables, <span class="math inline">\(K^{co}\)</span> is the number of variables in the cointegration term and <span class="math inline">\(r\)</span> is the rank of <span class="math inline">\(\Pi\)</span>, which describes the number of cointegrating relationships that exist between the variables. Note that if <span class="math inline">\(r = 0\)</span>, there is no cointegration between the variables so that <span class="math inline">\(\Pi = 0\)</span>.</p>
+<p>To illustrate the estimation of VECMs in R, we use dataset E6 from Lütkepohl (2007), which contains quarterly, seasonally unadjusted time series for German long-term interest and inflation rates from 1972Q2 to 1998Q4. It comes with the <code>bvartools</code> package.</p>
+<pre class="r"><code>library(bvartools) # Load the package, which contains the data
+data(&quot;e6&quot;) # Load data
+plot(e6) # Plot data</code></pre>
+<p><img src="/timeseries/vecintro_files/figure-html/data-1.png" width="480" /></p>
+</div>
+<div id="estimation" class="section level2">
+<h2>Estimation</h2>
+<p>There are multiple ways to estimate VEC models. A first approach would be to use ordinary least squares, which yields accurate result, but does not allow to estimate the cointegrating relations among the variables. The estimated generalised least squares (EGLS) approach would be an alternative. However, the most popular estimator for VECMs seems to be the maximum likelihood estimator of Johansen (1995), which is implemented in R by the <code>ca.jo</code> function of the <code>urca</code> package of Pfaff (2008a).<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a></p>
+<p>But before the VEC model can be estimated, the lag order <span class="math inline">\(p\)</span>, the rank of the cointegration matrix <span class="math inline">\(r\)</span> and deterministic terms have to be specified. A valid strategy to choose the lag order is to estimated the VAR in levels and choose the lag specification that minimises an Information criterion. Since the time series show strong seasonal pattern, we control for this by specifying <code>season = 4</code>, where 4 is the frequency of the data.</p>
+<pre class="r"><code>library(vars) # Load package</code></pre>
+<pre><code>## Loading required package: MASS</code></pre>
+<pre><code>## Loading required package: strucchange</code></pre>
+<pre><code>## Loading required package: zoo</code></pre>
+<pre><code>## 
+## Attaching package: &#39;zoo&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     as.Date, as.Date.numeric</code></pre>
+<pre><code>## Loading required package: sandwich</code></pre>
+<pre><code>## Loading required package: urca</code></pre>
+<pre><code>## Loading required package: lmtest</code></pre>
+<pre><code>## 
+## Attaching package: &#39;vars&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:bvartools&#39;:
+## 
+##     fevd, irf</code></pre>
+<pre class="r"><code># Estimate VAR
+var_aic &lt;- VAR(e6, type = &quot;const&quot;, lag.max = 8, ic = &quot;AIC&quot;, season = 4)
+
+# Lag order suggested by AIC
+var_aic$p</code></pre>
+<pre><code>## AIC(n) 
+##      4</code></pre>
+<p>According to the AIC, a lag order of 4 can be used, which is the same value used in Lütkepohl (2007). This means the VEC model corresponding to the VAR in levels has 3 lags. Since the <code>ca.jo</code> function requires the lag order of the VAR model we set <code>K = 4</code>.<a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a></p>
+<p>The inclusion of deterministic terms in a VECM is a delicate issue. Without going into detail a common strategy is to add a linear trend to the error correction term and a constant to the non-cointegration part of the equation. For this example we follow Lütkepohl (2007) and add a constant term and seasonal dummies to the non-cointegration part of the equation.</p>
+<p>The <code>ca.jo</code> function does not just estimate the VECM. It also calculates the test statistics for different specificaions of <span class="math inline">\(r\)</span> and the user can choose between two alternative approaches, the trace and the eigenvalue test. For this example the trace test is used, i.e. <code>type = &quot;trace&quot;</code>.</p>
+<p>By default, the <code>ca.jo</code> function sets <code>spec = &quot;longrun&quot;</code> This specification would mean that the error correction term does not refer to the first lag of the variables in levels as decribed above, but to the <span class="math inline">\(p-1\)</span>th lag instead. By setting <code>spec = &quot;transitory&quot;</code> the first lag will be used instead. Further information on the interpretation the two alternatives can be found in the function’s documentation <code>?ca.jo</code>.</p>
+<p>For further details on VEC modelling I recommend Lütkepohl (2007, Chapters 6, 7 and 8).</p>
+<pre class="r"><code>library(urca) # Load package
+
+# Estimate
+vec &lt;- ca.jo(e6, ecdet = &quot;none&quot;, type = &quot;trace&quot;,
+             K = 4, spec = &quot;transitory&quot;, season = 4)
+
+summary(vec)</code></pre>
+<pre><code>## 
+## ###################### 
+## # Johansen-Procedure # 
+## ###################### 
+## 
+## Test type: trace statistic , with linear trend 
+## 
+## Eigenvalues (lambda):
+## [1] 0.15184737 0.03652339
+## 
+## Values of teststatistic and critical values of test:
+## 
+##           test 10pct  5pct  1pct
+## r &lt;= 1 |  3.83  6.50  8.18 11.65
+## r = 0  | 20.80 15.66 17.95 23.52
+## 
+## Eigenvectors, normalised to first column:
+## (These are the cointegration relations)
+## 
+##            R.l1    Dp.l1
+## R.l1   1.000000 1.000000
+## Dp.l1 -3.961937 1.700513
+## 
+## Weights W:
+## (This is the loading matrix)
+## 
+##            R.l1       Dp.l1
+## R.d  -0.1028717 -0.03938511
+## Dp.d  0.1577005 -0.02146119</code></pre>
+<p>The trace test suggests that <span class="math inline">\(r=1\)</span> and the first columns of the estimates of the cointegration relations <span class="math inline">\(\beta\)</span> and the loading matrix <span class="math inline">\(\alpha\)</span> correspond to the results of the ML estimator in Lütkepohl (2007, Ch. 7):</p>
+<pre class="r"><code># Beta
+round(vec@V, 2)</code></pre>
+<pre><code>##        R.l1 Dp.l1
+## R.l1   1.00   1.0
+## Dp.l1 -3.96   1.7</code></pre>
+<pre class="r"><code># Alpha
+round(vec@W, 2)</code></pre>
+<pre><code>##       R.l1 Dp.l1
+## R.d  -0.10 -0.04
+## Dp.d  0.16 -0.02</code></pre>
+<p>However, the estimated coefficients of the non-cointegration part of the model correspond to the results of the EGLS estimator.</p>
+<pre class="r"><code>round(vec@GAMMA, 2)</code></pre>
+<pre><code>##      constant  sd1  sd2  sd3 R.dl1 Dp.dl1 R.dl2 Dp.dl2 R.dl3 Dp.dl3
+## R.d      0.01 0.01 0.00 0.00  0.29  -0.16  0.01  -0.19  0.25  -0.09
+## Dp.d    -0.01 0.02 0.02 0.03  0.08  -0.31  0.01  -0.37  0.04  -0.34</code></pre>
+<p>The deterministic terms are different from the results in Lütkepohl (2007), because different reference dates are used.</p>
+<div id="impulse-response-analyis" class="section level3">
+<h3>Impulse response analyis</h3>
+<p>The impulse response function of a VECM is usually obtained from its VAR form. The function <code>vec2var</code> of the <code>vars</code> package can be used to transform the output of the <code>ca.jo</code> function into an object that can be handled by the <code>irf</code> function of the <code>vars</code> package. Note that since <code>ur.jo</code> does not set the rank <span class="math inline">\(r\)</span> of the cointegration matrix automatically, it has to be specified manually.</p>
+<pre class="r"><code># Transform VEC to VAR with r = 1
+var &lt;- vec2var(vec, r = 1)</code></pre>
+<p>The impulse response function is then calculated in the usual manner by using the <code>irf</code> function.</p>
+<pre class="r"><code># Obtain IRF
+ir &lt;- irf(var, n.ahead = 20, impulse = &quot;R&quot;, response = &quot;Dp&quot;,
+          ortho = FALSE, runs = 500)
+
+# Plot
+plot(ir)</code></pre>
+<p><img src="/timeseries/vecintro_files/figure-html/ir-1.png" width="576" /></p>
+<p>Note that an important difference to stationary VAR models is that the impulse response of a cointegrated VAR model does not neccessarily approach zero, because the variables are not stationary.</p>
+</div>
+<div id="references" class="section level3">
+<h3>References</h3>
+<p>Lütkepohl, H. (2007). <em>New introduction to multiple time series analysis</em> (2nd ed.). Berlin: Springer.</p>
+<p>Pfaff, B. (2008a). <em>Analysis of Integrated and Cointegrated Time Series with R</em>. Second Edition. New York: Springer.</p>
+<p>Pfaff, B. (2008b). VAR, SVAR and SVEC Models: Implementation Within R Package vars. <em>Journal of Statistical Software 27</em>(4).</p>
+</div>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>See Lütkepohl (2007) for more details.<a href="#fnref1">↩</a></p></li>
+<li id="fn2"><p>Not that if some variables in the model are known to be integrated, the VAR order must be at least one.<a href="#fnref2">↩</a></p></li>
+</ol>
+</div>
