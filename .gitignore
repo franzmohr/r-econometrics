@@ -3,6 +3,7 @@
 .RData
 .Ruserdata
 *.Rmd
+*.Rmarkdown
 *.dta
 *.Rproj
 index.Rmd
