@@ -225,6 +225,12 @@
   </url>
   
   <url>
+    <loc>https://www.r-econometrics.com/tags/bayesian/</loc>
+    <lastmod>2018-08-04T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>https://www.r-econometrics.com/tags/bayesian-var/</loc>
     <lastmod>2019-07-07T00:00:00+00:00</lastmod>
     <priority>0</priority>
@@ -460,6 +466,12 @@
   <url>
     <loc>https://www.r-econometrics.com/timeseries/</loc>
     <lastmod>2019-07-22T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/timeseries/</loc>
+    <lastmod>2018-08-04T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
