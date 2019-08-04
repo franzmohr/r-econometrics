@@ -277,23 +277,23 @@ The data sets are from the wooldridge package, which is a collection of all data
     </item>
     
     <item>
+      <title>Time Series Topics</title>
+      <link>https://www.r-econometrics.com/timeseriesintro/</link>
+      <pubDate>Sat, 04 Aug 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/timeseriesintro/</guid>
+      <description>Work in progress (July 2019). I will try to update this page over the next few months.
+This section is intended to provide an overview of the relevant issues in (macro)economic time series analysis. Again the standard disclaimer: This site does not replace a good textbook, but it should help you to get a grasp of the basic concepts more quickly than if you learned it on your own.
+The intended structure of this site is:</description>
+    </item>
+    
+    <item>
       <title>The Structure of R</title>
       <link>https://www.r-econometrics.com/rbasics/rstructure/</link>
       <pubDate>Fri, 20 Jul 2018 00:00:00 +0000</pubDate>
       
       <guid>https://www.r-econometrics.com/rbasics/rstructure/</guid>
       <description>R can be comprehended as a language that provides the basis for a system of code chunks, which have been developed by many people across the globe, who wanted to share their work. These code chunks are called packages. And each of those packages usually consist of at least one function.1 This structure is presented in the following graph. Beside a schematic description of a package and its functions in the upper part of the graph it also contains some real world examples using the packages ggplot2 and dplyr.</description>
-    </item>
-    
-    <item>
-      <title>Time Series Topics</title>
-      <link>https://www.r-econometrics.com/timeseriesintro/</link>
-      <pubDate>Sat, 07 Jul 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://www.r-econometrics.com/timeseriesintro/</guid>
-      <description>Work in progress (July 2019). I will try to update this page over the next few months.
-This section is intended to provide an overview of the relevant issues in (macro)economic time series analysis. Again the standard disclaimer: This site does not replace a good textbook, but it should help you to get a grasp of the basic concepts more quickly than if you learned it on your own.
-The intended structure of this site is:</description>
     </item>
     
     <item>

@@ -1,0 +1,31 @@
+---
+title: Making Alluvial Diagrams in R
+author: Franz X. Mohr
+date: '2019-07-23'
+categories: []
+tags:
+  - ggplot2
+  - alluvial
+---
+
+```{r}
+library(dplyr)
+library(eurostat)
+library(tidyr)
+
+households <- get_eurostat(id = "nasq_10_f_bs",
+                           filters = list(geo = "AT",
+                                          finpos = c("ASS", "LIAB"),
+                                          unit = "MIO_EUR",
+                                          na_item = c("F", "F2", "F3", "F4",
+                                                      "F5", "F6", "F7", "F8", "BF90"),
+                                          sector = "S14"))
+
+households %>%
+  select(time, finpos, na_item, values) %>%
+  arrange(time) %>%
+  filter(time == max(time)) %>%
+  spread(finpos, values)
+
+```
+
