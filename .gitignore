@@ -6,4 +6,7 @@
 *.dta
 *.Rproj
 index.Rmd
-.RData
+*.Rmarkdown
+*.zip
+*.mc
+*.rda
