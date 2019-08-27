@@ -35,7 +35,7 @@ x &lt;- data$X</code></pre>
 <div id="estimation" class="section level2">
 <h2>Estimation</h2>
 <pre class="r"><code># Reset random number generator for reproducibility
-set.seed(1234567)
+set.seed(7654321)
 
 iter &lt;- 10000 # Number of iterations of the Gibbs sampler
 burnin &lt;- 5000 # Number of burn-in draws
@@ -120,11 +120,11 @@ dimnames(Gamma) &lt;- list(dimnames(y)[[1]], dimnames(x)[[1]]) # Rename matrix d
 
 round(Gamma, 3) # Print</code></pre>
 <pre><code>##      d.R.1 d.Dp.1  d.R.2 d.Dp.2 d.R.3 d.Dp.3 const season.1 season.2
-## d.R  0.262 -0.176 -0.021 -0.199 0.222 -0.096 0.002    0.001    0.009
-## d.Dp 0.079 -0.386  0.005 -0.422 0.024 -0.362 0.011   -0.034   -0.018
+## d.R  0.267 -0.187 -0.017 -0.207 0.225 -0.099 0.002    0.001    0.009
+## d.Dp 0.074 -0.383  0.000 -0.421 0.025 -0.361 0.011   -0.034   -0.018
 ##      season.3
 ## d.R     0.000
-## d.Dp   -0.016</code></pre>
+## d.Dp   -0.017</code></pre>
 <pre class="r"><code>beta &lt;- rowMeans(t(t(draws_beta) / t(draws_beta)[, 1])) # Obtain means for every row
 beta &lt;- matrix(beta, k_w) # Transform mean vector into a matrix
 beta &lt;- round(beta, 3) # Round values
@@ -133,7 +133,7 @@ dimnames(beta) &lt;- list(dimnames(w)[[1]], NULL) # Rename matrix dimensions
 beta # Print</code></pre>
 <pre><code>##        [,1]
 ## l.R   1.000
-## l.Dp -8.894</code></pre>
+## l.Dp -3.969</code></pre>
 <pre class="r"><code>Sigma &lt;- rowMeans(draws_sigma) # Obtain means for every row
 Sigma &lt;- matrix(Sigma, k) # Transform mean vector into a matrix
 Sigma &lt;- round(Sigma * 10^4, 2) # Round values
@@ -141,7 +141,7 @@ dimnames(Sigma) &lt;- list(dimnames(y)[[1]], dimnames(y)[[1]]) # Rename matrix d
 
 Sigma # Print</code></pre>
 <pre><code>##        d.R  d.Dp
-## d.R   0.30 -0.02
+## d.R   0.29 -0.02
 ## d.Dp -0.02  0.27</code></pre>
 </div>
 <div id="bvec-objects" class="section level2">
