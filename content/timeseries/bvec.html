@@ -53,19 +53,22 @@ k_beta &lt;- k_w * r # Number of elements in beta
 k_gamma &lt;- k * k_x
 
 # Set uninformative priors
+# ...for non-cointegration parameters
 a_mu_prior &lt;- matrix(0, k_x * k) # Vector of prior parameter means
 a_v_i_prior &lt;- diag(0, k_x * k) # Inverse of the prior covariance matrix
 
+# ...for cointegration parameters
 v_i &lt;- 0
-p_tau_i &lt;- diag(1, k_w)
+p_tau_i &lt;- matrix(0, k_w, k_w)
+p_tau_i[1:r, 1:r] &lt;- diag(1, r)
 
+#...for the error term
 u_sigma_df_prior &lt;- r # Prior degrees of freedom
 u_sigma_scale_prior &lt;- diag(0, k) # Prior covariance matrix
 u_sigma_df_post &lt;- t + u_sigma_df_prior # Posterior degrees of freedom
 
 # Initial values
 beta &lt;- matrix(c(1, -4), k_w, r)
-#beta &lt;- matrix(rnorm(k_w * r), k_w, r)
 
 u_sigma_i &lt;- diag(.0001, k)
 u_sigma &lt;- solve(u_sigma_i)
