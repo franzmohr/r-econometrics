@@ -1,5 +1,5 @@
 
-<script>
+<script type="application/javascript">
 var doNotTrack = false;
 if (!doNotTrack) {
 	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -102,7 +102,10 @@ if (!doNotTrack) {
                         </time>
                     </header>
                     <section>
-                        <p>Below you find the script for all examples in chapter 3 of Wooldridge (2013). The only difference to the last chapter is how to use multiple independent variables in the <code>lm</code> function. This is easily achieved by separating each exogenous variable that should enter the model with a plus sign, e.g. <code>lm(colGPA ~ hsGPA + ACT)</code>.</p>
+                        
+
+
+<p>Below you find the script for all examples in chapter 3 of Wooldridge (2013). The only difference to the last chapter is how to use multiple independent variables in the <code>lm</code> function. This is easily achieved by separating each exogenous variable that should enter the model with a plus sign, e.g. <code>lm(colGPA ~ hsGPA + ACT)</code>.</p>
 <p>The other commands that appear new are quite helpful and you should take a minute to think about them:</p>
 <ul>
 <li><code>rm(list = ls())</code>: Sometimes it might be helpful to keep your memory clean in order to keep an overview of the data you use. This command <strong>r</strong>e<strong>m</strong>oves positions from the window in the upper right, i.e. it deletes data that R temporarily stored in your memory. <code>list</code> tells R that you are going to delete more than one items. <code>ls()</code> is the so-called <em>environment</em> that you want to delete. In our case this is a quite big one. If you are interested type <code>ls(1)</code>, <code>ls(2)</code>, etc. to see what happens.</li>
@@ -408,7 +411,7 @@ sum(lm_x$residuals * gpa1$colGPA) / sum(lm_x$residuals^2)</code></pre>
 
     </script>
     
-<script>
+<script type="application/javascript">
 var doNotTrack = false;
 if (!doNotTrack) {
 	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

@@ -6,10 +6,28 @@
     <description>Recent content in Rbasics on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 20 Jul 2018 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 06 Oct 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://www.r-econometrics.com/rbasics/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Getting Help, Importing Data and Some More Vocabulary</title>
+      <link>https://www.r-econometrics.com/rbasics/help_and_data_import_etc/</link>
+      <pubDate>Sun, 06 Oct 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/rbasics/help_and_data_import_etc/</guid>
+      <description>Getting help An important part of any R package is its documentation. The documentation of any function can be obtained by using ? followed by the name of the function or by using help(&amp;quot;function_name&amp;quot;). After the execution of a help command a new page should appear in the lower right window in RStudio. If not, click on the tab Help in the lower right window. The help page contains the title of the function followed by a short description.</description>
+    </item>
+    
+    <item>
+      <title>Preparing Your Workplace for an Analysis</title>
+      <link>https://www.r-econometrics.com/rbasics/beforestart/</link>
+      <pubDate>Sun, 06 Oct 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/rbasics/beforestart/</guid>
+      <description>Create a working directory Usually, people want to keep the folder structure on their computers tidy, so that they and their co-workers understand, which documents and data were used for a particular project – even if that project was finished months ago. This should also be the case when you work with R. Therefore, I recommend to create a new folder for every new project, which becomes the so-called working directory.</description>
+    </item>
     
     <item>
       <title>The Structure of R</title>
@@ -38,15 +56,6 @@ ggplot graphs are built with some kind of blocks, which usually start with the f
       <guid>https://www.r-econometrics.com/rbasics/installation/</guid>
       <description>For this introduction I recommend to install two software packages on your system:
  R: The software, which does all the calculations. RStudio: The working environment, where all the code will developed.  Note that the instructions of this section were written for a standard installation on a private computer. If you work on a corporate machine, the installation could be different due to different IT requirements of your company.</description>
-    </item>
-    
-    <item>
-      <title>Preparing Your Workplace for an Analysis</title>
-      <link>https://www.r-econometrics.com/rbasics/beforestart/</link>
-      <pubDate>Sun, 04 Feb 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://www.r-econometrics.com/rbasics/beforestart/</guid>
-      <description>Create a working directory Usually, people want to keep the folder structure on their computers tidy, so that they and their co-workers understand, which documents and data were used for a particular project – even if that project was finished months ago. This should also be the case when you work with R. Therefore, I recommend to create a new folder for every new project, which becomes the so-called working directory.</description>
     </item>
     
   </channel>

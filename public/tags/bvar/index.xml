@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Bvar on r-econometrics</title>
+    <title>bvar on r-econometrics</title>
     <link>https://www.r-econometrics.com/tags/bvar/</link>
-    <description>Recent content in Bvar on r-econometrics</description>
+    <description>Recent content in bvar on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Sun, 07 Jul 2019 00:00:00 +0000</lastBuildDate>
@@ -17,8 +17,11 @@
       <pubDate>Sun, 07 Jul 2019 00:00:00 +0000</pubDate>
       
       <guid>https://www.r-econometrics.com/timeseries/bvar/</guid>
-      <description>Bayesian methods have significantly gained in popularity during the last decades as computers have become more powerful and new software has been developed. Their flexibility and other advantageous features have made these methods also more popular in econometrics. This post gives a brief introduction to Bayesian VAR (BVAR) models and provides the code to set up and estimate a basic model with the bvartools package.
- BVAR models Bayesian VAR (BVAR) models have the same mathematical form as any other VAR model, i.</description>
+      <description>
+
+
+&lt;p&gt;Bayesian methods have significantly gained in popularity during the last decades as computers have become more powerful and new software has been developed. Their flexibility and other advantageous features have made these methods also more popular in econometrics. This post gives a brief introduction to Bayesian VAR (BVAR) models and provides the code to set up and estimate a basic model with the &lt;a href=&#34;https://cran.r-project.org/package=bvartools&#34;&gt;&lt;code&gt;bvartools&lt;/code&gt;&lt;/a&gt; package.&lt;/p&gt;
+</description>
     </item>
     
     <item>
@@ -37,8 +40,7 @@
       
       <guid>https://www.r-econometrics.com/timeseriesintro/</guid>
       <description>Work in progress (July 2019). I will try to update this page over the next few months.
-This section is intended to provide an overview of the relevant issues in (macro)economic time series analysis. Again the standard disclaimer: This site does not replace a good textbook, but it should help you to get a grasp of the basic concepts more quickly than if you learned it on your own.
-The intended structure of this site is:</description>
+This section is intended to provide an overview of the relevant issues in (macro)economic time series analysis. Again the standard disclaimer: This site does not replace a good textbook, but it should help you to get a grasp of the basic concepts more quickly than if you learned it on your own.</description>
     </item>
     
   </channel>

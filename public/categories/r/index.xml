@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>R on r-econometrics</title>
+    <title>r on r-econometrics</title>
     <link>https://www.r-econometrics.com/categories/r/</link>
-    <description>Recent content in R on r-econometrics</description>
+    <description>Recent content in r on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Fri, 31 Aug 2018 00:00:00 +0000</lastBuildDate>

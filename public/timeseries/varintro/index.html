@@ -1,5 +1,5 @@
 
-<script>
+<script type="application/javascript">
 var doNotTrack = false;
 if (!doNotTrack) {
 	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -118,7 +118,10 @@ if (!doNotTrack) {
                         </time>
                     </header>
                     <section>
-                        <p>Since the seminal paper of Sims (1980) vector autoregressive models have become a key instrument in macroeconomic research. This post presents the basic concept of VAR analysis and guides through the estimation procedure of a simple model. When I started my undergraduate program in economics I occasionally encountered the abbreviation <em>VAR</em> in some macro papers. I was fascinated by those waves in the boxes titled <em>impulse responses</em> and wondered how difficult it would be to do such reseach on my own. I was motivated, but my first attempts were admittedly embarrassing. It took me quite a long time to figure out which kind of data can be analysed, how to estimate a VAR model and how to obtain meaningful impulse responses. Today, I think that there is nothing fancy about VAR models at all once you keep in mind some points.</p>
+                        
+
+
+<p>Since the seminal paper of Sims (1980) vector autoregressive models have become a key instrument in macroeconomic research. This post presents the basic concept of VAR analysis and guides through the estimation procedure of a simple model. When I started my undergraduate program in economics I occasionally encountered the abbreviation <em>VAR</em> in some macro papers. I was fascinated by those waves in the boxes titled <em>impulse responses</em> and wondered how difficult it would be to do such reseach on my own. I was motivated, but my first attempts were admittedly embarrassing. It took me quite a long time to figure out which kind of data can be analysed, how to estimate a VAR model and how to obtain meaningful impulse responses. Today, I think that there is nothing fancy about VAR models at all once you keep in mind some points.</p>
 <div id="univariate-autoregression" class="section level3">
 <h3>Univariate autoregression</h3>
 <p>VAR stands for <em>vector autoregression</em>. To understand what this means, let us first look at a simple univariate (i.e. only one dependent or endogenous variable) autoregressive (AR) model of the form <span class="math inline">\(y_{t} = a_1 y_{t-1} + e_t\)</span>. In this model the current value of variable <span class="math inline">\(y\)</span> depends on its own first lag, where <span class="math inline">\(a_1\)</span> denotes its parameter coefficient and the subscript refers to its lag. Since the model contains only one lagged value the model is called autoregressive of order one, short AR(1), but you can easily increase the order to p by adding more lags, which results in an AR(p). The error term <span class="math inline">\(e_t\)</span> is assumed to be normally distributed with mean zero and variance <span class="math inline">\(\sigma^2\)</span>.</p>
@@ -373,7 +376,7 @@ plot(ir.2)</code></pre>
 
     </script>
     
-<script>
+<script type="application/javascript">
 var doNotTrack = false;
 if (!doNotTrack) {
 	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

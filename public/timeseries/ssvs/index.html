@@ -1,5 +1,5 @@
 
-<script>
+<script type="application/javascript">
 var doNotTrack = false;
 if (!doNotTrack) {
 	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -115,7 +115,10 @@ if (!doNotTrack) {
                         </time>
                     </header>
                     <section>
-                        <div id="introduction" class="section level2">
+                        
+
+
+<div id="introduction" class="section level2">
 <h2>Introduction</h2>
 <p>A general drawback of vector autoregressive (VAR) models is that the number of estimated coefficients increases disproportionately with the number of lags. Therefore, fewer information per parameter is available for the estimation as the number of lags increases. In the Bayesian VAR literature one approach to mitigate this so-called <em>curse of dimensionality</em> is <em>stochastic search variable selection</em> (SSVS) as proposed by George et al. (2008). The basic idea of SSVS is to assign commonly used prior variances to parameters, which should be included in a model, and prior variances close to zero to irrelevant parameters. By that, relevant parameters are estimated in the usual way and posterior draws of irrelevant variables are close to zero so that they have no significant effect on forecasts and impulse responses. This is achieved by adding a hierarchial prior to the model, where the relevance of a variable is assessed in each step of the sampling algorithm.<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a></p>
 <p>This post presents code for the estimation of a Bayesian vector autoregressive (BVAR) model with SSVS. It uses <a href="http://www.jmulti.de/download/datasets/e1.dat">dataset E1</a> from Lütkepohl (2007), which contains data on West German fixed investment, disposable income and consumption expenditures in billions of DM from 1960Q1 to 1982Q4. Following a related example in Lütkepohl (2007, Section 5.2.10) only the first 71 observations of a VAR(4) model are used. The <code>bvartools</code> package can be used to load the data and generate the data matrices:</p>
@@ -409,7 +412,7 @@ plot(OIR, main = &quot;Orthogonalised Impulse Response&quot;, xlab = &quot;Perio
 
     </script>
     
-<script>
+<script type="application/javascript">
 var doNotTrack = false;
 if (!doNotTrack) {
 	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

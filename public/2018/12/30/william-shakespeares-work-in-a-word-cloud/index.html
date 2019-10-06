@@ -1,5 +1,5 @@
 
-<script>
+<script type="application/javascript">
 var doNotTrack = false;
 if (!doNotTrack) {
 	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -112,8 +112,6 @@ if (!doNotTrack) {
                     </header>
                     <section>
                         <p>Word or tag clouds seem to be quite popular at the moment. Although their analytical power might be limited, they do serve an aesthetic purpose and, for example, could be put on the cover page of a thesis or a presentation using the content of your work or the literature you went through. This post uses text data from the Gutenberg project to give a step-by-step introduction on how to create a wordcould in R.</p>
-
-<p></p>
 
 <p>Inspired by <a href="https://www.r-bloggers.com/constructing-a-word-cloud-for-icml-2015/" target="_blank" rel="noopener">Andrew Collier&rsquo;s blog post on creating word clouds from multiple PDF-sources</a> I played around with some texts from the Gutenberg project to visualize some of the most prominent pieces of classic literature. Then I remembered my old English teacher, who said that Shakespeare&rsquo;s work basically hinged on the motives of &ldquo;love&rdquo;, &ldquo;death&rdquo; and &ldquo;aristocracy&rdquo;. So, I became curious about how this might be reflected in a word cloud that is drawn from the complete works of William Shakespeare. Fortunately, a complete version of the master&rsquo;s work is available on the <a href="http://www.gutenberg.org/ebooks/100" target="_blank" rel="noopener">Project Gutenberg</a>, where you can also find a myriad of other free literature to download and read (legally!!!). But let&rsquo;s postpone the reading and concentrate on how to make a word cloud from such data. I will go through this step-by-step as in Andrew Collier&rsquo; post.</p>
 
@@ -264,7 +262,7 @@ tagcloud(text_tbl$vars, weights = text_tbl$n, fvert = .3)
 
     </script>
     
-<script>
+<script type="application/javascript">
 var doNotTrack = false;
 if (!doNotTrack) {
 	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

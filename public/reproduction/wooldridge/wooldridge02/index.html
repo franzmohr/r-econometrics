@@ -1,5 +1,5 @@
 
-<script>
+<script type="application/javascript">
 var doNotTrack = false;
 if (!doNotTrack) {
 	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -102,7 +102,10 @@ if (!doNotTrack) {
                         </time>
                     </header>
                     <section>
-                        <p>In R the function for basic linear regression models is <code>lm</code>, which is short for <em>linear model</em>. Its first argument is a formula of the regression model, which has the form <code>y ~ a</code>. The tilde between <em>y</em> and <em>a</em> indicates that <em>y</em> is the dependent variable and <em>a</em> is the explanatory variable. It is also possible to add a further explanatory variable - for example <em>b</em> - to the regression by adding a plus sign followed by the the name of the additional variable to the formula. In our example this would result in <code>y ~ a + b</code>. But since this chapter only covers models with a single explanatory variable, we postpone this issue to the next chapter.</p>
+                        
+
+
+<p>In R the function for basic linear regression models is <code>lm</code>, which is short for <em>linear model</em>. Its first argument is a formula of the regression model, which has the form <code>y ~ a</code>. The tilde between <em>y</em> and <em>a</em> indicates that <em>y</em> is the dependent variable and <em>a</em> is the explanatory variable. It is also possible to add a further explanatory variable - for example <em>b</em> - to the regression by adding a plus sign followed by the the name of the additional variable to the formula. In our example this would result in <code>y ~ a + b</code>. But since this chapter only covers models with a single explanatory variable, we postpone this issue to the next chapter.</p>
 <p>Beside the formula, the <code>lm</code> function also requires you to specify the data used for the estimation. This can be done in multiple ways, but it is quite common practise to specify a data frame as the <em>data</em> argument, e.g. <code>data = my_data_frame</code>, which contains the variables that are mentioned in the model formula.</p>
 <p>With this knowledge we can already estimate a simple model. In the textbook this is a regression of the variable <em>salary</em> on the variable <em>roe</em>, where both variables are contained in the <em>ceosal1</em> data set. We can access this data set by loading the <em>wooldridge</em> data package with <code>library(wooldridge</code> and then load the sample with <code>data(&quot;ceosal1&quot;)</code>:</p>
 <pre class="r"><code>library(wooldridge) # Load the data package
@@ -429,7 +432,7 @@ summary(lm_1)</code></pre>
 
     </script>
     
-<script>
+<script type="application/javascript">
 var doNotTrack = false;
 if (!doNotTrack) {
 	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

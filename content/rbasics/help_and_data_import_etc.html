@@ -1,0 +1,68 @@
+---
+title: "Getting Help, Importing Data and Some More Vocabulary"
+author: "Franz X. Mohr"
+date: "2019-10-06"
+---
+
+
+
+<div id="getting-help" class="section level3">
+<h3>Getting help</h3>
+<p>An important part of any R package is its documentation. The documentation of any function can be obtained by using <code>?</code> followed by the name of the function or by using <code>help(&quot;function_name&quot;)</code>. After the execution of a help command a new page should appear in the lower right window in RStudio. If not, click on the tab <em>Help</em> in the lower right window. The help page contains the title of the function followed by a short description. For now the most important parts of the documentation are the following:</p>
+<ul>
+<li><em>Usage</em> describes the arguments of the function, which can be specified by the user. The values to the right of the equality signs are the standard values, which are used if the users do not specify those values manually.</li>
+<li><em>Arguments</em> provides further information on the possible specifications of the arguments.</li>
+</ul>
+<p>For example, assume that you want to read some data into R. We will use the Penn World Table data (version 9.0) for this. Got to <a href="https://www.rug.nl/ggdc/productivity/pwt/pwt-releases/pwt9.0" target="_blank">this link</a> and download the Excel version of the data set into your working directory. I saved it under <code>pwt90.xlsx</code>.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></p>
+<p>Since the data come in an xlsx file, we need a function that can read it. Such a function is not included in the standard installation of R, but the <code>readxl</code> package contains one: <code>read_xlsx</code>. To understand what kind of input this function needs in order to work, you can read its documentation by using the help function:</p>
+<pre class="r"><code>library(readxl) # install.packages(&quot;readxl&quot;)
+
+?read_xlsx</code></pre>
+<p>which can also be written as <code>help(&quot;read_xlsx&quot;)</code>. Alternatively, you can click on the tab <em>Help</em> in the lower right window and enter <em>read_xlsx</em> into the search field. As soon as you start typing, RStudio will give you some suggestions on functions that fit your input and for which documentation is available.</p>
+<p>For our purpose we only need to specify the first two arguments:</p>
+<ul>
+<li><code>path</code> contains the name of the xlsx file you want to read.</li>
+<li><code>sheet</code> is the number or name of the sheet you want to read.</li>
+</ul>
+<p>It might also be worthwhile to take a minute to go through the other arguments that could be specified.</p>
+</div>
+<div id="importing-data" class="section level3">
+<h3>Importing data</h3>
+<p>Since the name of our data file is <em>pwt90.xlsx</em>, the first argument of the <code>read_xlsx</code> function is <code>path = &quot;pwt90.xlsx&quot;</code>. Furthermore, after opening the xlsx file in a spreadsheet program we know that the file consists of three sheets. We only want to read the content of the third sheet named <em>Data</em>. Thus, we can either use the argument <code>sheet = 3</code> or <code>sheet = &quot;Data&quot;</code>. I recommend to use the latter approach, because it is more reliable in case the order of the Excel sheets is changed in the future. So, the following line of code should be just right for our purpose:</p>
+<pre class="r"><code># Load the readxl package
+library(readxl) # install.packages(&quot;readxl&quot;)
+
+# Read the data
+read_xlsx(path = &quot;pwt90.xlsx&quot;, sheet = &quot;Data&quot;)</code></pre>
+<p>Note that the order of a function’s arguments is not important as long as you provide the names of the arguments followed by the equality sign. The space between the entries is also not important, but it is good practice to use it, since it makes the code more readable. Furthermore, make sure that you write the names of objects and arguments correctly. This is especially true for lower and upper cases. R is very sensitive in this regard.</p>
+<p>If the command worked, the console will be filled with a lot of numbers and signs and it will indicate that some rows were omitted. This is because the function <code>read_xlsx</code> only reads the xlsx file and R does not know what else to do with the output than just to display its content in the console. In order to change this behaviour, we use the operator <code>&lt;-</code>. It assigns a certain input to an <em>object</em>, or so-called flat-file. In this example, it takes the output of the <code>read_xlsx</code> function as input and assigns it to a new object. The following code line assigns the content of the sheet <em>Data</em> of the <em>pwt90.xlsx</em> file to the object <em>pwt</em>. Of course, you could also use other names for the object like, e.g., <em>this_is_data_from_pwt90</em>, but <em>pwt</em> seems more convenient.</p>
+<pre class="r"><code>pwt &lt;- read_xlsx(path = &quot;pwt90.xlsx&quot;, sheet = &quot;Data&quot;)</code></pre>
+<p>Note that this line also represents the <em>typical form of code in R</em>: A function with some arguments is executed and its output is assigned to an object via the <code>&lt;-</code> operator.<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></p>
+<p>Also note that object names may never contain spaces, so <code>pwt data &lt;- read_xlsx(path = &quot;pwt90.xlsx&quot;, sheet = &quot;Data&quot;)</code> would result in an error.</p>
+<p>If your data file has a different format, you have to search for the package, which is able to read it. This might seem a bit laborious, but fortunately the structure of those functions is very similar, so that this example should be representative for most other file formats. If not, open a search engine and enter, for example, <em>r read xyz data</em> and search the results for answers on the website <a href="https://stackoverflow.com/">stockoverflow.com</a>. It is a forum, where people post questions on coding issues. Usually, the respondents give the right advice. The quality of the answers to a question can be assessed by the approval rating of the community and, even better, a check sign, which indicates that this answer can be regarded as the final solution to the respective problem.</p>
+<p>Once the file is successfully loaded into R, an object will appear in the upper right window. This window contains all the objects, which are loaded in R and which can be used for further processing. At the moment this is only one object, <code>pwt</code>. But with every use of the <code>&lt;-</code> operator you can create a new object or overwrite an existing one with something else. For example, you could just copy the object <code>pwt</code> and save the copy as <code>data_copy</code>:</p>
+<pre class="r"><code>data_copy &lt;- pwt</code></pre>
+<p>Now there are two objects in the upper right window, where one is obviously redundant. In order to get rid of it, you can use the command <code>rm(data_copy)</code> which will <strong>r</strong>e<strong>m</strong>ove the object from the memory. This can be very helpful when working with large samples that have millions of observations.</p>
+<p>A very useful application of the <code>rm</code> function is <code>rm(list = ls())</code>, which removes all the objects in the upper right window and, thus, from your computer’s memory. I usually put this command on top of a script to make sure that no remaining objects from a different project can cause problems in the new project. Feel free to try the command out and load the data into R again by executing</p>
+<pre class="r"><code># Remove objects in the memory
+rm(list = ls())
+
+pwt &lt;- read_xlsx(path = &quot;pwt90.xlsx&quot;, sheet = &quot;Data&quot;) # Re-load PWT data</code></pre>
+<p>Note that the lines above contain <em>comments</em>, which are indicated by the route <code>#</code> signs. Comments are an essential part of every code, because they allow other people to understand your code more easily. It is good practice to use comments to explain, why you added a certain line of code. You should definitely make a habit out of using them.</p>
+<p>R can handle a broad variety of data formats such as boolean<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a> or numeric values, dates or text[^text]. These different kinds of data can also be structured differently. These categories of data formats and structures are called <em>classes</em>. And one of the most popular classes in R are a so-called <em>data frames</em>. They serve as the data input for most of the basic R functions and, hence, we will focus on them in this introduction.</p>
+<p>Data frames are quite similar to standard spreadsheets, which might become a bit clearer when you either execute <code>View(pwt)</code> or, equivalently, click on <code>pwt</code> in the upper right window. This will open an additional tab in the editor window, where you can explore the data just like in a spreadsheet program.</p>
+<p>Following a different approach you can execute the lines</p>
+<pre class="r"><code>names_pwt &lt;- names(pwt) # Save names column names as distinct object
+names_pwt # Show object</code></pre>
+<p>to extract the column names of the data frame <code>pwt</code> and save them as a new object with the name <code>names_pwt</code> (fist line) and to display the names in the console (second line). Note that R will print the content of an object in the console, if the object name is entered and executed just like before when we used the <code>read_xlsx</code> function without assigning its output to an object.</p>
+<p>The output of the <code>names</code> function is new object named <code>names_pwt</code>. It is not a data frame, but a so-called <em>character vector</em>, which is another way to structure data in R. The quotation marks around its elements indicate that the content of the vector is text. Note that this is also indicated by the abbreviation <em>chr</em> to the right of the object name in the upper right window. Moreover, we get the same information when using the command <code>class(names_pwt)</code>, which gives <code>&quot;character&quot;</code> as output.</p>
+<p>If you extend the data frame object by clicking on the white button to the left of the object name, you will also notice the abbreviation <em>chr</em> in some lines, whereas <em>num</em> (<em>numeric</em>) will appear in others. This indicates that every column of a data frame is a vector of a certain format. Note that although it is possible for data frames to consist of vectors with different data formats, a vector can only contain one kind of data.</p>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>Note that a newer version of the PWT is available. Go to <a href="https://www.rug.nl/ggdc/productivity/pwt/" target="_blank">PWT-website</a> got get the most recent version.<a href="#fnref1" class="footnote-back">↩</a></p></li>
+<li id="fn2"><p>Sometimes you will encounter code which uses the equality sign <code>=</code> instead of the <code>&lt;-</code>. This is perfectly fine, since they can be considered as equivalent. However, the <code>&lt;-</code> seems more widespread.<a href="#fnref2" class="footnote-back">↩</a></p></li>
+<li id="fn3"><p>This means that entries that can only have two values, true or false.<a href="#fnref3" class="footnote-back">↩</a></p></li>
+</ol>
+</div>

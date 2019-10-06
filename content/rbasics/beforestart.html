@@ -1,7 +1,7 @@
 ---
 title: "Preparing Your Workplace for an Analysis"
-author: "Franz Mohr"
-date: "2018-02-04"
+author: "Franz X. Mohr"
+date: "2019-10-06"
 ---
 
 
@@ -20,20 +20,22 @@ date: "2018-02-04"
 </div>
 <div id="set-the-working-directory-in-r" class="section level2">
 <h2>Set the working directory in R</h2>
-<p>Before we start our analysis, we should set the path to the working directory in R. The reason for this is a bit technical. Let’s suppose that we want to use R to access a certain file on our computer. There is no way, that R would automatically know in which folder this file is located, if we only specified its name. Therefore, we would not only have to provide the filename, but also the path to it. This can become cumbersome if we want to access many files with R. But given that we have put all the necessary data for our project in the folder <em>r_intro</em>, we only have to enter the path once by setting the working directory. Basically, it tells R to access this directory by default, whenever it has to use a file on the hard drive.<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a> The working directory of R can be set with the <code>setwd</code> function:</p>
+<p>Before we start our analysis, we should set the path to the working directory in R. The reason for this is a bit technical. Let’s suppose that we want to use R to access a certain file on our computer. There is no way, that R would automatically know in which folder this file is located, if we only specified its name. Therefore, we would not only have to provide the filename, but also the path to it. This can become cumbersome if we want to access many files with R. But given that we have put all the necessary data for our project in the folder <em>r_intro</em>, we only have to enter the path once by setting the working directory. Basically, it tells R to access this directory by default, whenever it has to use a file on the hard drive.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> The working directory of R can be set with the <code>setwd</code> function:</p>
 <pre class="r"><code>setwd(&quot;C:/path/to/your/working/directory/r_intro&quot;)</code></pre>
 <p>Recall that a function in R has a name and at least one argument. In the previous line <code>setwd</code> is the name of the function and the path to the working directory is the argument. Note that the path to the working directory has to be in quotation marks <code>&quot;path/to/your/working/directory&quot;</code> and the folders have to be separated by slashes <code>/</code> and <em>not backslashes</em> <code>\</code> as they would be inserted when you directly copy a path from the Windows explorer into R.</p>
 </div>
 <div id="load-the-packages-you-need" class="section level2">
 <h2>Load the packages you need</h2>
-<p>Having installed all the necessary packages does not mean, that we can use them without any further action. Before we use the functions of a particular package, we have to load the package whenever R is started.<a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a> This is commonly done with the <code>library(packagename)</code> function.<a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a></p>
+<p>Having installed all the necessary packages does not mean, that we can use them without any further action. Before we use the functions of a particular package, we have to load the package whenever R is started.<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a> This is commonly done with the <code>library(packagename)</code> function.<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a></p>
 <pre class="r"><code>library(foreign)</code></pre>
+<p>These are the basic steps which I believe are useful before starting with the actual coding. However, there are also other ways to set up your workplace. For example, RStudio offers the functionality of so-called <em>projects</em> which, among other things, set the working directory automatically for you so that you do not have to think about that. I can only recommend to work with them. A short introduction to working with RStudio-projects can be found on <a href="https://support.rstudio.com/hc/en-us/articles/200526207-Using-Projects" target="_blank">RStudio’s website</a>.</p>
+<p>Anyway, once your workplace is set up you can proceed with the next step, <a href="/rbasics/help_and_data_import_ect">importing data into R</a>.</p>
 </div>
 <div class="footnotes">
 <hr />
 <ol>
-<li id="fn1"><p>However, you can also import data from different folders than your working directory, if you provide the full path to a file. This can be useful if you have a common data base, which should not be copied too often in order to save memory or to ensure that you always access the most recent data.<a href="#fnref1">↩</a></p></li>
-<li id="fn2"><p>Note that you have to install a package only once, whereas you have to load a package every time you start R.<a href="#fnref2">↩</a></p></li>
-<li id="fn3"><p>There is also a function called <code>require</code> which, basically, does the same as <code>library</code>. However, it also gives out the value <code>TRUE</code> if the package was loaded successfully and <code>FALSE</code> if not. This can be useful when you want your script to check, whether a certain package is installed on a machine. For example, if a co-worker uses the script and misses a certain package, <code>require</code> can be used to indicate this.<a href="#fnref3">↩</a></p></li>
+<li id="fn1"><p>However, you can also import data from different folders than your working directory, if you provide the full path to a file. This can be useful if you have a common data base, which should not be copied too often in order to save memory or to ensure that you always access the most recent data.<a href="#fnref1" class="footnote-back">↩</a></p></li>
+<li id="fn2"><p>Note that you have to install a package only once, whereas you have to load a package every time you start R.<a href="#fnref2" class="footnote-back">↩</a></p></li>
+<li id="fn3"><p>There is also a function called <code>require</code> which, basically, does the same as <code>library</code>. However, it also gives out the value <code>TRUE</code> if the package was loaded successfully and <code>FALSE</code> if not. This can be useful when you want your script to check, whether a certain package is installed on a machine. For example, if a co-worker uses the script and misses a certain package, <code>require</code> can be used to indicate this.<a href="#fnref3" class="footnote-back">↩</a></p></li>
 </ol>
 </div>
