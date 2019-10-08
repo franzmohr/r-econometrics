@@ -6,10 +6,19 @@
     <description>Recent content on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 06 Oct 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 07 Oct 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://www.r-econometrics.com/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Introduction to dplyr</title>
+      <link>https://www.r-econometrics.com/rbasics/dplyrintro/</link>
+      <pubDate>Mon, 07 Oct 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/rbasics/dplyrintro/</guid>
+      <description>The cleaning and transformation of data belong to the most time consuming parts of any economic analysis. Many graphical or statistical functions in R require specifically formated data to work properly. Although the standard functions of R can be used to prepare your data for further analysis, some people find them a bit labourious for daily applications. Therefore, alternatives have been developed, which make data transformation in R easier and also faster.</description>
+    </item>
     
     <item>
       <title>Getting Help, Importing Data and Some More Vocabulary</title>
@@ -36,7 +45,7 @@
       
       <guid>https://www.r-econometrics.com/rbasicsintro/</guid>
       <description>This section should help you to
- get R and RStudio started on your computer understand the structure of the program prepare your workspace for an analysis import data, get help and some more important vocabulary [manipulate data with the dplyr package] create graphics with the ggplot2 package.  Recently, I have finished the first version of a below 30 pages introduction to R. It uses an exemplary workflow to explain some basics of the language and the application of the packages dplyr, ggplot2 and openxlsx.</description>
+ get R and RStudio started on your computer understand the structure of the program prepare your workspace for an analysis import data, get help and some more important vocabulary manipulate data with the dplyr package create graphics with the ggplot2 package.  Recently, I have finished the first version of a below 30 pages introduction to R. It uses an exemplary workflow to explain some basics of the language and the application of the packages dplyr, ggplot2 and openxlsx.</description>
     </item>
     
     <item>

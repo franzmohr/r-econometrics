@@ -1,0 +1,85 @@
+---
+title: "Introduction to dplyr"
+author: "Franz X. Mohr"
+date: "2019-10-07"
+tags:
+  - dplyr
+  - r
+---
+
+
+
+<p>The cleaning and transformation of data belong to the most time consuming parts of any economic analysis. Many graphical or statistical functions in R require specifically formated data to work properly. Although the standard functions of R can be used to prepare your data for further analysis, some people find them a bit labourious for daily applications. Therefore, alternatives have been developed, which make data transformation in R easier and also faster. One of these alternatives is the <code>dplyr</code> package of the <a href="https://www.tidyverse.org/" target="_blank">tidyverse</a>. It has gained great popularity among R users and being familiar with its syntax can be considered a standard skill in R.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> In the following I give an introduction to some main functions of <code>dplyr</code>, which I also use extensively at work.</p>
+<p>For this illustration we use data from the World Penn Tables, which come with the <code>pwt9</code> package. In particular, we use the 9.0 version of the data set, which can be loaded with <code>data(&quot;pwt9.0&quot;)</code>.</p>
+<pre class="r"><code>library(dplyr) # Load dplyr
+
+library(pwt9) # Load data
+data(&quot;pwt9.0&quot;)</code></pre>
+<div id="tibbles" class="section level2">
+<h2>tibbles</h2>
+<p>But before we start with a tour through the main function of <code>dplyr</code> it should be mentioned that the package works with its own object format, which is called <em>tibble</em>.<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a> Tibbles are practically data.frames, but with some nice additional features. For some further information take a look at the documentation: <code>?tibble::tibble</code>. You will notice the differences between tibbles and data.frame when you work more with <code>dplyr</code>. For now, there is not much more use must know to use them.</p>
+</div>
+<div id="pipes" class="section level2">
+<h2>pipes</h2>
+<p><code>dplyr</code> also utilises a very handy tool called <em>pipe</em>, which comes with the <code>magrittr</code> package. Pipes are indicated by the operator <code>%&gt;%</code> and they forward the output of the part to its left as input for the part to its right. What this means will become clearer immediately.<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a></p>
+</div>
+<div id="select" class="section level2">
+<h2>select</h2>
+<p>The <code>select</code> function can be used to select the columns of a table. For example, the <code>pwt9.0</code> data set contains 47 columns. But let’s assume that we only want to analyse real GDP and the population size, i.e. variables <code>rgdpna</code> and <code>pop</code>, for all countries and all years. This can be done with the following lines:</p>
+<pre class="r"><code>pwt_select &lt;- pwt9.0 %&gt;% select(year, country, rgdpna, pop)</code></pre>
+<p>Let’s start with object <code>pwt9.0</code>. This is the data set that was originally loaded. The pipe to its right tells R that it should be used as input for the function to its right, i.e. <code>select</code>. The select function recognises the data coming from the pipe and selects the columns called <em>year</em>, <em>country</em>, <em>rgdpna</em> and <em>pop</em>. All other columns are dropped.</p>
+<p>There are two things to mention at this point. First, note that the column names in the <code>select</code> function do not have to be in quotes. If we used the standard R commands to select the same data we would have to use <code>pwt9.0[, c(&quot;year&quot;, &quot;country&quot;, &quot;rgdpna&quot;, &quot;pop&quot;)]</code>.</p>
+<p>Second, to understand better how pipes work, it should be mentioned that it would also be possible to write the command differently and omit the pipe. This would result in <code>pwt_data &lt;- select(pwt9.0, year, country, rgdpna, pop)</code>. This would yield the exact same result as above. The only differnece is that we included the data object in the <code>select</code> function. But since the function was designed to work with pipes, it recognices that the data comes via a pipe so that the data argument of <code>select</code> does not have to be specified.</p>
+</div>
+<div id="rename" class="section level2">
+<h2>rename</h2>
+<p>Let’s assume we are not satisfied with the names of the original column names and want to change them. With <code>dplyr</code> this can be done with the command <code>rename</code>, where the new name of the column is followed by the equality sign and the old name of the column. The following example illustrates this:</p>
+<pre class="r"><code>pwt_rename &lt;- pwt_select %&gt;%
+  rename(ctr = country,
+         gdp = rgdpna)</code></pre>
+<p>Starting with the object <code>pwt_select</code> we forward its content to the <code>rename</code> function and define <code>ctr</code> as the new column name for <code>country</code> and <code>gdp</code> as the new column name instead of <code>rgdpna</code>. And the output of this operation is saved as object <code>pwt_rename</code>. Again, it would also be possbile to write <code>rename(pwt_select, ctr = country, value = rgdpna)</code>, but since we use pipes, we can forget about the data argument.</p>
+<p>Note that it is not necessary to write the commands in one line. In fact, it is good practise to begin a new code line after a pipe. For a comprehensive style guide for the tidyverse see the <a href="https://style.tidyverse.org/" target="_blank">online book by Hadley Wickham</a>.</p>
+</div>
+<div id="filter" class="section level2">
+<h2>filter</h2>
+<p><code>dplyr</code> also provides a filter function, where the conditions of the filter can be added consecutively and separated with a column. Eeach condition can be regarded as an <em>and</em> operator. <em>Or</em> conditions must be specified in the same line. The following code used the data in <code>pwt_rename</code> and omits all observations, where the column <em>gdp</em> contains <code>NA</code> value, the year is lower than 1980 and where the country name is not Austria, Germany or France.<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a> The result is save as object <code>pwt_filter</code>.</p>
+<pre class="r"><code>pwt_filter &lt;- pwt_rename %&gt;%
+  filter(!is.na(gdp), # Omit observation with NA values in column &quot;value&quot;
+         year &gt;= 1980, # Drow observations before 1980
+         ctr %in% c(&quot;Austria&quot;, &quot;Germany&quot;, &quot;France&quot;)) # Only use obs for AT, DE and FR</code></pre>
+<p>This is relatively simple compared to the way you would have to do it when using the core R operators only:</p>
+<pre class="r"><code>pwt_filter &lt;- pwt_rename[!is.na(pwt_rename$value) &amp; pwt_rename$year &gt;= 1980 &amp; pwt_rename$ctr %in% c(&quot;Austria&quot;, &quot;Germany&quot;, &quot;France&quot;),]</code></pre>
+</div>
+<div id="mutate" class="section level2">
+<h2>mutate</h2>
+<p>The <code>mutate</code> function can be use to change the content of an existing column in the data set or to generate a new column. In our example we calculate the GDP per capita ratio for the three countries in the filtered data set:</p>
+<pre class="r"><code>pwt_mutate &lt;- pwt_filter %&gt;%
+  mutate(gdp_pc = gdp / pop)</code></pre>
+<p>After executing <code>View(pwt_mutate)</code> we see that the data.frame contains a new column called <em>gdp_pc</em>. Which contains the GDP per capita for each country and year since 1980. Again, thanks to the logic of the <code>dyplr</code> package we do not have to use quote to specify the varible names, which makes programming more convenient and faster.</p>
+</div>
+<div id="group_by" class="section level2">
+<h2>group_by</h2>
+<p>One of the most tricky functions in the <code>dplyr</code> package is <code>group_by</code>. Basically, it tells R to execute the the following commands for each distinct value in the specified columns separately. This should become more clear when we look more closely at the following function…</p>
+</div>
+<div id="summarise" class="section level2">
+<h2>summarise</h2>
+<p>Sometimes it might be useful to calculate aggregate values over a group of observations. This can be done with the <code>summarise</code> function in combination with the <code>group_by</code> function. The following code uses the <code>group_by</code> function to tell R that it should apply the <code>summarise</code> function to each year separately and calculate aggregate GDP and population for the region of Austria, France and Germany.</p>
+<pre class="r"><code>data_summarise &lt;- pwt_filter %&gt;% 
+  group_by(year) %&gt;%
+  summarise(gdp = sum(gdp),
+            pop = sum(pop)) %&gt;%
+  ungroup()</code></pre>
+<p>Note that it is good practise to add the <code>ungroup</code> function after code lines which run in the context of a <code>group_by</code>. Although not really necessary, this can improve the performance of your code substantially.</p>
+<p>Beside the functions presented above there are two further functions you should know when you work with <code>dplyr</code>. They are called <code>spread</code> and <code>gather</code> and come with the <code>tidyr</code> package.</p>
+<p>Working with the <code>dplyr</code> packages requires some practise. This is especially true, when somebody just started to work with it. However, you have now already learned the basic functions and syntax of the package and there is a lot of additional material out there, which assists in becoming more familiar with the functions of <code>dplyr</code>. And once somebody is quite familiar with the syntax of the package, I find so-called <em>cheatsheets</em> as they are provided on the RStudio website especially useful.<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a> Other sources might be blog articles, online training courses or stockoverflow.com for a particular problem.</p>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>More information can be found on the <a href="https://dplyr.tidyverse.org/" target="_blank">dplyr’s website</a>. Another quite popular and even a bit faster package would be <code>data.table</code>.<a href="#fnref1" class="footnote-back">↩</a></p></li>
+<li id="fn2"><p>To be precise this object class actually comes with the <code>tibble</code> package, but <code>dplyr</code> utilises it.<a href="#fnref2" class="footnote-back">↩</a></p></li>
+<li id="fn3"><p>For further information on pipes see <a href="http://r-posts.com/pipes-in-r-tutorial-for-beginners/">http://r-posts.com/pipes-in-r-tutorial-for-beginners/</a>.<a href="#fnref3" class="footnote-back">↩</a></p></li>
+<li id="fn4"><p>For completeness possible signs for vale comparison are <code>==</code>, <code>&lt;</code>, <code>&lt;=</code>, <code>&gt;</code>, <code>&gt;=</code> and <code>!=</code> for checking if the value on the left side of the sign is equal, lower, lower or equal, larger, larger or equal and different, respectively, from the value on the right side. The operator <code>%in%</code> can be used to determine, whether the object to its left is in a vector to its right.<a href="#fnref4" class="footnote-back">↩</a></p></li>
+<li id="fn5"><p>Cheatsheets are compact summaries for the use of packages. They can be found on the RStudio website: <a href="https://www.rstudio.com/resources/cheatsheets/">https://www.rstudio.com/resources/cheatsheets/</a>.<a href="#fnref5" class="footnote-back">↩</a></p></li>
+</ol>
+</div>
