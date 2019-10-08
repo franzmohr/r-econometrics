@@ -9,6 +9,7 @@ tags:
   - r
   - var
   - vector autoregression
+description: "An intuitive introduction to the concept of vector autoregression (VAR) and impulse response analysis. The post also guides through the estimation procedure of a simple VAR model and the generation of impulse responses in R using the vars package."
 ---
 
 
@@ -36,7 +37,8 @@ tags:
 <p>At this point the VAR approach comes in. A simple VAR model can be written as</p>
 <p><span class="math display">\[\begin{pmatrix} y_{1t} \\ y_{2t} \end{pmatrix} = \begin{bmatrix} a_{11} &amp; a_{12} \\ a_{21} &amp; a_{22} \end{bmatrix} \begin{pmatrix} y_{1t-1} \\ y_{2t-1} \end{pmatrix} + \begin{pmatrix} \epsilon_{1t} \\ \epsilon_{2t} \end{pmatrix}\]</span></p>
 <p>or, more compactly,</p>
-<p><span class="math display">\[ y_t = A_1 y_{t-1} + \epsilon_t,\]</span> where <span class="math inline">\(y_t = \begin{pmatrix} y_{1t} \\ y_{2t} \end{pmatrix}\)</span>, <span class="math inline">\(A_1= \begin{bmatrix} a_{11} &amp; a_{12} \\ a_{21} &amp; a_{22} \end{bmatrix}\)</span> and <span class="math inline">\(\epsilon_t = \begin{pmatrix} \epsilon_{1t} \\ \epsilon_{2t} \end{pmatrix}.\)</span></p>
+<p><span class="math display">\[ y_t = A_1 y_{t-1} + \epsilon_t,\]</span>
+where <span class="math inline">\(y_t = \begin{pmatrix} y_{1t} \\ y_{2t} \end{pmatrix}\)</span>, <span class="math inline">\(A_1= \begin{bmatrix} a_{11} &amp; a_{12} \\ a_{21} &amp; a_{22} \end{bmatrix}\)</span> and <span class="math inline">\(\epsilon_t = \begin{pmatrix} \epsilon_{1t} \\ \epsilon_{2t} \end{pmatrix}.\)</span></p>
 <p><em>Note: Yes, you should familiarise yourself with some (basic) matrix algebra (addition, subtraction, multiplication, transposition, inversion and the determinant), if you want to work with VARs.</em></p>
 <p>Basically, such a model implies that <em>everything depends on everything</em>. But as can be seen from this formulation, each row can be written as a separate equation, so that <span class="math inline">\(y_{1t} = a_{11} y_{1t-1} + a_{12} y_{2t-1} + \epsilon_{1t}\)</span> and <span class="math inline">\(y_{2t} = a_{21} y_{1t-1} + a_{22} y_{2t-1} + \epsilon_{2t}\)</span>. Hence, the VAR model can be rewritten as a series of individual ADL models as described above. In fact, it is possible to estimate VAR models by estimating each equation separately.</p>
 <p>Looking a bit closer at the single equations you will notice, that there appear no contemporaneous values on the right-hand side (<em>rhs</em>) of the VAR model. However, information about contemporaneous relations can be found in the so-called <em>variance-covariance matrix</em> <span class="math inline">\(\Sigma\)</span>. It contains the variances of the endogenous variable on its diagonal elements and covariances of the errors on the off-diagonal elements. Latter contain information about contemporaneous effects. Like the error variance <span class="math inline">\(\sigma^2\)</span> in a single equation model it is essential for the calculation of test statistics and confidence intervals.</p>
