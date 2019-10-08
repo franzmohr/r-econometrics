@@ -6,6 +6,11 @@
 {{ $categories := .Params.categories }}
 {{ $tags := .Params.tags }}
 
+  <meta
+     name="description"
+     content="{{ if .Params.description }}{{ .Params.description }}{{ end }}"
+   />
+
     <div class="container">
         <div class="row">
             <div class="sixteen columns">
