@@ -6,10 +6,19 @@
     <description>Recent content in r on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 07 Oct 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 09 Oct 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://www.r-econometrics.com/tags/r/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>An Introduction to Impulse Response Analysis of VAR Models</title>
+      <link>https://www.r-econometrics.com/timeseries/irf/</link>
+      <pubDate>Wed, 09 Oct 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/timeseries/irf/</guid>
+      <description>Impulse response analysis is an important step in econometric analyes, which employ vector autoregressive models. Their main purpose is to describe the evolution of a model’s variables in reaction to a shock in one or more variables. This feature allows to trace the transmission of a single shock within an otherwise noisy system of equations and, thus, makes them very useful tools in the assessment of economic policies. This post provides an introduction to the concept and interpretation of impulse response functions as they are commonly used in the VAR literature and provides code for their calculation in R.</description>
+    </item>
     
     <item>
       <title>Introduction to dplyr</title>
@@ -69,15 +78,6 @@
       <guid>https://www.r-econometrics.com/reproduction/2015_timmer_wiod/</guid>
       <description>As international trade has become increasingly fragmented over the past decades the analysis of global value chains (GVC) has gained popularity in economic research. This post reproduces Timmer et al. (2015), who introduce the world input-output database (WIOD) and present basic concepts of GVC analysis.
 Data Timmer et al. (2015) use the 2013 vintage of the world input-output database (WIOD). The following code downloads the data from the project’s website, unzips it and loads the resulting STATA file into R using the readstata13 package.</description>
-    </item>
-    
-    <item>
-      <title>An Introduction to Impulse Response Analysis of VAR Models</title>
-      <link>https://www.r-econometrics.com/timeseries/irf/</link>
-      <pubDate>Sat, 23 Mar 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://www.r-econometrics.com/timeseries/irf/</guid>
-      <description>Impulse response analysis is an important step in econometric analyes, which employ vector autoregressive models. Their main purpose is to describe the evolution of a model’s variables in reaction to a shock in one or more variables. This feature allows to trace the transmission of a single shock within an otherwise noisy system of equations and, thus, makes them very useful tools in the assessment of economic policies. This post provides an introduction to the concept and interpretation of impulse response functions as they are commonly used in the VAR literature and provides code for their calculation in R.</description>
     </item>
     
     <item>

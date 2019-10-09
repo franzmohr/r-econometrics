@@ -88,7 +88,7 @@ if (!doNotTrack) {
 
   <meta
      name="description"
-     content=""
+     content="An introduction to the concept of impulse response functions (IRFs) for linear multivariate models, the related identification problem and potential approaches to solve it. The post also illustrates how to generate different impulse response function in R using the vars and urca package."
    />
 
     <div class="container">
@@ -114,7 +114,7 @@ if (!doNotTrack) {
                             
                         </span>
                          - 
-                        <time class="li-article-date">Franz X. Mohr, March 23, 2019
+                        <time class="li-article-date">Franz X. Mohr, October 9, 2019
                         </time>
                     </header>
                     <section>
@@ -142,7 +142,8 @@ data &lt;- diff(log(data))
 plot(data,  main = &quot;Dataset E1 from Lütkepohl (2007)&quot;)</code></pre>
 <p><img src="/timeseries/irf_files/figure-html/data-1.png" width="528" /></p>
 <p>This data is used to estimate a VAR(2) model with a constant term:</p>
-<p><span class="math display">\[ y_t = v + \sum_{i = 1}^{2} A_i y_{t-i} + u_t,\]</span> where <span class="math inline">\(u_t \sim N(0, \Sigma)\)</span>.</p>
+<p><span class="math display">\[ y_t = v + \sum_{i = 1}^{2} A_i y_{t-i} + u_t,\]</span>
+where <span class="math inline">\(u_t \sim N(0, \Sigma)\)</span>.</p>
 </div>
 <div id="estimation" class="section level3">
 <h3>Estimation</h3>
@@ -159,8 +160,10 @@ summary(model)</code></pre>
 </div>
 <div id="forecast-error-impulse-response" class="section level3">
 <h3>Forecast error impulse response</h3>
-<p>Since all variables in a VAR model depend on each other, individual coefficient estimates only provide limited information on the reaction of the system to a shock. In order to get a better picture of the model’s dynamic behaviour, <em>impulse responses</em> (IR) are used. The departure point of every impluse reponse function for a linear VAR model is its moving average (MA) representation, which is also the forecast error impulse response (FEIR) function. Mathematically, the FEIR <span class="math inline">\(\Phi_i\)</span> for the <span class="math inline">\(i\)</span>th period after the shock is obtained by <span class="math display">\[\Phi_i = \sum_{j = 1}^{i} \Phi_{j-1} A_j, \ \  i = 1, 2, ...\]</span> with <span class="math inline">\(\Phi_0 = I_{K}\)</span> and <span class="math inline">\(A_j = 0 \text{ for } j&gt;p\)</span>, where <span class="math inline">\(K\)</span> is the number of endogenous variables and <span class="math inline">\(p\)</span> is the lag order of the VAR model.</p>
-<p>In R the <code>irf</code> function of the <code>vars</code> package can be used to obtain forecast error impulse responses. The following code calculates and plots the estimated response of consumption to a forecast error impulse in income with bootstrapped error bands<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>:</p>
+<p>Since all variables in a VAR model depend on each other, individual coefficient estimates only provide limited information on the reaction of the system to a shock. In order to get a better picture of the model’s dynamic behaviour, <em>impulse responses</em> (IR) are used. The departure point of every impluse reponse function for a linear VAR model is its moving average (MA) representation, which is also the forecast error impulse response (FEIR) function. Mathematically, the FEIR <span class="math inline">\(\Phi_i\)</span> for the <span class="math inline">\(i\)</span>th period after the shock is obtained by
+<span class="math display">\[\Phi_i = \sum_{j = 1}^{i} \Phi_{j-1} A_j, \ \  i = 1, 2, ...\]</span>
+with <span class="math inline">\(\Phi_0 = I_{K}\)</span> and <span class="math inline">\(A_j = 0 \text{ for } j&gt;p\)</span>, where <span class="math inline">\(K\)</span> is the number of endogenous variables and <span class="math inline">\(p\)</span> is the lag order of the VAR model.</p>
+<p>In R the <code>irf</code> function of the <code>vars</code> package can be used to obtain forecast error impulse responses. The following code calculates and plots the estimated response of consumption to a forecast error impulse in income with bootstrapped error bands<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>:</p>
 <pre class="r"><code>feir &lt;- irf(model, impulse = &quot;income&quot;, response = &quot;cons&quot;,
              n.ahead = 8, ortho = FALSE, runs = 1000)
 
@@ -187,7 +190,8 @@ model_summary$covres</code></pre>
 ## cons   0.2827548 0.5552611 1.0000000</code></pre>
 <p>However, those matrices only describe the correlation between the errors, but it remains unclear in which direction the causalities go. <em>Identifying</em> these causal relationships is one of the main challenges of any VAR analysis.</p>
 <p>Regardless of the specific methods used to identify the shocks of a linear VAR model, further information on contemporaneous relationships can be introduced to the FEIR by simply multiplying it by a matrix <span class="math inline">\(F\)</span>:</p>
-<p><span class="math display">\[\Theta_i = \Phi_i F\]</span> for <span class="math inline">\(i = 0, 1, ...\)</span>. In the following some methodes to find <span class="math inline">\(F\)</span> and their corresponding impulse responses are presented.</p>
+<p><span class="math display">\[\Theta_i = \Phi_i F\]</span>
+for <span class="math inline">\(i = 0, 1, ...\)</span>. In the following some methodes to find <span class="math inline">\(F\)</span> and their corresponding impulse responses are presented.</p>
 </div>
 <div id="orthogonal-impulse-responses" class="section level3">
 <h3>Orthogonal impulse responses</h3>
@@ -210,13 +214,15 @@ plot(oir)</code></pre>
 <div id="strucual-impulse-responses" class="section level3">
 <h3>Strucual impulse responses</h3>
 <p>Structural impulse responses (SIR) already take the identification problem into account during the estimation of the VAR model. For the structrual vector autoregressive (SVAR) model</p>
-<p><span class="math display">\[ A_0 y_t = v + \sum_{i = 1}^{2} A_i y_{t-i} + \epsilon_t,\]</span> where <span class="math inline">\(\epsilon_t \sim N(0, \Omega)\)</span> with <span class="math inline">\(\Omega\)</span> as a diagonal matrix of variances and <span class="math inline">\(A_0\)</span> as lower triangular matrix with ones on its main diagonal the structural impulse response function becomes</p>
+<p><span class="math display">\[ A_0 y_t = v + \sum_{i = 1}^{2} A_i y_{t-i} + \epsilon_t,\]</span>
+where <span class="math inline">\(\epsilon_t \sim N(0, \Omega)\)</span> with <span class="math inline">\(\Omega\)</span> as a diagonal matrix of variances and <span class="math inline">\(A_0\)</span> as lower triangular matrix with ones on its main diagonal the structural impulse response function becomes</p>
 <p><span class="math display">\[\Theta^s_i = \Phi_i A_0^{-1}\]</span></p>
 </div>
 <div id="generalised-impulse-responses" class="section level3">
 <h3>Generalised impulse responses</h3>
 <p>Both orthogonal and structural impulse responses are constrained either by finding the right order of variables or by the identification of the estimated structural parameters. Koop et al. (1996) and Koop et al. (1998) propose a different kind of impulse response function, so-called generalised impulse responses (GIR). They are independent of the variable order, because they integrate the effects of other shocks out of the response. Mathematically, this is achieved in the following way:</p>
-<p><span class="math display">\[\Theta^g_i = \Phi_i \sigma_{jj}^{-\frac{1}{2}} \Sigma,\]</span> where <span class="math inline">\(\sigma_{jj}\)</span> is the variance of the <span class="math inline">\(j\)</span>th variable.</p>
+<p><span class="math display">\[\Theta^g_i = \Phi_i \sigma_{jj}^{-\frac{1}{2}} \Sigma,\]</span>
+where <span class="math inline">\(\sigma_{jj}\)</span> is the variance of the <span class="math inline">\(j\)</span>th variable.</p>
 <p>GIRs are very useful in the case of large systems, where structual relationships are hard to identify. They cannot really be interpreted as structural impulse responses, but they provide an accurate depiction of the historic development of the variable.</p>
 </div>
 <div id="references" class="section level3">
@@ -229,7 +235,7 @@ plot(oir)</code></pre>
 <div class="footnotes">
 <hr />
 <ol>
-<li id="fn1"><p>In chapter 3 of Lütkephol (2007) so-called asymptotic error bounds are presented, which can be calculated analytically. By contrast, <code>vars::irf</code> uses bootstrapped error bands, which is a common method to obtain test statistics and impulse repsonses. Basically, bootstrapping means that the model is repeatedly estimated using artificial samples, which are derived from the original model results. For each round of the bootstrapping algorithm IRFs can be obtained (along with other statistics of interest). The resulting distribution of IRFs can then be cut to obtain the error band of the point estimate. This error band is usually close to the analytical error band.<a href="#fnref1">↩</a></p></li>
+<li id="fn1"><p>In chapter 3 of Lütkephol (2007) so-called asymptotic error bounds are presented, which can be calculated analytically. By contrast, <code>vars::irf</code> uses bootstrapped error bands, which is a common method to obtain test statistics and impulse repsonses. Basically, bootstrapping means that the model is repeatedly estimated using artificial samples, which are derived from the original model results. For each round of the bootstrapping algorithm IRFs can be obtained (along with other statistics of interest). The resulting distribution of IRFs can then be cut to obtain the error band of the point estimate. This error band is usually close to the analytical error band.<a href="#fnref1" class="footnote-back">↩</a></p></li>
 </ol>
 </div>
 
