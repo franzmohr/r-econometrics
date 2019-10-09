@@ -29,5 +29,14 @@
       <description>One of the prerequisits for the estimation of a vector autoregressive (VAR) model is that the analysed time series are stationary. However, economic theory suggests that there exist equilibrium relations between economic variables in their levels, which can render these variables stationary without taking differences. This is called cointegration. Since knowing the size of such relationships can improve the results of an analysis, it would be desireable to have an econometric model, which is able to capture them.</description>
     </item>
     
+    <item>
+      <title>An Introduction to Vector Autoregression (VAR)</title>
+      <link>https://www.r-econometrics.com/timeseries/varintro/</link>
+      <pubDate>Fri, 31 Aug 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/timeseries/varintro/</guid>
+      <description>Since the seminal paper of Sims (1980) vector autoregressive models have become a key instrument in macroeconomic research. This post presents the basic concept of VAR analysis and guides through the estimation procedure of a simple model. When I started my undergraduate program in economics I occasionally encountered the abbreviation VAR in some macro papers. I was fascinated by those waves in the boxes titled impulse responses and wondered how difficult it would be to do such reseach on my own.</description>
+    </item>
+    
   </channel>
 </rss>

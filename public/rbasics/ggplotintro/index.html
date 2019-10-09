@@ -19,7 +19,7 @@ if (!doNotTrack) {
         <meta http-equiv="content-type" content="text/html; charset=utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
 
-        <title>Graphics with ggplot2 &middot; r-econometrics</title>
+        <title>Data Visualisation in R Using ggplot2 &middot; r-econometrics</title>
         <link rel='stylesheet' href='//fonts.googleapis.com/css?family=Open+Sans:400,300,600' type='text/css'>
         <link rel="stylesheet" href="https://www.r-econometrics.com//libraries/normalize.3.0.1.css" />
         <link rel="stylesheet" href="https://www.r-econometrics.com//css/liquorice.css" />
@@ -88,7 +88,7 @@ if (!doNotTrack) {
 
   <meta
      name="description"
-     content=""
+     content="A short introduction to data visualisation in R using the ggplot2 package. It presents the main function of the package and illustrates their use with a simple example."
    />
 
     <div class="container">
@@ -96,7 +96,7 @@ if (!doNotTrack) {
             <div class="sixteen columns">
                 <article class="li-article">
                     <header class="li-article-header">
-                        <h1 class="li-article-title">Graphics with ggplot2</h1>
+                        <h1 class="li-article-title">Data Visualisation in R Using ggplot2</h1>
                         <span class="li-article-taxonomies">
                             
 
@@ -105,22 +105,22 @@ if (!doNotTrack) {
                                 
                                     <a href="https://www.r-econometrics.com//tags/ggplot2">ggplot2</a>
                                 
-                                    <a href="https://www.r-econometrics.com//tags/r">R</a>
+                                    <a href="https://www.r-econometrics.com//tags/r">r</a>
                                 
                                     <a href="https://www.r-econometrics.com//tags/graphics">graphics</a>
                                 
                             
                         </span>
                          - 
-                        <time class="li-article-date">Franz Mohr, February 4, 2018
+                        <time class="li-article-date">Franz X. Mohr, February 4, 2018
                         </time>
                     </header>
                     <section>
                         
 
 
-<p>A major challenge in data analysis is to summarise and present data with informative graphs. The <code>ggplot2</code> package was specifically designed to help with this task. Since it is a very powerful and well documented package<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>, this introduction will only focus on its basic syntax, so that the user gets a better understanding of how to read the supporting material on the internet.</p>
-<p>ggplot graphs are built with some kind of blocks, which usually start with the function <code>ggplot</code>. Its first argument contains the data object and the second argument is a further function called <code>aes</code>.<a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a> It controls, which columns of the data frame are used for the axes, colours, shapes of the data points and further features of the graph. The remaining blocks are separated by plus <code>+</code> signs and – if not specified otherwise – take the information from the first block and add a certain aspect to the graph, for example additional lines or data points. To understand what this all means, let us look at some basic examples.</p>
+<p>A major challenge in data analysis is to summarise and present data with informative graphs. The <code>ggplot2</code> package was specifically designed to help with this task. Since it is a very powerful and well documented package<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>, this introduction will only focus on its basic syntax, so that the user gets a better understanding of how to read the supporting material on the internet.</p>
+<p>ggplot graphs are built with some kind of blocks, which usually start with the function <code>ggplot</code>. Its first argument contains the data object and the second argument is a further function called <code>aes</code>.<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a> It controls, which columns of the data frame are used for the axes, colours, shapes of the data points and further features of the graph. The remaining blocks are separated by plus <code>+</code> signs and – if not specified otherwise – take the information from the first block and add a certain aspect to the graph, for example additional lines or data points. To understand what this all means, let us look at some basic examples.</p>
 <pre class="r"><code>library(ggplot2)
 library(pwt9)
 data &lt;- pwt9.0
@@ -252,8 +252,8 @@ g # Plot graph</code></pre>
 <div class="footnotes">
 <hr />
 <ol>
-<li id="fn1"><p>Beside the help function in R the <a href="http://ggplot2.tidyverse.org/reference/">website of the <code>ggplot2</code> package</a> contains very good documentation and examples of the package’s functions. There is also a <a href="https://www.rstudio.com/resources/cheatsheets/">cheatsheet on the website of RStudio</a>.<a href="#fnref1">↩</a></p></li>
-<li id="fn2"><p>This is short for “aesthetic mappings”.<a href="#fnref2">↩</a></p></li>
+<li id="fn1"><p>Beside the help function in R the <a href="http://ggplot2.tidyverse.org/reference/">website of the <code>ggplot2</code> package</a> contains very good documentation and examples of the package’s functions. There is also a <a href="https://www.rstudio.com/resources/cheatsheets/">cheatsheet on the website of RStudio</a>.<a href="#fnref1" class="footnote-back">↩</a></p></li>
+<li id="fn2"><p>This is short for “aesthetic mappings”.<a href="#fnref2" class="footnote-back">↩</a></p></li>
 </ol>
 </div>
 
