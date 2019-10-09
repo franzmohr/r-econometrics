@@ -20,7 +20,8 @@ data_aut &lt;- data[data$isocode == &quot;AUT&quot;,]</code></pre>
 <div id="line-plots" class="section level2">
 <h2>Line plots</h2>
 <p>In order to plot the time series of the Austrian GDP per capita we use the following code:</p>
-<pre class="r"><code>data_aut &lt;- cbind(data_aut, &quot;GDP.pc&quot; = data_aut$rgdpe/data_aut$pop)
+<pre class="r"><code>data_aut &lt;- cbind(data_aut, &quot;GDP.pc&quot; = data_aut$rgdpe / data_aut$pop)
+
 ggplot(data_aut, aes(x = year, y = GDP.pc)) +
   geom_line()</code></pre>
 <p><img src="/rbasics/ggplotintro_files/figure-html/unnamed-chunk-1-1.png" width="384" /></p>
@@ -30,10 +31,11 @@ ggplot(data_aut, aes(x = year, y = GDP.pc)) +
 <p>Note that it was not necessary here to write <code>data = data_aut</code> to specify the data used for the graph and – unless the column names contain spaces – it is not necessary to write the variable names in quotations marks neither. However, if you want to add a title manually, quotation marks still will be required. But do not worry. If this requirement is not met, R will give an error message anyway.</p>
 <p>Note that in a lot of examples on the internet the first block of a ggplot graph is saved as a separate object. This can be very convenient, if somebody wanted to try out different graph specifications with the same data. In our time series example this could look like this:</p>
 <pre class="r"><code>g &lt;- ggplot(data_aut, aes(x = year, y = GDP.pc))
+
 g + geom_line()</code></pre>
 <p>The layout of the current graph does not look very appealing. But this can be changed relatively quickly with some more blocks. In the following code the explanation of each line is given in the form of a comment.</p>
 <pre class="r"><code># Specify the data and rescale the values of the y axis
-ggplot(data_aut, aes(x = year, y = GDP.pc/1000)) +
+ggplot(data_aut, aes(x = year, y = GDP.pc / 1000)) +
   geom_line() + # Add a line to the plot
   labs(title = &quot;GDP per Capita (Austria)&quot;, # Add a title
        caption = &quot;Source: Penn World Table 9.0.&quot;, # Add a caption at the bottom
@@ -45,7 +47,7 @@ ggplot(data_aut, aes(x = year, y = GDP.pc/1000)) +
 data_multi &lt;- cbind(data_multi, &quot;GDP.pc&quot; = data_multi$rgdpe/data_multi$pop)
 
 # Specify the data and rescale the values of the y axis
-ggplot(data_multi, aes(x = year, y = GDP.pc/1000, colour = country)) + 
+ggplot(data_multi, aes(x = year, y = GDP.pc / 1000, colour = country)) + 
   geom_line() + # Add a line to the plot
   # The function labs allows to add and change labels like a title
   labs(title = &quot;GDP per Capita&quot;,
@@ -58,7 +60,7 @@ ggplot(data_multi, aes(x = year, y = GDP.pc/1000, colour = country)) +
 <p><img src="/rbasics/ggplotintro_files/figure-html/unnamed-chunk-4-1.png" width="384" /></p>
 <p>If you do not want to use colours, but instead prefer different line types to separate the countries’ values, this can be done by replacing the <code>colour</code> argument with <code>linetype</code>. Furthermore, you can rename the title of the legend with the <code>scale_abc_xyz</code> function by specifying the <code>name</code> argument, i.e. <code>scale_linetype_discrete(name = &quot;Country&quot;)</code> in this example.</p>
 <pre class="r"><code># Specify the data and rescale the values of the y axis
-ggplot(data_multi, aes(x = year, y = GDP.pc/1000, linetype = country)) + 
+ggplot(data_multi, aes(x = year, y = GDP.pc / 1000, linetype = country)) + 
   geom_line() + # Add a line to the plot
   labs(title = &quot;GDP per Capita&quot;, # Add a title
        subtitle = &quot;In thousand Dollars&quot;, # Add a subtitle
@@ -73,16 +75,17 @@ ggplot(data_multi, aes(x = year, y = GDP.pc/1000, linetype = country)) +
 <h2>Bar charts</h2>
 <p>Another popular type of graphs are bar charts, which can be useful when the share of single components in an aggregate are of interest. In the following example a new data frame is created, which contains real GDP values for Austria, France, Germany and Switzerland from the year 2000 until 2013. Afterwards the bar chart is created. Again, nearly the same code as in the previous sub-section is used.</p>
 <pre class="r"><code>library(dplyr)
+
 # Extract data
 data_gdp &lt;- data %&gt;% 
-  filter(country%in%c(&quot;Austria&quot;, &quot;France&quot;, &quot;Germany&quot;, &quot;Switzerland&quot;),
+  filter(country %in% c(&quot;Austria&quot;, &quot;France&quot;, &quot;Germany&quot;, &quot;Switzerland&quot;),
          year &gt;= 2000, year &lt;= 2013) %&gt;% 
   select(year, country, rgdpe) %&gt;% # Select the relevant columns
   rename(Year = year, Country = country, GDP = rgdpe) # Rename columns
 
 # Create graph
 # Specify the data and rescale the values of the y axis
-ggplot(data_gdp, aes(x = Year, y = GDP/1000, fill = Country)) +
+ggplot(data_gdp, aes(x = Year, y = GDP / 1000, fill = Country)) +
   geom_bar(stat = &quot;identity&quot;) + # Add bars to the plot
   labs(title = &quot;GDP&quot;, # Add a title
        subtitle = &quot;In billion Dollars&quot;, # Add a subtitle
