@@ -389,7 +389,10 @@ anova(lm.7.10,lm.7.10.t)</code></pre>
 <pre class="r"><code># Example 7.11
 data(&quot;mlb1&quot;)
 
-lm.7.11 &lt;- lm(lsalary ~ years + gamesyr + bavg + hrunsyr + rbisyr + runsyr + fldperc + allstar + black + hispan + blckpb + hispph, data = mlb1)
+lm.7.11 &lt;- lm(lsalary ~ years + gamesyr + bavg + hrunsyr + 
+                rbisyr + runsyr + fldperc + allstar + 
+                black + hispan + blckpb + hispph, data = mlb1)
+
 summary(lm.7.11)</code></pre>
 <pre><code>## 
 ## Call:
@@ -426,7 +429,9 @@ summary(lm.7.11)</code></pre>
 <pre class="r"><code># Equation 7.22
 data(&quot;gpa3&quot;)
 
-lm.e7.22 &lt;- lm(cumgpa ~ female + sat + I(female*sat) + hsperc + I(female*hsperc) + tothrs + I(female*tothrs), data = gpa3[gpa3$term==2,])
+lm.e7.22 &lt;- lm(cumgpa ~ female + sat + I(female*sat) + 
+                 hsperc + I(female*hsperc) + 
+                 tothrs + I(female*tothrs), data = gpa3[gpa3$term==2,])
 
 summary(lm.e7.22)</code></pre>
 <pre><code>## 
@@ -458,7 +463,8 @@ summary(lm.e7.22)</code></pre>
 <pre class="r"><code># Equation 7.29
 data(&quot;mroz&quot;)
 
-lm.e7.29 &lt;- lm(inlf ~ nwifeinc + educ + exper + expersq + age + kidslt6 + kidsge6, data = mroz)
+lm.e7.29 &lt;- lm(inlf ~ nwifeinc + educ + exper + expersq + 
+                 age + kidslt6 + kidsge6, data = mroz)
 
 summary(lm.e7.29)</code></pre>
 <pre><code>## 
@@ -492,6 +498,7 @@ data(&quot;crime1&quot;)
 arr86 &lt;- as.numeric(crime1$narr86 &gt; 0)
 
 lm.7.12 &lt;- lm(arr86 ~ pcnv + avgsen + tottime + ptime86 + qemp86, data = crime1)
+
 summary(lm.7.12)</code></pre>
 <pre><code>## 
 ## Call:
@@ -517,7 +524,9 @@ summary(lm.7.12)</code></pre>
 ## Multiple R-squared:  0.04735,    Adjusted R-squared:  0.0456 
 ## F-statistic: 27.03 on 5 and 2719 DF,  p-value: &lt; 2.2e-16</code></pre>
 <pre class="r"><code># Equation 7.23
-lm.e7.23 &lt;- lm(arr86 ~ pcnv + avgsen + tottime + ptime86 + qemp86 + black + hispan, data = crime1)
+lm.e7.23 &lt;- lm(arr86 ~ pcnv + avgsen + tottime + ptime86 + qemp86 + 
+                 black + hispan, data = crime1)
+
 summary(lm.e7.23)</code></pre>
 <pre><code>## 
 ## Call:
@@ -546,6 +555,7 @@ summary(lm.e7.23)</code></pre>
 ## F-statistic: 28.41 on 7 and 2717 DF,  p-value: &lt; 2.2e-16</code></pre>
 <pre class="r"><code># Equation 7.33
 lm.e7.33 &lt;- lm(lscrap ~ grant + lsales + lemploy, data = jtrain[jtrain$d88 == 1,])
+
 summary(lm.e7.33)</code></pre>
 <pre><code>## 
 ## Call:
@@ -573,6 +583,7 @@ summary(lm.e7.33)</code></pre>
 data(&quot;fertil2&quot;)
 
 lm.e7.35 &lt;- lm(children ~ age + educ, data = fertil2)
+
 summary(lm.e7.35)</code></pre>
 <pre><code>## 
 ## Call:
@@ -595,6 +606,7 @@ summary(lm.e7.35)</code></pre>
 ## F-statistic:  2768 on 2 and 4358 DF,  p-value: &lt; 2.2e-16</code></pre>
 <pre class="r"><code># Equation 7.37
 lm.e7.37 &lt;- lm(children ~ age + educ + electric, data = fertil2)
+
 summary(lm.e7.37)</code></pre>
 <pre><code>## 
 ## Call:
