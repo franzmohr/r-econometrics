@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>urca on r-econometrics</title>
+    <link>https://www.r-econometrics.com/tags/urca/</link>
+    <description>Recent content in urca on r-econometrics</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 22 Jul 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://www.r-econometrics.com/tags/urca/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>An Introduction to Vector Error Correction Models (VECMs)</title>
+      <link>https://www.r-econometrics.com/timeseries/vecintro/</link>
+      <pubDate>Mon, 22 Jul 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/timeseries/vecintro/</guid>
+      <description>One of the prerequisits for the estimation of a vector autoregressive (VAR) model is that the analysed time series are stationary. However, economic theory suggests that there exist equilibrium relations between economic variables in their levels, which can render these variables stationary without taking differences. This is called cointegration. Since knowing the size of such relationships can improve the results of an analysis, it would be desireable to have an econometric model, which is able to capture them.</description>
+    </item>
+    
+  </channel>
+</rss>
