@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Tags on r-econometrics</title>
@@ -6,10 +6,37 @@
     <description>Recent content in Tags on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 09 Oct 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 18 Nov 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://www.r-econometrics.com/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>F-test</title>
+      <link>https://www.r-econometrics.com/tags/f-test/</link>
+      <pubDate>Mon, 18 Nov 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/tags/f-test/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>normality-test</title>
+      <link>https://www.r-econometrics.com/tags/normality-test/</link>
+      <pubDate>Mon, 18 Nov 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/tags/normality-test/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>t-test</title>
+      <link>https://www.r-econometrics.com/tags/t-test/</link>
+      <pubDate>Mon, 18 Nov 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/tags/t-test/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>irf</title>
@@ -309,15 +336,6 @@
     </item>
     
     <item>
-      <title>F-test</title>
-      <link>https://www.r-econometrics.com/tags/f-test/</link>
-      <pubDate>Mon, 24 Dec 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://www.r-econometrics.com/tags/f-test/</guid>
-      <description></description>
-    </item>
-    
-    <item>
       <title>heteroskedasticity</title>
       <link>https://www.r-econometrics.com/tags/heteroskedasticity/</link>
       <pubDate>Mon, 24 Dec 2018 00:00:00 +0000</pubDate>
@@ -332,15 +350,6 @@
       <pubDate>Mon, 24 Dec 2018 00:00:00 +0000</pubDate>
       
       <guid>https://www.r-econometrics.com/tags/robust-error/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>t-test</title>
-      <link>https://www.r-econometrics.com/tags/t-test/</link>
-      <pubDate>Mon, 24 Dec 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://www.r-econometrics.com/tags/t-test/</guid>
       <description></description>
     </item>
     

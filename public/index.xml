@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>r-econometrics</title>
@@ -6,10 +6,19 @@
     <description>Recent content on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 09 Oct 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 18 Nov 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://www.r-econometrics.com/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Model Testing in R</title>
+      <link>https://www.r-econometrics.com/methods/teststats/</link>
+      <pubDate>Mon, 18 Nov 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/methods/teststats/</guid>
+      <description>Model testing belongs to the main tasks of any econometric analysis. This post gives an overview of tests, which should be applied to OLS regressions, and illustrates how to calculate them in R. The focus of the post is rather on the calcuation of the tests. For a treatment of mathematical details, please, consult a standard textbook. This list of statistical tests is necessarily incomplete. However, if you have a strong opinion that a specific test is missing, feel free to leave a comment below.</description>
+    </item>
     
     <item>
       <title>An Introduction to Impulse Response Analysis of VAR Models</title>
