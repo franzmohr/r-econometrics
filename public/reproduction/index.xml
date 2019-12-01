@@ -6,10 +6,20 @@
     <description>Recent content in Reproductions on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 20 May 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 01 Dec 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://www.r-econometrics.com/reproduction/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Chapter 18: State Space and Unobserved Components Models</title>
+      <link>https://www.r-econometrics.com/reproduction/bayesmethods/bayesmethods18/</link>
+      <pubDate>Sun, 01 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/reproduction/bayesmethods/bayesmethods18/</guid>
+      <description>Exercise 18.1: The local level model Data: US PCE inflation until 2015Q4 # Specify URL url &amp;lt;- &amp;quot;https://web.ics.purdue.edu/~jltobias/second_edition/Chapter18/code_for_exercise_1/USPCE_2015Q4.csv&amp;quot; # Load data pce &amp;lt;- read.csv(url, header = FALSE, col.names = &amp;quot;pci&amp;quot;) # Log growth rates pce &amp;lt;- diff(ts(log(pce), start = 1959, frequency = 4)) # Rescale y &amp;lt;- matrix(pce * 100 * 4, 1) tt &amp;lt;- ncol(y) # T z &amp;lt;- diag(1, tt) # Data matrix  Estimation Prior
+a0 &amp;lt;- 5 b0 &amp;lt;- 100 Initial values</description>
+    </item>
     
     <item>
       <title>Reproduction: Timmer, M. P., Dietzenbacher, E., Los, B., Stehrer, R., &amp; De Vries, G. J. (2015). An illustrated user guide to the world input–output database: the case of global automotive production.</title>
@@ -19,6 +29,16 @@
       <guid>https://www.r-econometrics.com/reproduction/2015_timmer_wiod/</guid>
       <description>As international trade has become increasingly fragmented over the past decades the analysis of global value chains (GVC) has gained popularity in economic research. This post reproduces Timmer et al. (2015), who introduce the world input-output database (WIOD) and present basic concepts of GVC analysis.
 Data Timmer et al. (2015) use the 2013 vintage of the world input-output database (WIOD). The following code downloads the data from the project’s website, unzips it and loads the resulting STATA file into R using the readstata13 package.</description>
+    </item>
+    
+    <item>
+      <title>Chan et al. (2019): Bayesian Econometric Methods</title>
+      <link>https://www.r-econometrics.com/reproduction/bayesmethods/bayesmethodsintro/</link>
+      <pubDate>Sat, 01 Dec 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/reproduction/bayesmethods/bayesmethodsintro/</guid>
+      <description>This section is based on Chan et al. (2019). Bayesian econometric methods (2nded.). The following links contain examples in the main text of the book and use R to estimate the models.
+Chapter 18: State Space and Unobserved Components Models</description>
     </item>
     
     <item>

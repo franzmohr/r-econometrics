@@ -6,10 +6,29 @@
     <description>Recent content on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 09 Oct 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 01 Dec 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://www.r-econometrics.com/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Chapter 18: State Space and Unobserved Components Models</title>
+      <link>https://www.r-econometrics.com/reproduction/bayesmethods/bayesmethods18/</link>
+      <pubDate>Sun, 01 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/reproduction/bayesmethods/bayesmethods18/</guid>
+      <description>Exercise 18.1: The local level model Data: US PCE inflation until 2015Q4 # Specify URL url &amp;lt;- &amp;quot;https://web.ics.purdue.edu/~jltobias/second_edition/Chapter18/code_for_exercise_1/USPCE_2015Q4.csv&amp;quot; # Load data pce &amp;lt;- read.csv(url, header = FALSE, col.names = &amp;quot;pci&amp;quot;) # Log growth rates pce &amp;lt;- diff(ts(log(pce), start = 1959, frequency = 4)) # Rescale y &amp;lt;- matrix(pce * 100 * 4, 1) tt &amp;lt;- ncol(y) # T z &amp;lt;- diag(1, tt) # Data matrix  Estimation Prior
+a0 &amp;lt;- 5 b0 &amp;lt;- 100 Initial values</description>
+    </item>
+    
+    <item>
+      <title>Standard Tests for OLS Models in R</title>
+      <link>https://www.r-econometrics.com/methods/teststats/</link>
+      <pubDate>Mon, 25 Nov 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/methods/teststats/</guid>
+      <description>Model testing belongs to the main tasks of any econometric analysis. This post gives an overview of tests, which should be applied to OLS regressions, and illustrates how to calculate them in R. The focus of the post is rather on the calcuation of the tests. For a treatment of mathematical details, please, consult a standard textbook. This list of statistical tests is necessarily incomplete. However, if you have a strong opinion that a specific test is missing, feel free to leave a comment below.</description>
+    </item>
     
     <item>
       <title>An Introduction to Impulse Response Analysis of VAR Models</title>
@@ -175,6 +194,16 @@ Data A popular illustration of heteroskedasticity is the relationship between sa
     </item>
     
     <item>
+      <title>Chan et al. (2019): Bayesian Econometric Methods</title>
+      <link>https://www.r-econometrics.com/reproduction/bayesmethods/bayesmethodsintro/</link>
+      <pubDate>Sat, 01 Dec 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/reproduction/bayesmethods/bayesmethodsintro/</guid>
+      <description>This section is based on Chan et al. (2019). Bayesian econometric methods (2nded.). The following links contain examples in the main text of the book and use R to estimate the models.
+Chapter 18: State Space and Unobserved Components Models</description>
+    </item>
+    
+    <item>
       <title>Chapter 8: Heteroskedasticity</title>
       <link>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge08/</link>
       <pubDate>Sat, 01 Dec 2018 00:00:00 +0000</pubDate>
@@ -257,10 +286,10 @@ lm.12.1.1 &amp;lt;- lm(inf ~ unem, data = phillips) res.static &amp;lt;- lm.12.1
       <pubDate>Sun, 07 Oct 2018 00:00:00 +0000</pubDate>
       
       <guid>https://www.r-econometrics.com/reproductionintro/</guid>
-      <description>Cincera, M. (1997). Patents, R&amp;amp;D, and technological spillovers at the firm level. 12, 265-280.
+      <description>Chan, J. C. C., Koop, G., Poirier, D. J., &amp;amp; Tobias, J. L. (2019). Bayesian econometric methods.
+Cincera, M. (1997). Patents, R&amp;amp;D, and technological spillovers at the firm level. 12, 265-280.
 Sheperd, B. (2016) The gravity model of international trade: A user guide.
-Timmer, M. P., Dietzenbacher, E., Los, B., Stehrer, R., &amp;amp; de Vries, G. J. (2015). An Illustrated User Guide to the World Input–Output Database: the Case of Global Automotive Production.
-Wooldridge, J. M. (2013) Introductory econometrics.</description>
+Timmer, M. P., Dietzenbacher, E., Los, B., Stehrer, R., &amp;amp; de Vries, G. J. (2015). An Illustrated User Guide to the World Input–Output Database: the Case of Global Automotive Production.</description>
     </item>
     
     <item>

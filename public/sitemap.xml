@@ -3,6 +3,51 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://www.r-econometrics.com/reproduction/bayesmethods/bayesmethods18/</loc>
+    <lastmod>2019-12-01T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/</loc>
+    <lastmod>2019-12-01T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/reproduction/</loc>
+    <lastmod>2019-12-01T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/f-test/</loc>
+    <lastmod>2019-11-25T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/methods/</loc>
+    <lastmod>2019-11-25T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/normality-test/</loc>
+    <lastmod>2019-11-25T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/methods/teststats/</loc>
+    <lastmod>2019-11-25T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/t-test/</loc>
+    <lastmod>2019-11-25T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/</loc>
+    <lastmod>2019-11-25T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://www.r-econometrics.com/timeseries/irf/</loc>
     <lastmod>2019-10-09T00:00:00+00:00</lastmod>
   </url>
@@ -14,16 +59,6 @@
   
   <url>
     <loc>https://www.r-econometrics.com/tags/r/</loc>
-    <lastmod>2019-10-09T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/</loc>
-    <lastmod>2019-10-09T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/tags/</loc>
     <lastmod>2019-10-09T00:00:00+00:00</lastmod>
   </url>
   
@@ -173,11 +208,6 @@
   </url>
   
   <url>
-    <loc>https://www.r-econometrics.com/reproduction/</loc>
-    <lastmod>2019-05-20T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://www.r-econometrics.com/2018/12/30/an-exercise-in-growth-accounting/</loc>
     <lastmod>2018-12-30T00:00:00+00:00</lastmod>
   </url>
@@ -273,11 +303,6 @@
   </url>
   
   <url>
-    <loc>https://www.r-econometrics.com/tags/f-test/</loc>
-    <lastmod>2018-12-24T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://www.r-econometrics.com/tags/heteroskedasticity/</loc>
     <lastmod>2018-12-24T00:00:00+00:00</lastmod>
   </url>
@@ -288,18 +313,13 @@
   </url>
   
   <url>
-    <loc>https://www.r-econometrics.com/methods/</loc>
-    <lastmod>2018-12-24T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://www.r-econometrics.com/tags/robust-error/</loc>
     <lastmod>2018-12-24T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://www.r-econometrics.com/tags/t-test/</loc>
-    <lastmod>2018-12-24T00:00:00+00:00</lastmod>
+    <loc>https://www.r-econometrics.com/reproduction/bayesmethods/bayesmethodsintro/</loc>
+    <lastmod>2018-12-01T00:00:00+00:00</lastmod>
   </url>
   
   <url>

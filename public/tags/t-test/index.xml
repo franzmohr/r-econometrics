@@ -6,10 +6,19 @@
     <description>Recent content in t-test on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 24 Dec 2018 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 25 Nov 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://www.r-econometrics.com/tags/t-test/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Standard Tests for OLS Models in R</title>
+      <link>https://www.r-econometrics.com/methods/teststats/</link>
+      <pubDate>Mon, 25 Nov 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/methods/teststats/</guid>
+      <description>Model testing belongs to the main tasks of any econometric analysis. This post gives an overview of tests, which should be applied to OLS regressions, and illustrates how to calculate them in R. The focus of the post is rather on the calcuation of the tests. For a treatment of mathematical details, please, consult a standard textbook. This list of statistical tests is necessarily incomplete. However, if you have a strong opinion that a specific test is missing, feel free to leave a comment below.</description>
+    </item>
     
     <item>
       <title>Heteroskedasticity Robust Standard Errors in R</title>

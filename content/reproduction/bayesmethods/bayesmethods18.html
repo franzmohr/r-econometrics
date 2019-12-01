@@ -1,0 +1,224 @@
+---
+title: "Chapter 18: State Space and Unobserved Components Models"
+author: "Franz X. Mohr"
+date: "2019-12-01"
+---
+
+
+
+<div id="exercise-18.1-the-local-level-model" class="section level2">
+<h2>Exercise 18.1: The local level model</h2>
+<div id="data-us-pce-inflation-until-2015q4" class="section level3">
+<h3>Data: US PCE inflation until 2015Q4</h3>
+<pre class="r"><code># Specify URL
+url &lt;- &quot;https://web.ics.purdue.edu/~jltobias/second_edition/Chapter18/code_for_exercise_1/USPCE_2015Q4.csv&quot;
+
+# Load data
+pce &lt;- read.csv(url, header = FALSE, col.names = &quot;pci&quot;)
+
+# Log growth rates
+pce &lt;- diff(ts(log(pce), start = 1959, frequency = 4))
+
+# Rescale
+y &lt;- matrix(pce * 100 * 4, 1)
+tt &lt;- ncol(y) # T
+z &lt;- diag(1, tt) # Data matrix</code></pre>
+</div>
+<div id="estimation" class="section level3">
+<h3>Estimation</h3>
+<p>Prior</p>
+<pre class="r"><code>a0 &lt;- 5
+b0 &lt;- 100</code></pre>
+<p>Initial values</p>
+<pre class="r"><code>library(bvartools)
+library(Matrix)
+
+# Difference matrix
+H &lt;- diag(1, tt)
+diag(H[2:tt, 1:(tt - 1)]) &lt;- -1
+
+# (Inverse) variance of the measeurement equation
+sigma &lt;- var(c(y))
+sigma_i &lt;- solve(sigma)
+sigma_i &lt;- kronecker(diag(1, tt), sigma_i)
+
+# Inverse variance of the transition equation
+q_i &lt;- kronecker(diag(1, tt), 1 / 100)
+
+# Inital state
+tau0 &lt;- matrix(y[1])
+
+# Transform into sparse matrices so that function chan_jeliazkov can be used
+z &lt;- Matrix(z)
+H &lt;- Matrix(H)
+sigma_i &lt;- Matrix(sigma_i)
+q_i &lt;- Matrix(q_i)</code></pre>
+<p>Gibbs sampler</p>
+<pre class="r"><code>iterations &lt;- 21000
+burnin &lt;- 1000
+
+# Container for draws
+draws_tau &lt;- matrix(NA, tt, iterations - burnin)
+
+for (draw in 1:iterations) {
+  # Draw trend
+  temp &lt;- chan_jeliazkov(y, z, sigma_i, H, q_i, tau0)
+  a &lt;- temp$a
+  
+  # Draw measurement eq. variance
+  diag(sigma_i) &lt;- rgamma(1, shape = 3 + tt / 2, rate = 2 + tcrossprod(temp$u) / 2)
+  
+  # Draw transition eq. variance
+  w &lt;- a[, -1] - matrix(a0, 1, tt)
+  w &lt;- w %*% as.matrix(crossprod(H)) %*% t(w)
+  diag(q_i) &lt;- rgamma(1, shape = 3 + tt / 2, rate = 2 * .25^2 + w / 2)
+  
+  # Draw initial condition
+  K_tau0 &lt;- 1 / b0 + q_i[1, 1]
+  mu_tau0 &lt;- 1 / K_tau0 * (a0 / b0 + a[, 2] * q_i[1, 1])
+  tau0 &lt;- rnorm(1, mu_tau0, sqrt(1 / K_tau0))
+  
+  # Save draws
+  if (draw &gt; burnin) {
+    draws_tau[, draw - burnin] &lt;- a[, -1]
+  }
+}</code></pre>
+<p>Plot estimated prior mean of tau.</p>
+<pre class="r"><code>tau &lt;- apply(draws_tau, 1, mean) # Mean
+tau &lt;- cbind(c(y), tau) # Combine with original series
+tau &lt;- ts(tau, start = 1959, frequency = 4)
+
+plot(tau, plot.type = &quot;single&quot;, col = c(&quot;black&quot;, &quot;red&quot;),
+     ylim = c(-15, 20), ylab = &quot;&quot;)</code></pre>
+<p><img src="/reproduction/bayesmethods/bayesmethods18_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+</div>
+</div>
+<div id="exercise-18.2-estimating-the-output-gap" class="section level2">
+<h2>Exercise 18.2: Estimating the output gap</h2>
+<p>The approach follows Grant, A. L., &amp; Chan, J. C. C. (2017). Reconciling output gaps: Unobserved components model and Hodrick-Prescott filter, <em>Journal of Economic Dynamics and Control, 75</em>, 114-121.</p>
+<div id="data-us-log-gdp-until-2015q4" class="section level3">
+<h3>Data: US log GDP until 2015Q4</h3>
+<pre class="r"><code># Specify URL
+url &lt;- &quot;https://web.ics.purdue.edu/~jltobias/second_edition/Chapter18/code_for_exercise_2/USGDP_2015Q4.csv&quot;
+
+# Download data
+gdp &lt;- read.csv(url, header = FALSE)[, 1]
+
+y &lt;- matrix(log(gdp) * 100) # Log GDP
+p &lt;- 2 # Lag of cyclical component
+tt &lt;- nrow(y) # T</code></pre>
+</div>
+<div id="estimation-1" class="section level3">
+<h3>Estimation</h3>
+<p>Priors</p>
+<pre class="r"><code># Priors of phi
+prior_phi_mu &lt;- matrix(c(1.3, -.7))
+prior_phi_v_i &lt;- diag(1, p)
+
+# Priors of gamma
+prior_gamma_mu &lt;- matrix(c(750, 750)) # Should be close to first value of the series
+prior_gamma_v_i &lt;- diag(1 / 100, p)
+
+# Priors for sigma2_tau
+prior_s_tau &lt;- .01
+
+# Priors for sigma2_c
+prior_s_c_shape &lt;- 3
+prior_s_c_rate &lt;- 2</code></pre>
+<p>Initial values</p>
+<pre class="r"><code># X_gamma
+x_gamma &lt;- cbind(2:(tt + 1), -1:-tt)
+
+# H_2
+h2 &lt;- diag(1, tt)
+diag(h2[-1, -tt]) &lt;- -2
+diag(h2[-(1:2), -((tt - 1):tt)]) &lt;- 1
+h2h2 &lt;- crossprod(h2)
+
+# H_phi
+h_phi &lt;- diag(1, tt)
+phi &lt;- matrix(c(1.34, -.7))
+for (i in 1:p) {
+  diag(h_phi[-(1:i), -((tt - i):tt)]) &lt;- -phi[i,]
+}
+
+# Inverse of sigma tau
+s_tau_i &lt;- 1 / .001
+
+# Inverse of sigma c
+s_c_i &lt;- 1 / .5
+
+# gamma
+gamma &lt;- t(rep(y[1], 2)) # Should be close to first value of the series</code></pre>
+<p>Gibbs sampler</p>
+<pre class="r"><code>iterations &lt;- 11000
+burnin &lt;- 1000
+
+# Data containers for draws
+draws_tau &lt;- matrix(NA, tt, iterations - burnin)
+draws_c &lt;- matrix(NA, tt, iterations - burnin)
+
+# Start Gibbs sampler
+for (draw in 1:iterations) {
+  # Draw tau
+  alpha &lt;- solve(h2, matrix(c(2 * gamma[1] - gamma[2], -gamma[1], rep(0, tt - 2))))
+  sh2 &lt;- s_tau_i * h2h2
+  shphi &lt;- s_c_i * as.matrix(crossprod(h_phi))
+  K_tau &lt;- sh2 + shphi
+  mu_tau &lt;- solve(K_tau, sh2 %*% alpha + shphi %*% y)
+  tau &lt;- mu_tau + solve(chol(K_tau), rnorm(tt))
+  
+  # Draw phi
+  c &lt;- c(rep(0, p), y - tau)
+  temp &lt;- embed(c, 1 + p)
+  c &lt;- matrix(temp[, 1])
+  x_phi &lt;- temp[, -1]
+  K_phi &lt;- prior_phi_v_i  + s_c_i * crossprod(x_phi)
+  mu_phi &lt;- solve(K_phi, prior_phi_v_i %*% prior_phi_mu + s_c_i * crossprod(x_phi, c))
+  phi_can &lt;- mu_phi + solve(chol(K_phi), rnorm(p))
+  if (sum(phi_can) &lt; .99 &amp; phi_can[2] - phi_can[1] &lt; .99 &amp; phi_can[2] &gt; -.99) {
+    phi &lt;- phi_can
+    for (i in 1:p) {
+      diag(h_phi[-(1:i), -((tt - i):tt)]) &lt;- -phi[i,]
+    }
+  }
+  
+  # Draw variance c
+  s_c_i &lt;- rgamma(1, shape = 3 + tt / 2, rate = 2 + crossprod(c - x_phi %*% phi) / 2)
+  
+  # Draw variance tau
+  tausq_sum &lt;- sum(diff(diff(c(gamma[2:1], tau)))^2)
+  s_tau_can &lt;- seq(from = runif(1) / 1000,
+                   to = prior_s_tau - runif(1) / 1000, length.out = 500)
+  lik &lt;- -tt / 2 * log(s_tau_can) - tausq_sum / (2 * s_tau_can)
+  plik &lt;- exp(lik - max(lik))
+  plik &lt;- plik / sum(plik)
+  plik &lt;- cumsum(plik)
+  s_tau_i &lt;- 1 / s_tau_can[runif(1) &lt; plik][1]
+  
+  # Draw gamma
+  sxh2 &lt;- s_tau_i * crossprod(x_gamma, h2h2)
+  K_gamma &lt;- as.matrix(prior_gamma_v_i + sxh2 %*% x_gamma)
+  mu_gamma &lt;- solve(K_gamma, prior_gamma_v_i %*% prior_gamma_mu + sxh2 %*% tau)
+  gamma &lt;- mu_gamma + solve(chol(K_gamma), rnorm(2))
+  
+  # Save draws
+  if (draw &gt; burnin) {
+    pos_draw &lt;- draw - burnin
+    draws_tau[, pos_draw] &lt;- tau
+    draws_c[, pos_draw] &lt;- c
+  }
+}</code></pre>
+<p>Plot cyclical component</p>
+<pre class="r"><code>mean_c &lt;- cbind(0, apply(draws_c, 1, mean))
+mean_c &lt;- ts(mean_c, start = 1949, frequency = 4)
+plot(mean_c, plot.type = &quot;single&quot;, ylab = &quot;&quot;, ylim = c(-8, 6))</code></pre>
+<p><img src="/reproduction/bayesmethods/bayesmethods18_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p>Plot annualised trend growt</p>
+<pre class="r"><code>temp &lt;- apply(draws_tau, 2, diff) * 4
+mean_dtau &lt;- ts(apply(temp, 1, mean), start = 1949, frequency = 4)
+plot(mean_dtau, plot.type = &quot;single&quot;, ylim = c(1, 4.5), ylab = &quot;&quot;)</code></pre>
+<p><img src="/reproduction/bayesmethods/bayesmethods18_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p><em>Work in progress</em></p>
+</div>
+</div>

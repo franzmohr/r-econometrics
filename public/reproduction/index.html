@@ -75,10 +75,24 @@
                 <ul class="li-article-list">
                     
                         <li>
+                            <time class="li-article-date">December, 1, 2019</time>
+                            <h4><a href="https://www.r-econometrics.com/reproduction/bayesmethods/bayesmethods18/">Chapter 18: State Space and Unobserved Components Models</a></h4>
+                            Exercise 18.1: The local level model Data: US PCE inflation until 2015Q4 # Specify URL url &lt;- &quot;https://web.ics.purdue.edu/~jltobias/second_edition/Chapter18/code_for_exercise_1/USPCE_2015Q4.csv&quot; # Load data pce &lt;- read.csv(url, header = FALSE, col.names = &quot;pci&quot;) # Log growth rates pce &lt;- diff(ts(log(pce), start = 1959, frequency = 4)) # Rescale y &lt;- matrix(pce * 100 * 4, 1) tt &lt;- ncol(y) # T z &lt;- diag(1, tt) # Data matrix  Estimation Prior
+a0 &lt;- 5 b0 &lt;- 100 Initial values
+                        </li>
+                    
+                        <li>
                             <time class="li-article-date">May, 20, 2019</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/2015_timmer_wiod/">Reproduction: Timmer, M. P., Dietzenbacher, E., Los, B., Stehrer, R., &amp; De Vries, G. J. (2015). An illustrated user guide to the world input–output database: the case of global automotive production.</a></h4>
                             As international trade has become increasingly fragmented over the past decades the analysis of global value chains (GVC) has gained popularity in economic research. This post reproduces Timmer et al. (2015), who introduce the world input-output database (WIOD) and present basic concepts of GVC analysis.
 Data Timmer et al. (2015) use the 2013 vintage of the world input-output database (WIOD). The following code downloads the data from the project’s website, unzips it and loads the resulting STATA file into R using the readstata13 package.
+                        </li>
+                    
+                        <li>
+                            <time class="li-article-date">December, 1, 2018</time>
+                            <h4><a href="https://www.r-econometrics.com/reproduction/bayesmethods/bayesmethodsintro/">Chan et al. (2019): Bayesian Econometric Methods</a></h4>
+                            This section is based on Chan et al. (2019). Bayesian econometric methods (2nded.). The following links contain examples in the main text of the book and use R to estimate the models.
+Chapter 18: State Space and Unobserved Components Models
                         </li>
                     
                         <li>

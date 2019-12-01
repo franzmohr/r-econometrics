@@ -117,83 +117,52 @@ if (!doNotTrack) {
                     </header>
                     <section>
                         <p>Word or tag clouds seem to be quite popular at the moment. Although their analytical power might be limited, they do serve an aesthetic purpose and, for example, could be put on the cover page of a thesis or a presentation using the content of your work or the literature you went through. This post uses text data from the Gutenberg project to give a step-by-step introduction on how to create a wordcould in R.</p>
-
-<p>Inspired by <a href="https://www.r-bloggers.com/constructing-a-word-cloud-for-icml-2015/" target="_blank" rel="noopener">Andrew Collier&rsquo;s blog post on creating word clouds from multiple PDF-sources</a> I played around with some texts from the Gutenberg project to visualize some of the most prominent pieces of classic literature. Then I remembered my old English teacher, who said that Shakespeare&rsquo;s work basically hinged on the motives of &ldquo;love&rdquo;, &ldquo;death&rdquo; and &ldquo;aristocracy&rdquo;. So, I became curious about how this might be reflected in a word cloud that is drawn from the complete works of William Shakespeare. Fortunately, a complete version of the master&rsquo;s work is available on the <a href="http://www.gutenberg.org/ebooks/100" target="_blank" rel="noopener">Project Gutenberg</a>, where you can also find a myriad of other free literature to download and read (legally!!!). But let&rsquo;s postpone the reading and concentrate on how to make a word cloud from such data. I will go through this step-by-step as in Andrew Collier&rsquo; post.</p>
-
+<p>Inspired by <!-- raw HTML omitted -->Andrew Collier's blog post on creating word clouds from multiple PDF-sources<!-- raw HTML omitted --> I played around with some texts from the Gutenberg project to visualize some of the most prominent pieces of classic literature. Then I remembered my old English teacher, who said that Shakespeare's work basically hinged on the motives of &ldquo;love&rdquo;, &ldquo;death&rdquo; and &ldquo;aristocracy&rdquo;. So, I became curious about how this might be reflected in a word cloud that is drawn from the complete works of William Shakespeare. Fortunately, a complete version of the master's work is available on the <!-- raw HTML omitted -->Project Gutenberg<!-- raw HTML omitted -->, where you can also find a myriad of other free literature to download and read (legally!!!). But let's postpone the reading and concentrate on how to make a word cloud from such data. I will go through this step-by-step as in Andrew Collier&rsquo; post.</p>
 <p>Download the raw text file into R and read its lines.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">rawc <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">readLines</span>(<span style="color:#a6e22e">file</span>(<span style="color:#e6db74">&#34;</span><span style="color:#e6db74">http://www.gutenberg.org/files/100/100-0.txt&#34;</span>))
+</code></pre></div><p>Both at the beginning and the end of the file there is a lot of information on how to use the file and copyright issues. Since such modern text might bias our results, we omit those lines by looking only at the part between them using <code>rawc[142:151140]</code>. Then we put the relevant lines together into a single character string:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">text <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">paste</span>(rawc[142<span style="color:#f92672">:</span><span style="color:#ae81ff">151140</span>], collapse <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;</span><span style="color:#e6db74"> &#34;</span>)
+</code></pre></div><p>Convert all letters into lower cases. After that you will need the <code>tm</code> package for <strong>t</strong>ext <strong>m</strong>ining, which contains functions to remove numbers and punctuation.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">text <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">tolower</span>(text) <span style="color:#75715e"># Convert all letters into lower cases</span>
 
-<pre><code class="language-r">rawc &lt;- readLines(file(&quot;http://www.gutenberg.org/files/100/100-0.txt&quot;))
-</code></pre>
-
-<p>Both at the beginning and the end of the file there is a lot of information on how to use the file and copyright issues. Since such modern text might bias our results, we omit those lines by looking only at the part between them using <code>rawc[142:151140]</code>. Then we put the relevant lines together into a single character string:</p>
-
-<pre><code class="language-r">text &lt;- paste(rawc[142:151140], collapse = &quot; &quot;)
-</code></pre>
-
-<p>Convert all letters into lower cases. After that you will need the <code>tm</code> package for <strong>t</strong>ext <strong>m</strong>ining, which contains functions to remove numbers and punctuation.</p>
-
-<pre><code class="language-r">text &lt;- tolower(text) # Convert all letters into lower cases
-
-library(tm) # install.packages(&quot;tm&quot;)
-text &lt;- removeNumbers(text) # Remove all numbers
-text &lt;- removePunctuation(text) # Remove punctuation
-</code></pre>
-
-<p>The <code>tm</code> package also includes a function that allows to remove words from the sample, which are very frequently used, but add no content to the analysis. First, there is a prespecified list of words available that contains such words. It can be easily accessed by <code>stopwords(&quot;english&quot;)</code>.</p>
-
+<span style="color:#a6e22e">library</span>(tm) <span style="color:#75715e"># install.packages(&#34;tm&#34;)</span>
+text <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">removeNumbers</span>(text) <span style="color:#75715e"># Remove all numbers</span>
+text <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">removePunctuation</span>(text) <span style="color:#75715e"># Remove punctuation</span>
+</code></pre></div><p>The <code>tm</code> package also includes a function that allows to remove words from the sample, which are very frequently used, but add no content to the analysis. First, there is a prespecified list of words available that contains such words. It can be easily accessed by <code>stopwords(&quot;english&quot;)</code>.</p>
 <p>When it is used in <code>removeWords</code>, a bunch of unnecessary words will be removed from the data. A little warning here: This takes some time&hellip;</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">text <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">removeWords</span>(text, <span style="color:#a6e22e">stopwords</span>(<span style="color:#e6db74">&#34;</span><span style="color:#e6db74">english&#34;</span>))
+</code></pre></div><p>Secondly, I removed some additional words, which I collected by iteratively running the code of this post and did not want to have in the sample. Again, this takes some time.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">exclude <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;</span><span style="color:#e6db74">shall&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">thee&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">thy&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">thus&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">will&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">come&#34;</span>,
+             <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">know&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">may&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">upon&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">hath&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">now&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">well&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">make&#34;</span>,
+             <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">let&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">see&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">tell&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">yet&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">like&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">put&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">speak&#34;</span>,
+             <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">give&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">speak&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">can&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">comes&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">makes&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">sees&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">tells&#34;</span>,
+             <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">likes&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">puts&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">speaks&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">gives&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">speaks&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">knows&#34;</span>,
+             <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">say&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">says&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">take&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">takes&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">exeunt&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">though&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">hear&#34;</span>, 
+             <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">think&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">hears&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">thinks&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">listen&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">listens&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">hear&#34;</span>, 
+             <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">hears&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">follow&#34;</span> ,<span style="color:#e6db74">&#34;</span><span style="color:#e6db74">commercially&#34;</span> ,<span style="color:#e6db74">&#34;</span><span style="color:#e6db74">commercial&#34;</span> , <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">readable&#34;</span>,
+             <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">personal&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">doth&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">membership&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">stand&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">therefore&#34;</span>, 
+             <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">complete&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">tis&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">electronic&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">prohibited&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">must&#34;</span>,
+             <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">look&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">looks&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">call&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">calls&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">done&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">prove&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">whose&#34;</span>,
+             <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">enter&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">one&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">words&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">thou&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">came&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">much&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">never&#34;</span>,
+             <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">wit&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">leave&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">even&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">ever&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">distributed&#34;</span> , <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">keep&#34;</span>,
+             <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">stay&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">made&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">scene&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">many&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">away&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">exit&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">shalt&#34;</span>)
 
-<pre><code class="language-r">text &lt;- removeWords(text, stopwords(&quot;english&quot;))
-</code></pre>
+text <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">removeWords</span>(text, exclude)
+</code></pre></div><p>Split the single character string into a list of words, get rid of the empty entries and keep all entries with more than two letters.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">text <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">strsplit</span>(text, split <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;</span><span style="color:#e6db74"> &#34;</span>)[[1]]
+text <span style="color:#f92672">&lt;-</span> text[text <span style="color:#f92672">!=</span> <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">&#34;</span>]
+text <span style="color:#f92672">&lt;-</span> text<span style="color:#a6e22e">[nchar</span>(text) <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">2</span>]
+</code></pre></div><p>The next step requires the <code>dplyr</code> package. Create a <em>tibble</em> from a data frame of the word list and count the number of instances of a word in that table. It is useful to let the count function sort the result according to the number of instances.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">library</span>(dplyr)
 
-<p>Secondly, I removed some additional words, which I collected by iteratively running the code of this post and did not want to have in the sample. Again, this takes some time.</p>
-
-<pre><code class="language-r">exclude &lt;- c(&quot;shall&quot;, &quot;thee&quot;, &quot;thy&quot;, &quot;thus&quot;, &quot;will&quot;, &quot;come&quot;,
-             &quot;know&quot;, &quot;may&quot;, &quot;upon&quot;, &quot;hath&quot;, &quot;now&quot;, &quot;well&quot;, &quot;make&quot;,
-             &quot;let&quot;, &quot;see&quot;, &quot;tell&quot;, &quot;yet&quot;, &quot;like&quot;, &quot;put&quot;, &quot;speak&quot;,
-             &quot;give&quot;, &quot;speak&quot;, &quot;can&quot;, &quot;comes&quot;, &quot;makes&quot;, &quot;sees&quot;, &quot;tells&quot;,
-             &quot;likes&quot;, &quot;puts&quot;, &quot;speaks&quot;, &quot;gives&quot;, &quot;speaks&quot;, &quot;knows&quot;,
-             &quot;say&quot;, &quot;says&quot;, &quot;take&quot;, &quot;takes&quot;, &quot;exeunt&quot;, &quot;though&quot;, &quot;hear&quot;, 
-             &quot;think&quot;, &quot;hears&quot;, &quot;thinks&quot;, &quot;listen&quot;, &quot;listens&quot;, &quot;hear&quot;, 
-             &quot;hears&quot;, &quot;follow&quot; ,&quot;commercially&quot; ,&quot;commercial&quot; , &quot;readable&quot;,
-             &quot;personal&quot;, &quot;doth&quot;, &quot;membership&quot;, &quot;stand&quot;, &quot;therefore&quot;, 
-             &quot;complete&quot;, &quot;tis&quot;, &quot;electronic&quot;, &quot;prohibited&quot;, &quot;must&quot;,
-             &quot;look&quot;, &quot;looks&quot;, &quot;call&quot;, &quot;calls&quot;, &quot;done&quot;, &quot;prove&quot;, &quot;whose&quot;,
-             &quot;enter&quot;, &quot;one&quot;, &quot;words&quot;, &quot;thou&quot;, &quot;came&quot;, &quot;much&quot;, &quot;never&quot;,
-             &quot;wit&quot;, &quot;leave&quot;, &quot;even&quot;, &quot;ever&quot;, &quot;distributed&quot; , &quot;keep&quot;,
-             &quot;stay&quot;, &quot;made&quot;, &quot;scene&quot;, &quot;many&quot;, &quot;away&quot;, &quot;exit&quot;, &quot;shalt&quot;)
-
-text &lt;- removeWords(text, exclude)
-</code></pre>
-
-<p>Split the single character string into a list of words, get rid of the empty entries and keep all entries with more than two letters.</p>
-
-<pre><code class="language-r">text &lt;- strsplit(text, split = &quot; &quot;)[[1]]
-text &lt;- text[text != &quot;&quot;]
-text &lt;- text[nchar(text) &gt; 2]
-</code></pre>
-
-<p>The next step requires the <code>dplyr</code> package. Create a <em>tibble</em> from a data frame of the word list and count the number of instances of a word in that table. It is useful to let the count function sort the result according to the number of instances.</p>
-
-<pre><code class="language-r">library(dplyr)
-
-text_tbl &lt;- as_tibble(as.data.frame(text)) # Create table
-text_tbl &lt;- count(text_tbl, sort = TRUE, vars = text) # Count and sort words
-</code></pre>
-
-<p>Basically, you could already make a word cloud from this data. However, since the amount of words is quite high (27,642), I would like to limit the set of plotted words to 300, which I deem to be a good size for word clouds, because you are still impressed by the number of words in the cloud without losing the ability to get a basic impression of the content from it.</p>
-
-<pre><code class="language-r">text_tbl &lt;- text_tbl[1:300,] # Extract the first 300 most frequent words
-</code></pre>
-
-<p>Finally, you can plot the word cloud using the function <code>tagcloud</code> from the <code>tagcloud</code> package, where you have to specify the words and their weights, i.e. counts. Additionally, I used <code>fvert = .3</code> so that 30 percent of the words in the could are aligned vertically.</p>
-
-<pre><code class="language-r">library(tagcloud)
-tagcloud(text_tbl$vars, weights = text_tbl$n, fvert = .3)
-</code></pre>
-
-<p><img src="/post/2018-12-30-shakespeare-wordcloud_files/figure-html/shakespeare-1.png" width="576" style="display: block; margin: auto;" /></p>
-
+text_tbl <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">as_tibble</span>(<span style="color:#a6e22e">as.data.frame</span>(text)) <span style="color:#75715e"># Create table</span>
+text_tbl <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">count</span>(text_tbl, sort <span style="color:#f92672">=</span> <span style="color:#66d9ef">TRUE</span>, vars <span style="color:#f92672">=</span> text) <span style="color:#75715e"># Count and sort words</span>
+</code></pre></div><p>Basically, you could already make a word cloud from this data. However, since the amount of words is quite high (27,642), I would like to limit the set of plotted words to 300, which I deem to be a good size for word clouds, because you are still impressed by the number of words in the cloud without losing the ability to get a basic impression of the content from it.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">text_tbl <span style="color:#f92672">&lt;-</span> text_tbl[1<span style="color:#f92672">:</span><span style="color:#ae81ff">300</span>,] <span style="color:#75715e"># Extract the first 300 most frequent words</span>
+</code></pre></div><p>Finally, you can plot the word cloud using the function <code>tagcloud</code> from the <code>tagcloud</code> package, where you have to specify the words and their weights, i.e. counts. Additionally, I used <code>fvert = .3</code> so that 30 percent of the words in the could are aligned vertically.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">library</span>(tagcloud)
+<span style="color:#a6e22e">tagcloud</span>(text_tbl<span style="color:#f92672">$</span>vars, weights <span style="color:#f92672">=</span> text_tbl<span style="color:#f92672">$</span>n, fvert <span style="color:#f92672">=</span> <span style="color:#ae81ff">.3</span>)
+</code></pre></div><p><!-- raw HTML omitted --></p>
 <p>Look at the result. As we can see, my English teacher was quite right, although I did not expect that high concentration of words with masculine aristocratic connotation. However, since we excluded words like &ldquo;thy&rdquo;, &ldquo;shall&rdquo;, &ldquo;will&rdquo;, &ldquo;thou&rdquo; etc., much content from the sonnets is lost, where a lot of motives like &ldquo;love&rdquo; and &ldquo;desire&rdquo; are not explicitly mentioned, but at least implicitly present. This might cause a bias towards motives from the dramatic pieces.</p>
                     </section>
                 </article>
