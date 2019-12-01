@@ -348,7 +348,7 @@ y &lt;- na.omit(data$lgdp)
 emd_gdp &lt;- emd(xt = y, boundary = &quot;none&quot;)
 
 # Exctract the intrinsic mode functions
-emd_gdp &lt;- as_tibble(emd_gdp$imf)
+emd_gdp &lt;- as.data.frame(emd_gdp$imf)
 
 # Create a data frame for plotting
 temp &lt;- emd_gdp %&gt;%
@@ -384,20 +384,152 @@ ggplot(temp, aes(x = date, y = value, colour = Variable)) +
        x = &quot;Qurarter&quot;, y = &quot;&quot;)</code></pre>
 <p><img src="/timeseries/economic-cycle-extraction_files/figure-html/emd%20plot-1.png" width="432" /></p>
 </div>
+<div id="grant-a.-l.-chan-j.-c.-c.-2017" class="section level2">
+<h2>Grant, A. L., &amp; Chan, J. C. C. (2017)</h2>
+<p>Priors</p>
+<pre class="r"><code># Rescaled data
+y &lt;- na.omit(data$lgdp) * 100
+tt &lt;- length(y) # T
+p &lt;- 2 # Lags of phi
+
+# Priors of phi
+prior_phi_mu &lt;- matrix(c(1.3, -.7))
+prior_phi_v_i &lt;- diag(1, p)
+
+# Priors of gamma
+prior_gamma_mu &lt;- matrix(c(850, 850)) # Should be close to first value of the series
+prior_gamma_v_i &lt;- diag(1 / 100, p)
+
+# Priors for sigma2_tau
+prior_s_tau &lt;- .01
+
+# Priors for sigma2_c
+prior_s_c_shape &lt;- 3
+prior_s_c_rate &lt;- 2</code></pre>
+<p>Initial values</p>
+<pre class="r"><code># X_gamma
+x_gamma &lt;- cbind(2:(tt + 1), -1:-tt)
+
+# H_2
+h2 &lt;- diag(1, tt)
+diag(h2[-1, -tt]) &lt;- -2
+diag(h2[-(1:2), -((tt - 1):tt)]) &lt;- 1
+h2h2 &lt;- crossprod(h2)
+
+# H_phi
+h_phi &lt;- diag(1, tt)
+phi &lt;- matrix(c(1.34, -.7))
+for (i in 1:p) {
+  diag(h_phi[-(1:i), -((tt - i):tt)]) &lt;- -phi[i,]
+}
+
+# Inverse of sigma tau
+s_tau_i &lt;- 1 / .001
+
+# Inverse of sigma c
+s_c_i &lt;- 1 / .5
+
+# gamma
+gamma &lt;- t(rep(y[1], 2)) # Should be close to first value of the series</code></pre>
+<p>Gibbs sampler</p>
+<pre class="r"><code>iterations &lt;- 11000
+burnin &lt;- 1000
+
+# Data containers for draws
+draws_tau &lt;- matrix(NA, tt, iterations - burnin)
+draws_c &lt;- matrix(NA, tt, iterations - burnin)
+
+# Start Gibbs sampler
+for (draw in 1:iterations) {
+  # Draw tau
+  alpha &lt;- solve(h2, matrix(c(2 * gamma[1] - gamma[2], -gamma[1], rep(0, tt - 2))))
+  sh2 &lt;- s_tau_i * h2h2
+  shphi &lt;- s_c_i * as.matrix(crossprod(h_phi))
+  K_tau &lt;- sh2 + shphi
+  mu_tau &lt;- solve(K_tau, sh2 %*% alpha + shphi %*% y)
+  tau &lt;- mu_tau + solve(chol(K_tau), rnorm(tt))
+  
+  # Draw phi
+  c &lt;- c(rep(0, p), y - tau)
+  temp &lt;- embed(c, 1 + p)
+  c &lt;- matrix(temp[, 1])
+  x_phi &lt;- temp[, -1]
+  K_phi &lt;- prior_phi_v_i  + s_c_i * crossprod(x_phi)
+  mu_phi &lt;- solve(K_phi, prior_phi_v_i %*% prior_phi_mu + s_c_i * crossprod(x_phi, c))
+  phi_can &lt;- mu_phi + solve(chol(K_phi), rnorm(p))
+  if (sum(phi_can) &lt; .99 &amp; phi_can[2] - phi_can[1] &lt; .99 &amp; phi_can[2] &gt; -.99) {
+    phi &lt;- phi_can
+    for (i in 1:p) {
+      diag(h_phi[-(1:i), -((tt - i):tt)]) &lt;- -phi[i,]
+    }
+  }
+  
+  # Draw variance c
+  s_c_i &lt;- rgamma(1, shape = 3 + tt / 2, rate = 2 + crossprod(c - x_phi %*% phi) / 2)
+  
+  # Draw variance tau
+  tausq_sum &lt;- sum(diff(diff(c(gamma[2:1], tau)))^2)
+  s_tau_can &lt;- seq(from = runif(1) / 1000,
+                   to = prior_s_tau - runif(1) / 1000, length.out = 500)
+  lik &lt;- -tt / 2 * log(s_tau_can) - tausq_sum / (2 * s_tau_can)
+  plik &lt;- exp(lik - max(lik))
+  plik &lt;- plik / sum(plik)
+  plik &lt;- cumsum(plik)
+  s_tau_i &lt;- 1 / s_tau_can[runif(1) &lt; plik][1]
+  
+  # Draw gamma
+  sxh2 &lt;- s_tau_i * crossprod(x_gamma, h2h2)
+  K_gamma &lt;- as.matrix(prior_gamma_v_i + sxh2 %*% x_gamma)
+  mu_gamma &lt;- solve(K_gamma, prior_gamma_v_i %*% prior_gamma_mu + sxh2 %*% tau)
+  gamma &lt;- mu_gamma + solve(chol(K_gamma), rnorm(2))
+  
+  # Save draws
+  if (draw &gt; burnin) {
+    pos_draw &lt;- draw - burnin
+    draws_tau[, pos_draw] &lt;- tau
+    draws_c[, pos_draw] &lt;- c
+  }
+}</code></pre>
+<p>Plot cyclical component</p>
+<pre class="r"><code>mean_c &lt;- apply(draws_c, 1, mean) / 100
+
+# Add cyclical component to the main data frame
+data &lt;- data %&gt;%
+  mutate(grant = mean_c)
+
+# Create data frame for the plot
+temp &lt;- data %&gt;%
+  select(date, hp, grant) %&gt;%
+  gather(key = &quot;Variable&quot;, value = &quot;value&quot;, -date) %&gt;%
+  filter(!is.na(value)) %&gt;%
+  mutate(Variable = factor(Variable,
+                           levels = c(&quot;hp&quot;, &quot;grant&quot;),
+                           labels = c(&quot;HP filter&quot;, &quot;Grant &amp; Chan (2017)&quot;)))
+
+# Plot
+ggplot(temp, aes(x = date, y = value, colour = Variable)) +
+  geom_hline(yintercept = 0, colour = &quot;grey&quot;) +
+  geom_line() +
+  theme_classic() +
+  labs(title = &quot;Grant &amp; Chan (2017)&quot;,
+       x = &quot;Qurarter&quot;, y = &quot;&quot;)</code></pre>
+<p><img src="/timeseries/economic-cycle-extraction_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+</div>
 <div id="references" class="section level2">
 <h2>References</h2>
-<p>Balcilar, M. (2018). mFilter: Miscellaneous Time Series Filters. R package version 0.1-4. <a href="https://CRAN.R-project.org/package=mFilter" class="uri">https://CRAN.R-project.org/package=mFilter</a></p>
-<p>Baxter, M., &amp; King, R. O. (1999). Measuring Business Cycles: Approximate Band-Pass Filters for Economic Time Series. <em>Review of Economics and Statistics</em>, 81(4), 575–593.</p>
-<p>Hamilton, J. D. (2018), Why you should never use the Hodrick-Prescott filter. <em>Review of Economics and Statistics</em>, 100(5), 831-843. <a href="https://doi.org/10.1162/rest_a_00706" class="uri">https://doi.org/10.1162/rest_a_00706</a></p>
+<p>Balcilar, M. (2018). mFilter: Miscellaneous Time Series Filters. R package version 0.1-4. <a href="https://CRAN.R-project.org/package=mFilter">https://CRAN.R-project.org/package=mFilter</a></p>
+<p>Baxter, M., &amp; King, R. O. (1999). Measuring Business Cycles: Approximate Band-Pass Filters for Economic Time Series. <em>Review of Economics and Statistics, 81</em>(4), 575–593.</p>
+<p>Grant, A. L., &amp; Chan, J. C. C. (2017). Reconciling output gaps: Unobserved components model and Hodrick-Prescott filter, <em>Journal of Economic Dynamics and Control, 75</em>, 114-121.</p>
+<p>Hamilton, J. D. (2018), Why you should never use the Hodrick-Prescott filter. <em>Review of Economics and Statistics, 100</em>(5), 831-843. <a href="https://doi.org/10.1162/rest_a_00706">https://doi.org/10.1162/rest_a_00706</a></p>
 <p>Kim, D. and Oh, H.-S. (2014). EMD: Empirical Mode Decomposition and Hilbert Spectral Analysis. R package version 1.5.7.</p>
-<p>Kožić, I., &amp; Sever, I. (2014). Measuring business cycles: Empirical Mode Decomposition of economic time series. Economics Letters, 123(3), 287–290. <a href="https://doi.org/10.1016/j.econlet.2014.03.009" class="uri">https://doi.org/10.1016/j.econlet.2014.03.009</a></p>
-<p>McTaggart, R., Daroczi, G., &amp; Leung, C. (2018). Quandl: API Wrapper for Quandl.com. R package version 2.9.1. <a href="https://CRAN.R-project.org/package=Quandl" class="uri">https://CRAN.R-project.org/package=Quandl</a></p>
-<p>Shea, J. M. (2018). neverhpfilter: A Better Alternative to the Hodrick-Prescott Filter. R package version 0.2-0. <a href="https://CRAN.R-project.org/package=neverhpfilter" class="uri">https://CRAN.R-project.org/package=neverhpfilter</a></p>
+<p>Kožić, I., &amp; Sever, I. (2014). Measuring business cycles: Empirical Mode Decomposition of economic time series. <em>Economics Letters, 123</em>(3), 287–290. <a href="https://doi.org/10.1016/j.econlet.2014.03.009">https://doi.org/10.1016/j.econlet.2014.03.009</a></p>
+<p>McTaggart, R., Daroczi, G., &amp; Leung, C. (2018). Quandl: API Wrapper for Quandl.com. R package version 2.9.1. <a href="https://CRAN.R-project.org/package=Quandl">https://CRAN.R-project.org/package=Quandl</a></p>
+<p>Shea, J. M. (2018). neverhpfilter: A Better Alternative to the Hodrick-Prescott Filter. R package version 0.2-0. <a href="https://CRAN.R-project.org/package=neverhpfilter">https://CRAN.R-project.org/package=neverhpfilter</a></p>
 <p>Stock, J. H., &amp; Watson, M. W. (1999). Business Cycle Fluctuations in US Macroeconomic Time Series. In J. B. Taylor &amp; M. Woodford (Eds.), Handbook of Macroeconomics. Handbook of Macroeconomics (pp. 3–64). Elsevier.</p>
-<p>Whitcher, B. (2015). waveslim: Basic wavelet routines for one-, two- and three-dimensional signal processing. R package version 1.7.5. <a href="https://CRAN.R-project.org/package=waveslim" class="uri">https://CRAN.R-project.org/package=waveslim</a></p>
+<p>Whitcher, B. (2015). waveslim: Basic wavelet routines for one-, two- and three-dimensional signal processing. R package version 1.7.5. <a href="https://CRAN.R-project.org/package=waveslim">https://CRAN.R-project.org/package=waveslim</a></p>
 <p>Wickham, H. (2016). ggplot2: Elegant Graphics for Data Analysis. Springer-Verlag New York.</p>
-<p>Wickham, H., François, R., Henry, L., &amp; Müller, K. (2018). dplyr: A Grammar of Data Manipulation. R package version 0.7.8. <a href="https://CRAN.R-project.org/package=dplyr" class="uri">https://CRAN.R-project.org/package=dplyr</a></p>
-<p>Yogo, M. (2008). Measuring business cycles: A wavelet analysis of economic time series. Economics Letters, 100(2), 208–212. <a href="https://doi.org/10.1016/j.econlet.2008.01.008" class="uri">https://doi.org/10.1016/j.econlet.2008.01.008</a></p>
+<p>Wickham, H., François, R., Henry, L., &amp; Müller, K. (2018). dplyr: A Grammar of Data Manipulation. R package version 0.7.8. <a href="https://CRAN.R-project.org/package=dplyr">https://CRAN.R-project.org/package=dplyr</a></p>
+<p>Yogo, M. (2008). Measuring business cycles: A wavelet analysis of economic time series. <em>Economics Letters, 100</em>(2), 208–212. <a href="https://doi.org/10.1016/j.econlet.2008.01.008">https://doi.org/10.1016/j.econlet.2008.01.008</a></p>
 </div>
 
                     </section>
