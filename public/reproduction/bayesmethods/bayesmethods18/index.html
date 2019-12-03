@@ -166,11 +166,11 @@ draws_tau &lt;- matrix(NA, tt, iterations - burnin)
 
 for (draw in 1:iterations) {
   # Draw trend
-  temp &lt;- chan_jeliazkov(y, z, sigma_i, H, q_i, tau0)
-  a &lt;- temp$a
+  a &lt;- chan_jeliazkov(y, z, sigma_i, H, q_i, tau0)
   
   # Draw measurement eq. variance
-  diag(sigma_i) &lt;- rgamma(1, shape = 3 + tt / 2, rate = 2 + tcrossprod(temp$u) / 2)
+  u &lt;- y - a[, -1]
+  diag(sigma_i) &lt;- rgamma(1, shape = 3 + tt / 2, rate = 2 + tcrossprod(u) / 2)
   
   # Draw transition eq. variance
   w &lt;- a[, -1] - matrix(a0, 1, tt)
@@ -187,7 +187,7 @@ for (draw in 1:iterations) {
     draws_tau[, draw - burnin] &lt;- a[, -1]
   }
 }</code></pre>
-<p>Plot estimated prior mean of tau.</p>
+<p>Plot estimated prior mean of tau</p>
 <pre class="r"><code>tau &lt;- apply(draws_tau, 1, mean) # Mean
 tau &lt;- cbind(c(y), tau) # Combine with original series
 tau &lt;- ts(tau, start = 1959, frequency = 4)
@@ -318,7 +318,7 @@ for (draw in 1:iterations) {
 mean_c &lt;- ts(mean_c, start = 1949, frequency = 4)
 plot(mean_c, plot.type = &quot;single&quot;, ylab = &quot;&quot;, ylim = c(-8, 6))</code></pre>
 <p><img src="/reproduction/bayesmethods/bayesmethods18_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
-<p>Plot annualised trend growt</p>
+<p>Plot annualised trend growth</p>
 <pre class="r"><code>temp &lt;- apply(draws_tau, 2, diff) * 4
 mean_dtau &lt;- ts(apply(temp, 1, mean), start = 1949, frequency = 4)
 plot(mean_dtau, plot.type = &quot;single&quot;, ylim = c(1, 4.5), ylab = &quot;&quot;)</code></pre>
