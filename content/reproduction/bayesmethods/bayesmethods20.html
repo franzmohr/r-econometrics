@@ -1,0 +1,335 @@
+---
+title: "Chapter 20: Multivariate Time Series Methods"
+author: "Franz X. Mohr"
+date: "2019-12-09"
+---
+
+
+
+<p>Load required packages</p>
+<pre class="r"><code>library(bvartools)
+library(dplyr)
+library(ggplot2)
+library(spam)
+library(tidyr)</code></pre>
+<div id="data" class="section level2">
+<h2>Data</h2>
+<p>US macro data until 2007Q4</p>
+<pre class="r"><code># Specify URL
+url &lt;- &quot;https://web.ics.purdue.edu/~jltobias/second_edition/Chapter20/code_for_exercise_1/US_macrodata.csv&quot;
+# Load data
+us_macro_2007 &lt;- read.csv(url, col.names = c(&quot;date&quot;, &quot;Dp&quot;, &quot;u&quot;, &quot;r&quot;))
+# Omit NA values
+us_macro_2007 &lt;- na.omit(us_macro_2007)
+# Transform into time-series object
+us_macro_2007 &lt;- ts(us_macro_2007[, -1], start = c(1959, 2), frequency = 4)</code></pre>
+</div>
+<div id="exercise-20.1" class="section level2">
+<h2>Exercise 20.1</h2>
+<p>Prepare the data</p>
+<pre class="r"><code>temp &lt;- gen_var(us_macro_2007, p = 2, deterministic = &quot;const&quot;)
+y &lt;- temp$Y
+x &lt;- temp$Z
+
+k &lt;- NROW(y)
+tt &lt;- ncol(y)
+z &lt;- kronecker(t(x), diag(1, k))
+m &lt;- ncol(z)</code></pre>
+<p>Specify the priors</p>
+<pre class="r"><code>mu_prior &lt;- matrix(0, m) # Prior mean
+v_i_prior &lt;- diag(1, m) # Prior variance
+diag(v_i_prior)[m - k + 1:k] &lt;- 1 / 10 # Deterministics
+
+df_prior &lt;- k + 3
+df_post &lt;- tt + df_prior
+scale_prior = diag(1, k)</code></pre>
+<p>Initial values</p>
+<pre class="r"><code>ols &lt;- tcrossprod(y, x) %*% solve(tcrossprod(x))
+epsilon &lt;- y - ols %*% x
+sigma &lt;- tcrossprod(epsilon) / tt
+sigma_i &lt;- solve(sigma)</code></pre>
+<p>Gibbs sampler</p>
+<pre class="r"><code>iterations &lt;- 21000 # Iterations
+burnin &lt;- 1000 # Burnin
+
+# Storage for coefficients
+store &lt;- iterations - burnin
+draws_b &lt;- matrix(NA, m, store)
+draws_sigma &lt;- matrix(NA, k * k, store)
+
+# Start Gibbs sampler
+for (draw in 1:iterations) {
+  # Draw parameters
+  b &lt;- post_normal_sur(y = y, z = z, sigma_i = sigma_i,
+                       a_prior = mu_prior, v_i_prior = v_i_prior)
+  
+  # Error
+  epsilon &lt;- y - matrix(b, k) %*% x
+  scale_post &lt;- scale_prior + tcrossprod(epsilon)
+  sigma_i &lt;- matrix(rWishart(1, df_post, solve(scale_post))[,,1], k)
+  sigma &lt;- solve(sigma_i)
+  
+  # Save post-burnin draws
+  if (draw &gt; burnin) {
+    draws_b[, draw - burnin] &lt;- b
+    draws_sigma[, draw - burnin] &lt;- sigma
+  }
+}</code></pre>
+<p>Create a <code>bvar</code> object for IRF</p>
+<pre class="r"><code>draws_a &lt;- draws_b[1:(m - k), ] # Draws of non-deterministic coefficients
+draws_det &lt;- draws_b[m - k + 1:k, ] # Draws of deterministic coefficients
+
+ex_20_1 &lt;- bvar(y = y, x = x, A = draws_a, C = draws_det, Sigma = draws_sigma)
+
+ex_20_1 &lt;- thin(ex_20_1) # Thin the output</code></pre>
+<p>Impuse response functions</p>
+<pre class="r"><code>Dp &lt;- irf(ex_20_1, impulse = &quot;r&quot;, response = &quot;Dp&quot;, n.ahead = 20, type = &quot;oir&quot;, keep_draws = TRUE)
+u &lt;- irf(ex_20_1, impulse = &quot;r&quot;, response = &quot;u&quot;, n.ahead = 20, type = &quot;oir&quot;, keep_draws = TRUE)
+r &lt;- irf(ex_20_1, impulse = &quot;r&quot;, response = &quot;r&quot;, n.ahead = 20, type = &quot;oir&quot;, keep_draws = TRUE)
+
+Dp &lt;- colMeans(Dp)
+u &lt;- colMeans(u)
+r &lt;- colMeans(r)
+
+temp &lt;- cbind(Dp, u, r) %&gt;%
+  as.data.frame() %&gt;%
+  mutate(time = 1:n() - 1) %&gt;%
+  pivot_longer(cols = c(&quot;Dp&quot;, &quot;u&quot;, &quot;r&quot;)) %&gt;%
+  mutate(name = factor(name, levels = c(&quot;Dp&quot;, &quot;u&quot;, &quot;r&quot;),
+                       labels = c(&quot;Inflation&quot;, &quot;Unemployment&quot;, &quot;Interest rate&quot;)))
+
+ggplot(temp, aes(x = time, y = value)) +
+  geom_line() +
+  facet_wrap(~ name, scales = &quot;free&quot;)</code></pre>
+<p><img src="/reproduction/bayesmethods/bayesmethods20_files/figure-html/irf-1.png" width="624" /></p>
+</div>
+<div id="exercise-20.6-time-varying-parameter-var" class="section level2">
+<h2>Exercise 20.6: Time varying parameter VAR</h2>
+<div id="data-us-macro-data-until-2007q4" class="section level3">
+<h3>Data: US macro data until 2007Q4</h3>
+<pre class="r"><code># Specify URL
+url &lt;- &quot;https://web.ics.purdue.edu/~jltobias/second_edition/Chapter20/code_for_exercise_5/US_macrodata.csv&quot;
+# Load data
+us_macro_2007 &lt;- read.csv(url, col.names = c(&quot;date&quot;, &quot;Dp&quot;, &quot;u&quot;, &quot;r&quot;))
+# Omit NA values
+us_macro_2007 &lt;- na.omit(us_macro_2007)
+# Transform into time-series object
+us_macro_2007 &lt;- ts(us_macro_2007[, -1], start = c(1959, 2), frequency = 4)
+
+# Genenerate data matrices
+temp &lt;- gen_var(us_macro_2007, p = 2, deterministic = &quot;const&quot;)
+y &lt;- temp$Y
+x &lt;- temp$Z
+
+k &lt;- nrow(y) # Number of endogenous variables
+tt &lt;- ncol(y) # Number of obs
+m &lt;- nrow(x) # Number of regressors
+n &lt;- m * k # Number of estimated coefficients</code></pre>
+</div>
+<div id="estimation" class="section level3">
+<h3>Estimation</h3>
+<p>Priors</p>
+<pre class="r"><code># Initial conditions
+a0_mu_prior &lt;- matrix(0, n)
+b0_v_i_prior &lt;- diag(1, n)
+diag(b0_v_i_prior)[n - k + 1:k] &lt;- 1 / 10 # Prior for determinsitic terms
+
+# Priors for measurement equation errors
+sigma_df_prior &lt;- k + 3
+sigma_df_post &lt;- tt + sigma_df_prior
+sigma_scale_prior &lt;- diag(1, k)
+
+# Priors for state equation errors
+q_shape_prior &lt;- 3
+q_shape_post &lt;- q_shape_prior + tt / 2
+q_rate_prior &lt;- rep(.01^2, n)
+q_rate_prior[n - k + 1:k] &lt;- .1^2 # Determinsitic</code></pre>
+<p>Initial values</p>
+<pre class="r"><code>y_vec &lt;- matrix(y)
+
+z &lt;- matrix(0, k * tt, n * tt)
+for (i in 1:tt) {
+  z[(i - 1) * k + 1:k, (i - 1) * n + 1:n] &lt;- kronecker(t(x[, i]), diag(1, k))
+}
+z &lt;- as.spam(z)
+
+beta0 &lt;- tcrossprod(y, x) %*% solve(tcrossprod(x))
+sigma_temp &lt;- tcrossprod(y - beta0 %*% x) / tt
+sigma_i_temp &lt;- solve(sigma_temp)
+sigma_i &lt;- kronecker(diag(1, tt), sigma_i_temp)
+sigma_i &lt;- as.spam(sigma_i)
+
+beta0 &lt;- matrix(beta0)
+
+q_i &lt;- kronecker(diag(1, tt), diag(100, n))
+q_i &lt;- as.spam(q_i)
+
+h &lt;- diag(1, m * k * tt)
+diag(h[-(1:(m * k)), 1:(m * k * (tt - 1))]) &lt;- -1
+h &lt;- as.spam(h)</code></pre>
+<p>Gibbs sampler</p>
+<pre class="r"><code>iterations &lt;- 21000
+burnin &lt;- 1000
+
+# Data containers for draws
+draws_beta &lt;- NULL
+for (i in 1:tt) {
+  draws_beta[[i]] &lt;- matrix(NA, n, iterations - burnin)
+}
+draws_sigma &lt;- matrix(NA, k * k, iterations - burnin)
+
+# Start Gibbs sampler
+for (draw in 1:iterations) {
+  # Draw parameters
+  HQiH &lt;- crossprod(h, q_i) %*% h
+  XSi &lt;- crossprod(z, sigma_i)
+  K_beta &lt;- HQiH + XSi %*% z
+  mu_beta &lt;- matrix(solve(K_beta, HQiH %*% kronecker(matrix(1, tt), beta0) + XSi %*% y_vec))
+  beta &lt;- mu_beta + solve.spam(chol(K_beta), rnorm(n * tt))
+  
+  # Measurement eq. variance-covariance matrix
+  u &lt;- matrix(y_vec - z %*% beta, k)
+  sigma_i_temp &lt;- rWishart(n, sigma_df_post, solve(sigma_scale_prior + tcrossprod(u)))[,, 1]
+  sigma_i &lt;- as.spam(kronecker(diag(1, tt), sigma_i_temp))
+  
+  # State eq. error variances
+  beta &lt;- matrix(beta, n)
+  v &lt;- apply(beta - cbind(beta0, beta[, -tt]), 1, function(x) {sum(x^2)})
+  q_post &lt;- cbind(q_shape_post, q_rate_prior + v / 2)
+  q_i_temp &lt;- apply(q_post, 1, function(x) {rgamma(1, shape = x[1], rate = x[2])})
+  diag(q_i) &lt;- rep(q_i_temp, tt)
+  
+  # Initial condition
+  K_beta0 &lt;- b0_v_i_prior + q_i[1:n, 1:n]
+  mu_beta0 &lt;- solve(K_beta0, b0_v_i_prior %*% a0_mu_prior + q_i[1:n, 1:n] %*% beta[, 1])
+  beta0 &lt;- mu_beta0 + solve(chol(K_beta0), rnorm(n))
+  
+  # Save draws
+  if (draw &gt; burnin) {
+    pos_draw &lt;- draw - burnin
+    
+    for (i in 1:tt) {
+      draws_beta[[i]][, pos_draw] &lt;- as.matrix(beta[, i])
+    }
+    
+    draws_sigma[, pos_draw] &lt;- solve(sigma_i_temp)
+  }
+}</code></pre>
+</div>
+<div id="impulse-responses" class="section level3">
+<h3>Impulse responses</h3>
+<p>Create <code>bvar</code> obejcts for further analysis</p>
+<pre class="r"><code># For 1975Q1
+tt_1975 &lt;- which(time(us_macro_2007) == 1975) - 2
+bvar_1975 &lt;- bvar(y = y, x = x,
+                   A = draws_beta[[tt_1975]][1:(n - k),],
+                   C = draws_beta[[tt_1975]][n - k + 1:k, ],
+                   Sigma = draws_sigma)
+
+# For 2005Q1
+tt_2005 &lt;- which(time(us_macro_2007) == 2005) - 2
+bvar_2005 &lt;- bvar(y = y, x = x,
+                   A = draws_beta[[tt_2005]][1:(n - k),],
+                   C = draws_beta[[tt_2005]][n - k + 1:k, ],
+                   Sigma = draws_sigma)</code></pre>
+<p>Obtain impulse responses for inflation</p>
+<pre class="r"><code>irf_1975 &lt;- irf(bvar_1975, impulse = &quot;r&quot;, response = &quot;Dp&quot;,
+                n.ahead = 20, type = &quot;oir&quot;, keep_draws = TRUE)
+
+irf_2005 &lt;- irf(bvar_2005, impulse = &quot;r&quot;, response = &quot;Dp&quot;,
+                n.ahead = 20, type = &quot;oir&quot;, keep_draws = TRUE)
+
+# Difference between the IRF
+diff_irf_Dp &lt;- irf_2005 - irf_1975
+diff_irf_Dp &lt;- t(apply(diff_irf_Dp, 2, quantile, probs = c(.05, .5, .95)))
+diff_irf_Dp &lt;- diff_irf_Dp %&gt;%
+  as.data.frame() %&gt;%
+  mutate(var = &quot;Inflation&quot;,
+         time = 1:n() - 1)
+
+# Mean IRF
+irf_1975 &lt;- colMeans(irf_1975)
+irf_2005 &lt;- colMeans(irf_2005)
+
+irf_Dp &lt;- cbind(irf_1975, irf_2005) %&gt;%
+  as.data.frame() %&gt;%
+  mutate(var = &quot;Inflation&quot;,
+         time = 1:n() - 1)</code></pre>
+<p>Obtain impulse responses for unemployment</p>
+<pre class="r"><code>irf_1975 &lt;- irf(bvar_1975, impulse = &quot;r&quot;, response = &quot;u&quot;,
+                n.ahead = 20, type = &quot;feir&quot;, keep_draws = TRUE)
+
+irf_2005 &lt;- irf(bvar_2005, impulse = &quot;r&quot;, response = &quot;u&quot;,
+                n.ahead = 20, type = &quot;feir&quot;, keep_draws = TRUE)
+
+# Difference between the IRF
+diff_irf_u &lt;- irf_2005 - irf_1975
+diff_irf_u &lt;- t(apply(diff_irf_u, 2, quantile, probs = c(.05, .5, .95)))
+diff_irf_u &lt;- diff_irf_u %&gt;%
+  as.data.frame() %&gt;%
+  mutate(var = &quot;Unemployment&quot;,
+         time = 1:n() - 1)
+
+# Mean IRF
+irf_1975 &lt;- colMeans(irf_1975)
+irf_2005 &lt;- colMeans(irf_2005)
+
+irf_u &lt;- cbind(irf_1975, irf_2005) %&gt;%
+  as.data.frame() %&gt;%
+  mutate(var = &quot;Unemployment&quot;,
+         time = 1:n() - 1)</code></pre>
+<p>Obtain impulse responses for interest rate</p>
+<pre class="r"><code>irf_1975 &lt;- irf(bvar_1975, impulse = &quot;r&quot;, response = &quot;r&quot;,
+                n.ahead = 20, type = &quot;feir&quot;, keep_draws = TRUE)
+
+irf_2005 &lt;- irf(bvar_2005, impulse = &quot;r&quot;, response = &quot;r&quot;,
+                n.ahead = 20, type = &quot;feir&quot;, keep_draws = TRUE)
+
+# Difference between the IRF
+diff_irf_r &lt;- irf_2005 - irf_1975
+diff_irf_r &lt;- t(apply(diff_irf_r, 2, quantile, probs = c(.05, .5, .95)))
+diff_irf_r &lt;- diff_irf_r %&gt;%
+  as.data.frame() %&gt;%
+  mutate(var = &quot;Interest rate&quot;,
+         time = 1:n() - 1)
+
+# Mean IRF
+irf_1975 &lt;- colMeans(irf_1975)
+irf_2005 &lt;- colMeans(irf_2005)
+
+irf_r &lt;- cbind(irf_1975, irf_2005) %&gt;%
+  as.data.frame() %&gt;%
+  mutate(var = &quot;Interest rate&quot;,
+         time = 1:n() - 1)</code></pre>
+<p>Figure 20.2: Mean IRF</p>
+<pre class="r"><code>temp &lt;- bind_rows(irf_Dp, irf_u, irf_r) %&gt;%
+  # Bring it into long form
+  pivot_longer(cols = starts_with(&quot;irf_&quot;),
+               names_to = &quot;Period&quot;) %&gt;%
+  # For better labelling in the plot
+  mutate(var = factor(var, levels = c(&quot;Inflation&quot;, &quot;Unemployment&quot;, &quot;Interest rate&quot;)),
+         Period = factor(Period, levels = c(&quot;irf_1975&quot;, &quot;irf_2005&quot;),
+                         labels = c(&quot;1975&quot;, &quot;2005&quot;)))
+
+# Plot
+ggplot(temp, aes(x = time, y = value, colour = Period)) +
+  facet_wrap(~ var, scales = &quot;free&quot;) +
+  geom_line() +
+  theme(legend.position = &quot;bottom&quot;, legend.title = element_blank())</code></pre>
+<p><img src="/reproduction/bayesmethods/bayesmethods20_files/figure-html/unnamed-chunk-11-1.png" width="576" /></p>
+<p>Figure 20.3: Plot differences between IRF</p>
+<pre class="r"><code>temp &lt;- bind_rows(diff_irf_Dp, diff_irf_u, diff_irf_r)
+names(temp) &lt;- c(&quot;ymin&quot;, &quot;y&quot;, &quot;ymax&quot;, &quot;var&quot;, &quot;time&quot;)
+
+temp &lt;- temp %&gt;%
+  mutate(var = factor(var, levels = c(&quot;Inflation&quot;, &quot;Unemployment&quot;, &quot;Interest rate&quot;)))
+
+# Plot
+ggplot(temp, aes(x = time)) +
+  geom_ribbon(aes(ymin = ymin, ymax = ymax, fill = &quot;a&quot;), alpha = .3, show.legend = FALSE) +
+  geom_line(aes(y = y, colour = &quot;a&quot;), show.legend = FALSE) +
+  facet_wrap(~ var, scales = &quot;free&quot;)</code></pre>
+<p><img src="/reproduction/bayesmethods/bayesmethods20_files/figure-html/unnamed-chunk-12-1.png" width="576" /></p>
+<p><em>Work in progress</em></p>
+</div>
+</div>

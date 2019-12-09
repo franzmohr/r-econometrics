@@ -3,17 +3,27 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>https://www.r-econometrics.com/reproduction/bayesmethods/bayesmethods18/</loc>
-    <lastmod>2019-12-01T00:00:00+00:00</lastmod>
+    <loc>https://www.r-econometrics.com/reproduction/bayesmethods/bayesmethods20/</loc>
+    <lastmod>2019-12-09T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://www.r-econometrics.com/</loc>
-    <lastmod>2019-12-01T00:00:00+00:00</lastmod>
+    <lastmod>2019-12-09T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/index_dummy/</loc>
+    <lastmod>2019-12-09T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://www.r-econometrics.com/reproduction/</loc>
+    <lastmod>2019-12-09T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/reproduction/bayesmethods/bayesmethods18/</loc>
     <lastmod>2019-12-01T00:00:00+00:00</lastmod>
   </url>
   
@@ -224,11 +234,6 @@
   
   <url>
     <loc>https://www.r-econometrics.com/tags/pwt/</loc>
-    <lastmod>2018-12-30T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/index_dummy/</loc>
     <lastmod>2018-12-30T00:00:00+00:00</lastmod>
   </url>
   

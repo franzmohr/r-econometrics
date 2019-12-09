@@ -6,10 +6,22 @@
     <description>Recent content in Reproductions on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 01 Dec 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 09 Dec 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://www.r-econometrics.com/reproduction/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Chapter 20: Multivariate Time Series Methods</title>
+      <link>https://www.r-econometrics.com/reproduction/bayesmethods/bayesmethods20/</link>
+      <pubDate>Mon, 09 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/reproduction/bayesmethods/bayesmethods20/</guid>
+      <description>Load required packages
+library(bvartools) library(dplyr) library(ggplot2) library(spam) library(tidyr) Data US macro data until 2007Q4
+# Specify URL url &amp;lt;- &amp;quot;https://web.ics.purdue.edu/~jltobias/second_edition/Chapter20/code_for_exercise_1/US_macrodata.csv&amp;quot; # Load data us_macro_2007 &amp;lt;- read.csv(url, col.names = c(&amp;quot;date&amp;quot;, &amp;quot;Dp&amp;quot;, &amp;quot;u&amp;quot;, &amp;quot;r&amp;quot;)) # Omit NA values us_macro_2007 &amp;lt;- na.omit(us_macro_2007) # Transform into time-series object us_macro_2007 &amp;lt;- ts(us_macro_2007[, -1], start = c(1959, 2), frequency = 4)  Exercise 20.1 Prepare the data
+temp &amp;lt;- gen_var(us_macro_2007, p = 2, deterministic = &amp;quot;const&amp;quot;) y &amp;lt;- temp$Y x &amp;lt;- temp$Z k &amp;lt;- NROW(y) tt &amp;lt;- ncol(y) z &amp;lt;- kronecker(t(x), diag(1, k)) m &amp;lt;- ncol(z) Specify the priors</description>
+    </item>
     
     <item>
       <title>Chapter 18: State Space and Unobserved Components Models</title>
@@ -38,7 +50,8 @@ Data Timmer et al. (2015) use the 2013 vintage of the world input-output databas
       
       <guid>https://www.r-econometrics.com/reproduction/bayesmethods/bayesmethodsintro/</guid>
       <description>This section is based on Chan et al. (2019). Bayesian econometric methods (2nded.). The following links contain examples in the main text of the book and use R to estimate the models.
-Chapter 18: State Space and Unobserved Components Models</description>
+Chapter 18: State Space and Unobserved Components Models
+Chapter 20: Multivariate Time Series Methods</description>
     </item>
     
     <item>
