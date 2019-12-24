@@ -212,6 +212,7 @@ Data A popular illustration of heteroskedasticity is the relationship between sa
       
       <guid>https://www.r-econometrics.com/reproduction/bayesmethods/bayesmethodsintro/</guid>
       <description>This section is based on Chan et al. (2019). Bayesian econometric methods (2nded.). The following links contain examples in the main text of the book and use R to estimate the models.
+Chapter 11: Monte Carlo Integration
 Chapter 18: State Space and Unobserved Components Models
 Chapter 20: Multivariate Time Series Methods</description>
     </item>

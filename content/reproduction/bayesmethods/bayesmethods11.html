@@ -1,0 +1,178 @@
+---
+title: "Chapter 11: Monte Carlo Integration"
+author: "Franz X. Mohr"
+date: "2019-12-25"
+---
+
+
+
+<div id="exercise-11.2-drawing-frmm-standard-distributions" class="section level2">
+<h2>Exercise 11.2: Drawing frmm standard distributions</h2>
+<pre class="r"><code># Sample size
+n1 &lt;- 10L
+n2 &lt;- 100L
+n3 &lt;- 100000L
+
+# Reset random number generator for reproducibilty
+set.seed(123456)</code></pre>
+<div id="uniform" class="section level3">
+<h3>Uniform</h3>
+<p>The standard specification of R’s random number generator (RNG) <code>runif</code> is <code>min = 0</code> and <code>max = 1</code>, which is exactly what we need. So we only have to specify the number of draws.</p>
+<pre class="r"><code>unif1 &lt;- runif(n1)
+unif2 &lt;- runif(n2)
+unif3 &lt;- runif(n3)
+
+result &lt;- data.frame(size = c(n1, n2, n3),
+                     mean = c(mean(unif1), mean(unif2), mean(unif3)),
+                     sd = c(sd(unif1), sd(unif2), sd(unif3)))
+
+result</code></pre>
+<pre><code>##     size      mean        sd
+## 1     10 0.4630601 0.2979562
+## 2    100 0.4929105 0.3095004
+## 3 100000 0.4990746 0.2891135</code></pre>
+</div>
+<div id="standard-normal" class="section level3">
+<h3>Standard normal</h3>
+<p>The standard specification of R’s RNG for the normal distribution <code>rnorm</code> is <code>mean = 0</code> and <code>sd = 1</code>, which is by definition a <em>standard normal</em> distribution. So we only have to specify the number of draws.</p>
+<pre class="r"><code>norm1 &lt;- rnorm(n1)
+norm2 &lt;- rnorm(n2)
+norm3 &lt;- rnorm(n3)
+
+result &lt;- data.frame(size = c(n1, n2, n3),
+                     mean = c(mean(norm1), mean(norm2), mean(norm3)),
+                     sd = c(sd(norm1), sd(norm2), sd(norm3)))
+
+result</code></pre>
+<pre><code>##     size         mean       sd
+## 1     10 -0.149059541 1.149290
+## 2    100 -0.076840784 1.090117
+## 3 100000  0.001551597 1.001076</code></pre>
+</div>
+<div id="student-t3" class="section level3">
+<h3>Student t(3)</h3>
+<pre class="r"><code>t1 &lt;- rt(n1, df = 3)
+t2 &lt;- rt(n2, df = 3)
+t3 &lt;- rt(n3, df = 3)
+
+result &lt;- data.frame(size = c(n1, n2, n3),
+                     mean = c(mean(t1), mean(t2), mean(t3)),
+                     sd = c(sd(t1), sd(t2), sd(t3)))
+
+result</code></pre>
+<pre><code>##     size         mean       sd
+## 1     10  0.523968595 1.427517
+## 2    100 -0.100952189 1.361346
+## 3 100000 -0.008228298 1.720145</code></pre>
+</div>
+<div id="beta32" class="section level3">
+<h3>Beta(3,2)</h3>
+<pre class="r"><code>beta1 &lt;- rbeta(n1, shape1 = 3, shape2 = 2)
+beta2 &lt;- rbeta(n2, shape1 = 3, shape2 = 2)
+beta3 &lt;- rbeta(n3, shape1 = 3, shape2 = 2)
+
+result &lt;- data.frame(size = c(n1, n2, n3),
+                     mean = c(mean(beta1), mean(beta2), mean(beta3)),
+                     sd = c(sd(beta1), sd(beta2), sd(beta3)))
+
+result</code></pre>
+<pre><code>##     size      mean        sd
+## 1     10 0.6460647 0.1927849
+## 2    100 0.5902536 0.1927114
+## 3 100000 0.5995364 0.1999195</code></pre>
+</div>
+<div id="exponential5" class="section level3">
+<h3>Exponential(5)</h3>
+<p>Two show the equivalence of the exponential(5) distribution and the G(1, 5) distribution, we reset the RNG before we draw from the respective distribution.</p>
+<p>Also note that <span class="math inline">\(rexp\)</span> requires a slightly different input than the mean as described in the textbook. Rather, we have to specify the rate of the distribution, which is defined as <code>1 / mean</code>.</p>
+<pre class="r"><code>set.seed(987654)
+
+exp1 &lt;- rexp(n1, rate = 1 / 5)
+exp2 &lt;- rexp(n2, rate = 1 / 5)
+exp3 &lt;- rexp(n3, rate = 1 / 5)
+
+result &lt;- data.frame(size = c(n1, n2, n3),
+                     mean = c(mean(exp1), mean(exp2), mean(exp3)),
+                     sd = c(sd(exp1), sd(exp2), sd(exp3)))
+
+result</code></pre>
+<pre><code>##     size     mean       sd
+## 1     10 6.066529 4.766100
+## 2    100 5.567845 5.514212
+## 3 100000 4.991803 4.994150</code></pre>
+</div>
+<div id="gamma1-5" class="section level3">
+<h3>Gamma(1, 5)</h3>
+<pre class="r"><code>set.seed(987654)
+
+gamma_exp1 &lt;- rgamma(n1, shape = 1, scale = 5)
+gamma_exp2 &lt;- rgamma(n2, shape = 1, scale = 5)
+gamma_exp3 &lt;- rgamma(n3, shape = 1, scale = 5)
+
+result &lt;- data.frame(size = c(n1, n2, n3),
+                     mean = c(mean(gamma_exp1), mean(gamma_exp2), mean(gamma_exp3)),
+                     sd = c(sd(gamma_exp1), sd(gamma_exp2), sd(gamma_exp3)))
+
+result</code></pre>
+<pre><code>##     size     mean       sd
+## 1     10 4.439433 2.772297
+## 2    100 4.856169 4.603918
+## 3 100000 4.995174 5.002952</code></pre>
+<p>Note that you could also specify the <span class="math inline">\(rate\)</span> argument in <span class="math inline">\(rgamma\)</span> to obtain the same result. In this case <code>rate</code> is defined as <code>1 / scale</code>.</p>
+<pre class="r"><code>set.seed(987654)
+
+gamma_exp1 &lt;- rgamma(n1, shape = 1, rate = 1 / 5)
+gamma_exp2 &lt;- rgamma(n2, shape = 1, rate = 1 / 5)
+gamma_exp3 &lt;- rgamma(n3, shape = 1, rate = 1 / 5)
+
+result &lt;- data.frame(size = c(n1, n2, n3),
+                     mean = c(mean(gamma_exp1), mean(gamma_exp2), mean(gamma_exp3)),
+                     sd = c(sd(gamma_exp1), sd(gamma_exp2), sd(gamma_exp3)))
+
+result</code></pre>
+<pre><code>##     size     mean       sd
+## 1     10 4.439433 2.772297
+## 2    100 4.856169 4.603918
+## 3 100000 4.995174 5.002952</code></pre>
+<p>The <code>rate</code> argument can be very handy if you want to draw from a inverse gamma distribution, which is often the case in Gibbs sampling.</p>
+</div>
+<div id="chi-squared2" class="section level3">
+<h3>Chi-squared(2)</h3>
+<p>Again, two show the equivalence of the <span class="math inline">\(\chi^{2}(5)\)</span> distribution and the <span class="math inline">\(G(1, 5)\)</span> distribution, we reset the RNG before we draw from the respective distribution.</p>
+<pre class="r"><code>set.seed(987654)
+
+chisq1 &lt;- rchisq(n1, 3)
+chisq2 &lt;- rchisq(n2, 3)
+chisq3 &lt;- rchisq(n3, 3)
+
+result &lt;- data.frame(size = c(n1, n2, n3),
+                     mean = c(mean(chisq1), mean(chisq2), mean(chisq3)),
+                     sd = c(sd(chisq1), sd(chisq2), sd(chisq3)))
+
+result</code></pre>
+<pre><code>##     size     mean       sd
+## 1     10 2.563593 1.633190
+## 2    100 3.050965 2.245561
+## 3 100000 3.006940 2.452734</code></pre>
+</div>
+<div id="gamma32-2" class="section level3">
+<h3>Gamma(3/2, 2)</h3>
+<pre class="r"><code>set.seed(987654)
+
+gamma_chi1 &lt;- rgamma(n1, shape = 3 / 2, scale = 2)
+gamma_chi2 &lt;- rgamma(n2, shape = 3 / 2, scale = 2)
+gamma_chi3 &lt;- rgamma(n3, shape = 3 / 2, scale = 2)
+
+result &lt;- data.frame(size = c(n1, n2, n3),
+                     mean = c(mean(gamma_chi1), mean(gamma_chi2), mean(gamma_chi3)),
+                     sd = c(sd(gamma_chi1), sd(gamma_chi2), sd(gamma_chi3)))
+
+result</code></pre>
+<pre><code>##     size     mean       sd
+## 1     10 2.563593 1.633190
+## 2    100 3.050965 2.245561
+## 3 100000 3.006940 2.452734</code></pre>
+<p>In this case, the output of the two RNGs is exaclty the same, which result from the reset of the RNG seed.</p>
+<p><em>Work in progress</em></p>
+</div>
+</div>
