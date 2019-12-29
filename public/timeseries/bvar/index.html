@@ -88,7 +88,7 @@ if (!doNotTrack) {
 
   <meta
      name="description"
-     content=""
+     content="An introduction into Bayesian VAR (BVAR) modelling and how to estimate it in R using Gibb sampling. The post also provides some experienced-based tips about important aspects that are usually not contained in textbooks."
    />
 
     <div class="container">
@@ -127,7 +127,8 @@ if (!doNotTrack) {
                         <div id="bvar-models" class="section level2">
 <h2>BVAR models</h2>
 <p>Bayesian VAR (BVAR) models have the same mathematical form as any other <a href="/timeseries/varintro">VAR model</a>, i.e.</p>
-<p><span class="math display">\[ y_t = c + \sum_{l=i}^{p} A_i y_{t-i} + \epsilon_t,\]</span> where <span class="math inline">\(y_t\)</span> is a <span class="math inline">\(K \times 1\)</span> vector of endogenous variables in period <span class="math inline">\(t\)</span>, <span class="math inline">\(A_i\)</span> is the cofficient matrix corresponding to the <span class="math inline">\(i\)</span>th lag of <span class="math inline">\(y_t\)</span>, <span class="math inline">\(c\)</span> is a constant deterministic term and <span class="math inline">\(\epsilon\)</span> is an error term with zero mean and variance-covariance <span class="math inline">\(\Sigma\)</span>.</p>
+<p><span class="math display">\[ y_t = c + \sum_{l=i}^{p} A_i y_{t-i} + \epsilon_t,\]</span>
+where <span class="math inline">\(y_t\)</span> is a <span class="math inline">\(K \times 1\)</span> vector of endogenous variables in period <span class="math inline">\(t\)</span>, <span class="math inline">\(A_i\)</span> is the cofficient matrix corresponding to the <span class="math inline">\(i\)</span>th lag of <span class="math inline">\(y_t\)</span>, <span class="math inline">\(c\)</span> is a constant deterministic term and <span class="math inline">\(\epsilon\)</span> is an error term with zero mean and variance-covariance <span class="math inline">\(\Sigma\)</span>.</p>
 <p>The only difference between usual VAR models and BVAR models is the way parameter estimates are obtained and interpreted. VAR models are usually estimated by <a href="/methods/ols">OLS</a>, which is a simple and computationally fast estimator. By contrast, Bayesian estimators are slightly more complicated and more burdensome in terms of algebra and calculation power. The coefficients obtained by so-called <em>frequentist</em> estimators like OLS are interpreted based on the concept of the <a href="https://en.wikipedia.org/wiki/Sampling_distribution" target="_blank">sampling distribution</a>. In Bayesian inference, the coefficients are assumed to have their own distribution. A more detailed treatment of the difference between frequentist and Bayesian inference can be found in Kennedy (2008, ch. 14), which provides a short introduction to the Bayesian approach and a series of references for interested readers. Koop and Korobilis (2010) provide a very good introduction to Bayesian VAR estimators.</p>
 <p>As already mentioned, Bayesian inference can be algebraically demanding. However, Bayesian estimators for linear VAR models can be implemented in a straightforward manner. A standard implementation is a so-called <strong>Gibbs sampler</strong>, which belongs to the family of Markov-Chain-Monte-Carlo (MCMC) methods. A detailed treatment of this method is beyond the scope of this post, but <a href="https://en.wikipedia.org/wiki/Gibbs_sampling">Wikipedia</a> might be a good start to become familiar with it. Personally, I like to think of the Gibbs sampler as throwing a bunch of random numbers at a model and see what sticks. The remainer of this text provides the code to set up and estimate a basic BVAR model with the <code>bvartools</code> package.</p>
 </div>
@@ -137,12 +138,15 @@ if (!doNotTrack) {
 <pre class="r"><code>library(bvartools)
 
 data(&quot;e1&quot;) # Load the data
-e1 &lt;- diff(log(e1)) # Calculate first-log-differences
+e1 &lt;- diff(log(e1)) # Calculate first-log-differences</code></pre>
+<p>Basically, it would be possible to proceed without any further transformation of the data. However, it is good practise to multiply log-differenced data by 100 so that, for example, the value 1% is indicated by 1 and not by 0.01.</p>
+<pre class="r"><code>e1 &lt;- e1 * 100 # Rescale data
 
 plot(e1) # Plot the series</code></pre>
-<p><img src="/timeseries/bvar_files/figure-html/data-1.png" width="432" style="display: block; margin: auto;" /></p>
+<p><img src="/timeseries/bvar_files/figure-html/unnamed-chunk-1-1.png" width="432" style="display: block; margin: auto;" /></p>
 <p>To assist with the set-up of the model the <code>gen_var</code> function produces the inputs <code>y</code> and <code>x</code> for the estimator, where <code>y</code> is a matrix of dependent variables and <code>x</code> is the matrix of regressors for the model</p>
-<p><span class="math display">\[y_t = A x_t + u_t,\]</span> with <span class="math inline">\(u_t \sim N(0, \Sigma)\)</span>. This is a more compact form of the model above, where the lags of the endogenous variables and the constant are already included in <span class="math inline">\(x_t\)</span>.</p>
+<p><span class="math display">\[y_t = A x_t + u_t,\]</span>
+with <span class="math inline">\(u_t \sim N(0, \Sigma)\)</span>. This is a more compact form of the model above, where the lags of the endogenous variables and the constant are already included in <span class="math inline">\(x_t\)</span>.</p>
 <pre class="r"><code>data &lt;- gen_var(e1, p = 2, deterministic = &quot;const&quot;)
 
 y &lt;- data$Y[, 1:73]
@@ -156,22 +160,22 @@ x &lt;- data$Z[, 1:73]</code></pre>
 <pre class="r"><code>A_freq &lt;- tcrossprod(y, x) %*% solve(tcrossprod(x)) # Calculate estimates
 round(A_freq, 3) # Round estimates and print</code></pre>
 <pre><code>##        invest.1 income.1 cons.1 invest.2 income.2 cons.2  const
-## invest   -0.320    0.146  0.961   -0.161    0.115  0.934 -0.017
-## income    0.044   -0.153  0.289    0.050    0.019 -0.010  0.016
-## cons     -0.002    0.225 -0.264    0.034    0.355 -0.022  0.013</code></pre>
+## invest   -0.320    0.146  0.961   -0.161    0.115  0.934 -1.672
+## income    0.044   -0.153  0.289    0.050    0.019 -0.010  1.577
+## cons     -0.002    0.225 -0.264    0.034    0.355 -0.022  1.293</code></pre>
 <p>And <span class="math inline">\(\Sigma\)</span> is calculated by</p>
 <pre class="r"><code>u_freq &lt;- y - A_freq %*% x
 u_sigma_freq &lt;- tcrossprod(u_freq) / (ncol(y) - nrow(x))
-round(u_sigma_freq * 10^4, 2)</code></pre>
+round(u_sigma_freq, 2)</code></pre>
 <pre><code>##        invest income cons
 ## invest  21.30   0.72 1.23
 ## income   0.72   1.37 0.61
 ## cons     1.23   0.61 0.89</code></pre>
-<p>These are the same values as in Lütkepohl (2007).</p>
+<p>These are virtually the same values as in Lütkepohl (2007, Ch. 3). The only differences stem from the re-scaling of the data above, which results in proportionally higher values for the <code>const</code> variable and does not require us to multiply the covariance matrix by <span class="math inline">\(10^4\)</span>.</p>
 </div>
 <div id="bayesian-estimator" class="section level3">
 <h3>Bayesian estimator</h3>
-<p>The following code is a Gibbs sampler for a simple VAR model with non-informative priors.</p>
+<p>The following code is a Gibbs sampler for a simple VAR model with non-informative priors. First, we define some variables, which help in the set-up of the sampler:</p>
 <pre class="r"><code># Reset random number generator for reproducibility
 set.seed(1234567)
 
@@ -179,27 +183,26 @@ iter &lt;- 30000 # Number of iterations of the Gibbs sampler
 burnin &lt;- 15000 # Number of burn-in draws
 store &lt;- iter - burnin
 
-t &lt;- ncol(y) # Number of observations
+tt &lt;- ncol(y) # Number of observations
 k &lt;- nrow(y) # Number of endogenous variables
-m &lt;- k * nrow(x) # Number of estimated coefficients
-
-# Set (uninformative) priors
+m &lt;- k * nrow(x) # Number of estimated coefficients</code></pre>
+<p>Then we set the priors. In this example, I use uninformative priors, which should produce draws of a posterior functions that mimics the OLS estimator.</p>
+<pre class="r"><code># Set (uninformative) priors
 a_mu_prior &lt;- matrix(0, m) # Vector of prior parameter means
 a_v_i_prior &lt;- diag(0, m) # Inverse of the prior covariance matrix
 
 u_sigma_df_prior &lt;- 0 # Prior degrees of freedom
 u_sigma_scale_prior &lt;- diag(0, k) # Prior covariance matrix
-u_sigma_df_post &lt;- t + u_sigma_df_prior # Posterior degrees of freedom
-
-# Initial values
-u_sigma_i &lt;- diag(.00001, k)
-u_sigma &lt;- solve(u_sigma_i)
-
-# Data containers for posterior draws
+u_sigma_df_post &lt;- tt + u_sigma_df_prior # Posterior degrees of freedom</code></pre>
+<p>Then we obtain some starting values. It might be a good idea to start with the OLS estimates of the model.</p>
+<pre class="r"><code># Initial values
+u_sigma_i &lt;- solve(u_sigma_freq)</code></pre>
+<p>Next, create object, in which the posterior draws are saved for later.</p>
+<pre class="r"><code># Data containers for posterior draws
 draws_a &lt;- matrix(NA, m, store)
-draws_sigma &lt;- matrix(NA, k^2, store)
-
-# Start Gibbs sampler
+draws_sigma &lt;- matrix(NA, k * k, store)</code></pre>
+<p>Finally run the Gibbs sampler.</p>
+<pre class="r"><code># Start Gibbs sampler
 for (draw in 1:iter) {
   # Draw conditional mean parameters
   a &lt;- post_normal(y, x, u_sigma_i, a_mu_prior, a_v_i_prior)
@@ -224,13 +227,13 @@ dimnames(A) &lt;- list(dimnames(y)[[1]], dimnames(x)[[1]]) # Rename matrix dimen
 
 A # Print</code></pre>
 <pre><code>##        invest.1 income.1 cons.1 invest.2 income.2 cons.2  const
-## invest   -0.318    0.152  0.960   -0.161    0.116  0.930 -0.017
-## income    0.044   -0.152  0.287    0.050    0.020 -0.012  0.016
-## cons     -0.002    0.225 -0.266    0.034    0.356 -0.023  0.013</code></pre>
+## invest   -0.318    0.152  0.961   -0.161    0.116  0.930 -1.676
+## income    0.044   -0.152  0.287    0.050    0.020 -0.012  1.579
+## cons     -0.002    0.225 -0.266    0.034    0.356 -0.023  1.294</code></pre>
 <p>Point estimates for the covariance matrix can also be obtained by calculating the means of the posterior draws.</p>
 <pre class="r"><code>Sigma &lt;- rowMeans(draws_sigma) # Obtain means for every row
 Sigma &lt;- matrix(Sigma, k) # Transform mean vector into a matrix
-Sigma &lt;- round(Sigma * 10^4, 2) # Round values
+Sigma &lt;- round(Sigma, 2) # Round values
 dimnames(Sigma) &lt;- list(dimnames(y)[[1]], dimnames(y)[[1]]) # Rename matrix dimensions
 
 Sigma # Print</code></pre>
