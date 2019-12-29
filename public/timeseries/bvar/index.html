@@ -186,14 +186,17 @@ store &lt;- iter - burnin
 tt &lt;- ncol(y) # Number of observations
 k &lt;- nrow(y) # Number of endogenous variables
 m &lt;- k * nrow(x) # Number of estimated coefficients</code></pre>
-<p>Then we set the priors. In this example, I use uninformative priors, which should produce draws of a posterior functions that mimics the OLS estimator.</p>
-<pre class="r"><code># Set (uninformative) priors
+<p>Next, we set the priors. The prior means of the coefficient vector <span class="math inline">\(a = vec(A)\)</span> are set to <span class="math inline">\(0\)</span> and the diagonal elements of the corresponding covariance matrix <span class="math inline">\(V\)</span> are set to <span class="math inline">\(1\)</span>, except for coefficients corresponding to intercept terms, which are set to <span class="math inline">\(10\)</span>. The prior degrees of freedom of the error term are set to <span class="math inline">\(6\)</span> and the diagonal elements of the scale matrix to <span class="math inline">\(1\)</span>.</p>
+<p><em>Note that the choice of the prior variances for coefficients, which correspond to intercept terms, can be motivated by the values of the analysed time series. For example, if a stationary series seems to move around the value <span class="math inline">\(5\)</span>, this could be taken into account by setting the prior mean of the respective coefficients to <span class="math inline">\(5\)</span> with a small prior variance around it. If the researcher still prefers to set the mean to <span class="math inline">\(0\)</span>, it should be ensured that the prior variance is large enough so that the value <span class="math inline">\(5\)</span> is captured by the prior distribution.</em></p>
+<p><em>Note that the choice of the prior variances of the errors can be highly influential if the scale of the errors is not taken into account appropriately. For example, if the dependent variable does exceed values between <span class="math inline">\(-0.1\)</span> and <span class="math inline">\(0.1\)</span>, a prior of <span class="math inline">\(1\)</span> would be too high and could lead to useless results.</em></p>
+<pre class="r"><code># Set priors
 a_mu_prior &lt;- matrix(0, m) # Vector of prior parameter means
-a_v_i_prior &lt;- diag(0, m) # Inverse of the prior covariance matrix
+a_v_i_prior &lt;- diag(1, m) # Inverse of the prior covariance matrix
 
-u_sigma_df_prior &lt;- 0 # Prior degrees of freedom
-u_sigma_scale_prior &lt;- diag(0, k) # Prior covariance matrix
+u_sigma_df_prior &lt;- 6 # Prior degrees of freedom
+u_sigma_scale_prior &lt;- diag(1, k) # Prior covariance matrix
 u_sigma_df_post &lt;- tt + u_sigma_df_prior # Posterior degrees of freedom</code></pre>
+<p><em>Note that we could also use uninformative priors, where all elements of the inverse prior covariance matrix <span class="math inline">\(V^{-1}\)</span> are set to zero and the prior degrees of freedom and the elements of the scale matrix are set to 0 as well. Such a specification should lead to posterior draws, which mimic the results of a frequentist OLS estimator.</em></p>
 <p>Then we obtain some starting values. It might be a good idea to start with the OLS estimates of the model.</p>
 <pre class="r"><code># Initial values
 u_sigma_i &lt;- solve(u_sigma_freq)</code></pre>
@@ -227,9 +230,9 @@ dimnames(A) &lt;- list(dimnames(y)[[1]], dimnames(x)[[1]]) # Rename matrix dimen
 
 A # Print</code></pre>
 <pre><code>##        invest.1 income.1 cons.1 invest.2 income.2 cons.2  const
-## invest   -0.318    0.152  0.961   -0.161    0.116  0.930 -1.676
-## income    0.044   -0.152  0.287    0.050    0.020 -0.012  1.579
-## cons     -0.002    0.225 -0.266    0.034    0.356 -0.023  1.294</code></pre>
+## invest   -0.284    0.200  0.573   -0.141    0.170  0.540 -0.353
+## income    0.041   -0.132  0.327    0.048    0.036  0.035  1.307
+## cons     -0.003    0.237 -0.244    0.033    0.365  0.000  1.145</code></pre>
 <p>Point estimates for the covariance matrix can also be obtained by calculating the means of the posterior draws.</p>
 <pre class="r"><code>Sigma &lt;- rowMeans(draws_sigma) # Obtain means for every row
 Sigma &lt;- matrix(Sigma, k) # Transform mean vector into a matrix
@@ -238,9 +241,9 @@ dimnames(Sigma) &lt;- list(dimnames(y)[[1]], dimnames(y)[[1]]) # Rename matrix d
 
 Sigma # Print</code></pre>
 <pre><code>##        invest income cons
-## invest  22.71   0.76 1.31
-## income   0.76   1.46 0.65
-## cons     1.31   0.65 0.95</code></pre>
+## invest  20.45   0.64 1.15
+## income   0.64   1.35 0.59
+## cons     1.15   0.59 0.88</code></pre>
 <p>The means of the coefficient draws are very close to the results of the frequentist estimatior, which would be expected with non-informative priors.</p>
 </div>
 </div>
