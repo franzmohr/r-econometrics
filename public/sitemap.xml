@@ -3,22 +3,27 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://www.r-econometrics.com/reproduction/bayesmethods/bayesmethods11/</loc>
+    <lastmod>2019-12-25T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/</loc>
+    <lastmod>2019-12-25T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/reproduction/</loc>
+    <lastmod>2019-12-25T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://www.r-econometrics.com/reproduction/bayesmethods/bayesmethods20/</loc>
     <lastmod>2019-12-09T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://www.r-econometrics.com/</loc>
-    <lastmod>2019-12-09T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://www.r-econometrics.com/index_dummy/</loc>
-    <lastmod>2019-12-09T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/reproduction/</loc>
     <lastmod>2019-12-09T00:00:00+00:00</lastmod>
   </url>
   

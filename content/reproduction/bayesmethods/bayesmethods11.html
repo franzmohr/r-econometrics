@@ -12,6 +12,8 @@ date: "2019-12-25"
 n1 &lt;- 10L
 n2 &lt;- 100L
 n3 &lt;- 100000L
+# We use integers as indicated by the &quot;L&quot; at the end of the number.
+# This only makes the results look nicer
 
 # Reset random number generator for reproducibilty
 set.seed(123456)</code></pre>
@@ -83,9 +85,9 @@ result</code></pre>
 </div>
 <div id="exponential5" class="section level3">
 <h3>Exponential(5)</h3>
-<p>Two show the equivalence of the exponential(5) distribution and the G(1, 5) distribution, we reset the RNG before we draw from the respective distribution.</p>
+<p>To show the equivalence of the exponential(5) distribution and the G(1, 5) distribution, we reset the RNG before we draw from the respective distribution.</p>
 <p>Also note that <span class="math inline">\(rexp\)</span> requires a slightly different input than the mean as described in the textbook. Rather, we have to specify the rate of the distribution, which is defined as <code>1 / mean</code>.</p>
-<pre class="r"><code>set.seed(987654)
+<pre class="r"><code>set.seed(987654) # Reset RNG
 
 exp1 &lt;- rexp(n1, rate = 1 / 5)
 exp2 &lt;- rexp(n2, rate = 1 / 5)
@@ -103,7 +105,7 @@ result</code></pre>
 </div>
 <div id="gamma1-5" class="section level3">
 <h3>Gamma(1, 5)</h3>
-<pre class="r"><code>set.seed(987654)
+<pre class="r"><code>set.seed(987654) # Reset RNG
 
 gamma_exp1 &lt;- rgamma(n1, shape = 1, scale = 5)
 gamma_exp2 &lt;- rgamma(n2, shape = 1, scale = 5)
@@ -118,8 +120,24 @@ result</code></pre>
 ## 1     10 4.439433 2.772297
 ## 2    100 4.856169 4.603918
 ## 3 100000 4.995174 5.002952</code></pre>
+<p>Although numerically not the same, it can be shown that the two approaches are equivalent by using one million draws and plotting their histograms:</p>
+<pre class="r"><code>library(ggplot2)
+
+# Exponential distribution
+set.seed(987654) # Reset RNG
+exp4 &lt;- data.frame(var = &quot;Exponential(5)&quot;, value = rexp(10^6, rate = 1 / 5))
+
+# Gamma distribution
+set.seed(987654) # Reset RNG
+gamma_exp4 &lt;- data.frame(var = &quot;Gamma(1, 5)&quot;, value = rgamma(10^6, shape = 1, scale = 5))
+
+temp &lt;- rbind(exp4, gamma_exp4)
+
+ggplot(temp, aes(x = value, fill = var)) +
+  geom_histogram(position = &quot;dodge&quot;)</code></pre>
+<p><img src="/reproduction/bayesmethods/bayesmethods11_files/figure-html/unnamed-chunk-8-1.png" width="576" /></p>
 <p>Note that you could also specify the <span class="math inline">\(rate\)</span> argument in <span class="math inline">\(rgamma\)</span> to obtain the same result. In this case <code>rate</code> is defined as <code>1 / scale</code>.</p>
-<pre class="r"><code>set.seed(987654)
+<pre class="r"><code>set.seed(987654) # Reset RNG
 
 gamma_exp1 &lt;- rgamma(n1, shape = 1, rate = 1 / 5)
 gamma_exp2 &lt;- rgamma(n2, shape = 1, rate = 1 / 5)
@@ -138,8 +156,8 @@ result</code></pre>
 </div>
 <div id="chi-squared2" class="section level3">
 <h3>Chi-squared(2)</h3>
-<p>Again, two show the equivalence of the <span class="math inline">\(\chi^{2}(5)\)</span> distribution and the <span class="math inline">\(G(1, 5)\)</span> distribution, we reset the RNG before we draw from the respective distribution.</p>
-<pre class="r"><code>set.seed(987654)
+<p>Again, to show the equivalence of the <span class="math inline">\(\chi^{2}(5)\)</span> distribution and the <span class="math inline">\(G(1, 5)\)</span> distribution, we reset the RNG before we draw from the respective distribution.</p>
+<pre class="r"><code>set.seed(987654) # Reset RNG
 
 chisq1 &lt;- rchisq(n1, 3)
 chisq2 &lt;- rchisq(n2, 3)
@@ -157,7 +175,7 @@ result</code></pre>
 </div>
 <div id="gamma32-2" class="section level3">
 <h3>Gamma(3/2, 2)</h3>
-<pre class="r"><code>set.seed(987654)
+<pre class="r"><code>set.seed(987654) # Reset RNG
 
 gamma_chi1 &lt;- rgamma(n1, shape = 3 / 2, scale = 2)
 gamma_chi2 &lt;- rgamma(n2, shape = 3 / 2, scale = 2)
@@ -172,7 +190,76 @@ result</code></pre>
 ## 1     10 2.563593 1.633190
 ## 2    100 3.050965 2.245561
 ## 3 100000 3.006940 2.452734</code></pre>
-<p>In this case, the output of the two RNGs is exaclty the same, which result from the reset of the RNG seed.</p>
+<p>In this case, the output of the two approaches is exaclty the same, which results from reseting the RNG seed.</p>
+</div>
+</div>
+<div id="exercise-11.3-monte-carlo-integration-in-a-regression-problem" class="section level2">
+<h2>Exercise 11.3: Monte Carlo integration in a regression problem</h2>
+<div id="generate-artificial-data-set" class="section level3">
+<h3>Generate artificial data set</h3>
+<pre class="r"><code>set.seed(987654) # Reset RNG
+
+n &lt;- 100 # Number of observations
+
+# Specify coefficients
+beta1 &lt;- 0
+beta2 &lt;- 1
+h &lt;- 1
+
+# Generate random draws of explanatory variables
+x &lt;- runif(n)
+
+# Generate random draws of errors
+epsilon &lt;- rnorm(n, 0, 1 / h)
+
+# Calculate depended variable
+y &lt;- beta1 + beta2 * x + epsilon
+y &lt;- matrix(y) # Transform to matrix format for later
+
+# Generate data matrix of regressors
+x &lt;- cbind(1, x)
+
+# Number of regressors
+k &lt;- ncol(x)</code></pre>
+</div>
+<div id="calculate-posterior-mean-and-standard-deviation" class="section level3">
+<h3>Calculate posterior mean and standard deviation</h3>
+<p>Set priors</p>
+<pre class="r"><code>beta_mu_prior &lt;- matrix(c(0, 1)) # Prior mean
+beta_v_i_prior &lt;- diag(1, k) # Prior covariance
+
+v_prior &lt;- 1 # Prior degrees of freedom
+s2_prior &lt;- 1 # Prior variance</code></pre>
+<p>Obtain posteriors</p>
+<pre class="r"><code># OLS results
+b_hat &lt;- solve(crossprod(x)) %*% crossprod(x, y) # OLS estimate
+v &lt;- n - k # Degrees of freedom
+s2 &lt;- crossprod(y - x %*% b_hat) / v # sigma2
+sse &lt;- v * s2 # SSE
+
+# beta posterior
+beta_v_i_post &lt;- solve(beta_v_i_prior + crossprod(x))
+beta_mu_post &lt;- beta_v_i_post %*% (beta_v_i_prior %*% beta_mu_prior + crossprod(x) %*% b_hat)
+
+
+v_post &lt;- v_prior + n
+
+beta_diff &lt;- b_hat - beta_mu_prior
+
+vs_post &lt;- as.numeric(v_prior * s2_prior + sse + crossprod(beta_diff, crossprod(x) %*% beta_v_i_post %*% beta_v_i_prior) %*% beta_diff)
+s2_post &lt;- vs_post / v_post</code></pre>
+<p>Posterior mean and standard deviation</p>
+<pre class="r"><code>beta_cov &lt;- beta_v_i_post * vs_post / (v_post - k)
+beta_sd &lt;- sqrt(diag(beta_cov))
+
+result &lt;- data.frame(beta_mu = beta_mu_post,
+                     beta_sd = beta_sd)
+row.names(result) &lt;- c(&quot;beta1&quot;, &quot;beta2&quot;)
+
+result</code></pre>
+<pre><code>##          beta_mu   beta_sd
+## beta1 0.03296222 0.1864333
+## beta2 0.63769948 0.3337710</code></pre>
 <p><em>Work in progress</em></p>
 </div>
 </div>
