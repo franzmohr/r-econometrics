@@ -1,11 +1,13 @@
 ---
-title: "Standard Tests for OLS Models in R"
+title: "Standard Test Statistics for OLS Models in R"
 author: "Franz X. Mohr"
 date: "2019-11-25"
+description: "An overview of how to calculate standard test statistics in R, which should be applied to any econometric analysis that is based on OLS."
 tags:
   - normality-test
   - t-test
   - F-test
+  - hausman-test
 ---
 
 
@@ -146,9 +148,9 @@ jarque.bera.test(model$residuals)</code></pre>
 <h3>Antidotes</h3>
 <p>In order to deal with non-normality in the errors, you could consider the following options:</p>
 <ul>
-<li>Use the log of the dependent variable for you regression</li>
+<li>Use the log of the dependent variable for you regression.</li>
 <li>For time series data use the first difference of the dependent variable, because you might have a stationarity issue.</li>
-<li>Use a different estimator. For example, if your dependet varible can only have positive values, you might be better off with a generalised linear model, which assumes Gamma distributed errors. Or for count data, you might want to use a Poisson estimator etc.</li>
+<li>Use a different estimator. For example, if your dependet varible can only have positive values, you might be better off with a generalised linear model, which assumes Gamma-distributed errors. Or for count data you might want to use a Poisson estimator etc.</li>
 </ul>
 </div>
 </div>
@@ -207,7 +209,61 @@ gqtest(model)</code></pre>
 <li>If the basic structure of heteroskedasticity is unknown - as is usually the case - use <a href="/methods/hcrobusterrors">heteroskedasticity robust standard errors</a>.</li>
 <li>If the researcher feels that the structure of heteroskedasticity can be estimated, use the <a href="https://en.wikipedia.org/wiki/Generalized_least_squares#Feasible_generalized_least_squares" target="_blank">feasible GLS</a> estimator</li>
 </ul>
-<p><em>To be continued… (December 2019)</em></p>
+</div>
+</div>
+<div id="correlation-between-explanatory-variables-and-the-error-term" class="section level2">
+<h2>Correlation between explanatory variables and the error term</h2>
+<p>If explanatory variables are correlated with the error term, i.e. when they are <em>endogenous</em>, an OLS estimator will produce biased estimates. Even if only one variable is causing this problem, the coefficients of all other variables will be affected as well. Since economic data is frequently affected by this problem - due to, for example, measurement error in explanatory variables, autoregression with autocorrelated errors, simultaneity, omitted explanatory variables or sample selection - it is important to test for it.</p>
+<div id="hausman-test" class="section level3">
+<h3>Hausman test</h3>
+<p>A popular method to test for correlation between explanatory variables and the error term is the <em>Hausman test</em>. It basically tests whether the results of the IV estimator are significantly different from the OLS estimator. To illustrate this, let’s use the <em>wage2</em> dataset from the <code>wooldridge</code> package and, again, estimate a basic <a href="https://en.wikipedia.org/wiki/Mincer_earnings_function" target="_blank">Mincer earnings function</a> as described above. However, this time we add <code>IQ</code> as a measure of <em>ability</em>. But since it is assumed that the measure is correlated with the error term, we use an additional measure of ability, <code>KWW</code>, as an instrument for <code>IQ</code>.</p>
+<pre class="r"><code>library(dplyr)
+library(wooldridge)
+data(&quot;wage2&quot;)
+
+# Add squared experience &quot;expersq&quot;
+wage2 &lt;- wage2 %&gt;%
+  mutate(expersq = exper^2)
+
+# IV estimator
+iv_model &lt;- ivreg(lwage ~ educ + exper + expersq + IQ | KWW + educ + exper + expersq,
+                  data = wage2)</code></pre>
+<p>The <code>summary</code> function of the <code>ivreg</code> object, performs the Hausman test automatically. We only have to add the argument <code>diagnostics = TRUE</code>.</p>
+<pre class="r"><code>summary(iv_model, diagnostics = TRUE)</code></pre>
+<pre><code>## 
+## Call:
+## ivreg(formula = lwage ~ educ + exper + expersq + IQ | KWW + educ + 
+##     exper + expersq, data = wage2)
+## 
+## Residuals:
+##       Min        1Q    Median        3Q       Max 
+## -2.097500 -0.256972  0.005075  0.274838  1.284012 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 4.5137035  0.2437555  18.517  &lt; 2e-16 ***
+## educ        0.0096496  0.0155761   0.620    0.536    
+## exper       0.0144617  0.0145717   0.992    0.321    
+## expersq     0.0001935  0.0006100   0.317    0.751    
+## IQ          0.0191398  0.0038791   4.934 9.54e-07 ***
+## 
+## Diagnostic tests:
+##                  df1 df2 statistic  p-value    
+## Weak instruments   1 930     77.13  &lt; 2e-16 ***
+## Wu-Hausman         1 929     15.63 8.26e-05 ***
+## Sargan             0  NA        NA       NA    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.4231 on 930 degrees of freedom
+## Multiple R-Squared: -0.004854,   Adjusted R-squared: -0.009176 
+## Wald test: 36.38 on 4 and 930 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>The (Wu-)Hausman test statistic has a very low p-value and, hence, the test rejects the null of no correcation between <code>IQ</code> and the error term in this example.</p>
+</div>
+<div id="sargan-test" class="section level3">
+<h3>Sargan test</h3>
+<p>The Sargan test checks whether an instrument is correlated with the errors, which should not be the case for good instruments. In the example above, the test statistic of the Sargan test is <code>NA</code>. This is to be expected, because we use <em>one</em> instrument for <em>one</em> endogenous regressor and the mathematical properties of the test require us to have at least one instrument more than endogenous regressor. So, if we use more instruments than endogenous regressors, the system would be identified and we would be able to obtain a test statistic. A low statistic (with rather high p-value) would indicate that the instrument is uncorrelated with the error term.</p>
+<p><em>To be continued… (January 2020)</em></p>
 <!-- ## Autocorrelated errors -->
 <!-- Similar to the problem of heteroskedasticity the presence of autocorrelated errors do not lead to a bias of the estimated coefficients, but they can render test statistics useless. This problem is most relevant for time series data. -->
 <!-- ### Tests -->
@@ -219,12 +275,6 @@ gqtest(model)</code></pre>
 <!-- * Hildreth-Lu Search Procedure -->
 <!-- * Maximum Likelihood: Instead of a simle OLS estimator, we could use the maximum likelihood estimator, which requires to make a bit stronger assumption about the distribution of the errors. -->
 <!-- * Bayesian estimator: That would lead too far. -->
-<!-- ## Correlation between explanatory variables and the error term -->
-<!-- This can cause a servere bias of the estimates -->
-<!-- ### Tests -->
-<!-- * Hausman test -->
-<!-- ### Antidotes -->
-<!-- * IV estimator and Sargan test -->
 <!-- ## Multicollinearity -->
 <!-- ### Tests -->
 <!-- Inflated R-squared -->
@@ -239,4 +289,5 @@ gqtest(model)</code></pre>
 <div id="literature" class="section level2">
 <h2>Literature</h2>
 <p>Kennedy, P. (2014). A Guide to Econometrics. Malden (Mass.): Blackwell Publishing 6th ed.</p>
+<p>Wooldridge, J.M. (2013). Introductory econometrics: A modern approach. (5<sup>th</sup>ed.)</p>
 </div>

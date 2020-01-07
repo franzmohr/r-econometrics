@@ -52,7 +52,7 @@ a0 &amp;lt;- 5 b0 &amp;lt;- 100 Initial values</description>
     </item>
     
     <item>
-      <title>Standard Tests for OLS Models in R</title>
+      <title>Standard Test Statistics for OLS Models in R</title>
       <link>https://www.r-econometrics.com/methods/teststats/</link>
       <pubDate>Mon, 25 Nov 2019 00:00:00 +0000</pubDate>
       
