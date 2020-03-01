@@ -12,7 +12,7 @@ description: "An introduction to network analysis in R using the igraph package 
 
 
 
-<p>With the increasing availability of granular data on the relationships between individual entities - such as persons, countries and financial institutions - network analysis offers many possibilities to extract useful information from such data. This post provides an introduction to network analysis in R using the powerful <code>igraph</code> package for the calculation of metrics and <code>ggraph</code> for visualisation.</p>
+<p>With the increasing availability of granular data on the relationships between individual entities - such as persons (social media), countries (internatinal trade) and financial institutions (supervisory reporting) - network analysis offers many possibilities to extract useful information from such data. This post provides an introduction to network analysis in R using the powerful <code>igraph</code> package for the calculation of metrics and <code>ggraph</code> for visualisation.</p>
 <div id="the-igraph-package" class="section level2">
 <h2>The <code>igraph</code> package</h2>
 <p>There are multiple packages for the analysis of networks in R. In this post I concentrate on the <code>igraph</code> package, which allows for a broad range of applications. But before we get into it in more detail, it is useful to know that there are two possible ways to represent the <em>edges</em>, i.e. the connections, of a network:</p>
@@ -21,8 +21,8 @@ description: "An introduction to network analysis in R using the igraph package 
 <li><strong>A list of connections</strong>: In its most simple form this is a list, where each edge of a network is represented by a row with one entity in the first column and the other in the second. For the purpose of this post this is our preferred representation.</li>
 </ul>
 </div>
-<div id="create-a-graph" class="section level2">
-<h2>Create a graph</h2>
+<div id="create-an-artificial-graph" class="section level2">
+<h2>Create an artificial graph</h2>
 <p>We can illustrate these two representations by looking at an artificial network. Such a network could be generated with certain functions of the <code>igraph</code> package. However, the following code only uses base functionalities of R. It results in a data frame with the names of the connected entities in the first and second row. The third row contains a random indicator for the strength of the connection. It is based on the square of a value from a standard normal distribution. To reduce the number of resulting edges, only values above a certain threshold are kept. Also, the code excludes the connections a node has with itself.</p>
 <pre class="r"><code># Set seed for reproducibility
 set.seed(12345)
@@ -62,9 +62,9 @@ library(igraph)</code></pre>
 <pre class="r"><code>graph_df &lt;- simplify(graph_df)</code></pre>
 <p>Now take a look at the object:</p>
 <pre class="r"><code>graph_df</code></pre>
-<pre><code>## IGRAPH 99be5b0 UN-- 26 173 -- 
+<pre><code>## IGRAPH 2297197 UN-- 26 173 -- 
 ## + attr: name (v/c)
-## + edges from 99be5b0 (vertex names):
+## + edges from 2297197 (vertex names):
 ##   [1] a--f a--g a--l a--m a--s a--v a--x a--y a--z b--d b--f b--g b--h b--k
 ##  [15] b--l b--m b--o b--p b--q b--r b--t b--u b--v b--w b--x b--z c--g c--h
 ##  [29] c--j c--l c--m c--n c--p c--q c--r c--s c--u c--v c--w c--x c--z d--e
@@ -137,10 +137,10 @@ round(g_eigen$vector, 2)</code></pre>
 <h2>Visualisation</h2>
 <p>Beside the calculation of summarising network metrics, the visualisation of a graph can also be a very informative step in network analysis. Since visualisations in R usually involve the <code>ggplot2</code> package, I focus on the <code>ggraph</code> package, which is based on the <code>ggplot2</code> architecture. However, the <code>plot</code> function can be used to get a quick impression of a network:</p>
 <pre class="r"><code>plot(graph_df)</code></pre>
-<p><img src="/post/2020-03-01-introduction-to-network-analysis-in-r_files/figure-html/unnamed-chunk-12-1.png" width="336" /></p>
+<p><img src="/post/2020-03-01-introduction-to-network-analysis-in-r_files/figure-html/unnamed-chunk-12-1.png" width="384" /></p>
 <p>When using <code>ggplot2</code> the main challenge in the visualisation of networks is to find suitable x- and y-coordinates for the nodes of a graph. Fortunately, there are some packages out there, which were developed for this purpose. For example, <code>ggraph</code> and <code>ggnetwork</code> take an <code>igraph</code> object and produce tables with suitable coordianates. These coordinates are usually obtained by using special algorithms such as the ones proposed by Fruchterman and Reingold (1991) or Kamada and Kawai (1989). The latter is applied in the code below.</p>
 <p><code>ggraph</code> diagrams follow the <code>ggplot2</code> logic, where the function <code>ggplot</code> is replaced by <code>ggraph</code> to set up the graph. The function is then followed by the layers the user wants to add. In this example we add a layer of edges with <code>geom_edge_link</code> and on top of this a layer of nodes, which are represented by points, using <code>geom_node_point</code>.</p>
-<pre class="r"><code># Load packeges
+<pre class="r"><code># Load packages
 library(ggraph)
 library(ggplot2)
 

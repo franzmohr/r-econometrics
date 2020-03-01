@@ -8,6 +8,11 @@
   </url>
   
   <url>
+    <loc>https://www.r-econometrics.com/networks/igraph/</loc>
+    <lastmod>2020-03-01T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://www.r-econometrics.com/tags/ggraph/</loc>
     <lastmod>2020-03-01T00:00:00+00:00</lastmod>
   </url>
@@ -18,7 +23,32 @@
   </url>
   
   <url>
+    <loc>https://www.r-econometrics.com/tags/network/</loc>
+    <lastmod>2020-03-01T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/networksintro/</loc>
+    <lastmod>2020-03-01T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/networks/network-summary/</loc>
+    <lastmod>2020-03-01T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/networks/network-visual/</loc>
+    <lastmod>2020-03-01T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://www.r-econometrics.com/tags/network-analysis/</loc>
+    <lastmod>2020-03-01T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/networks/</loc>
     <lastmod>2020-03-01T00:00:00+00:00</lastmod>
   </url>
   
@@ -29,6 +59,11 @@
   
   <url>
     <loc>https://www.r-econometrics.com/post/</loc>
+    <lastmod>2020-03-01T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/</loc>
     <lastmod>2020-03-01T00:00:00+00:00</lastmod>
   </url>
   
@@ -49,11 +84,6 @@
   
   <url>
     <loc>https://www.r-econometrics.com/reproduction/bayesmethods/bayesmethods20/</loc>
-    <lastmod>2019-12-09T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/</loc>
     <lastmod>2019-12-09T00:00:00+00:00</lastmod>
   </url>
   

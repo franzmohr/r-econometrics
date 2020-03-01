@@ -1,0 +1,291 @@
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-115075361-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+<!DOCTYPE html>
+<html xmlns="//www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+    <head>
+        
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+
+        <title>Basics of the igraph package &middot; r-econometrics</title>
+        <link rel='stylesheet' href='//fonts.googleapis.com/css?family=Open+Sans:400,300,600' type='text/css'>
+        <link rel="stylesheet" href="https://www.r-econometrics.com//libraries/normalize.3.0.1.css" />
+        <link rel="stylesheet" href="https://www.r-econometrics.com//css/liquorice.css" />
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <link rel="apple-touch-icon-precomposed" href="/apple-touch-icon-144-precomposed.png" sizes="144x144" />
+        <link rel="alternate" href="" type="application/rss+xml" title="r-econometrics" />
+    </head>
+    <body class="li-body">
+
+<header class="li-page-header">
+    <div class="container">
+        <div class="row">
+            <div class="sixteen columns">
+                <div class="li-brand li-left">
+                <a href="https://www.r-econometrics.com/">r-econometrics</a></div>
+                <div class="li-menu li-right">
+                    <span class="li-menu-icon" onclick="javascript:toggle('menu');">&#9776;</span>
+                    <ul id="menu2" class="li-menu-items">
+                        
+                            <li><a href="/rbasicsintro"> R(eal) Basics </a></li>
+                        
+                            <li><a href="/methodsintro"> Econometric Methods </a></li>
+                        
+                            <li><a href="/timeseriesintro"> Time Series Topics </a></li>
+                        
+                            <li><a href="/networksintro"> Network Analysis </a></li>
+                        
+                            <li><a href="/links"> Links </a></li>
+                        
+                            <li><a href="/post"> Blog </a></li>
+                        
+                            <li><a href="/reproductionintro"> Reproduction Projects </a></li>
+                        
+                            <li><a href="/about"> About and Disclaimer </a></li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="sixteen columns">
+                <ul id="menu" class="li-menu-items li-menu-mobile">
+                    
+                        <li><a href="/rbasicsintro"> R(eal) Basics </a></li>
+                    
+                        <li><a href="/methodsintro"> Econometric Methods </a></li>
+                    
+                        <li><a href="/timeseriesintro"> Time Series Topics </a></li>
+                    
+                        <li><a href="/networksintro"> Network Analysis </a></li>
+                    
+                        <li><a href="/links"> Links </a></li>
+                    
+                        <li><a href="/post"> Blog </a></li>
+                    
+                        <li><a href="/reproductionintro"> Reproduction Projects </a></li>
+                    
+                        <li><a href="/about"> About and Disclaimer </a></li>
+                    
+                </ul>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+
+
+
+
+  <meta
+     name="description"
+     content=""
+   />
+
+    <div class="container">
+        <div class="row">
+            <div class="sixteen columns">
+                <article class="li-article">
+                    <header class="li-article-header">
+                        <h1 class="li-article-title">Basics of the igraph package</h1>
+                        <span class="li-article-taxonomies">
+                            
+
+                            
+                                with tags
+                                
+                                    <a href="https://www.r-econometrics.com//tags/igraph">igraph</a>
+                                
+                            
+                        </span>
+                         - 
+                        <time class="li-article-date">Franz X. Mohr, March 1, 2020
+                        </time>
+                    </header>
+                    <section>
+                        
+
+
+<p>There are multiple packages for the analysis of networks in R. This page concentrates on the <code>igraph</code> package, which allows for a broad range of applications. But before we get into it in more detail, it is useful to know that there are two possible ways to represent the <em>edges</em>, i.e. the connections, of a network:</p>
+<ul>
+<li><strong>Adjacency matrix</strong>: This is a square matrix, where each row and column corresponds to an entity. If two entities are conencted, the respective field in the matrix takes the value one and zero otherwise.</li>
+<li><strong>A list of connections</strong>: In its most simple form this is a list, where each edge of a network is represented by a row with one entity in the first column and the other in the second. For the purpose of this post this is our preferred representation.</li>
+</ul>
+<div id="create-an-artificial-graph" class="section level2">
+<h2>Create an artificial graph</h2>
+<p>We can illustrate these two representations by looking at an artificial network. Such a network could be generated with certain functions of the <code>igraph</code> package. However, the following code only uses base functionalities of R. It results in a data frame with the names of the connected entities in the first and second row. The third row contains a random indicator for the strength of the connection. It is based on the square of a value from a standard normal distribution. To reduce the number of resulting edges, only values above a certain threshold are kept. Also, the code excludes the connections a node has with itself.</p>
+<pre class="r"><code># Set seed for reproducibility
+set.seed(12345)
+
+# Generate data
+raw &lt;- data.frame(byer = rep(letters, 1, each = 26),
+                  sllr = rep(letters, 26),
+                  con = rnorm(26 * 26)^2) # Calculate arbitrary weights
+
+# Drop connections with oneself
+raw &lt;- raw[raw$byer != raw$sllr,]
+
+# Only keep strong connections
+raw &lt;- raw[abs(raw$con) &gt; 1,]
+
+# Reformat row numbers
+rownames(raw) &lt;- NULL
+
+# Look at result
+head(raw)</code></pre>
+<pre><code>##   byer sllr      con
+## 1    a    f 3.304964
+## 2    a    l 3.302623
+## 3    a    s 1.255997
+## 4    a    v 2.119310
+## 5    a    x 2.412236
+## 6    a    y 2.552676</code></pre>
+<p>Basically, this is a list repesentation of the artifical network. In a next step, we convert the data frame to an <code>igraph</code> object.</p>
+</div>
+<div id="igraph-objects" class="section level2">
+<h2><code>igraph</code> objects</h2>
+<pre class="r"><code># Load package
+library(igraph)</code></pre>
+<p>The transformation is straightforward and can be done with the <code>graph_from_data_frame</code> function, where for simplicity we set the argument <code>directed = FALSE</code> to indicated that the network is not directed.</p>
+<pre class="r"><code>graph_df &lt;- graph_from_data_frame(raw, directed = FALSE)</code></pre>
+<p>The function <code>simplify</code> can be used to get rid of loops and multiple edges:</p>
+<pre class="r"><code>graph_df &lt;- simplify(graph_df)</code></pre>
+<p>Now take a look at the object:</p>
+<pre class="r"><code>graph_df</code></pre>
+<pre><code>## IGRAPH f2ded91 UN-- 26 173 -- 
+## + attr: name (v/c)
+## + edges from f2ded91 (vertex names):
+##   [1] a--f a--g a--l a--m a--s a--v a--x a--y a--z b--d b--f b--g b--h b--k
+##  [15] b--l b--m b--o b--p b--q b--r b--t b--u b--v b--w b--x b--z c--g c--h
+##  [29] c--j c--l c--m c--n c--p c--q c--r c--s c--u c--v c--w c--x c--z d--e
+##  [43] d--f d--h d--o d--q d--t d--x d--z e--f e--g e--h e--i e--j e--k e--o
+##  [57] e--q e--r e--s e--t e--v e--w e--x e--y e--z f--g f--i f--k f--l f--m
+##  [71] f--n f--q f--r f--u f--z g--l g--m g--p g--s g--t g--u g--w g--x g--y
+##  [85] g--z h--m h--o h--r h--s h--t h--v h--x h--y h--z i--j i--k i--n i--q
+##  [99] i--u i--v i--y i--z j--m j--p j--r j--t j--u j--v j--w j--y j--z k--l
+## + ... omitted several edges</code></pre>
+<p>It does not look like the data frame list. However, it can be seen that each element of the list of edges refers to a conenction between to entities.</p>
+<p>Let’s compare this list to the adjacency matrix representation. It can be obtained directly from the <code>igraph</code> object by using the <code>as_adj</code> function.</p>
+<pre class="r"><code>graph_adj &lt;- as_adj(graph_df)</code></pre>
+<p>Now look at the first six rows and columns of the resulting object.</p>
+<pre class="r"><code>graph_adj[1:6, 1:6]</code></pre>
+<pre><code>## 6 x 6 sparse Matrix of class &quot;dgCMatrix&quot;
+##   a b c d e f
+## a . . . . . 1
+## b . . . 1 . 1
+## c . . . . . .
+## d . 1 . . 1 1
+## e . . . 1 . 1
+## f 1 1 . 1 1 .</code></pre>
+<p>An existing connection between two nodes is indicated by the value one. If there is no connection between them, the field contains a dot. For example, the (undirected) connection between <em>a</em> and <em>f</em> is described by the 1 in the sixth value of the first column and the sixth value in the first row. This corresponds to the first entry in the list representation of the above <code>igraph</code> object. If the network were directed, only one field would contain a 1 - unless the connection was mutual.</p>
+<p>Note that the resulting object is not an object of class <code>igraph</code>. <code>as_adj</code> produces a <code>dgCMatrix</code> object, which comes with the <code>Matrix</code> package and was specifically designed to implement so-called <em>sparse matrices</em>. Sparse matrices are simply matrices which contain a lot of zeros. By only considereing non-zero values, sparse matrices allow for a lot of additional computational efficiency, which is beneficial for the analysis of very large networks.</p>
+<p>Now that we are familiar with the basic structure of <code>igraph</code> objects we can proceed with the calculation of basic <a href="/networks/network-summary">network summary statistics</a>.</p>
+</div>
+<div id="references" class="section level2">
+<h2>References</h2>
+<p>Csardi G., &amp; Nepusz, T. (2006). The igraph software package for complex network research, <em>InterJournal</em> Complex Systems, 1695.</p>
+</div>
+
+                    </section>
+                </article>
+                <div class="container">
+  <div class="row">
+    <div class="sixteen columns center">
+      <div class="addthis_tipjar_inline"></div>
+      <div class="addthis_inline_share_toolbox"></div>
+    </div>
+  </div>
+</div>
+
+                
+<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5a9c6c9b8a39890d"></script>
+                
+                <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+<footer class="li-page-footer">
+    <div class="container">
+        <div class="row">
+            <div class="sixteen columns center">
+              <div id="disqus_thread"></div>
+                <script type="text/javascript">
+                  (function() { 
+                  if (window.location.hostname == "localhost") return;
+                  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                  var disqus_shortname = 'r-econometrics';
+                  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                  })();
+                  </script>
+                  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+            </div>
+        </div>
+    </div>
+</footer>
+            </div>
+        </div>
+        
+    </div>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+<footer class="li-page-footer">
+    <div class="container">
+        <div class="row">
+            <div class="sixteen columns center">
+              <div class="li-page-footer-legal">
+                &copy; Franz X. Mohr. Powered by <a href="https://github.com/rstudio/blogdown" target="_blank" >Blogdown</a> and hosted by <a href="https://www.netlify.com/" target="_blank" >Netlify</a>. Source available on <a href="https://github.com/rranzmohr/r-econometrics" target="_blank" >Github</a>.
+              </div>
+              <div class="li-page-footer-theme">
+                <span class=""><a href="https://github.com/eliasson/liquorice/">liquorice</a> is a theme for <a href="https://gohugo.io/">hugo</a>
+                </span>
+              </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+    <script src="//yihui.name/js/math-code.js"></script>
+    <script async
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
+    </script>
+
+    <script type="text/javascript">
+    
+    function toggle(id) {
+        var e = document.getElementById(id);
+        e.style.display == 'block' ? e.style.display = 'none' : e.style.display = 'block';
+    }
+
+    </script>
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-115075361-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+    </body>
+</html>
+

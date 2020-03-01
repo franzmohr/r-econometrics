@@ -1,0 +1,35 @@
+---
+title: "Network Summary Statistics"
+author: "Franz X. Mohr"
+date: "2020-03-01"
+tags:
+  - igraph
+  - networks
+  - network-analysis
+---
+
+
+
+<p>Beside the calculation of summarising network metrics, the visualisation of a graph can also be a very informative step in network analysis. Since visualisations in R usually involve the <code>ggplot2</code> package, I focus on the <code>ggraph</code> package, which is based on the <code>ggplot2</code> architecture. For illustration I use the artificial data set from my <a href="https://www.r-econometrics.com/2020/03/01/an-introduction-to-network-analysis-in-r/" target="_blank">post on network analysis</a>, which is an <code>igraph</code> object names <code>graph_df</code>.</p>
+<p>When using <code>ggplot2</code> the main challenge in the visualisation of networks is to find suitable x- and y-coordinates for the nodes of a graph. Fortunately, there are some packages out there, which were developed for this purpose. For example, <code>ggraph</code> and <code>ggnetwork</code> take an <code>igraph</code> object and produce tables with suitable coordianates. These coordinates are usually obtained by using special algorithms such as the ones proposed by Fruchterman and Reingold (1991) or Kamada and Kawai (1989). The latter is applied in the code below.</p>
+<p><code>ggraph</code> diagrams follow the <code>ggplot2</code> logic, where the function <code>ggplot</code> is replaced by <code>ggraph</code> to set up the graph. The function is then followed by the layers the user wants to add. In this example we add a layer of edges with <code>geom_edge_link</code> and on top of this a layer of nodes, which are represented by points, using <code>geom_node_point</code>.</p>
+<pre class="r"><code># Load packages
+library(ggraph)
+library(ggplot2)
+library(igraph)
+
+ggraph(graph_df, layout = &quot;kk&quot;) + # Generate graph
+  geom_edge_link(colour = &quot;darkgrey&quot;) + # Add a layer of edges
+  geom_node_point(size = 3) + # Add a layer of nodes
+  theme_graph() # Get rid of gray background colour, grid and axes</code></pre>
+<p><img src="/networks/network-visual_files/figure-html/unnamed-chunk-2-1.png" width="355.2" /></p>
+<p>Further introductions to <code>ggraph</code> can be found on <a href="https://www.data-imaginist.com/tags/ggraph" target="_blank">https://www.data-imaginist.com/tags/ggraph</a> and in the package’s vignettes, of course.</p>
+<p>However, the <code>plot</code> function can be used to get a quick impression of a network:</p>
+<pre class="r"><code>plot(graph_df)</code></pre>
+<p><img src="/networks/network-visual_files/figure-html/unnamed-chunk-3-1.png" width="384" /></p>
+<div id="references" class="section level2">
+<h2>References</h2>
+<p>Csardi G., &amp; Nepusz, T. (2006). The igraph software package for complex network research, <em>InterJournal</em> Complex Systems, 1695.</p>
+<p>Fruchterman, T. M. J., &amp; Reingold, E. M. (1991). Graph Drawing by Force-directed Placement. <em>Software - Practice and Experience, 21</em>(11), 1129-1164.</p>
+<p>Kamada, T., &amp; Kawai, S. (1989). An algorithm for drawing general undirected graphs. <em>Information Processing Letters 31</em>(1), 7-15.</p>
+</div>

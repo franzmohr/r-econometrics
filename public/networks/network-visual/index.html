@@ -1,0 +1,239 @@
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-115075361-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+<!DOCTYPE html>
+<html xmlns="//www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+    <head>
+        
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+
+        <title>Network Summary Statistics &middot; r-econometrics</title>
+        <link rel='stylesheet' href='//fonts.googleapis.com/css?family=Open+Sans:400,300,600' type='text/css'>
+        <link rel="stylesheet" href="https://www.r-econometrics.com//libraries/normalize.3.0.1.css" />
+        <link rel="stylesheet" href="https://www.r-econometrics.com//css/liquorice.css" />
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <link rel="apple-touch-icon-precomposed" href="/apple-touch-icon-144-precomposed.png" sizes="144x144" />
+        <link rel="alternate" href="" type="application/rss+xml" title="r-econometrics" />
+    </head>
+    <body class="li-body">
+
+<header class="li-page-header">
+    <div class="container">
+        <div class="row">
+            <div class="sixteen columns">
+                <div class="li-brand li-left">
+                <a href="https://www.r-econometrics.com/">r-econometrics</a></div>
+                <div class="li-menu li-right">
+                    <span class="li-menu-icon" onclick="javascript:toggle('menu');">&#9776;</span>
+                    <ul id="menu2" class="li-menu-items">
+                        
+                            <li><a href="/rbasicsintro"> R(eal) Basics </a></li>
+                        
+                            <li><a href="/methodsintro"> Econometric Methods </a></li>
+                        
+                            <li><a href="/timeseriesintro"> Time Series Topics </a></li>
+                        
+                            <li><a href="/networksintro"> Network Analysis </a></li>
+                        
+                            <li><a href="/links"> Links </a></li>
+                        
+                            <li><a href="/post"> Blog </a></li>
+                        
+                            <li><a href="/reproductionintro"> Reproduction Projects </a></li>
+                        
+                            <li><a href="/about"> About and Disclaimer </a></li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="sixteen columns">
+                <ul id="menu" class="li-menu-items li-menu-mobile">
+                    
+                        <li><a href="/rbasicsintro"> R(eal) Basics </a></li>
+                    
+                        <li><a href="/methodsintro"> Econometric Methods </a></li>
+                    
+                        <li><a href="/timeseriesintro"> Time Series Topics </a></li>
+                    
+                        <li><a href="/networksintro"> Network Analysis </a></li>
+                    
+                        <li><a href="/links"> Links </a></li>
+                    
+                        <li><a href="/post"> Blog </a></li>
+                    
+                        <li><a href="/reproductionintro"> Reproduction Projects </a></li>
+                    
+                        <li><a href="/about"> About and Disclaimer </a></li>
+                    
+                </ul>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+
+
+
+
+  <meta
+     name="description"
+     content=""
+   />
+
+    <div class="container">
+        <div class="row">
+            <div class="sixteen columns">
+                <article class="li-article">
+                    <header class="li-article-header">
+                        <h1 class="li-article-title">Network Summary Statistics</h1>
+                        <span class="li-article-taxonomies">
+                            
+
+                            
+                                with tags
+                                
+                                    <a href="https://www.r-econometrics.com//tags/igraph">igraph</a>
+                                
+                                    <a href="https://www.r-econometrics.com//tags/networks">networks</a>
+                                
+                                    <a href="https://www.r-econometrics.com//tags/network-analysis">network-analysis</a>
+                                
+                            
+                        </span>
+                         - 
+                        <time class="li-article-date">Franz X. Mohr, March 1, 2020
+                        </time>
+                    </header>
+                    <section>
+                        
+
+
+<p>Beside the calculation of summarising network metrics, the visualisation of a graph can also be a very informative step in network analysis. Since visualisations in R usually involve the <code>ggplot2</code> package, I focus on the <code>ggraph</code> package, which is based on the <code>ggplot2</code> architecture. For illustration I use the artificial data set from my <a href="https://www.r-econometrics.com/2020/03/01/an-introduction-to-network-analysis-in-r/" target="_blank">post on network analysis</a>, which is an <code>igraph</code> object names <code>graph_df</code>.</p>
+<p>When using <code>ggplot2</code> the main challenge in the visualisation of networks is to find suitable x- and y-coordinates for the nodes of a graph. Fortunately, there are some packages out there, which were developed for this purpose. For example, <code>ggraph</code> and <code>ggnetwork</code> take an <code>igraph</code> object and produce tables with suitable coordianates. These coordinates are usually obtained by using special algorithms such as the ones proposed by Fruchterman and Reingold (1991) or Kamada and Kawai (1989). The latter is applied in the code below.</p>
+<p><code>ggraph</code> diagrams follow the <code>ggplot2</code> logic, where the function <code>ggplot</code> is replaced by <code>ggraph</code> to set up the graph. The function is then followed by the layers the user wants to add. In this example we add a layer of edges with <code>geom_edge_link</code> and on top of this a layer of nodes, which are represented by points, using <code>geom_node_point</code>.</p>
+<pre class="r"><code># Load packages
+library(ggraph)
+library(ggplot2)
+library(igraph)
+
+ggraph(graph_df, layout = &quot;kk&quot;) + # Generate graph
+  geom_edge_link(colour = &quot;darkgrey&quot;) + # Add a layer of edges
+  geom_node_point(size = 3) + # Add a layer of nodes
+  theme_graph() # Get rid of gray background colour, grid and axes</code></pre>
+<p><img src="/networks/network-visual_files/figure-html/unnamed-chunk-2-1.png" width="355.2" /></p>
+<p>Further introductions to <code>ggraph</code> can be found on <a href="https://www.data-imaginist.com/tags/ggraph" target="_blank">https://www.data-imaginist.com/tags/ggraph</a> and in the package’s vignettes, of course.</p>
+<p>However, the <code>plot</code> function can be used to get a quick impression of a network:</p>
+<pre class="r"><code>plot(graph_df)</code></pre>
+<p><img src="/networks/network-visual_files/figure-html/unnamed-chunk-3-1.png" width="384" /></p>
+<div id="references" class="section level2">
+<h2>References</h2>
+<p>Csardi G., &amp; Nepusz, T. (2006). The igraph software package for complex network research, <em>InterJournal</em> Complex Systems, 1695.</p>
+<p>Fruchterman, T. M. J., &amp; Reingold, E. M. (1991). Graph Drawing by Force-directed Placement. <em>Software - Practice and Experience, 21</em>(11), 1129-1164.</p>
+<p>Kamada, T., &amp; Kawai, S. (1989). An algorithm for drawing general undirected graphs. <em>Information Processing Letters 31</em>(1), 7-15.</p>
+</div>
+
+                    </section>
+                </article>
+                <div class="container">
+  <div class="row">
+    <div class="sixteen columns center">
+      <div class="addthis_tipjar_inline"></div>
+      <div class="addthis_inline_share_toolbox"></div>
+    </div>
+  </div>
+</div>
+
+                
+<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5a9c6c9b8a39890d"></script>
+                
+                <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+<footer class="li-page-footer">
+    <div class="container">
+        <div class="row">
+            <div class="sixteen columns center">
+              <div id="disqus_thread"></div>
+                <script type="text/javascript">
+                  (function() { 
+                  if (window.location.hostname == "localhost") return;
+                  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                  var disqus_shortname = 'r-econometrics';
+                  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                  })();
+                  </script>
+                  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+            </div>
+        </div>
+    </div>
+</footer>
+            </div>
+        </div>
+        
+    </div>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+<footer class="li-page-footer">
+    <div class="container">
+        <div class="row">
+            <div class="sixteen columns center">
+              <div class="li-page-footer-legal">
+                &copy; Franz X. Mohr. Powered by <a href="https://github.com/rstudio/blogdown" target="_blank" >Blogdown</a> and hosted by <a href="https://www.netlify.com/" target="_blank" >Netlify</a>. Source available on <a href="https://github.com/rranzmohr/r-econometrics" target="_blank" >Github</a>.
+              </div>
+              <div class="li-page-footer-theme">
+                <span class=""><a href="https://github.com/eliasson/liquorice/">liquorice</a> is a theme for <a href="https://gohugo.io/">hugo</a>
+                </span>
+              </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+    <script src="//yihui.name/js/math-code.js"></script>
+    <script async
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
+    </script>
+
+    <script type="text/javascript">
+    
+    function toggle(id) {
+        var e = document.getElementById(id);
+        e.style.display == 'block' ? e.style.display = 'none' : e.style.display = 'block';
+    }
+
+    </script>
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-115075361-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+    </body>
+</html>
+

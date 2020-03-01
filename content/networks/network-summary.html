@@ -1,0 +1,62 @@
+---
+title: "Network Summary Statistics"
+author: "Franz X. Mohr"
+date: "2020-03-01"
+tags:
+  - igraph
+  - networks
+  - network-analysis
+---
+
+
+
+<p>This page covers some basic network summary statistics as presented in Jackson (2008). The presented metrics are based on the concept of <em>centrality</em>, which describes the importance of a node in a given network of nodes. For illustration I use the artificial data set from my <a href="https://www.r-econometrics.com/2020/03/01/an-introduction-to-network-analysis-in-r/" target="_blank">post on network analysis</a>, which is an <code>igraph</code> object names <code>graph_df</code>.</p>
+<div id="degree" class="section level3">
+<h3>Degree</h3>
+<p>The degree of a node is the number of its connections. The <code>degree</code> function calculates this number for each node of a graph. The node with the highest number is the node with the highest number of connections.</p>
+<pre class="r"><code># Load package
+library(igraph)
+
+# Obtain degrees
+g_degree &lt;- degree(graph_df)
+
+g_degree</code></pre>
+<pre><code>##  a  b  c  d  e  f  g  h  i  j  k  l  m  n  o  p  q  r  s  t  u  v  w  x  y 
+## 12 20 18 11 19 16 16 16 13 14 16 10 17 15 17 12 16 18 13 13 15 15 14 19 15 
+##  z 
+## 20</code></pre>
+<p>The degree is of a node is an insteresting metric to identify the most connected nodes of a network. However, if the structure of a network is of interest, the <em>degree distribution</em> can be an informative metric. It describes the relative frequencey of nodes that have different degrees. In that way it is a histogram of degrees.</p>
+<pre class="r"><code>hist(g_degree)</code></pre>
+<p><img src="/networks/network-summary_files/figure-html/unnamed-chunk-3-1.png" width="384" /></p>
+<p>This histogram might not look very informative, which is partly due to the way the artificial network was constructed. However, as the number of nodes of a real life network increases, this distribution can become very imformative. <em>Note that sometimes it is beneficial to obtain the distribution of the log-degree</em>.</p>
+</div>
+<div id="betweenness" class="section level3">
+<h3>Betweenness</h3>
+<p><em>Betweenness</em> denotes the number of shortest paths passing through a node.</p>
+<pre class="r"><code>g_betw &lt;- betweenness(graph_df)
+
+round(g_betw, 2)</code></pre>
+<pre><code>##     a     b     c     d     e     f     g     h     i     j     k     l 
+##  3.22  9.75  8.33  1.48  9.76  7.67  6.86  4.60  2.57  4.16  6.56  1.61 
+##     m     n     o     p     q     r     s     t     u     v     w     x 
+##  5.38  4.93  6.95  3.85  6.83  8.05  3.81  3.53  5.05  5.72  3.13 11.09 
+##     y     z 
+##  6.21 10.90</code></pre>
+</div>
+<div id="eigenvector-centrality" class="section level3">
+<h3>Eigenvector centrality</h3>
+<p>The <em>eigenvector centrality</em> (Bonabeau, 1972) belongs to the class of spectral centralities. It is based on the idea that the importance of a node is recusively related to the importance of the nodes pointing to it. For example, your popularity depends on the popularity of your friends, whose popularity depends on their friends etc.</p>
+<pre class="r"><code>g_eigen &lt;- eigen_centrality(graph_df)
+
+round(g_eigen$vector, 2)</code></pre>
+<pre><code>##    a    b    c    d    e    f    g    h    i    j    k    l    m    n    o 
+## 0.59 1.00 0.88 0.59 0.93 0.76 0.79 0.85 0.65 0.72 0.78 0.51 0.89 0.75 0.85 
+##    p    q    r    s    t    u    v    w    x    y    z 
+## 0.59 0.79 0.89 0.65 0.66 0.76 0.76 0.72 0.91 0.72 1.00</code></pre>
+</div>
+<div id="references" class="section level2">
+<h2>References</h2>
+<p>Bonabeau, E. (1972). Factoring and weighting approaches to status scores and clique identification. <em>Journal of Mathematical Sociology 2</em>, 113-120.</p>
+<p>Csardi G., &amp; Nepusz, T. (2006). The igraph software package for complex network research, <em>InterJournal</em> Complex Systems, 1695.</p>
+<p>Jackson, M. O. (2008). <em>Social and economic networks</em>. Princeton: University Press.</p>
+</div>

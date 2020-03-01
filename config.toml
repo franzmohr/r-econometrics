@@ -24,6 +24,10 @@ googleAnalytics = "UA-115075361-1"
     url = "/timeseriesintro"
     weight = 30
 [[menu.main]]
+    name = "Network Analysis"
+    url = "/networksintro"
+    weight = 35
+[[menu.main]]
     name = "Links"
     url = "/links"
     weight = 40

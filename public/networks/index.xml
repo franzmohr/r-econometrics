@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Networks on r-econometrics</title>
+    <link>https://www.r-econometrics.com/networks/</link>
+    <description>Recent content in Networks on r-econometrics</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 01 Mar 2020 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://www.r-econometrics.com/networks/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Basics of the igraph package</title>
+      <link>https://www.r-econometrics.com/networks/igraph/</link>
+      <pubDate>Sun, 01 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/networks/igraph/</guid>
+      <description>There are multiple packages for the analysis of networks in R. This page concentrates on the igraph package, which allows for a broad range of applications. But before we get into it in more detail, it is useful to know that there are two possible ways to represent the edges, i.e. the connections, of a network:
+ Adjacency matrix: This is a square matrix, where each row and column corresponds to an entity.</description>
+    </item>
+    
+    <item>
+      <title>Network Summary Statistics</title>
+      <link>https://www.r-econometrics.com/networks/network-summary/</link>
+      <pubDate>Sun, 01 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/networks/network-summary/</guid>
+      <description>This page covers some basic network summary statistics as presented in Jackson (2008). The presented metrics are based on the concept of centrality, which describes the importance of a node in a given network of nodes. For illustration I use the artificial data set from my post on network analysis, which is an igraph object names graph_df.
+Degree The degree of a node is the number of its connections. The degree function calculates this number for each node of a graph.</description>
+    </item>
+    
+    <item>
+      <title>Network Summary Statistics</title>
+      <link>https://www.r-econometrics.com/networks/network-visual/</link>
+      <pubDate>Sun, 01 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/networks/network-visual/</guid>
+      <description>Beside the calculation of summarising network metrics, the visualisation of a graph can also be a very informative step in network analysis. Since visualisations in R usually involve the ggplot2 package, I focus on the ggraph package, which is based on the ggplot2 architecture. For illustration I use the artificial data set from my post on network analysis, which is an igraph object names graph_df.
+When using ggplot2 the main challenge in the visualisation of networks is to find suitable x- and y-coordinates for the nodes of a graph.</description>
+    </item>
+    
+  </channel>
+</rss>
