@@ -125,7 +125,7 @@ if (!doNotTrack) {
                         
 
 
-<p>With the increasing availability of granular data on the relationships between individual entities - such as persons (social media), countries (internatinal trade) and financial institutions (supervisory reporting) - network analysis offers many possibilities to extract useful information from such data. This post provides an introduction to network analysis in R using the powerful <code>igraph</code> package for the calculation of metrics and <code>ggraph</code> for visualisation.</p>
+<p>With the increasing availability of granular data on the relationships between individual entities - such as persons (social media), countries (internatinal trade) and financial institutions (supervisory reporting) - network analysis offers many possibilities to extract useful information from such data. This post provides an introduction to network analysis in R using the powerful <code>igraph</code> package for the calculation of metrics and <code>ggraph</code> for visualisation. It marks the beginning of a more comprehensive treatment of <a href="https://www.r-econometrics.com/networksintro/" target="_blank">network analysis on r-econometrics</a>.</p>
 <div id="the-igraph-package" class="section level2">
 <h2>The <code>igraph</code> package</h2>
 <p>There are multiple packages for the analysis of networks in R. In this post I concentrate on the <code>igraph</code> package, which allows for a broad range of applications. But before we get into it in more detail, it is useful to know that there are two possible ways to represent the <em>edges</em>, i.e. the connections, of a network:</p>
@@ -175,9 +175,9 @@ library(igraph)</code></pre>
 <pre class="r"><code>graph_df &lt;- simplify(graph_df)</code></pre>
 <p>Now take a look at the object:</p>
 <pre class="r"><code>graph_df</code></pre>
-<pre><code>## IGRAPH 2297197 UN-- 26 173 -- 
+<pre><code>## IGRAPH 3f1db5e UN-- 26 173 -- 
 ## + attr: name (v/c)
-## + edges from 2297197 (vertex names):
+## + edges from 3f1db5e (vertex names):
 ##   [1] a--f a--g a--l a--m a--s a--v a--x a--y a--z b--d b--f b--g b--h b--k
 ##  [15] b--l b--m b--o b--p b--q b--r b--t b--u b--v b--w b--x b--z c--g c--h
 ##  [29] c--j c--l c--m c--n c--p c--q c--r c--s c--u c--v c--w c--x c--z d--e

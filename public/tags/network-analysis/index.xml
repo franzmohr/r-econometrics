@@ -17,8 +17,7 @@
       <pubDate>Sun, 01 Mar 2020 00:00:00 +0000</pubDate>
       
       <guid>https://www.r-econometrics.com/2020/03/01/an-introduction-to-network-analysis-in-r/</guid>
-      <description>With the increasing availability of granular data on the relationships between individual entities - such as persons (social media), countries (internatinal trade) and financial institutions (supervisory reporting) - network analysis offers many possibilities to extract useful information from such data. This post provides an introduction to network analysis in R using the powerful igraph package for the calculation of metrics and ggraph for visualisation.
-The igraph package There are multiple packages for the analysis of networks in R.</description>
+      <description>With the increasing availability of granular data on the relationships between individual entities - such as persons (social media), countries (internatinal trade) and financial institutions (supervisory reporting) - network analysis offers many possibilities to extract useful information from such data. This post provides an introduction to network analysis in R using the powerful igraph package for the calculation of metrics and ggraph for visualisation. It marks the beginning of a more comprehensive treatment of network analysis on r-econometrics.</description>
     </item>
     
     <item>
