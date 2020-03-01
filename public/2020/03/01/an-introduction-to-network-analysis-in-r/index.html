@@ -163,21 +163,21 @@ head(raw)</code></pre>
 ## 4    a    v 2.119310
 ## 5    a    x 2.412236
 ## 6    a    y 2.552676</code></pre>
-<p>Basically, this is a list repesentation of the artifical network. In a next step, we convert the data frame to an <code>igraph</code> object.</p>
+<p>Basically, this is a list repesentation of the artifical network. In a next step we convert the data frame to an <code>igraph</code> object.</p>
 </div>
 <div id="igraph-objects" class="section level2">
 <h2><code>igraph</code> objects</h2>
 <pre class="r"><code># Load package
 library(igraph)</code></pre>
-<p>The transformation is straightforward and can be done with the <code>graph_from_data_frame</code> function, where for simplicity we set the argument <code>directed = FALSE</code> to indicated that the network is not directed.</p>
+<p>The transformation is straightforward and can be done with the <code>graph_from_data_frame</code> function, where for simplicity we set the argument <code>directed = FALSE</code> to indicated that the network is not directed. <em>Note that it is important that the first and second column of the data frame contain the names of the nodes that have a connection.</em></p>
 <pre class="r"><code>graph_df &lt;- graph_from_data_frame(raw, directed = FALSE)</code></pre>
 <p>The function <code>simplify</code> can be used to get rid of loops and multiple edges:</p>
 <pre class="r"><code>graph_df &lt;- simplify(graph_df)</code></pre>
 <p>Now take a look at the object:</p>
 <pre class="r"><code>graph_df</code></pre>
-<pre><code>## IGRAPH 3f1db5e UN-- 26 173 -- 
+<pre><code>## IGRAPH bdf5bb9 UN-- 26 173 -- 
 ## + attr: name (v/c)
-## + edges from 3f1db5e (vertex names):
+## + edges from bdf5bb9 (vertex names):
 ##   [1] a--f a--g a--l a--m a--s a--v a--x a--y a--z b--d b--f b--g b--h b--k
 ##  [15] b--l b--m b--o b--p b--q b--r b--t b--u b--v b--w b--x b--z c--g c--h
 ##  [29] c--j c--l c--m c--n c--p c--q c--r c--s c--u c--v c--w c--x c--z d--e
