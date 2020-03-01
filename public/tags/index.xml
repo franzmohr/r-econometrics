@@ -6,10 +6,46 @@
     <description>Recent content in Tags on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 25 Nov 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 01 Mar 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://www.r-econometrics.com/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>ggraph</title>
+      <link>https://www.r-econometrics.com/tags/ggraph/</link>
+      <pubDate>Sun, 01 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/tags/ggraph/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>igraph</title>
+      <link>https://www.r-econometrics.com/tags/igraph/</link>
+      <pubDate>Sun, 01 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/tags/igraph/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>network-analysis</title>
+      <link>https://www.r-econometrics.com/tags/network-analysis/</link>
+      <pubDate>Sun, 01 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/tags/network-analysis/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>networks</title>
+      <link>https://www.r-econometrics.com/tags/networks/</link>
+      <pubDate>Sun, 01 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/tags/networks/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>F-test</title>
@@ -84,6 +120,15 @@
     </item>
     
     <item>
+      <title>vec</title>
+      <link>https://www.r-econometrics.com/tags/vec/</link>
+      <pubDate>Wed, 09 Oct 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/tags/vec/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>vector autoregression</title>
       <link>https://www.r-econometrics.com/tags/vector-autoregression/</link>
       <pubDate>Wed, 09 Oct 2019 00:00:00 +0000</pubDate>
@@ -120,20 +165,20 @@
     </item>
     
     <item>
-      <title>vec</title>
-      <link>https://www.r-econometrics.com/tags/vec/</link>
-      <pubDate>Mon, 22 Jul 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://www.r-econometrics.com/tags/vec/</guid>
-      <description></description>
-    </item>
-    
-    <item>
       <title>bayes</title>
       <link>https://www.r-econometrics.com/tags/bayes/</link>
       <pubDate>Sun, 07 Jul 2019 00:00:00 +0000</pubDate>
       
       <guid>https://www.r-econometrics.com/tags/bayes/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>bayesian</title>
+      <link>https://www.r-econometrics.com/tags/bayesian/</link>
+      <pubDate>Sun, 07 Jul 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/tags/bayesian/</guid>
       <description></description>
     </item>
     
@@ -359,15 +404,6 @@
       <pubDate>Mon, 24 Dec 2018 00:00:00 +0000</pubDate>
       
       <guid>https://www.r-econometrics.com/tags/robust-error/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>bayesian</title>
-      <link>https://www.r-econometrics.com/tags/bayesian/</link>
-      <pubDate>Sat, 04 Aug 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://www.r-econometrics.com/tags/bayesian/</guid>
       <description></description>
     </item>
     

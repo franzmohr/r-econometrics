@@ -6,10 +6,20 @@
     <description>Recent content in Posts on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 30 Dec 2018 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 01 Mar 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://www.r-econometrics.com/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>An Introduction to Network Analysis in R</title>
+      <link>https://www.r-econometrics.com/2020/03/01/an-introduction-to-network-analysis-in-r/</link>
+      <pubDate>Sun, 01 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/2020/03/01/an-introduction-to-network-analysis-in-r/</guid>
+      <description>With the increasing availability of granular data on the relationships between individual entities - such as persons, countries and financial institutions - network analysis offers many possibilities to extract useful information from such data. This post provides an introduction to network analysis in R using the powerful igraph package for the calculation of metrics and ggraph for visualisation.
+The igraph package There are multiple packages for the analysis of networks in R.</description>
+    </item>
     
     <item>
       <title>An Exercise in Growth Accounting</title>

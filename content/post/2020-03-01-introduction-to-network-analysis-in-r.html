@@ -1,0 +1,161 @@
+---
+title: "An Introduction to Network Analysis in R"
+author: "Franz X. Mohr"
+date: "2020-03-01"
+tags:
+  - igraph
+  - ggraph
+  - networks
+  - network-analysis
+description: "An introduction to network analysis in R using the igraph package for the calculation of metrics and ggraph for visualisation."
+---
+
+
+
+<p>With the increasing availability of granular data on the relationships between individual entities - such as persons, countries and financial institutions - network analysis offers many possibilities to extract useful information from such data. This post provides an introduction to network analysis in R using the powerful <code>igraph</code> package for the calculation of metrics and <code>ggraph</code> for visualisation.</p>
+<div id="the-igraph-package" class="section level2">
+<h2>The <code>igraph</code> package</h2>
+<p>There are multiple packages for the analysis of networks in R. In this post I concentrate on the <code>igraph</code> package, which allows for a broad range of applications. But before we get into it in more detail, it is useful to know that there are two possible ways to represent the <em>edges</em>, i.e. the connections, of a network:</p>
+<ul>
+<li><strong>Adjacency matrix</strong>: This is a square matrix, where each row and column corresponds to an entity. If two entities are conencted, the respective field in the matrix takes the value one and zero otherwise.</li>
+<li><strong>A list of connections</strong>: In its most simple form this is a list, where each edge of a network is represented by a row with one entity in the first column and the other in the second. For the purpose of this post this is our preferred representation.</li>
+</ul>
+</div>
+<div id="create-a-graph" class="section level2">
+<h2>Create a graph</h2>
+<p>We can illustrate these two representations by looking at an artificial network. Such a network could be generated with certain functions of the <code>igraph</code> package. However, the following code only uses base functionalities of R. It results in a data frame with the names of the connected entities in the first and second row. The third row contains a random indicator for the strength of the connection. It is based on the square of a value from a standard normal distribution. To reduce the number of resulting edges, only values above a certain threshold are kept. Also, the code excludes the connections a node has with itself.</p>
+<pre class="r"><code># Set seed for reproducibility
+set.seed(12345)
+
+# Generate data
+raw &lt;- data.frame(byer = rep(letters, 1, each = 26),
+                  sllr = rep(letters, 26),
+                  con = rnorm(26 * 26)^2) # Calculate arbitrary weights
+
+# Drop connections with oneself
+raw &lt;- raw[raw$byer != raw$sllr,]
+
+# Only keep strong connections
+raw &lt;- raw[abs(raw$con) &gt; 1,]
+
+# Reformat row numbers
+rownames(raw) &lt;- NULL
+
+# Look at result
+head(raw)</code></pre>
+<pre><code>##   byer sllr      con
+## 1    a    f 3.304964
+## 2    a    l 3.302623
+## 3    a    s 1.255997
+## 4    a    v 2.119310
+## 5    a    x 2.412236
+## 6    a    y 2.552676</code></pre>
+<p>Basically, this is a list repesentation of the artifical network. In a next step, we convert the data frame to an <code>igraph</code> object.</p>
+</div>
+<div id="igraph-objects" class="section level2">
+<h2><code>igraph</code> objects</h2>
+<pre class="r"><code># Load package
+library(igraph)</code></pre>
+<p>The transformation is straightforward and can be done with the <code>graph_from_data_frame</code> function, where for simplicity we set the argument <code>directed = FALSE</code> to indicated that the network is not directed.</p>
+<pre class="r"><code>graph_df &lt;- graph_from_data_frame(raw, directed = FALSE)</code></pre>
+<p>The function <code>simplify</code> can be used to get rid of loops and multiple edges:</p>
+<pre class="r"><code>graph_df &lt;- simplify(graph_df)</code></pre>
+<p>Now take a look at the object:</p>
+<pre class="r"><code>graph_df</code></pre>
+<pre><code>## IGRAPH 99be5b0 UN-- 26 173 -- 
+## + attr: name (v/c)
+## + edges from 99be5b0 (vertex names):
+##   [1] a--f a--g a--l a--m a--s a--v a--x a--y a--z b--d b--f b--g b--h b--k
+##  [15] b--l b--m b--o b--p b--q b--r b--t b--u b--v b--w b--x b--z c--g c--h
+##  [29] c--j c--l c--m c--n c--p c--q c--r c--s c--u c--v c--w c--x c--z d--e
+##  [43] d--f d--h d--o d--q d--t d--x d--z e--f e--g e--h e--i e--j e--k e--o
+##  [57] e--q e--r e--s e--t e--v e--w e--x e--y e--z f--g f--i f--k f--l f--m
+##  [71] f--n f--q f--r f--u f--z g--l g--m g--p g--s g--t g--u g--w g--x g--y
+##  [85] g--z h--m h--o h--r h--s h--t h--v h--x h--y h--z i--j i--k i--n i--q
+##  [99] i--u i--v i--y i--z j--m j--p j--r j--t j--u j--v j--w j--y j--z k--l
+## + ... omitted several edges</code></pre>
+<p>It does not look like the data frame list. However, it can be seen that each element of the list of edges refers to a conenction between to entities.</p>
+<p>Let’s compare this list to the adjacency matrix representation. It can be obtained directly from the <code>igraph</code> object by using the <code>as_adj</code> function.</p>
+<pre class="r"><code>graph_adj &lt;- as_adj(graph_df)</code></pre>
+<p>Now look at the first six rows and columns of the resulting object.</p>
+<pre class="r"><code>graph_adj[1:6, 1:6]</code></pre>
+<pre><code>## 6 x 6 sparse Matrix of class &quot;dgCMatrix&quot;
+##   a b c d e f
+## a . . . . . 1
+## b . . . 1 . 1
+## c . . . . . .
+## d . 1 . . 1 1
+## e . . . 1 . 1
+## f 1 1 . 1 1 .</code></pre>
+<p>An existing connection between two nodes is indicated by the value one. If there is no connection between them, the field contains a dot. For example, the (undirected) connection between <em>a</em> and <em>f</em> is described by the 1 in the sixth value of the first column and the sixth value in the first row. This corresponds to the first entry in the list representation of the above <code>igraph</code> object. If the network were directed, only one field would contain a 1 - unless the connection was mutual.</p>
+<p>Note that the resulting object is not an object of class <code>igraph</code>. <code>as_adj</code> produces a <code>dgCMatrix</code> object, which comes with the <code>Matrix</code> package and was specifically designed to implement so-called <em>sparse matrices</em>. Sparse matrices are simply matrices which contain a lot of zeros. By only considereing non-zero values, sparse matrices allow for a lot of additional computational efficiency, which is beneficial for the analysis of very large networks.</p>
+</div>
+<div id="summary-statistics" class="section level2">
+<h2>Summary statistics</h2>
+<p>This secton covers standard metrics to describe a network. Most of these metrics focus on the <em>centrality</em> of a graph’s nodes. The following desciption is based on Jackson (2008).</p>
+<div id="degree" class="section level3">
+<h3>Degree</h3>
+<p>The degree of a node is the number of its connections. The <code>degree</code> function calculates this number for each node of a graph. The node with the highest number is the node with the highest number of connections.</p>
+<pre class="r"><code>g_degree &lt;- degree(graph_df)
+
+g_degree</code></pre>
+<pre><code>##  a  b  c  d  e  f  g  h  i  j  k  l  m  n  o  p  q  r  s  t  u  v  w  x  y 
+##  9 17 15  9 17 14 15 13 10 12 14 10 14 10 14 11 15 16 12 13 14 13 12 16 14 
+##  z 
+## 17</code></pre>
+<p>The degree is of a node is an insteresting metric to identify the most connected nodes of a network. However, if the structure of a network is of interest, the <em>degree distribution</em> can be an informative metric. It describes the relative frequencey of nodes that have different degrees. In that way it is a histogram of degrees.</p>
+<pre class="r"><code>hist(g_degree)</code></pre>
+<p><img src="/post/2020-03-01-introduction-to-network-analysis-in-r_files/figure-html/unnamed-chunk-9-1.png" width="384" /></p>
+</div>
+<div id="betweenness" class="section level3">
+<h3>Betweenness</h3>
+<p><em>Betweenness</em> denotes the number of shortest paths passing through a node.</p>
+<pre class="r"><code>g_betw &lt;- betweenness(graph_df)
+
+round(g_betw, 2)</code></pre>
+<pre><code>##     a     b     c     d     e     f     g     h     i     j     k     l 
+##  2.17  9.50  7.79  1.11 10.10  6.85  7.86  4.25  2.19  4.42  6.48  2.12 
+##     m     n     o     p     q     r     s     t     u     v     w     x 
+##  5.67  2.93  6.01  3.99  7.56  8.62  3.84  4.53  5.61  6.19  3.15 10.15 
+##     y     z 
+##  7.21 11.68</code></pre>
+</div>
+<div id="eigenvector-centrality" class="section level3">
+<h3>Eigenvector centrality</h3>
+<p>The <em>eigenvector centrality</em> (Bonabeau, 1972) belongs to the class of spectral centralities. It is based on the idea that the importance of a node is recusively related to the importance of the nodes pointing to it. For example, your popularity depends on the popularity of your friends, whose popularity depends on their friends etc.</p>
+<pre class="r"><code>g_eigen &lt;- eigen_centrality(graph_df)
+
+round(g_eigen$vector, 2)</code></pre>
+<pre><code>##    a    b    c    d    e    f    g    h    i    j    k    l    m    n    o 
+## 0.54 1.00 0.87 0.58 0.99 0.81 0.88 0.81 0.60 0.72 0.82 0.61 0.85 0.61 0.84 
+##    p    q    r    s    t    u    v    w    x    y    z 
+## 0.64 0.89 0.94 0.72 0.79 0.85 0.76 0.73 0.92 0.80 0.97</code></pre>
+<p>Further measures will be added in the future.</p>
+</div>
+</div>
+<div id="visualisation" class="section level2">
+<h2>Visualisation</h2>
+<p>Beside the calculation of summarising network metrics, the visualisation of a graph can also be a very informative step in network analysis. Since visualisations in R usually involve the <code>ggplot2</code> package, I focus on the <code>ggraph</code> package, which is based on the <code>ggplot2</code> architecture. However, the <code>plot</code> function can be used to get a quick impression of a network:</p>
+<pre class="r"><code>plot(graph_df)</code></pre>
+<p><img src="/post/2020-03-01-introduction-to-network-analysis-in-r_files/figure-html/unnamed-chunk-12-1.png" width="336" /></p>
+<p>When using <code>ggplot2</code> the main challenge in the visualisation of networks is to find suitable x- and y-coordinates for the nodes of a graph. Fortunately, there are some packages out there, which were developed for this purpose. For example, <code>ggraph</code> and <code>ggnetwork</code> take an <code>igraph</code> object and produce tables with suitable coordianates. These coordinates are usually obtained by using special algorithms such as the ones proposed by Fruchterman and Reingold (1991) or Kamada and Kawai (1989). The latter is applied in the code below.</p>
+<p><code>ggraph</code> diagrams follow the <code>ggplot2</code> logic, where the function <code>ggplot</code> is replaced by <code>ggraph</code> to set up the graph. The function is then followed by the layers the user wants to add. In this example we add a layer of edges with <code>geom_edge_link</code> and on top of this a layer of nodes, which are represented by points, using <code>geom_node_point</code>.</p>
+<pre class="r"><code># Load packeges
+library(ggraph)
+library(ggplot2)
+
+ggraph(graph_df, layout = &quot;kk&quot;) + # Generate graph
+  geom_edge_link(colour = &quot;darkgrey&quot;) + # Add a layer of edges
+  geom_node_point(size = 3) + # Add a layer of nodes
+  theme_graph() # Get rid of gray background colour, grid and axes</code></pre>
+<p><img src="/post/2020-03-01-introduction-to-network-analysis-in-r_files/figure-html/unnamed-chunk-13-1.png" width="355.2" /></p>
+<p>Further introductions to <code>ggraph</code> can be found on <a href="https://www.data-imaginist.com/tags/ggraph" target="_blank">https://www.data-imaginist.com/tags/ggraph</a> and in the package’s vignettes, of course.</p>
+</div>
+<div id="references" class="section level2">
+<h2>References</h2>
+<p>Bonabeau, E. (1972). Factoring and weighting approaches to status scores and clique identification. <em>Journal of Mathematical Sociology 2</em>, 113-120.</p>
+<p>Csardi G., &amp; Nepusz, T. (2006). The igraph software package for complex network research, <em>InterJournal</em> Complex Systems, 1695.</p>
+<p>Fruchterman, T. M. J., &amp; Reingold, E. M. (1991). Graph Drawing by Force-directed Placement. <em>Software - Practice and Experience, 21</em>(11), 1129-1164.</p>
+<p>Jackson, M. O. (2008). <em>Social and economic networks</em>. Princeton: University Press.</p>
+<p>Kamada, T., &amp; Kawai, S. (1989). An algorithm for drawing general undirected graphs. <em>Information Processing Letters 31</em>(1), 7-15.</p>
+</div>

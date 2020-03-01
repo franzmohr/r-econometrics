@@ -3,12 +3,42 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>https://www.r-econometrics.com/reproduction/bayesmethods/bayesmethods11/</loc>
-    <lastmod>2019-12-25T00:00:00+00:00</lastmod>
+    <loc>https://www.r-econometrics.com/2020/03/01/an-introduction-to-network-analysis-in-r/</loc>
+    <lastmod>2020-03-01T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://www.r-econometrics.com/</loc>
+    <loc>https://www.r-econometrics.com/tags/ggraph/</loc>
+    <lastmod>2020-03-01T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/igraph/</loc>
+    <lastmod>2020-03-01T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/network-analysis/</loc>
+    <lastmod>2020-03-01T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/networks/</loc>
+    <lastmod>2020-03-01T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/post/</loc>
+    <lastmod>2020-03-01T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/</loc>
+    <lastmod>2020-03-01T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/reproduction/bayesmethods/bayesmethods11/</loc>
     <lastmod>2019-12-25T00:00:00+00:00</lastmod>
   </url>
   
@@ -19,6 +49,11 @@
   
   <url>
     <loc>https://www.r-econometrics.com/reproduction/bayesmethods/bayesmethods20/</loc>
+    <lastmod>2019-12-09T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/</loc>
     <lastmod>2019-12-09T00:00:00+00:00</lastmod>
   </url>
   
@@ -63,11 +98,6 @@
   </url>
   
   <url>
-    <loc>https://www.r-econometrics.com/tags/</loc>
-    <lastmod>2019-11-25T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://www.r-econometrics.com/timeseries/irf/</loc>
     <lastmod>2019-10-09T00:00:00+00:00</lastmod>
   </url>
@@ -94,6 +124,11 @@
   
   <url>
     <loc>https://www.r-econometrics.com/tags/vars/</loc>
+    <lastmod>2019-10-09T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/vec/</loc>
     <lastmod>2019-10-09T00:00:00+00:00</lastmod>
   </url>
   
@@ -148,17 +183,17 @@
   </url>
   
   <url>
-    <loc>https://www.r-econometrics.com/tags/vec/</loc>
-    <lastmod>2019-07-22T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://www.r-econometrics.com/timeseries/bvar/</loc>
     <lastmod>2019-07-07T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://www.r-econometrics.com/tags/bayes/</loc>
+    <lastmod>2019-07-07T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/bayesian/</loc>
     <lastmod>2019-07-07T00:00:00+00:00</lastmod>
   </url>
   
@@ -234,11 +269,6 @@
   
   <url>
     <loc>https://www.r-econometrics.com/tags/growth-accounting/</loc>
-    <lastmod>2018-12-30T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/post/</loc>
     <lastmod>2018-12-30T00:00:00+00:00</lastmod>
   </url>
   
@@ -400,11 +430,6 @@
   <url>
     <loc>https://www.r-econometrics.com/timeseries/varintro/</loc>
     <lastmod>2018-08-31T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/tags/bayesian/</loc>
-    <lastmod>2018-08-04T00:00:00+00:00</lastmod>
   </url>
   
   <url>

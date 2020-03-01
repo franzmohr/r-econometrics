@@ -120,7 +120,7 @@ if (!doNotTrack) {
 <h2 id="theory">Theory</h2>
 <p>Based on the growth model of Solow (1957) the discipline of growth accounting tries to assess the relative contribution of labour, capital and technology to the economic growth of a country. It departs from the idea that the economy can be described by a single production function of the form
 <code>$$Y= A K^{\alpha}L^{1-\alpha,}$$</code>
-which becomes <code>\(y=Ak^{\alpha}\)</code> in per-capita terms, where <code>\(y = Y / L\)</code> is output per capita, <code>\(k = K / L\)</code> is capital per capita and <code>\(A\)</code> is total factor productivity (TFP). Taking logs and differentiating with respect to time gives an expression of the economy's growth rate <code>\(g = \frac{\dot{y}}{y}\)</code>, which depends on TFP growth <code>\(\frac{\dot{A}}{A}\)</code> and capital growth <code>\(\frac{\dot{k}}{k}\)</code> over time so that
+which becomes <code>\(y=Ak^{\alpha}\)</code> in per-capita terms, where <code>\(y = Y / L\)</code> is output per capita, <code>\(k = K / L\)</code> is capital per capita and <code>\(A\)</code> is total factor productivity (TFP). Taking logs and differentiating with respect to time gives an expression of the economy&rsquo;s growth rate <code>\(g = \frac{\dot{y}}{y}\)</code>, which depends on TFP growth <code>\(\frac{\dot{A}}{A}\)</code> and capital growth <code>\(\frac{\dot{k}}{k}\)</code> over time so that
 <code>$$g = \frac{\dot{A}}{A} + \alpha \frac{\dot{k}}{k}.$$</code></p>
 <p>Since output, capital and labour can be observed, but <code>\(A\)</code> cannot, the latter has to be calculated in some way. The most basic approach to do so is the so-called <em>residual method</em>, which assumes that <code>\(\alpha\)</code> is equal to the share of capital income in national income.<sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup> Once this value is obtained the TFP growth rate can be obtained by</p>
 <p><code>$$\frac{\dot{A}}{A} = g - \alpha \frac{\dot{k}}{k}.$$</code></p>
@@ -131,14 +131,14 @@ which becomes <code>\(y=Ak^{\alpha}\)</code> in per-capita terms, where <code>\(
 <span style="color:#a6e22e">library</span>(pwt9) <span style="color:#75715e"># install.packages(&#34;pwt9&#34;)</span>
 
 <span style="color:#75715e"># Load data</span>
-<span style="color:#a6e22e">data</span>(<span style="color:#e6db74">&#34;</span><span style="color:#e6db74">pwt9.0&#34;</span>)
+<span style="color:#a6e22e">data</span>(<span style="color:#e6db74">&#34;pwt9.0&#34;</span>)
 </code></pre></div><p>Next, we select some countries in the sample, where observations from 1960 to 2000 are available. This period is chosen, because this is also the period used for the growth accounting example in Aghion and Howitt (2009).</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">library</span>(dplyr)
 
 data <span style="color:#f92672">&lt;-</span> pwt9.0 <span style="color:#f92672">%&gt;%</span>
-  <span style="color:#a6e22e">filter</span>(country <span style="color:#f92672">%in%</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;</span><span style="color:#e6db74">Australia&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">Austria&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">Belgium&#34;</span>,
-                        <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">Germany&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">France&#34;</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">United Kingdom&#34;</span>,
-                        <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">United States of America&#34;</span>)) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">filter</span>(country <span style="color:#f92672">%in%</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;Australia&#34;</span>, <span style="color:#e6db74">&#34;Austria&#34;</span>, <span style="color:#e6db74">&#34;Belgium&#34;</span>,
+                        <span style="color:#e6db74">&#34;Germany&#34;</span>, <span style="color:#e6db74">&#34;France&#34;</span>, <span style="color:#e6db74">&#34;United Kingdom&#34;</span>,
+                        <span style="color:#e6db74">&#34;United States of America&#34;</span>)) <span style="color:#f92672">%&gt;%</span>
   <span style="color:#a6e22e">select</span>(year, isocode, rgdpna, rkna, emp, labsh) <span style="color:#f92672">%&gt;%</span>
   <span style="color:#a6e22e">filter</span>(year <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">1960</span>,
          year <span style="color:#f92672">&lt;=</span> <span style="color:#ae81ff">2000</span>) <span style="color:#f92672">%&gt;%</span>
