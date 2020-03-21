@@ -120,7 +120,7 @@ if (!doNotTrack) {
                             
                         </span>
                          - 
-                        <time class="li-article-date">Franz X. Mohr, October 9, 2019
+                        <time class="li-article-date">Franz X. Mohr, March 21, 2020
                         </time>
                     </header>
                     <section>
@@ -167,7 +167,7 @@ summary(model)</code></pre>
 <div id="forecast-error-impulse-response" class="section level3">
 <h3>Forecast error impulse response</h3>
 <p>Since all variables in a VAR model depend on each other, individual coefficient estimates only provide limited information on the reaction of the system to a shock. In order to get a better picture of the model’s dynamic behaviour, <em>impulse responses</em> (IR) are used. The departure point of every impluse reponse function for a linear VAR model is its moving average (MA) representation, which is also the forecast error impulse response (FEIR) function. Mathematically, the FEIR <span class="math inline">\(\Phi_i\)</span> for the <span class="math inline">\(i\)</span>th period after the shock is obtained by
-<span class="math display">\[\Phi_i = \sum_{j = 1}^{i} \Phi_{j-1} A_j, \ \  i = 1, 2, ...\]</span>
+<span class="math display">\[\Phi_i = \sum_{j = 1}^{i} \Phi_{i - j} A_j, \ \  i = 1, 2, ...\]</span>
 with <span class="math inline">\(\Phi_0 = I_{K}\)</span> and <span class="math inline">\(A_j = 0 \text{ for } j&gt;p\)</span>, where <span class="math inline">\(K\)</span> is the number of endogenous variables and <span class="math inline">\(p\)</span> is the lag order of the VAR model.</p>
 <p>In R the <code>irf</code> function of the <code>vars</code> package can be used to obtain forecast error impulse responses. The following code calculates and plots the estimated response of consumption to a forecast error impulse in income with bootstrapped error bands<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>:</p>
 <pre class="r"><code>feir &lt;- irf(model, impulse = &quot;income&quot;, response = &quot;cons&quot;,
@@ -201,7 +201,7 @@ for <span class="math inline">\(i = 0, 1, ...\)</span>. In the following some me
 </div>
 <div id="orthogonal-impulse-responses" class="section level3">
 <h3>Orthogonal impulse responses</h3>
-<p>A common approach to identify the shocks of a VAR model is to use orthogonal impulse respones (OIR). The basic idea is to decompose the variance-covariance matrix so that <span class="math inline">\(\Sigma = PP^{-1}\)</span>, where <span class="math inline">\(P\)</span> is a lower triangular matrix with positve diagonal elements, which is often obtained by a Choleski decomposition. Given the estimated variance-covariance matrix <span class="math inline">\(P\)</span> the decomposition can be obtained by</p>
+<p>A common approach to identify the shocks of a VAR model is to use orthogonal impulse respones (OIR). The basic idea is to decompose the variance-covariance matrix so that <span class="math inline">\(\Sigma = PP^{\prime}\)</span>, where <span class="math inline">\(P\)</span> is a lower triangular matrix with positve diagonal elements, which is often obtained by a Choleski decomposition. Given the estimated variance-covariance matrix <span class="math inline">\(P\)</span> the decomposition can be obtained by</p>
 <pre class="r"><code>t(chol(model_summary$covres))</code></pre>
 <pre><code>##             invest      income        cons
 ## invest 0.046147903 0.000000000 0.000000000

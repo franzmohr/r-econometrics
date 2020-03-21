@@ -6,10 +6,64 @@
     <description>Recent content in Tags on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 01 Mar 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 21 Mar 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://www.r-econometrics.com/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>irf</title>
+      <link>https://www.r-econometrics.com/tags/irf/</link>
+      <pubDate>Sat, 21 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/tags/irf/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>r</title>
+      <link>https://www.r-econometrics.com/tags/r/</link>
+      <pubDate>Sat, 21 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/tags/r/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>var</title>
+      <link>https://www.r-econometrics.com/tags/var/</link>
+      <pubDate>Sat, 21 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/tags/var/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>vars</title>
+      <link>https://www.r-econometrics.com/tags/vars/</link>
+      <pubDate>Sat, 21 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/tags/vars/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>vec</title>
+      <link>https://www.r-econometrics.com/tags/vec/</link>
+      <pubDate>Sat, 21 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/tags/vec/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>vector autoregression</title>
+      <link>https://www.r-econometrics.com/tags/vector-autoregression/</link>
+      <pubDate>Sat, 21 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/tags/vector-autoregression/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>ggraph</title>
@@ -89,60 +143,6 @@
       <pubDate>Mon, 25 Nov 2019 00:00:00 +0000</pubDate>
       
       <guid>https://www.r-econometrics.com/tags/t-test/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>irf</title>
-      <link>https://www.r-econometrics.com/tags/irf/</link>
-      <pubDate>Wed, 09 Oct 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://www.r-econometrics.com/tags/irf/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>r</title>
-      <link>https://www.r-econometrics.com/tags/r/</link>
-      <pubDate>Wed, 09 Oct 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://www.r-econometrics.com/tags/r/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>var</title>
-      <link>https://www.r-econometrics.com/tags/var/</link>
-      <pubDate>Wed, 09 Oct 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://www.r-econometrics.com/tags/var/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>vars</title>
-      <link>https://www.r-econometrics.com/tags/vars/</link>
-      <pubDate>Wed, 09 Oct 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://www.r-econometrics.com/tags/vars/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>vec</title>
-      <link>https://www.r-econometrics.com/tags/vec/</link>
-      <pubDate>Wed, 09 Oct 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://www.r-econometrics.com/tags/vec/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>vector autoregression</title>
-      <link>https://www.r-econometrics.com/tags/vector-autoregression/</link>
-      <pubDate>Wed, 09 Oct 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://www.r-econometrics.com/tags/vector-autoregression/</guid>
       <description></description>
     </item>
     
