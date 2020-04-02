@@ -1,7 +1,8 @@
 ---
-title: "Basics of the igraph package"
+title: "Basics of the igraph Package"
 author: "Franz X. Mohr"
 date: "2020-03-01"
+description: "An introduction to the logic and use of the igraph package in R."
 tags:
   - igraph
 ---
@@ -54,17 +55,17 @@ library(igraph)</code></pre>
 <pre class="r"><code>graph_df &lt;- simplify(graph_df)</code></pre>
 <p>Now take a look at the object:</p>
 <pre class="r"><code>graph_df</code></pre>
-<pre><code>## IGRAPH 18e937d UN-- 26 173 -- 
+<pre><code>## IGRAPH 2e4c8fd UN-- 26 173 -- 
 ## + attr: name (v/c)
-## + edges from 18e937d (vertex names):
-##   [1] a--f a--g a--l a--m a--s a--v a--x a--y a--z b--d b--f b--g b--h b--k
-##  [15] b--l b--m b--o b--p b--q b--r b--t b--u b--v b--w b--x b--z c--g c--h
-##  [29] c--j c--l c--m c--n c--p c--q c--r c--s c--u c--v c--w c--x c--z d--e
-##  [43] d--f d--h d--o d--q d--t d--x d--z e--f e--g e--h e--i e--j e--k e--o
-##  [57] e--q e--r e--s e--t e--v e--w e--x e--y e--z f--g f--i f--k f--l f--m
-##  [71] f--n f--q f--r f--u f--z g--l g--m g--p g--s g--t g--u g--w g--x g--y
-##  [85] g--z h--m h--o h--r h--s h--t h--v h--x h--y h--z i--j i--k i--n i--q
-##  [99] i--u i--v i--y i--z j--m j--p j--r j--t j--u j--v j--w j--y j--z k--l
+## + edges from 2e4c8fd (vertex names):
+##   [1] a--f a--g a--l a--m a--s a--v a--x a--y a--z b--d b--f b--g b--h b--k b--l
+##  [16] b--m b--o b--p b--q b--r b--t b--u b--v b--w b--x b--z c--g c--h c--j c--l
+##  [31] c--m c--n c--p c--q c--r c--s c--u c--v c--w c--x c--z d--e d--f d--h d--o
+##  [46] d--q d--t d--x d--z e--f e--g e--h e--i e--j e--k e--o e--q e--r e--s e--t
+##  [61] e--v e--w e--x e--y e--z f--g f--i f--k f--l f--m f--n f--q f--r f--u f--z
+##  [76] g--l g--m g--p g--s g--t g--u g--w g--x g--y g--z h--m h--o h--r h--s h--t
+##  [91] h--v h--x h--y h--z i--j i--k i--n i--q i--u i--v i--y i--z j--m j--p j--r
+## [106] j--t j--u j--v j--w j--y j--z k--l k--m k--n k--p k--q k--t k--u k--v k--x
 ## + ... omitted several edges</code></pre>
 <p>It does not look like the data frame list. However, it can be seen that each element of the list of edges refers to a conenction between to entities.</p>
 <p>Let’s compare this list to the adjacency matrix representation. It can be obtained directly from the <code>igraph</code> object by using the <code>as_adj</code> function.</p>

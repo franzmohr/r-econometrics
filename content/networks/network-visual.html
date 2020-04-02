@@ -1,7 +1,8 @@
 ---
-title: "Network Summary Statistics"
+title: "Network Visualisation in R"
 author: "Franz X. Mohr"
 date: "2020-03-01"
+description: "An introduction to the visualisation of networks in R using the igraph and ggraph package."
 tags:
   - igraph
   - networks
@@ -24,7 +25,7 @@ ggraph(graph_df, layout = &quot;kk&quot;) + # Generate graph
   theme_graph() # Get rid of gray background colour, grid and axes</code></pre>
 <p><img src="/networks/network-visual_files/figure-html/unnamed-chunk-2-1.png" width="355.2" /></p>
 <p>Further introductions to <code>ggraph</code> can be found on <a href="https://www.data-imaginist.com/tags/ggraph" target="_blank">https://www.data-imaginist.com/tags/ggraph</a> and in the package’s vignettes, of course.</p>
-<p>However, the <code>plot</code> function can be used to get a quick impression of a network:</p>
+<p>However, the standard <code>plot</code> function can be used to get a quick impression of a network as well:</p>
 <pre class="r"><code>plot(graph_df)</code></pre>
 <p><img src="/networks/network-visual_files/figure-html/unnamed-chunk-3-1.png" width="384" /></p>
 <div id="references" class="section level2">

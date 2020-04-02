@@ -2,6 +2,7 @@
 title: "Network Summary Statistics"
 author: "Franz X. Mohr"
 date: "2020-03-01"
+description: "An introduction to basic network summary statistics as presented in Jackson (2008) and their calculation in R."
 tags:
   - igraph
   - networks
@@ -10,7 +11,8 @@ tags:
 
 
 
-<p>This page covers some basic network summary statistics as presented in Jackson (2008). The presented metrics are based on the concept of <em>centrality</em>, which describes the importance of a node in a given network of nodes. For illustration I use the artificial data set from my <a href="https://www.r-econometrics.com/2020/03/01/an-introduction-to-network-analysis-in-r/" target="_blank">post on network analysis</a>, which is an <code>igraph</code> object names <code>graph_df</code>.</p>
+<p>If a network is small, it can be easily summarised by its graph or a figure. But once a network reaches a certain size, it becomes more meaningful to use more formal summary statistics in order to describe its features. This post covers some basic network summary statistics as presented in Jackson (2008). The metrics are based on the concept of <em>centrality</em>, which describes the importance of a node in a given network of nodes.</p>
+<p>For this illustration I use the artificial data set generated in my <a href="https://www.r-econometrics.com/2020/03/01/an-introduction-to-network-analysis-in-r/" target="_blank">post on network analysis</a>.</p>
 <div id="degree" class="section level3">
 <h3>Degree</h3>
 <p>The degree of a node is the number of its connections. The <code>degree</code> function calculates this number for each node of a graph. The node with the highest number is the node with the highest number of connections.</p>
@@ -21,27 +23,60 @@ library(igraph)
 g_degree &lt;- degree(graph_df)
 
 g_degree</code></pre>
-<pre><code>##  a  b  c  d  e  f  g  h  i  j  k  l  m  n  o  p  q  r  s  t  u  v  w  x  y 
-## 12 20 18 11 19 16 16 16 13 14 16 10 17 15 17 12 16 18 13 13 15 15 14 19 15 
-##  z 
-## 20</code></pre>
+<pre><code>##  a  b  c  d  e  f  g  h  i  j  k  l  m  n  o  p  q  r  s  t  u  v  w  x  y  z 
+## 12 20 18 11 19 16 16 16 13 14 16 10 17 15 17 12 16 18 13 13 15 15 14 19 15 20</code></pre>
 <p>The degree is of a node is an insteresting metric to identify the most connected nodes of a network. However, if the structure of a network is of interest, the <em>degree distribution</em> can be an informative metric. It describes the relative frequencey of nodes that have different degrees. In that way it is a histogram of degrees.</p>
 <pre class="r"><code>hist(g_degree)</code></pre>
 <p><img src="/networks/network-summary_files/figure-html/unnamed-chunk-3-1.png" width="384" /></p>
-<p>This histogram might not look very informative, which is partly due to the way the artificial network was constructed. However, as the number of nodes of a real life network increases, this distribution can become very imformative. <em>Note that sometimes it is beneficial to obtain the distribution of the log-degree</em>.</p>
+<p>This histogram might not look very informative, which is partly due to the way the artificial network was constructed. However, as the number of nodes of a real life network increases, this distribution can become very imformative. <em>Note that in many cases it is beneficial to obtain the distribution of the log-degree</em>.</p>
+<p>Let’s explore this by looking at a larger network, that can be generated with the <code>igraph</code> package. More precisely, we create a scale-free:</p>
+<pre class="r"><code># From the example of sample_degseq
+
+# Pre-specify the degrees of the nodes according to the 
+# power law
+degs &lt;- sample(1:100, 1000, replace=TRUE, prob = (1:100)^-2)
+
+# Check if degrees sum up to an even number
+# if not, add 1 to the first node to make the sum even
+if (sum(degs) %% 2 != 0) {
+  degs[1] &lt;- degs[1] + 1
+}
+
+# Create random graph
+g_large &lt;- sample_degseq(degs, method = &quot;vl&quot;)
+
+# Calculate degree
+deg_large &lt;- degree(g_large)
+
+# Histogram of the degree
+hist(deg_large)</code></pre>
+<p><img src="/networks/network-summary_files/figure-html/unnamed-chunk-4-1.png" width="384" /></p>
+<p>The degree distribution showes that most nodes have less than 10 connections and there are a few with more than 80. If we did not already know that the degree distribution follows a power-law, this might be a sign that we are dealing with such a network. A look at the log-degree distribution might support this suspition as well:</p>
+<pre class="r"><code>hist(log(deg_large))</code></pre>
+<p><img src="/networks/network-summary_files/figure-html/unnamed-chunk-5-1.png" width="384" /></p>
+</div>
+<div id="closeness" class="section level3">
+<h3>Closeness</h3>
+<p><em>Closeness centrality</em> describes how close a given node is to any other node. It is usually defined as the inverse of the average of the shortest path between a node and all other nodes. Therefore, shorter paths between a node and any other node in the graph imply a higher value of the ratio.</p>
+<pre class="r"><code>g_close &lt;- closeness(graph_df)
+
+round(g_close, 2)</code></pre>
+<pre><code>##    a    b    c    d    e    f    g    h    i    j    k    l    m    n    o    p 
+## 0.02 0.03 0.03 0.02 0.03 0.03 0.03 0.03 0.02 0.03 0.03 0.02 0.03 0.02 0.03 0.03 
+##    q    r    s    t    u    v    w    x    y    z 
+## 0.03 0.03 0.03 0.03 0.03 0.03 0.03 0.03 0.03 0.03</code></pre>
+<p>In constrast to the degree of a node, which describes the number of its direct connections, its closeness provides an idea of how well a node is indirectly connected via other nodes.</p>
 </div>
 <div id="betweenness" class="section level3">
 <h3>Betweenness</h3>
-<p><em>Betweenness</em> denotes the number of shortest paths passing through a node.</p>
+<p>Freeman (1977) proposes <em>betweenness centrality</em> as the number of shortest paths passing through a node. A higher value of a node impilies that other nodes are well connected through it.</p>
 <pre class="r"><code>g_betw &lt;- betweenness(graph_df)
 
 round(g_betw, 2)</code></pre>
-<pre><code>##     a     b     c     d     e     f     g     h     i     j     k     l 
-##  3.22  9.75  8.33  1.48  9.76  7.67  6.86  4.60  2.57  4.16  6.56  1.61 
-##     m     n     o     p     q     r     s     t     u     v     w     x 
-##  5.38  4.93  6.95  3.85  6.83  8.05  3.81  3.53  5.05  5.72  3.13 11.09 
-##     y     z 
-##  6.21 10.90</code></pre>
+<pre><code>##     a     b     c     d     e     f     g     h     i     j     k     l     m 
+##  3.22  9.75  8.33  1.48  9.76  7.67  6.86  4.60  2.57  4.16  6.56  1.61  5.38 
+##     n     o     p     q     r     s     t     u     v     w     x     y     z 
+##  4.93  6.95  3.85  6.83  8.05  3.81  3.53  5.05  5.72  3.13 11.09  6.21 10.90</code></pre>
 </div>
 <div id="eigenvector-centrality" class="section level3">
 <h3>Eigenvector centrality</h3>
@@ -49,14 +84,46 @@ round(g_betw, 2)</code></pre>
 <pre class="r"><code>g_eigen &lt;- eigen_centrality(graph_df)
 
 round(g_eigen$vector, 2)</code></pre>
-<pre><code>##    a    b    c    d    e    f    g    h    i    j    k    l    m    n    o 
-## 0.59 1.00 0.88 0.59 0.93 0.76 0.79 0.85 0.65 0.72 0.78 0.51 0.89 0.75 0.85 
-##    p    q    r    s    t    u    v    w    x    y    z 
-## 0.59 0.79 0.89 0.65 0.66 0.76 0.76 0.72 0.91 0.72 1.00</code></pre>
+<pre><code>##    a    b    c    d    e    f    g    h    i    j    k    l    m    n    o    p 
+## 0.59 1.00 0.88 0.59 0.93 0.76 0.79 0.85 0.65 0.72 0.78 0.51 0.89 0.75 0.85 0.59 
+##    q    r    s    t    u    v    w    x    y    z 
+## 0.79 0.89 0.65 0.66 0.76 0.76 0.72 0.91 0.72 1.00</code></pre>
+</div>
+<div id="relationships-between-the-measures" class="section level2">
+<h2>Relationships between the measures</h2>
+<p>To conclude this post, let’s look at the relationships between the different network measures. For this we can use scatterplot matrices.</p>
+<div id="small-network" class="section level3">
+<h3>Small network</h3>
+<pre class="r"><code># Collect the different centrality measures in a data frame
+centr_small &lt;- data.frame(degree = g_degree,
+                          closeness = g_close,
+                          betweenness = g_betw,
+                          eigenvalue = g_eigen$vector)
+
+# Scatterplot matrix
+pairs(centr_small)</code></pre>
+<p><img src="/networks/network-summary_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p>For the small graph the scatterplot matrix of the different centrality measures suggest that they have a linear relationship and, hence, each measure provides more or less the same information. However, this is probably the result of the way the small network was generated in the first place.</p>
+</div>
+<div id="large-network" class="section level3">
+<h3>Large network</h3>
+<p>Looking at the scatterplot matrix of the centrality measures of the larger network provides a different picture:</p>
+<pre class="r"><code># Collect the different centrality measures in a data frame
+centr_large &lt;- data.frame(degree = degree(g_large),
+                          closeness = closeness(g_large),
+                          betweenness = betweenness(g_large),
+                          eigenvalue = eigen_centrality(g_large)$vector)
+
+# Scatterplot matrix
+pairs(centr_large)</code></pre>
+<p><img src="/networks/network-summary_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p>For example, although the degree and eigenvalue centrlity exhibit a quite linear relationship, the relationship between degree centrality and closeness seems to be non-linear.</p>
+</div>
 </div>
 <div id="references" class="section level2">
 <h2>References</h2>
 <p>Bonabeau, E. (1972). Factoring and weighting approaches to status scores and clique identification. <em>Journal of Mathematical Sociology 2</em>, 113-120.</p>
 <p>Csardi G., &amp; Nepusz, T. (2006). The igraph software package for complex network research, <em>InterJournal</em> Complex Systems, 1695.</p>
+<p>Freeman, L. C. (1977). A set of measures of centrality based on betweenness. <em>Sociometry 40</em>, 35-41.</p>
 <p>Jackson, M. O. (2008). <em>Social and economic networks</em>. Princeton: University Press.</p>
 </div>

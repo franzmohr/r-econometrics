@@ -12,7 +12,7 @@
     
     
     <item>
-      <title>Basics of the igraph package</title>
+      <title>Basics of the igraph Package</title>
       <link>https://www.r-econometrics.com/networks/igraph/</link>
       <pubDate>Sun, 01 Mar 2020 00:00:00 +0000</pubDate>
       
@@ -27,12 +27,11 @@
       <pubDate>Sun, 01 Mar 2020 00:00:00 +0000</pubDate>
       
       <guid>https://www.r-econometrics.com/networks/network-summary/</guid>
-      <description>This page covers some basic network summary statistics as presented in Jackson (2008). The presented metrics are based on the concept of centrality, which describes the importance of a node in a given network of nodes. For illustration I use the artificial data set from my post on network analysis, which is an igraph object names graph_df.
-Degree The degree of a node is the number of its connections. The degree function calculates this number for each node of a graph.</description>
+      <description>If a network is small, it can be easily summarised by its graph or a figure. But once a network reaches a certain size, it becomes more meaningful to use more formal summary statistics in order to describe its features. This post covers some basic network summary statistics as presented in Jackson (2008). The metrics are based on the concept of centrality, which describes the importance of a node in a given network of nodes.</description>
     </item>
     
     <item>
-      <title>Network Summary Statistics</title>
+      <title>Network Visualisation in R</title>
       <link>https://www.r-econometrics.com/networks/network-visual/</link>
       <pubDate>Sun, 01 Mar 2020 00:00:00 +0000</pubDate>
       
