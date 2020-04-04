@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Posts on r-econometrics</title>
@@ -26,7 +26,9 @@
       <pubDate>Sun, 30 Dec 2018 00:00:00 +0000</pubDate>
       
       <guid>https://www.r-econometrics.com/2018/12/30/an-exercise-in-growth-accounting/</guid>
-      <description>&lt;p&gt;The discipline of growth accounting tries to assess the relative contribution of labour, capital and technology to the economic growth of a country. This post provides a short theoretical introduction to the concept of growth accounting and uses Penn World Table data to calculate total factor productivity (TFP) growth rates for a series of countries using the simple Solow-method.&lt;/p&gt;</description>
+      <description>&lt;p&gt;The discipline of growth accounting tries to assess the relative contribution of labour, capital and technology to the economic growth of a country. This post provides a short theoretical introduction to the concept of growth accounting and uses Penn World Table data to calculate total factor productivity (TFP) growth rates for a series of countries using the simple Solow-method.&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -35,7 +37,9 @@
       <pubDate>Sun, 30 Dec 2018 00:00:00 +0000</pubDate>
       
       <guid>https://www.r-econometrics.com/2018/12/30/william-shakespeares-work-in-a-word-cloud/</guid>
-      <description>&lt;p&gt;Word or tag clouds seem to be quite popular at the moment. Although their analytical power might be limited, they do serve an aesthetic purpose and, for example, could be put on the cover page of a thesis or a presentation using the content of your work or the literature you went through. This post uses text data from the Gutenberg project to give a step-by-step introduction on how to create a wordcould in R.&lt;/p&gt;</description>
+      <description>&lt;p&gt;Word or tag clouds seem to be quite popular at the moment. Although their analytical power might be limited, they do serve an aesthetic purpose and, for example, could be put on the cover page of a thesis or a presentation using the content of your work or the literature you went through. This post uses text data from the Gutenberg project to give a step-by-step introduction on how to create a wordcould in R.&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
     </item>
     
   </channel>

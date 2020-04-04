@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>r-econometrics</title>
@@ -6,7 +6,7 @@
     <description>Recent content on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 01 Mar 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 21 Mar 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://www.r-econometrics.com/index.xml" rel="self" type="application/rss+xml" />
     
@@ -45,7 +45,7 @@
       <pubDate>Sun, 01 Mar 2020 00:00:00 +0000</pubDate>
       
       <guid>https://www.r-econometrics.com/networksintro/</guid>
-      <description> With the increasing availability of granular data on the relationships between individual entities - such as persons (social media), countries (internatinal trade) and financial institutions (supervisory reporting) - network analysis offers many possibilities to extract useful information from such data. This section provides brief introductions to the analysis of network data in R.
+      <description>With the increasing availability of granular data on the relationships between individual entities - such as persons (social media), countries (internatinal trade) and financial institutions (supervisory reporting) - network analysis offers many possibilities to extract useful information from such data. This section provides brief introductions to the analysis of network data in R.
  Basics of the igraph package Summary statistics with the igraph Network visualisation with ggraph  </description>
     </item>
     
@@ -95,7 +95,7 @@ temp &amp;lt;- gen_var(us_macro_2007, p = 2, deterministic = &amp;quot;const&amp
       <pubDate>Mon, 09 Dec 2019 00:00:00 +0000</pubDate>
       
       <guid>https://www.r-econometrics.com/index_dummy/</guid>
-      <description>You want to learn the basics of the R programming language and how to use the software for econometric analyses? Great! This site could be useful for you. It is about learning how to use the free statistical software R for basic econometric applications and shall provide an intuition of the basic structure of the program and statistical functions, which are needed to pass introductory or intermediate courses in econometrics.</description>
+      <description>You want to learn the basics of the R programming language and how to use the software for econometric analyses? Great! This site could be useful for you. It is about learning how to use the free statistical software R for basic econometric applications and shall provide an intuition of the basic structure of the program and statistical functions, which are needed to pass introductory or intermediate courses in econometrics. The focus is less on the math behind the statistical methods and more on their application, so that newcomers become familiar with the language quickly.</description>
     </item>
     
     <item>
@@ -169,11 +169,8 @@ a0 &amp;lt;- 5 b0 &amp;lt;- 100 Initial values</description>
       <pubDate>Sun, 07 Jul 2019 00:00:00 +0000</pubDate>
       
       <guid>https://www.r-econometrics.com/timeseries/bvar/</guid>
-      <description>
-
-
-&lt;p&gt;Bayesian methods have significantly gained in popularity during the last decades as computers have become more powerful and new software has been developed. Their flexibility and other advantageous features have made these methods also more popular in econometrics. This post gives a brief introduction to Bayesian VAR (BVAR) models and provides the code to set up and estimate a basic model with the &lt;a href=&#34;https://cran.r-project.org/package=bvartools&#34;&gt;&lt;code&gt;bvartools&lt;/code&gt;&lt;/a&gt; package.&lt;/p&gt;
-</description>
+      <description>Bayesian methods have significantly gained in popularity during the last decades as computers have become more powerful and new software has been developed. Their flexibility and other advantageous features have made these methods also more popular in econometrics. This post gives a brief introduction to Bayesian VAR (BVAR) models and provides the code to set up and estimate a basic model with the bvartools package.
+ BVAR models Bayesian VAR (BVAR) models have the same mathematical form as any other VAR model, i.</description>
     </item>
     
     <item>
@@ -231,7 +228,9 @@ Data Timmer et al. (2015) use the 2013 vintage of the world input-output databas
       <pubDate>Sun, 30 Dec 2018 00:00:00 +0000</pubDate>
       
       <guid>https://www.r-econometrics.com/2018/12/30/an-exercise-in-growth-accounting/</guid>
-      <description>&lt;p&gt;The discipline of growth accounting tries to assess the relative contribution of labour, capital and technology to the economic growth of a country. This post provides a short theoretical introduction to the concept of growth accounting and uses Penn World Table data to calculate total factor productivity (TFP) growth rates for a series of countries using the simple Solow-method.&lt;/p&gt;</description>
+      <description>&lt;p&gt;The discipline of growth accounting tries to assess the relative contribution of labour, capital and technology to the economic growth of a country. This post provides a short theoretical introduction to the concept of growth accounting and uses Penn World Table data to calculate total factor productivity (TFP) growth rates for a series of countries using the simple Solow-method.&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -240,7 +239,9 @@ Data Timmer et al. (2015) use the 2013 vintage of the world input-output databas
       <pubDate>Sun, 30 Dec 2018 00:00:00 +0000</pubDate>
       
       <guid>https://www.r-econometrics.com/2018/12/30/william-shakespeares-work-in-a-word-cloud/</guid>
-      <description>&lt;p&gt;Word or tag clouds seem to be quite popular at the moment. Although their analytical power might be limited, they do serve an aesthetic purpose and, for example, could be put on the cover page of a thesis or a presentation using the content of your work or the literature you went through. This post uses text data from the Gutenberg project to give a step-by-step introduction on how to create a wordcould in R.&lt;/p&gt;</description>
+      <description>&lt;p&gt;Word or tag clouds seem to be quite popular at the moment. Although their analytical power might be limited, they do serve an aesthetic purpose and, for example, could be put on the cover page of a thesis or a presentation using the content of your work or the literature you went through. This post uses text data from the Gutenberg project to give a step-by-step introduction on how to create a wordcould in R.&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -338,7 +339,7 @@ data(&amp;quot;nyse&amp;quot;) lm.11.4 &amp;lt;- lm(return ~ return_1, data = ny
       
       <guid>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge17/</guid>
       <description>Example 17.1 First, look at the linear model.
-data(&amp;quot;mroz&amp;quot;) lm.17.1 &amp;lt;- lm(inlf ~ nwifeinc + educ + exper + expersq + age + kidslt6 + kidsge6, data = mroz) summary(lm.17.1) ## ## Call: ## lm(formula = inlf ~ nwifeinc + educ + exper + expersq + age + ## kidslt6 + kidsge6, data = mroz) ## ## Residuals: ## Min 1Q Median 3Q Max ## -0.93432 -0.37526 0.08833 0.34404 0.</description>
+data(&amp;quot;mroz&amp;quot;) lm.17.1 &amp;lt;- lm(inlf ~ nwifeinc + educ + exper + expersq + age + kidslt6 + kidsge6, data = mroz) summary(lm.17.1) ## ## Call: ## lm(formula = inlf ~ nwifeinc + educ + exper + expersq + age + ## kidslt6 + kidsge6, data = mroz) ## ## Residuals: ## Min 1Q Median 3Q Max ## -0.93432 -0.37526 0.08833 0.34404 0.99417 ## ## Coefficients: ## Estimate Std.</description>
     </item>
     
     <item>
@@ -348,7 +349,7 @@ data(&amp;quot;mroz&amp;quot;) lm.17.1 &amp;lt;- lm(inlf ~ nwifeinc + educ + exp
       
       <guid>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge12/</guid>
       <description>library(lmtest) library(sandwich) library(tseries) library(wooldridge) Example 12.1 data(&amp;quot;phillips&amp;quot;) Static Phillips curve
-lm.12.1.1 &amp;lt;- lm(inf ~ unem, data = phillips) res.static &amp;lt;- lm.12.1.1$res res.static_1 &amp;lt;- c(NA, lm.12.1.1$res[-(length(res.static))]) lm.12.1.1.test &amp;lt;- lm(res.static ~ res.static_1) summary(lm.12.1.1.test) ## ## Call: ## lm(formula = res.static ~ res.static_1) ## ## Residuals: ## Min 1Q Median 3Q Max ## -8.047 -1.104 -0.248 1.028 6.684 ## ## Coefficients: ## Estimate Std. Error t value Pr(&amp;gt;|t|) ## (Intercept) -0.1118 0.3180 -0.</description>
+lm.12.1.1 &amp;lt;- lm(inf ~ unem, data = phillips) res.static &amp;lt;- lm.12.1.1$res res.static_1 &amp;lt;- c(NA, lm.12.1.1$res[-(length(res.static))]) lm.12.1.1.test &amp;lt;- lm(res.static ~ res.static_1) summary(lm.12.1.1.test) ## ## Call: ## lm(formula = res.static ~ res.static_1) ## ## Residuals: ## Min 1Q Median 3Q Max ## -8.047 -1.104 -0.248 1.028 6.684 ## ## Coefficients: ## Estimate Std. Error t value Pr(&amp;gt;|t|) ## (Intercept) -0.1118 0.3180 -0.352 0.</description>
     </item>
     
     <item>
@@ -409,7 +410,8 @@ The data sets are from the wooldridge package, which is a collection of all data
       
       <guid>https://www.r-econometrics.com/timeseriesintro/</guid>
       <description>Work in progress (July 2019). I will try to update this page over the next few months.
-This section is intended to provide an overview of the relevant issues in (macro)economic time series analysis. Again the standard disclaimer: This site does not replace a good textbook, but it should help you to get a grasp of the basic concepts more quickly than if you learned it on your own.</description>
+This section is intended to provide an overview of the relevant issues in (macro)economic time series analysis. Again the standard disclaimer: This site does not replace a good textbook, but it should help you to get a grasp of the basic concepts more quickly than if you learned it on your own.
+The intended structure of this site is:</description>
     </item>
     
     <item>
@@ -477,7 +479,8 @@ The other commands that appear new are quite helpful and you should take a minut
       
       <guid>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge06/</guid>
       <description>Chapter 6 in Wooldridge (2013) deals with some more issues that might have an impact on your estimates. Among these are a change in the scale of your variables, so-called beta-factors and the interpretation of variables that appear together with their squared values, i.e. interaction terms.
-Before you start, set your working directory, load the foreign library and download the data we are going to use in this chapter.</description>
+Before you start, set your working directory, load the foreign library and download the data we are going to use in this chapter.
+library(QuantPsyc) library(wooldridge) The impact of scales on the estimated coefficients</description>
     </item>
     
     <item>
@@ -526,7 +529,7 @@ ggplot graphs are built with some kind of blocks, which usually start with the f
       
       <guid>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge04/</guid>
       <description>Before we start, let’s clear our memory, set the working directory and load the wooldridge data package.
-rm(list = ls()) setwd(&amp;quot;C:/path/to/the/working/directory&amp;quot;) library(wooldridge) data(wage1) lm.1 &amp;lt;- lm(lwage ~ educ + exper + tenure, data = wage1) s.1 &amp;lt;- summary(lm.1) s.1 ## ## Call: ## lm(formula = lwage ~ educ + exper + tenure, data = wage1) ## ## Residuals: ## Min 1Q Median 3Q Max ## -2.05802 -0.29645 -0.03265 0.28788 1.</description>
+rm(list = ls()) setwd(&amp;quot;C:/path/to/the/working/directory&amp;quot;) library(wooldridge) data(wage1) lm.1 &amp;lt;- lm(lwage ~ educ + exper + tenure, data = wage1) s.1 &amp;lt;- summary(lm.1) s.1 ## ## Call: ## lm(formula = lwage ~ educ + exper + tenure, data = wage1) ## ## Residuals: ## Min 1Q Median 3Q Max ## -2.05802 -0.29645 -0.03265 0.28788 1.42809 ## ## Coefficients: ## Estimate Std.</description>
     </item>
     
     <item>

@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>timeseries on r-econometrics</title>
+    <title>Timeseries on r-econometrics</title>
     <link>https://www.r-econometrics.com/tags/timeseries/</link>
-    <description>Recent content in timeseries on r-econometrics</description>
+    <description>Recent content in Timeseries on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Sat, 04 Aug 2018 00:00:00 +0000</lastBuildDate>
@@ -18,7 +18,8 @@
       
       <guid>https://www.r-econometrics.com/timeseriesintro/</guid>
       <description>Work in progress (July 2019). I will try to update this page over the next few months.
-This section is intended to provide an overview of the relevant issues in (macro)economic time series analysis. Again the standard disclaimer: This site does not replace a good textbook, but it should help you to get a grasp of the basic concepts more quickly than if you learned it on your own.</description>
+This section is intended to provide an overview of the relevant issues in (macro)economic time series analysis. Again the standard disclaimer: This site does not replace a good textbook, but it should help you to get a grasp of the basic concepts more quickly than if you learned it on your own.
+The intended structure of this site is:</description>
     </item>
     
   </channel>

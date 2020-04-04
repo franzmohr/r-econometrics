@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>ggraph on r-econometrics</title>
+    <title>Ggraph on r-econometrics</title>
     <link>https://www.r-econometrics.com/tags/ggraph/</link>
-    <description>Recent content in ggraph on r-econometrics</description>
+    <description>Recent content in Ggraph on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Sun, 01 Mar 2020 00:00:00 +0000</lastBuildDate>

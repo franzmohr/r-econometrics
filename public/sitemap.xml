@@ -1,49 +1,9 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
     <loc>https://www.r-econometrics.com/timeseries/irf/</loc>
-    <lastmod>2020-03-21T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/tags/irf/</loc>
-    <lastmod>2020-03-21T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/tags/r/</loc>
-    <lastmod>2020-03-21T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/tags/</loc>
-    <lastmod>2020-03-21T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/timeseries/</loc>
-    <lastmod>2020-03-21T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/tags/var/</loc>
-    <lastmod>2020-03-21T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/tags/vars/</loc>
-    <lastmod>2020-03-21T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/tags/vec/</loc>
-    <lastmod>2020-03-21T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/tags/vector-autoregression/</loc>
     <lastmod>2020-03-21T00:00:00+00:00</lastmod>
   </url>
   
@@ -54,21 +14,6 @@
   
   <url>
     <loc>https://www.r-econometrics.com/networks/igraph/</loc>
-    <lastmod>2020-03-01T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/tags/ggraph/</loc>
-    <lastmod>2020-03-01T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/tags/igraph/</loc>
-    <lastmod>2020-03-01T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/tags/network/</loc>
     <lastmod>2020-03-01T00:00:00+00:00</lastmod>
   </url>
   
@@ -88,37 +33,7 @@
   </url>
   
   <url>
-    <loc>https://www.r-econometrics.com/tags/network-analysis/</loc>
-    <lastmod>2020-03-01T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/networks/</loc>
-    <lastmod>2020-03-01T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/tags/networks/</loc>
-    <lastmod>2020-03-01T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/post/</loc>
-    <lastmod>2020-03-01T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/</loc>
-    <lastmod>2020-03-01T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://www.r-econometrics.com/reproduction/bayesmethods/bayesmethods11/</loc>
-    <lastmod>2019-12-25T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/reproduction/</loc>
     <lastmod>2019-12-25T00:00:00+00:00</lastmod>
   </url>
   
@@ -138,47 +53,12 @@
   </url>
   
   <url>
-    <loc>https://www.r-econometrics.com/tags/f-test/</loc>
-    <lastmod>2019-11-25T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/tags/hausman-test/</loc>
-    <lastmod>2019-11-25T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/methods/</loc>
-    <lastmod>2019-11-25T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/tags/normality-test/</loc>
-    <lastmod>2019-11-25T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://www.r-econometrics.com/methods/teststats/</loc>
     <lastmod>2019-11-25T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://www.r-econometrics.com/tags/t-test/</loc>
-    <lastmod>2019-11-25T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/tags/dplyr/</loc>
-    <lastmod>2019-10-07T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://www.r-econometrics.com/rbasics/dplyrintro/</loc>
-    <lastmod>2019-10-07T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/rbasics/</loc>
     <lastmod>2019-10-07T00:00:00+00:00</lastmod>
   </url>
   
@@ -203,62 +83,12 @@
   </url>
   
   <url>
-    <loc>https://www.r-econometrics.com/tags/cointegration/</loc>
-    <lastmod>2019-07-22T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/tags/urca/</loc>
-    <lastmod>2019-07-22T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://www.r-econometrics.com/timeseries/bvar/</loc>
     <lastmod>2019-07-07T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://www.r-econometrics.com/tags/bayes/</loc>
-    <lastmod>2019-07-07T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/tags/bayesian/</loc>
-    <lastmod>2019-07-07T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/tags/bayesian-var/</loc>
-    <lastmod>2019-07-07T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/tags/bvar/</loc>
-    <lastmod>2019-07-07T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/tags/bvartools/</loc>
-    <lastmod>2019-07-07T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/tags/gibbs-sampler/</loc>
-    <lastmod>2019-07-07T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://www.r-econometrics.com/timeseries/bvec/</loc>
-    <lastmod>2019-06-11T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/tags/bvec/</loc>
-    <lastmod>2019-06-11T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/tags/ssvs/</loc>
     <lastmod>2019-06-11T00:00:00+00:00</lastmod>
   </url>
   
@@ -273,21 +103,6 @@
   </url>
   
   <url>
-    <loc>https://www.r-econometrics.com/tags/global-value-chain/</loc>
-    <lastmod>2019-05-20T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/tags/gvc/</loc>
-    <lastmod>2019-05-20T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/tags/leontief-decomposition/</loc>
-    <lastmod>2019-05-20T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://www.r-econometrics.com/reproduction/2015_timmer_wiod/</loc>
     <lastmod>2019-05-20T00:00:00+00:00</lastmod>
   </url>
@@ -298,58 +113,8 @@
   </url>
   
   <url>
-    <loc>https://www.r-econometrics.com/tags/growth-accounting/</loc>
-    <lastmod>2018-12-30T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/tags/pwt/</loc>
-    <lastmod>2018-12-30T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/tags/solow-residual/</loc>
-    <lastmod>2018-12-30T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/tags/text-mining/</loc>
-    <lastmod>2018-12-30T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://www.r-econometrics.com/2018/12/30/william-shakespeares-work-in-a-word-cloud/</loc>
     <lastmod>2018-12-30T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/tags/wordcloud/</loc>
-    <lastmod>2018-12-30T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/tags/baxter-king/</loc>
-    <lastmod>2018-12-27T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/tags/business-cycles/</loc>
-    <lastmod>2018-12-27T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/tags/detrend/</loc>
-    <lastmod>2018-12-27T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/tags/emd/</loc>
-    <lastmod>2018-12-27T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/tags/empirical-mode-decomposition/</loc>
-    <lastmod>2018-12-27T00:00:00+00:00</lastmod>
   </url>
   
   <url>
@@ -358,37 +123,7 @@
   </url>
   
   <url>
-    <loc>https://www.r-econometrics.com/tags/hamilton/</loc>
-    <lastmod>2018-12-27T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/tags/hodrick-prescott/</loc>
-    <lastmod>2018-12-27T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/tags/hp-filter/</loc>
-    <lastmod>2018-12-27T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/tags/wavelet/</loc>
-    <lastmod>2018-12-27T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/tags/heteroskedasticity/</loc>
-    <lastmod>2018-12-24T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://www.r-econometrics.com/methods/hcrobusterrors/</loc>
-    <lastmod>2018-12-24T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/tags/robust-error/</loc>
     <lastmod>2018-12-24T00:00:00+00:00</lastmod>
   </url>
   
@@ -468,11 +203,6 @@
   </url>
   
   <url>
-    <loc>https://www.r-econometrics.com/tags/timeseries/</loc>
-    <lastmod>2018-08-04T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://www.r-econometrics.com/rbasics/rstructure/</loc>
     <lastmod>2018-07-20T00:00:00+00:00</lastmod>
   </url>
@@ -489,16 +219,6 @@
   
   <url>
     <loc>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge15/</loc>
-    <lastmod>2018-02-06T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/tags/instrumental-variables/</loc>
-    <lastmod>2018-02-06T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/tags/iv/</loc>
     <lastmod>2018-02-06T00:00:00+00:00</lastmod>
   </url>
   
@@ -533,16 +253,6 @@
   </url>
   
   <url>
-    <loc>https://www.r-econometrics.com/tags/ggplot2/</loc>
-    <lastmod>2018-02-04T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/tags/graphics/</loc>
-    <lastmod>2018-02-04T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://www.r-econometrics.com/rbasics/installation/</loc>
     <lastmod>2018-02-04T00:00:00+00:00</lastmod>
   </url>
@@ -553,17 +263,7 @@
   </url>
   
   <url>
-    <loc>https://www.r-econometrics.com/tags/gravity/</loc>
-    <lastmod>2018-01-30T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://www.r-econometrics.com/reproduction/2016_sheperd_gravity/</loc>
-    <lastmod>2018-01-30T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/tags/trade/</loc>
     <lastmod>2018-01-30T00:00:00+00:00</lastmod>
   </url>
   
@@ -573,7 +273,368 @@
   </url>
   
   <url>
+    <loc>https://www.r-econometrics.com/tags/baxter-king/</loc>
+    <lastmod>2018-12-27T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/bayes/</loc>
+    <lastmod>2019-07-07T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/bayesian/</loc>
+    <lastmod>2018-08-04T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/bayesian-var/</loc>
+    <lastmod>2019-07-07T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/business-cycles/</loc>
+    <lastmod>2018-12-27T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/bvar/</loc>
+    <lastmod>2019-07-07T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/bvartools/</loc>
+    <lastmod>2019-07-07T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/bvec/</loc>
+    <lastmod>2019-06-11T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>https://www.r-econometrics.com/categories/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/cointegration/</loc>
+    <lastmod>2019-07-22T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/detrend/</loc>
+    <lastmod>2018-12-27T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/dplyr/</loc>
+    <lastmod>2019-10-07T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/emd/</loc>
+    <lastmod>2018-12-27T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/empirical-mode-decomposition/</loc>
+    <lastmod>2018-12-27T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/f-test/</loc>
+    <lastmod>2019-11-25T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/ggplot2/</loc>
+    <lastmod>2018-02-04T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/ggraph/</loc>
+    <lastmod>2020-03-01T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/gibbs-sampler/</loc>
+    <lastmod>2019-07-07T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/global-value-chain/</loc>
+    <lastmod>2019-05-20T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/graphics/</loc>
+    <lastmod>2018-02-04T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/gravity/</loc>
+    <lastmod>2018-01-30T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/growth-accounting/</loc>
+    <lastmod>2018-12-30T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/gvc/</loc>
+    <lastmod>2019-05-20T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/hamilton/</loc>
+    <lastmod>2018-12-27T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/hausman-test/</loc>
+    <lastmod>2019-11-25T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/heteroskedasticity/</loc>
+    <lastmod>2018-12-24T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/hodrick-prescott/</loc>
+    <lastmod>2018-12-27T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/hp-filter/</loc>
+    <lastmod>2018-12-27T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/igraph/</loc>
+    <lastmod>2020-03-01T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/instrumental-variables/</loc>
+    <lastmod>2018-02-06T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/irf/</loc>
+    <lastmod>2020-03-21T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/iv/</loc>
+    <lastmod>2018-02-06T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/leontief-decomposition/</loc>
+    <lastmod>2019-05-20T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/methods/</loc>
+    <lastmod>2019-11-25T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/network/</loc>
+    <lastmod>2020-03-01T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/network-analysis/</loc>
+    <lastmod>2020-03-01T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/networks/</loc>
+    <lastmod>2020-03-01T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/networks/</loc>
+    <lastmod>2020-03-01T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/normality-test/</loc>
+    <lastmod>2019-11-25T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/post/</loc>
+    <lastmod>2020-03-01T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/pwt/</loc>
+    <lastmod>2018-12-30T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/r/</loc>
+    <lastmod>2020-03-21T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/rbasics/</loc>
+    <lastmod>2019-10-07T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/reproduction/</loc>
+    <lastmod>2019-12-25T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/robust-error/</loc>
+    <lastmod>2018-12-24T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/solow-residual/</loc>
+    <lastmod>2018-12-30T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/ssvs/</loc>
+    <lastmod>2019-06-11T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/t-test/</loc>
+    <lastmod>2019-11-25T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/</loc>
+    <lastmod>2018-12-27T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/text-mining/</loc>
+    <lastmod>2018-12-30T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/timeseries/</loc>
+    <lastmod>2020-03-21T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/timeseries/</loc>
+    <lastmod>2018-08-04T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/trade/</loc>
+    <lastmod>2018-01-30T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/urca/</loc>
+    <lastmod>2019-07-22T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/var/</loc>
+    <lastmod>2020-03-21T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/vars/</loc>
+    <lastmod>2020-03-21T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/vec/</loc>
+    <lastmod>2019-07-22T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/vector-autoregression/</loc>
+    <lastmod>2020-03-21T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/wavelet/</loc>
+    <lastmod>2018-12-27T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/wordcloud/</loc>
+    <lastmod>2018-12-30T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/</loc>
+    <lastmod>2020-03-21T00:00:00+00:00</lastmod>
+    <priority>0</priority>
   </url>
   
 </urlset>
