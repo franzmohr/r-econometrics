@@ -146,14 +146,14 @@ data(&quot;nyse&quot;) lm.11.4 &lt;- lm(return ~ return_1, data = nyse) summary(
                             <time class="li-article-date">October, 7, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/wooldridge/wooldridge17/">Chapter 17: Limited Dependent Variable Models and Sample Selection Corrections</a></h4>
                             Example 17.1 First, look at the linear model.
-data(&quot;mroz&quot;) lm.17.1 &lt;- lm(inlf ~ nwifeinc + educ + exper + expersq + age + kidslt6 + kidsge6, data = mroz) summary(lm.17.1) ## ## Call: ## lm(formula = inlf ~ nwifeinc + educ + exper + expersq + age + ## kidslt6 + kidsge6, data = mroz) ## ## Residuals: ## Min 1Q Median 3Q Max ## -0.93432 -0.37526 0.08833 0.34404 0.99417 ## ## Coefficients: ## Estimate Std.
+data(&quot;mroz&quot;) lm.17.1 &lt;- lm(inlf ~ nwifeinc + educ + exper + expersq + age + kidslt6 + kidsge6, data = mroz) summary(lm.17.1) ## ## Call: ## lm(formula = inlf ~ nwifeinc + educ + exper + expersq + age + ## kidslt6 + kidsge6, data = mroz) ## ## Residuals: ## Min 1Q Median 3Q Max ## -0.93432 -0.37526 0.08833 0.34404 0.
                         </li>
                     
                         <li>
                             <time class="li-article-date">October, 7, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/wooldridge/wooldridge12/">Chapter12: Serial Correlation and Heteroskedasticity in Time Series Regressions</a></h4>
                             library(lmtest) library(sandwich) library(tseries) library(wooldridge) Example 12.1 data(&quot;phillips&quot;) Static Phillips curve
-lm.12.1.1 &lt;- lm(inf ~ unem, data = phillips) res.static &lt;- lm.12.1.1$res res.static_1 &lt;- c(NA, lm.12.1.1$res[-(length(res.static))]) lm.12.1.1.test &lt;- lm(res.static ~ res.static_1) summary(lm.12.1.1.test) ## ## Call: ## lm(formula = res.static ~ res.static_1) ## ## Residuals: ## Min 1Q Median 3Q Max ## -8.047 -1.104 -0.248 1.028 6.684 ## ## Coefficients: ## Estimate Std. Error t value Pr(&gt;|t|) ## (Intercept) -0.1118 0.3180 -0.352 0.
+lm.12.1.1 &lt;- lm(inf ~ unem, data = phillips) res.static &lt;- lm.12.1.1$res res.static_1 &lt;- c(NA, lm.12.1.1$res[-(length(res.static))]) lm.12.1.1.test &lt;- lm(res.static ~ res.static_1) summary(lm.12.1.1.test) ## ## Call: ## lm(formula = res.static ~ res.static_1) ## ## Residuals: ## Min 1Q Median 3Q Max ## -8.047 -1.104 -0.248 1.028 6.684 ## ## Coefficients: ## Estimate Std. Error t value Pr(&gt;|t|) ## (Intercept) -0.1118 0.3180 -0.
                         </li>
                     
                         <li>
@@ -216,7 +216,6 @@ The other commands that appear new are quite helpful and you should take a minut
                             <h4><a href="https://www.r-econometrics.com/reproduction/wooldridge/wooldridge06/">Chapter 6: Further Issues</a></h4>
                             Chapter 6 in Wooldridge (2013) deals with some more issues that might have an impact on your estimates. Among these are a change in the scale of your variables, so-called beta-factors and the interpretation of variables that appear together with their squared values, i.e. interaction terms.
 Before you start, set your working directory, load the foreign library and download the data we are going to use in this chapter.
-library(QuantPsyc) library(wooldridge) The impact of scales on the estimated coefficients
                         </li>
                     
                         <li>
@@ -236,7 +235,7 @@ library(QuantPsyc) library(wooldridge) The impact of scales on the estimated coe
                             <time class="li-article-date">February, 4, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/wooldridge/wooldridge04/">Statistical Inference</a></h4>
                             Before we start, let’s clear our memory, set the working directory and load the wooldridge data package.
-rm(list = ls()) setwd(&quot;C:/path/to/the/working/directory&quot;) library(wooldridge) data(wage1) lm.1 &lt;- lm(lwage ~ educ + exper + tenure, data = wage1) s.1 &lt;- summary(lm.1) s.1 ## ## Call: ## lm(formula = lwage ~ educ + exper + tenure, data = wage1) ## ## Residuals: ## Min 1Q Median 3Q Max ## -2.05802 -0.29645 -0.03265 0.28788 1.42809 ## ## Coefficients: ## Estimate Std.
+rm(list = ls()) setwd(&quot;C:/path/to/the/working/directory&quot;) library(wooldridge) data(wage1) lm.1 &lt;- lm(lwage ~ educ + exper + tenure, data = wage1) s.1 &lt;- summary(lm.1) s.1 ## ## Call: ## lm(formula = lwage ~ educ + exper + tenure, data = wage1) ## ## Residuals: ## Min 1Q Median 3Q Max ## -2.05802 -0.29645 -0.03265 0.28788 1.
                         </li>
                     
                         <li>
@@ -298,14 +297,17 @@ data &lt;- data %&gt;% mutate(ln_trade = log(trade), ln_distance = log(dist), ln
 
     </script>
     
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'UA-115075361-1', 'auto');
-ga('send', 'pageview');
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-115075361-1', 'auto');
+	
+	ga('send', 'pageview');
+}
 </script>
 
     </body>

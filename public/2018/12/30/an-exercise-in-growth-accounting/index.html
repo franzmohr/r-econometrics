@@ -1,12 +1,15 @@
 
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'UA-115075361-1', 'auto');
-ga('send', 'pageview');
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-115075361-1', 'auto');
+	
+	ga('send', 'pageview');
+}
 </script>
 
 <!DOCTYPE html>
@@ -118,72 +121,54 @@ ga('send', 'pageview');
                     </header>
                     <section>
                         <p>The discipline of growth accounting tries to assess the relative contribution of labour, capital and technology to the economic growth of a country. This post provides a short theoretical introduction to the concept of growth accounting and uses Penn World Table data to calculate total factor productivity (TFP) growth rates for a series of countries using the simple Solow-method.</p>
-
-<p></p>
-
 <h2 id="theory">Theory</h2>
-
 <p>Based on the growth model of Solow (1957) the discipline of growth accounting tries to assess the relative contribution of labour, capital and technology to the economic growth of a country. It departs from the idea that the economy can be described by a single production function of the form
 <code>$$Y= A K^{\alpha}L^{1-\alpha,}$$</code>
 which becomes <code>\(y=Ak^{\alpha}\)</code> in per-capita terms, where <code>\(y = Y / L\)</code> is output per capita, <code>\(k = K / L\)</code> is capital per capita and <code>\(A\)</code> is total factor productivity (TFP). Taking logs and differentiating with respect to time gives an expression of the economy&rsquo;s growth rate <code>\(g = \frac{\dot{y}}{y}\)</code>, which depends on TFP growth <code>\(\frac{\dot{A}}{A}\)</code> and capital growth <code>\(\frac{\dot{k}}{k}\)</code> over time so that
 <code>$$g = \frac{\dot{A}}{A} + \alpha \frac{\dot{k}}{k}.$$</code></p>
-
-<p>Since output, capital and labour can be observed, but <code>\(A\)</code> cannot, the latter has to be calculated in some way. The most basic approach to do so is the so-called <em>residual method</em>, which assumes that <code>\(\alpha\)</code> is equal to the share of capital income in national income.<sup class="footnote-ref" id="fnref:alpha"><a href="#fn:alpha">1</a></sup> Once this value is obtained the TFP growth rate can be obtained by</p>
-
+<p>Since output, capital and labour can be observed, but <code>\(A\)</code> cannot, the latter has to be calculated in some way. The most basic approach to do so is the so-called <em>residual method</em>, which assumes that <code>\(\alpha\)</code> is equal to the share of capital income in national income.<sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup> Once this value is obtained the TFP growth rate can be obtained by</p>
 <p><code>$$\frac{\dot{A}}{A} = g - \alpha \frac{\dot{k}}{k}.$$</code></p>
-
 <p>Note that since TFP growth is the residual value after the contribution of capital growth was subtracted from output growth, TFP growth is also called the <em>Solow residual</em>.</p>
-
 <h2 id="application-in-r">Application in R</h2>
+<p>Applying this method in R is straightforward. A main source of data for growth-related analyses is <!-- raw HTML omitted -->Penn World Table<!-- raw HTML omitted -->, which is also available on CRAN.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e"># Load package</span>
+<span style="color:#a6e22e">library</span>(pwt9) <span style="color:#75715e"># install.packages(&#34;pwt9&#34;)</span>
 
-<p>Applying this method in R is straightforward. A main source of data for growth-related analyses is <a href="https://www.rug.nl/ggdc/productivity/pwt/" target="_blank">Penn World Table</a>, which is also available on CRAN.</p>
+<span style="color:#75715e"># Load data</span>
+<span style="color:#a6e22e">data</span>(<span style="color:#e6db74">&#34;pwt9.0&#34;</span>)
+</code></pre></div><p>Next, we select some countries in the sample, where observations from 1960 to 2000 are available. This period is chosen, because this is also the period used for the growth accounting example in Aghion and Howitt (2009).</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">library</span>(dplyr)
 
-<pre><code class="language-r"># Load package
-library(pwt9) # install.packages(&quot;pwt9&quot;)
+data <span style="color:#f92672">&lt;-</span> pwt9.0 <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">filter</span>(country <span style="color:#f92672">%in%</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;Australia&#34;</span>, <span style="color:#e6db74">&#34;Austria&#34;</span>, <span style="color:#e6db74">&#34;Belgium&#34;</span>,
+                        <span style="color:#e6db74">&#34;Germany&#34;</span>, <span style="color:#e6db74">&#34;France&#34;</span>, <span style="color:#e6db74">&#34;United Kingdom&#34;</span>,
+                        <span style="color:#e6db74">&#34;United States of America&#34;</span>)) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">select</span>(year, isocode, rgdpna, rkna, emp, labsh) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">filter</span>(year <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">1960</span>,
+         year <span style="color:#f92672">&lt;=</span> <span style="color:#ae81ff">2000</span>) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">na.omit</span>()
+</code></pre></div><p>Then calculate the real output and capital per worker (in national currency), take logs and the first difference to obtain percentage changes. <code>\(\alpha\)</code> is one minus the share of labour compensation in GDP at current national prices, i.e. variable <code>labsh</code> in the dataset. You have to omit the first observation so that you have the same amount of observations as of output and capital growth.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">data <span style="color:#f92672">&lt;-</span> data <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(y_pc <span style="color:#f92672">=</span> <span style="color:#a6e22e">log</span>(rgdpna <span style="color:#f92672">/</span> emp), <span style="color:#75715e"># GDP per worker</span>
+         k_pc <span style="color:#f92672">=</span> <span style="color:#a6e22e">log</span>(rkna <span style="color:#f92672">/</span> emp), <span style="color:#75715e"># Capital per worker</span>
+         a <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">-</span> labsh) <span style="color:#f92672">%&gt;%</span> <span style="color:#75715e"># Capital share</span>
+  <span style="color:#a6e22e">arrange</span>(year) <span style="color:#f92672">%&gt;%</span> <span style="color:#75715e"># Order by year</span>
+  <span style="color:#a6e22e">group_by</span>(isocode) <span style="color:#f92672">%&gt;%</span> <span style="color:#75715e"># For each country calculate...</span>
+  <span style="color:#a6e22e">mutate</span>(g <span style="color:#f92672">=</span> (y_pc <span style="color:#f92672">-</span> <span style="color:#a6e22e">lag</span>(y_pc)) <span style="color:#f92672">*</span> <span style="color:#ae81ff">100</span>, <span style="color:#75715e"># ...the growth rate of GDP per capita</span>
+         dk <span style="color:#f92672">=</span> (k_pc <span style="color:#f92672">-</span> <span style="color:#a6e22e">lag</span>(k_pc)) <span style="color:#f92672">*</span> <span style="color:#ae81ff">100</span>, <span style="color:#75715e"># ...the growth rate of capital per capita</span>
+         dsolow <span style="color:#f92672">=</span> g <span style="color:#f92672">-</span> a <span style="color:#f92672">*</span> dk) <span style="color:#f92672">%&gt;%</span> <span style="color:#75715e"># ...the Solow residual</span>
+  <span style="color:#a6e22e">na.omit</span>()
 
-# Load data
-data(&quot;pwt9.0&quot;)
-</code></pre>
+solow <span style="color:#f92672">&lt;-</span> data <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">summarise</span>(g <span style="color:#f92672">=</span> <span style="color:#a6e22e">mean</span>(g),
+            tfp.growth <span style="color:#f92672">=</span> <span style="color:#a6e22e">mean</span>(dsolow),
+            capital.deepening <span style="color:#f92672">=</span> <span style="color:#a6e22e">mean</span>(a <span style="color:#f92672">*</span> dk),
+            tfp.share <span style="color:#f92672">=</span> <span style="color:#a6e22e">mean</span>(dsolow) <span style="color:#f92672">/</span> <span style="color:#a6e22e">mean</span>(g),
+            capital.share <span style="color:#f92672">=</span> <span style="color:#a6e22e">mean</span>(a))
 
-<p>Next, we select some countries in the sample, where observations from 1960 to 2000 are available. This period is chosen, because this is also the period used for the growth accounting example in Aghion and Howitt (2009).</p>
-
-<pre><code class="language-r">library(dplyr)
-
-data &lt;- pwt9.0 %&gt;%
-  filter(country %in% c(&quot;Australia&quot;, &quot;Austria&quot;, &quot;Belgium&quot;,
-                        &quot;Germany&quot;, &quot;France&quot;, &quot;United Kingdom&quot;,
-                        &quot;United States of America&quot;)) %&gt;%
-  select(year, isocode, rgdpna, rkna, emp, labsh) %&gt;%
-  filter(year &gt;= 1960,
-         year &lt;= 2000) %&gt;%
-  na.omit()
-</code></pre>
-
-<p>Then calculate the real output and capital per worker (in national currency), take logs and the first difference to obtain percentage changes. <code>\(\alpha\)</code> is one minus the share of labour compensation in GDP at current national prices, i.e. variable <code>labsh</code> in the dataset. You have to omit the first observation so that you have the same amount of observations as of output and capital growth.</p>
-
-<pre><code class="language-r">data &lt;- data %&gt;%
-  mutate(y_pc = log(rgdpna / emp), # GDP per worker
-         k_pc = log(rkna / emp), # Capital per worker
-         a = 1 - labsh) %&gt;% # Capital share
-  arrange(year) %&gt;% # Order by year
-  group_by(isocode) %&gt;% # For each country calculate...
-  mutate(g = (y_pc - lag(y_pc)) * 100, # ...the growth rate of GDP per capita
-         dk = (k_pc - lag(k_pc)) * 100, # ...the growth rate of capital per capita
-         dsolow = g - a * dk) %&gt;% # ...the Solow residual
-  na.omit()
-
-solow &lt;- data %&gt;%
-  summarise(g = mean(g),
-            tfp.growth = mean(dsolow),
-            capital.deepening = mean(a * dk),
-            tfp.share = mean(dsolow) / mean(g),
-            capital.share = mean(a))
-
-# Print output
+<span style="color:#75715e"># Print output</span>
 solow
-</code></pre>
-
-<pre><code>## # A tibble: 7 x 6
+</code></pre></div><pre><code>## # A tibble: 7 x 6
 ##   isocode     g tfp.growth capital.deepening tfp.share capital.share
 ##   &lt;fct&gt;   &lt;dbl&gt;      &lt;dbl&gt;             &lt;dbl&gt;     &lt;dbl&gt;         &lt;dbl&gt;
 ## 1 AUS      1.72       1.16             0.565     0.672         0.348
@@ -193,24 +178,18 @@ solow
 ## 5 FRA      2.82       1.81             1.02      0.639         0.307
 ## 6 GBR      2.19       1.28             0.910     0.584         0.394
 ## 7 USA      1.81       1.26             0.545     0.698         0.370
-</code></pre>
-
-<p>The results are very similar to the numbers in table 5.1 in Aghion and Howitt (2009).</p>
-
+</code></pre><p>The results are very similar to the numbers in table 5.1 in Aghion and Howitt (2009).</p>
 <h2 id="literature">Literature</h2>
-
 <p>Aghion, Philippe; Howitt, Peter (2009): The Economics of Growth: The MIT Press (MIT Press Books).</p>
-
 <p>Solow, Robert M. (1957): Technical Change and the Aggregate Production Function. In The Review of Economics and Statistics 39 (3), pp. 312–320. Available online at <a href="http://www.jstor.org/stable/1926047">http://www.jstor.org/stable/1926047</a>.</p>
-<div class="footnotes">
-
-<hr />
-
+<section class="footnotes" role="doc-endnotes">
+<hr>
 <ol>
-<li id="fn:alpha">This is based on the assumption of perfectly competitive captial markets, where the marginal product of capital is equal to the rental price of capital.
- <a class="footnote-return" href="#fnref:alpha"><sup>[return]</sup></a></li>
+<li id="fn:1" role="doc-endnote">
+<p>This is based on the assumption of perfectly competitive captial markets, where the marginal product of capital is equal to the rental price of capital. <a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
 </ol>
-</div>
+</section>
                     </section>
                 </article>
                 <div class="container">
@@ -285,14 +264,17 @@ solow
 
     </script>
     
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'UA-115075361-1', 'auto');
-ga('send', 'pageview');
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-115075361-1', 'auto');
+	
+	ga('send', 'pageview');
+}
 </script>
 
     </body>

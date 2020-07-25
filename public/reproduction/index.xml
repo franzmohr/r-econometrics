@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Reproductions on r-econometrics</title>
@@ -109,7 +109,7 @@ data(&amp;quot;nyse&amp;quot;) lm.11.4 &amp;lt;- lm(return ~ return_1, data = ny
       
       <guid>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge17/</guid>
       <description>Example 17.1 First, look at the linear model.
-data(&amp;quot;mroz&amp;quot;) lm.17.1 &amp;lt;- lm(inlf ~ nwifeinc + educ + exper + expersq + age + kidslt6 + kidsge6, data = mroz) summary(lm.17.1) ## ## Call: ## lm(formula = inlf ~ nwifeinc + educ + exper + expersq + age + ## kidslt6 + kidsge6, data = mroz) ## ## Residuals: ## Min 1Q Median 3Q Max ## -0.93432 -0.37526 0.08833 0.34404 0.99417 ## ## Coefficients: ## Estimate Std.</description>
+data(&amp;quot;mroz&amp;quot;) lm.17.1 &amp;lt;- lm(inlf ~ nwifeinc + educ + exper + expersq + age + kidslt6 + kidsge6, data = mroz) summary(lm.17.1) ## ## Call: ## lm(formula = inlf ~ nwifeinc + educ + exper + expersq + age + ## kidslt6 + kidsge6, data = mroz) ## ## Residuals: ## Min 1Q Median 3Q Max ## -0.93432 -0.37526 0.08833 0.34404 0.</description>
     </item>
     
     <item>
@@ -119,7 +119,7 @@ data(&amp;quot;mroz&amp;quot;) lm.17.1 &amp;lt;- lm(inlf ~ nwifeinc + educ + exp
       
       <guid>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge12/</guid>
       <description>library(lmtest) library(sandwich) library(tseries) library(wooldridge) Example 12.1 data(&amp;quot;phillips&amp;quot;) Static Phillips curve
-lm.12.1.1 &amp;lt;- lm(inf ~ unem, data = phillips) res.static &amp;lt;- lm.12.1.1$res res.static_1 &amp;lt;- c(NA, lm.12.1.1$res[-(length(res.static))]) lm.12.1.1.test &amp;lt;- lm(res.static ~ res.static_1) summary(lm.12.1.1.test) ## ## Call: ## lm(formula = res.static ~ res.static_1) ## ## Residuals: ## Min 1Q Median 3Q Max ## -8.047 -1.104 -0.248 1.028 6.684 ## ## Coefficients: ## Estimate Std. Error t value Pr(&amp;gt;|t|) ## (Intercept) -0.1118 0.3180 -0.352 0.</description>
+lm.12.1.1 &amp;lt;- lm(inf ~ unem, data = phillips) res.static &amp;lt;- lm.12.1.1$res res.static_1 &amp;lt;- c(NA, lm.12.1.1$res[-(length(res.static))]) lm.12.1.1.test &amp;lt;- lm(res.static ~ res.static_1) summary(lm.12.1.1.test) ## ## Call: ## lm(formula = res.static ~ res.static_1) ## ## Residuals: ## Min 1Q Median 3Q Max ## -8.047 -1.104 -0.248 1.028 6.684 ## ## Coefficients: ## Estimate Std. Error t value Pr(&amp;gt;|t|) ## (Intercept) -0.1118 0.3180 -0.</description>
     </item>
     
     <item>
@@ -208,8 +208,7 @@ The other commands that appear new are quite helpful and you should take a minut
       
       <guid>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge06/</guid>
       <description>Chapter 6 in Wooldridge (2013) deals with some more issues that might have an impact on your estimates. Among these are a change in the scale of your variables, so-called beta-factors and the interpretation of variables that appear together with their squared values, i.e. interaction terms.
-Before you start, set your working directory, load the foreign library and download the data we are going to use in this chapter.
-library(QuantPsyc) library(wooldridge) The impact of scales on the estimated coefficients</description>
+Before you start, set your working directory, load the foreign library and download the data we are going to use in this chapter.</description>
     </item>
     
     <item>
@@ -238,7 +237,7 @@ library(QuantPsyc) library(wooldridge) The impact of scales on the estimated coe
       
       <guid>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge04/</guid>
       <description>Before we start, let’s clear our memory, set the working directory and load the wooldridge data package.
-rm(list = ls()) setwd(&amp;quot;C:/path/to/the/working/directory&amp;quot;) library(wooldridge) data(wage1) lm.1 &amp;lt;- lm(lwage ~ educ + exper + tenure, data = wage1) s.1 &amp;lt;- summary(lm.1) s.1 ## ## Call: ## lm(formula = lwage ~ educ + exper + tenure, data = wage1) ## ## Residuals: ## Min 1Q Median 3Q Max ## -2.05802 -0.29645 -0.03265 0.28788 1.42809 ## ## Coefficients: ## Estimate Std.</description>
+rm(list = ls()) setwd(&amp;quot;C:/path/to/the/working/directory&amp;quot;) library(wooldridge) data(wage1) lm.1 &amp;lt;- lm(lwage ~ educ + exper + tenure, data = wage1) s.1 &amp;lt;- summary(lm.1) s.1 ## ## Call: ## lm(formula = lwage ~ educ + exper + tenure, data = wage1) ## ## Residuals: ## Min 1Q Median 3Q Max ## -2.05802 -0.29645 -0.03265 0.28788 1.</description>
     </item>
     
     <item>

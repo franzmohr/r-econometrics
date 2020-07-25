@@ -1,12 +1,15 @@
 
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'UA-115075361-1', 'auto');
-ga('send', 'pageview');
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-115075361-1', 'auto');
+	
+	ga('send', 'pageview');
+}
 </script>
 
 <!DOCTYPE html>
@@ -119,7 +122,10 @@ ga('send', 'pageview');
                         </time>
                     </header>
                     <section>
-                        <p>Model testing belongs to the main tasks of any econometric analysis. This post gives an overview of tests, which should be applied to OLS regressions, and illustrates how to calculate them in R. The focus of the post is rather on the calcuation of the tests. For a treatment of mathematical details, please, consult a standard textbook. This list of statistical tests is necessarily incomplete. However, if you have a strong opinion that a specific test is missing, feel free to leave a comment below.</p>
+                        
+
+
+<p>Model testing belongs to the main tasks of any econometric analysis. This post gives an overview of tests, which should be applied to OLS regressions, and illustrates how to calculate them in R. The focus of the post is rather on the calcuation of the tests. For a treatment of mathematical details, please, consult a standard textbook. This list of statistical tests is necessarily incomplete. However, if you have a strong opinion that a specific test is missing, feel free to leave a comment below.</p>
 <div id="data-and-model" class="section level2">
 <h2>Data and model</h2>
 <p>To illustrate the calculation of test statistics in R, let’s use the <em>wage1</em> dataset from the <code>wooldridge</code> package and estimate a basic <a href="https://en.wikipedia.org/wiki/Mincer_earnings_function" target="_blank">Mincer earnings function</a>. This standard specification of earnings models explains the natural log of average hourly earnings <code>lwage</code> by years of education <code>educ</code> and experience <code>exper</code>. The standard specification also includes squared values of experience <code>expersq</code> to take into account potential decreasing marginal effects.</p>
@@ -473,14 +479,17 @@ iv_model &lt;- ivreg(lwage ~ educ + exper + expersq + IQ | KWW + educ + exper + 
 
     </script>
     
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'UA-115075361-1', 'auto');
-ga('send', 'pageview');
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-115075361-1', 'auto');
+	
+	ga('send', 'pageview');
+}
 </script>
 
     </body>

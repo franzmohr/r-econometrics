@@ -1,12 +1,15 @@
 
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'UA-115075361-1', 'auto');
-ga('send', 'pageview');
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-115075361-1', 'auto');
+	
+	ga('send', 'pageview');
+}
 </script>
 
 <!DOCTYPE html>
@@ -119,7 +122,10 @@ ga('send', 'pageview');
                         </time>
                     </header>
                     <section>
-                        <p>With the increasing availability of granular data on the relationships between individual entities - such as persons (social media), countries (internatinal trade) and financial institutions (supervisory reporting) - network analysis offers many possibilities to extract useful information from such data. This post provides an introduction to network analysis in R using the powerful <code>igraph</code> package for the calculation of metrics and <code>ggraph</code> for visualisation. It marks the beginning of a more comprehensive treatment of <a href="https://www.r-econometrics.com/networksintro/" target="_blank">network analysis on r-econometrics</a>.</p>
+                        
+
+
+<p>With the increasing availability of granular data on the relationships between individual entities - such as persons (social media), countries (internatinal trade) and financial institutions (supervisory reporting) - network analysis offers many possibilities to extract useful information from such data. This post provides an introduction to network analysis in R using the powerful <code>igraph</code> package for the calculation of metrics and <code>ggraph</code> for visualisation. It marks the beginning of a more comprehensive treatment of <a href="https://www.r-econometrics.com/networksintro/" target="_blank">network analysis on r-econometrics</a>.</p>
 <div id="the-igraph-package" class="section level2">
 <h2>The <code>igraph</code> package</h2>
 <p>There are multiple packages for the analysis of networks in R. In this post I concentrate on the <code>igraph</code> package, which allows for a broad range of applications. But before we get into it in more detail, it is useful to know that there are two possible ways to represent the <em>edges</em>, i.e. the connections, of a network:</p>
@@ -341,14 +347,17 @@ ggraph(graph_df, layout = &quot;kk&quot;) + # Generate graph
 
     </script>
     
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'UA-115075361-1', 'auto');
-ga('send', 'pageview');
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-115075361-1', 'auto');
+	
+	ga('send', 'pageview');
+}
 </script>
 
     </body>
