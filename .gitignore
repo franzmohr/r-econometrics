@@ -10,4 +10,4 @@ index.Rmd
 *.zip
 *.mc
 *.rda
-/content/post/*.html
+/content/post/*.html  

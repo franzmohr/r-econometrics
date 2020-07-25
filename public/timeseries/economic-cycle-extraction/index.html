@@ -89,7 +89,7 @@ ga('send', 'pageview');
 
   <meta
      name="description"
-     content=""
+     content="This post presents methods that can be used to decompose economic time series into their trend and cyclical compoentents in R."
    />
 
     <div class="container">
@@ -337,7 +337,7 @@ ggplot(temp, aes(x = date, y = value, colour = Variable)) +
 </div>
 <div id="empirical-mode-decomposition-emd" class="section level2">
 <h2>Empirical mode decomposition (EMD)</h2>
-<p>Kozic and Sever (2014) propose empirical mode decomposition as a further method of business cycle extraction as presented in Huang et al. (1998). The <code>emd</code> function can be found in the <em>EMD</em> package and requires a differenced time series, a boundary condition and a rule that specifies, at which point the iterative algorithm can stop. The results of this filter method are relatively different from the HP, BK and wavelet filter. It is the task of every researching to assess, whether working with this method is justified or not.</p>
+<p>Kozic and Sever (2014) propose empirical mode decomposition as a further method of business cycle extraction as presented in Huang et al. (1998). An implementation of the method comes with the <code>emd</code> function in the <em>EMD</em> package. It requires a time series, which can be both stationary or non-stationary and a <code>boundary</code> condition. The basic idea of EMD is similar to wavelets. It decomposes a time series into sub-series, which are called <em>intrinsic mode functions</em> (IMF).</p>
 <pre class="r"><code>library(EMD)
 
 y &lt;- na.omit(data$lgdp)
@@ -346,10 +346,10 @@ y &lt;- na.omit(data$lgdp)
 emd_gdp &lt;- emd(xt = y, boundary = &quot;none&quot;)
 
 # Exctract the intrinsic mode functions
-emd_gdp &lt;- as.data.frame(emd_gdp$imf)
+imf_gdp &lt;- as.data.frame(emd_gdp$imf)
 
 # Create a data frame for plotting
-temp &lt;- emd_gdp %&gt;%
+temp &lt;- imf_gdp %&gt;%
   gather(key = &quot;imf&quot;, value = &quot;value&quot;) %&gt;%
   group_by(imf) %&gt;%
   mutate(date = data$date)
@@ -363,7 +363,7 @@ ggplot(temp, aes(x = date, y = value)) +
 <p><img src="/timeseries/economic-cycle-extraction_files/figure-html/emd-1.png" width="432" /></p>
 <pre class="r"><code># Add EMD output to main data frame
 data &lt;- data %&gt;%
-  mutate(emd = emd_gdp$V2)
+  mutate(emd = lgdp - emd_gdp$residue)
 
 # Create data frame for plotting
 temp &lt;- data %&gt;%
@@ -381,6 +381,7 @@ ggplot(temp, aes(x = date, y = value, colour = Variable)) +
   labs(title = &quot;Empirical mode decomposition&quot;,
        x = &quot;Qurarter&quot;, y = &quot;&quot;)</code></pre>
 <p><img src="/timeseries/economic-cycle-extraction_files/figure-html/emd%20plot-1.png" width="432" /></p>
+<p>Note that the first and last elements are equal to zero. This is because we used the argument <code>boundary = &quot;none&quot;</code>. If we used a different specification, the function would eliminate this boundary effect by extending the original series.</p>
 </div>
 <div id="grant-a.-l.-chan-j.-c.-c.-2017" class="section level2">
 <h2>Grant, A. L., &amp; Chan, J. C. C. (2017)</h2>

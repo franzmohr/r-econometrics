@@ -62,7 +62,7 @@ hist(deg_large)</code></pre>
 
 round(g_close, 2)</code></pre>
 <pre><code>##    a    b    c    d    e    f    g    h    i    j    k    l    m    n    o    p 
-## 0.02 0.03 0.03 0.02 0.03 0.03 0.03 0.03 0.02 0.03 0.03 0.02 0.03 0.02 0.03 0.03 
+## 0.02 0.03 0.03 0.02 0.03 0.03 0.03 0.03 0.03 0.03 0.03 0.03 0.03 0.03 0.03 0.03 
 ##    q    r    s    t    u    v    w    x    y    z 
 ## 0.03 0.03 0.03 0.03 0.03 0.03 0.03 0.03 0.03 0.03</code></pre>
 <p>In constrast to the degree of a node, which describes the number of its direct connections, its closeness provides an idea of how well a node is indirectly connected via other nodes.</p>
@@ -80,7 +80,7 @@ round(g_betw, 2)</code></pre>
 </div>
 <div id="eigenvector-centrality" class="section level3">
 <h3>Eigenvector centrality</h3>
-<p>The <em>eigenvector centrality</em> (Bonabeau, 1972) belongs to the class of spectral centralities. It is based on the idea that the importance of a node is recusively related to the importance of the nodes pointing to it. For example, your popularity depends on the popularity of your friends, whose popularity depends on their friends etc.</p>
+<p><em>Eigenvector centrality</em> (Bonabeau, 1972) is based on the idea that the importance of a node is recusively related to the importance of the nodes pointing to it. For example, your popularity depends on the popularity of your friends, whose popularity depends on their friends etc. Therefore, this measure is also self-referential in the sense that a node’s centrality depends on the centrality of another node, whose centrality depends the first node. A higher value of eigenvector centrality implies that a node’s neighbours are more prestigious than the neighbours of other nodes.</p>
 <pre class="r"><code>g_eigen &lt;- eigen_centrality(graph_df)
 
 round(g_eigen$vector, 2)</code></pre>
@@ -88,6 +88,15 @@ round(g_eigen$vector, 2)</code></pre>
 ## 0.59 1.00 0.88 0.59 0.93 0.76 0.79 0.85 0.65 0.72 0.78 0.51 0.89 0.75 0.85 0.59 
 ##    q    r    s    t    u    v    w    x    y    z 
 ## 0.79 0.89 0.65 0.66 0.76 0.76 0.72 0.91 0.72 1.00</code></pre>
+</div>
+<div id="centrality-measures-with-decay-factors" class="section level3">
+<h3>Centrality measures with decay factors</h3>
+<p>A further group of centrality measures uses decay factors to take into account that links with more distant neighbours should be less influential in the calculation of a node’s centrality. The following mesures belong to this group:</p>
+<ul>
+<li>Decay centrality is based on closeness</li>
+<li>Katz prestige-2 as a special case of Bonacich centrality as implemented with <code>power_centrality</code></li>
+</ul>
+<p>These are useful measures as well, however, they require the researcher to specify additional variables such as the decay factor, which can have a substantial impact on the results. While one specification might lead to results that are similar to the degree distribution, since it favours the close neighbourhood of a node, another specification could givs more weight to longer paths.</p>
 </div>
 <div id="relationships-between-the-measures" class="section level2">
 <h2>Relationships between the measures</h2>
