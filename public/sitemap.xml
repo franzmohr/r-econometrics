@@ -3,6 +3,51 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://www.r-econometrics.com/timeseries/stationarity/</loc>
+    <lastmod>2020-08-09T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/cointegration/</loc>
+    <lastmod>2020-08-09T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/r/</loc>
+    <lastmod>2020-08-09T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/</loc>
+    <lastmod>2020-08-09T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/stationarity/</loc>
+    <lastmod>2020-08-09T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/</loc>
+    <lastmod>2020-08-09T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/time-series/</loc>
+    <lastmod>2020-08-09T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/timeseries/</loc>
+    <lastmod>2020-08-09T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/unit-root/</loc>
+    <lastmod>2020-08-09T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://www.r-econometrics.com/post/</loc>
     <lastmod>2020-04-19T00:00:00+00:00</lastmod>
   </url>
@@ -13,32 +58,12 @@
   </url>
   
   <url>
-    <loc>https://www.r-econometrics.com/</loc>
-    <lastmod>2020-04-19T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://www.r-econometrics.com/timeseries/irf/</loc>
     <lastmod>2020-03-21T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://www.r-econometrics.com/tags/irf/</loc>
-    <lastmod>2020-03-21T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/tags/r/</loc>
-    <lastmod>2020-03-21T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/tags/</loc>
-    <lastmod>2020-03-21T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/timeseries/</loc>
     <lastmod>2020-03-21T00:00:00+00:00</lastmod>
   </url>
   
@@ -199,11 +224,6 @@
   
   <url>
     <loc>https://www.r-econometrics.com/timeseries/vecintro/</loc>
-    <lastmod>2019-07-22T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/tags/cointegration/</loc>
     <lastmod>2019-07-22T00:00:00+00:00</lastmod>
   </url>
   

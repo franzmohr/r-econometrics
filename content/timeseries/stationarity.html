@@ -1,0 +1,166 @@
+---
+title: "An Introduction to Stationarity and Unit Roots in Time Series Analysis"
+author: "Franz X. Mohr"
+date: "2020-08-09"
+tags:
+  - r
+  - stationarity
+  - unit-root
+  - cointegration
+  - time-series
+description: "An overview on the concept of stationarity and unit roots in time series analysis and related statistical tests in R."
+---
+
+
+
+<div id="concepts" class="section level2">
+<h2>Concepts</h2>
+<p>Basically <strong>stationarity</strong> means that a time series has a constant mean and constant variance over time. Althouth not particularly imporant for the estimation of parameters of econometric models these features are essential for the calculation of reliable test statistics and, hence, can have a significant impact on model selection.</p>
+<p>To illustrate this concept, let’s look at quarterly data on disposable income in billion DM from 1960 to 1982, which is data set E1 from Luetkepohl (2007).</p>
+<pre class="r"><code># Load data
+library(bvartools)
+data(&quot;e1&quot;)
+
+# Disposable income in levels
+income &lt;- e1[, &quot;income&quot;]
+
+# Plot series
+plot(income, main = &quot;West Germain disposable income&quot;, ylab = &quot;Billion DM&quot;)</code></pre>
+<p><img src="/timeseries/stationarity_files/figure-html/unnamed-chunk-1-1.png" width="480" /></p>
+<p>The series is continuously increasing and, thus, does not fluctuate around a constant mean. Furthermore, if we calculated the variances for an increasing window of periods from the beginning of the series to the end, we would see a constant increase in the estimated values. Therefore, disposable income in levels does not seem to be a stationary series. But how can we make this series stationary? For this it is useful to know that there are two popular models for nonstationary series, trend- and difference-stationary models.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></p>
+<p><strong>Trend-stationary</strong>: A series is trend-stationary, if it fluctuates around a deterministic trend, to which it reverts in the long run. Subtracting this trend from the original series yields a stationary series. For example, assuming that log disposable income follows a linear trend, we can regress the series on a constant and a linear trend and use the residuals as a candidate for a stationary series:</p>
+<pre class="r"><code># Obtain ln of income
+lincome &lt;- log(income)
+
+# Obtain detrended series
+t_lincome &lt;- (lincome - fitted(lm(lincome ~ I(1:length(lincome))))) * 100
+
+# Plot and add horizontal line at 0
+plot(t_lincome, main = &quot;West German Disposable Income&quot;,
+     ylab = &quot;Deviation from linear trend&quot;); abline(h = 0)</code></pre>
+<p><img src="/timeseries/stationarity_files/figure-html/unnamed-chunk-2-1.png" width="480" /></p>
+<p>Although the mean of the resulting series is (practially) zero, its variance could be considered to increase over time. This might be due to the assumption of a simple linear trend. In this case we could search for better ways to extract the trend from this series, for example by adding a squared trend or by useing <a href="https://www.r-econometrics.com/timeseries/economic-cycle-extraction/" target="_blank">more sophisticated routines</a>. <em>However, note that the results of any time series analysis with trend stationary data might be sensitive to the method that was chosen to estimated the trend component of the series. It is very important to keep this in mind.</em></p>
+<p>Apart from refining the method for estimating the deterministic trend of the series, the strong deviation of the actual values from the linear trend and its smoothness could also indicate a unit root, which would be associated with a difference stationary process.</p>
+<p><strong>Difference-stationary</strong>: If a time series can be made stationary by differencing, it is said to contain a <strong>unit root</strong>. In essence, this means that the current value of a series <span class="math inline">\(y_t\)</span> <em>is equal</em> to its last value <span class="math inline">\(y_{t - 1}\)</span> plus an error <span class="math inline">\(\epsilon_t\)</span>, i.e. <span class="math inline">\(y_t = a y_{t - 1} + \epsilon_t\)</span> with <span class="math inline">\(|a| = 1\)</span>. Variables that show this behaviour are also said to be integrated of order d, or <span class="math inline">\(I\)</span>(d), which means that d differences are neccesary to render a series stationary. According to the Box-Jenking approach - which is associated with ARIMA models - most economic time series can be made stationary by differencing the log of the series. Usually, one or two differencing operations should be enough.</p>
+<p>Note that a time series can still contain a unit root, even when a deterministic trend was already removed. So, differencing the detrended series might still be necessary to render a series stationary.</p>
+<p>In the case of the time series of disposable income it appears that the series is stationary after calculating the first differences of the natural logarithm. It flucuates around a relatively constant mean, exhibits a rather constant variance and is more erratic as the detrended series.<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></p>
+<pre class="r"><code># Obtain first log-differences of disposable income
+d_lincome &lt;- diff(log(e1[,&quot;income&quot;])) * 100
+
+# # Plot and add horizontal line at 0
+plot(d_lincome, main = &quot;West German disposable income&quot;,
+     ylab = &quot;Log growth rate&quot;); abline(h = 0)</code></pre>
+<p><img src="/timeseries/stationarity_files/figure-html/unnamed-chunk-3-1.png" width="480" /></p>
+<p>By looking at the results above, it seems that disposable income is difference-stationary with <span class="math inline">\(I\)</span>(1). But since these are rather subjective impressions, more formal tests should be applied to check this.</p>
+</div>
+<div id="tests" class="section level2">
+<h2>Tests</h2>
+<div id="correlogram" class="section level3">
+<h3>Correlogram</h3>
+<p>When working with the Box-Jenkins approach it is common to check the stationarity of a time series by visual inspection of the correlogram, i.e. a plot containing the <span class="math inline">\(k\)</span>th-order normalised autocorrelations. If the estimated autocorrelations die out rather quickly, the series is likely to be stationary.</p>
+<p>In the following example, the autocorrelation function (ACF) is obtained for log disposable income in levels. Since the estimated autocorrelations remain above the confidence interval for all periods, the series is rather not stationary…</p>
+<pre class="r"><code>lincome &lt;- log(income)
+plot(lincome, main = &quot;Log income...&quot;, ylab = NA)
+acf(lincome, main = &quot;...and corresponding ACF&quot;, ylab = NA)</code></pre>
+<p><img src="/timeseries/stationarity_files/figure-html/unnamed-chunk-4-1.png" width="50%" /><img src="/timeseries/stationarity_files/figure-html/unnamed-chunk-4-2.png" width="50%" /></p>
+<p>…and the detrended series shows similar features.</p>
+<pre class="r"><code>plot(t_lincome, main = &quot;Deviation from linear trend...&quot;, ylab = NA)
+acf(t_lincome, main = &quot;...and corresponding ACF&quot;, ylab = NA)</code></pre>
+<p><img src="/timeseries/stationarity_files/figure-html/unnamed-chunk-5-1.png" width="50%" /><img src="/timeseries/stationarity_files/figure-html/unnamed-chunk-5-2.png" width="50%" /></p>
+<p>By contrast, the autocorrelations of the differenced log series die out rather quickly, which indicates stationarity.</p>
+<pre class="r"><code>plot(d_lincome, main = &quot;First difference of log income...&quot;, ylab = NA)
+acf(d_lincome, main = &quot;...and corresponding ACF&quot;, ylab = NA)</code></pre>
+<p><img src="/timeseries/stationarity_files/figure-html/unnamed-chunk-6-1.png" width="50%" /><img src="/timeseries/stationarity_files/figure-html/unnamed-chunk-6-2.png" width="50%" /></p>
+</div>
+<div id="unit-root-tests" class="section level3">
+<h3>Unit root tests</h3>
+<p>Unit root tests help in assessing whether a time series is stationary. Due to the statistical issues that are associated with <span class="math inline">\(I\)</span>(1) series, this is a very difficult task. Therefore, there is series of unit root tests and proposals under which circumstances a test is more useful than another. In the following some popular tests are presented.</p>
+<p>For all tests the same data on log levels as well as first and second log differences are used. All series have the same length.</p>
+<pre class="r"><code>d1_lincome &lt;- diff(lincome) # First difference
+d2_lincome &lt;- diff(d1_lincome) # Second difference
+
+# Combine
+data &lt;- cbind(lincome, d1_lincome, d2_lincome)
+
+# Get rid of NAs so that all have same length
+data &lt;- na.omit(data)
+
+# Rename columsn
+dimnames(data)[[2]] &lt;- c(&quot;level&quot;, &quot;diff_1&quot;, &quot;diff_2&quot;)</code></pre>
+<p>The <code>tseries</code> package contains the unit root tests that are used here.</p>
+<pre class="r"><code>library(tseries)</code></pre>
+<div id="augmented-dickey-fuller-test" class="section level4">
+<h4>Augmented Dickey-Fuller test</h4>
+<p>The augmented Dickey-Fuller (ADF) test (Said and Dickey, 1984) seems to be the most popular unit root test. It estimates the equation</p>
+<p><span class="math display">\[\Delta y_t = \mu + \beta t + (\theta - 1) y_{t - 1} + \sum \delta_i \Delta y_{t - i} + \epsilon_t,\]</span></p>
+<p>where <span class="math inline">\(\theta\)</span> is the variable of interest. The null hypothesis of the ADF test is that the series contains a unit root. If <span class="math inline">\(\theta\)</span> is significantly different from 1, this would indicate stationarity. In the following code the ADF test is performed for a series of lag orders.</p>
+<pre class="r"><code>adf &lt;- data.frame(k = 0:9, 
+                  level = NA,
+                  diff_1 = NA,
+                  diff_2 = NA)
+
+# Run test for a series fo models
+for (i in 1:nrow(adf)) {
+  k &lt;- adf$k[i]
+  pos &lt;- (9 - k + 1):nrow(data) # Position of used observations
+  for (j in c(&quot;level&quot;, &quot;diff_1&quot;, &quot;diff_2&quot;)) {
+    adf_test &lt;- adf.test(data[pos, j], alternative = &quot;stationary&quot;, k = k)
+    adf[i, j] &lt;- adf_test$p.value 
+  }
+}
+
+# Show results
+adf</code></pre>
+<pre><code>##    k     level     diff_1     diff_2
+## 1  0 0.9900000 0.01000000 0.01000000
+## 2  1 0.9900000 0.01000000 0.01000000
+## 3  2 0.9900000 0.06318328 0.01000000
+## 4  3 0.9659595 0.19862916 0.01000000
+## 5  4 0.9570174 0.36135454 0.01000000
+## 6  5 0.9390069 0.45127002 0.01000000
+## 7  6 0.9249955 0.46563987 0.03763891
+## 8  7 0.9334218 0.16353566 0.03603800
+## 9  8 0.9888206 0.21500947 0.01178816
+## 10 9 0.9900000 0.41652671 0.01000000</code></pre>
+<p>The results show that the null of a unit root cannot be rejected for all lags of the series in levels. For the first differenced series the picture is mixed. For lower lag orders, the test rejects the null, but not for higher lags. For the series with data in second differences the results clearly suggest a unit root.</p>
+<p>The original Dickey-Fuller (DF) test has proven to be not very useful in practise. Therefore, it is not covered here.</p>
+</div>
+<div id="kpss" class="section level4">
+<h4>KPSS</h4>
+<p>In contrast to many other unit root tests the null hypothesis of the KPSS test (Kwiatkowski et al., 1992) is that an observable time series is (trend-)stationary. Function <code>kpss.test</code> allows to specify a null, where the series is level stationary or trend stationary. Since the log-series shows clear signs of a linear trend, argument <code>null</code> is set to <code>&quot;Trend&quot;</code> for the variable in levels. For the first and second differences the argument is set to <code>&quot;Level&quot;</code>.</p>
+<pre class="r"><code>kpss &lt;- data.frame(level = NA,
+                   diff_1 = NA,
+                   diff_2 = NA)
+
+# Run test for level data
+kpss[, &quot;level&quot;] &lt;- kpss.test(data[pos, &quot;level&quot;], null = &quot;Trend&quot;)$p.value 
+
+# Run test for first differences
+kpss[, &quot;diff_1&quot;] &lt;- kpss.test(data[pos, &quot;diff_1&quot;], null = &quot;Level&quot;)$p.value 
+
+# Run test for second differences
+kpss[, &quot;diff_2&quot;] &lt;- kpss.test(data[pos, &quot;diff_2&quot;], null = &quot;Level&quot;)$p.value 
+
+# Show results
+kpss</code></pre>
+<pre><code>##   level     diff_1 diff_2
+## 1  0.01 0.07781436    0.1</code></pre>
+<p>The results show that for log disposable income in levels the null of stationarity is rejected at a very high confidence level. However, the test fails to reject the null of stationariy for differenced data at the 5 percent level. This is further indication that log disposable income is <span class="math inline">\(I\)</span>(1).</p>
+</div>
+</div>
+</div>
+<div id="literature" class="section level2">
+<h2>Literature</h2>
+<p>Hyndman, R., Athanasopoulos, G., Bergmeir, C., Caceres, G., Chhay, L., O’Hara-Wild, M., Petropoulos, F., Razbash, S., Wang, E., &amp; Yasmeen, F. (2020). <em>forecast: Forecasting functions for time series and linear models</em>.</p>
+<p>Kennedy, P. (2014). <em>A guide to econometrics</em>. Malden (Mass.): Blackwell Publishing 6th ed.</p>
+<p>Kwiatkowski, D., Phillips, P. C. B., Schmidt, P., &amp; Shin, Y. (1992): Testing the null hypothesis of stationarity against the alternative of a unit root. <em>Journal of Econometrics 54</em>, 159–178.</p>
+<p>Luetkepohl, H. (2007). <em>New introduction to multiple time series analyis</em>. Berlin: Springer.</p>
+<p>Said, S. E., &amp; Dickey, D. A. (1984). <em>Testing for unit roots in autoregressive-moving average models of unknown order</em>. <em>Biometrika 71</em>(3), 599–607.</p>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>A slightly more technical summary of difference and trend stationary processes can be found on <a href="https://de.mathworks.com/help/econ/trend-stationary-vs-difference-stationary.html" target="_blank">mathworks.com</a>.<a href="#fnref1" class="footnote-back">↩</a></p></li>
+<li id="fn2"><p>In case you wondered, the first difference of the detrended series of disposable income looks exactly like the differenced log-series, except that it has a different mean.<a href="#fnref2" class="footnote-back">↩</a></p></li>
+</ol>
+</div>
