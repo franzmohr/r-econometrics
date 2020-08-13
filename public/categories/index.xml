@@ -6,9 +6,28 @@
     <description>Recent content in Categories on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
+    <lastBuildDate>Thu, 13 Aug 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://www.r-econometrics.com/categories/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>r</title>
+      <link>https://www.r-econometrics.com/categories/r/</link>
+      <pubDate>Thu, 13 Aug 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/categories/r/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>var</title>
+      <link>https://www.r-econometrics.com/categories/var/</link>
+      <pubDate>Thu, 13 Aug 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/categories/var/</guid>
+      <description></description>
+    </item>
     
   </channel>
 </rss>

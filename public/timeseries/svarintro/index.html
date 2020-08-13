@@ -1,0 +1,401 @@
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-115075361-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+<!DOCTYPE html>
+<html xmlns="//www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+    <head>
+        
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+
+        <title>An Introduction to Structural Vector Autoregression (SVAR) &middot; r-econometrics</title>
+        <link rel='stylesheet' href='//fonts.googleapis.com/css?family=Open+Sans:400,300,600' type='text/css'>
+        <link rel="stylesheet" href="https://www.r-econometrics.com//libraries/normalize.3.0.1.css" />
+        <link rel="stylesheet" href="https://www.r-econometrics.com//css/liquorice.css" />
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <link rel="apple-touch-icon-precomposed" href="/apple-touch-icon-144-precomposed.png" sizes="144x144" />
+        <link rel="alternate" href="" type="application/rss+xml" title="r-econometrics" />
+    </head>
+    <body class="li-body">
+
+<header class="li-page-header">
+    <div class="container">
+        <div class="row">
+            <div class="sixteen columns">
+                <div class="li-brand li-left">
+                <a href="https://www.r-econometrics.com/">r-econometrics</a></div>
+                <div class="li-menu li-right">
+                    <span class="li-menu-icon" onclick="javascript:toggle('menu');">&#9776;</span>
+                    <ul id="menu2" class="li-menu-items">
+                        
+                            <li><a href="/rbasicsintro"> R(eal) Basics </a></li>
+                        
+                            <li><a href="/methodsintro"> Econometric Methods </a></li>
+                        
+                            <li><a href="/timeseriesintro"> Time Series Topics </a></li>
+                        
+                            <li><a href="/networksintro"> Network Analysis </a></li>
+                        
+                            <li><a href="/links"> Links </a></li>
+                        
+                            <li><a href="/post"> Blog </a></li>
+                        
+                            <li><a href="/reproductionintro"> Reproduction Projects </a></li>
+                        
+                            <li><a href="/about"> About and Disclaimer </a></li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="sixteen columns">
+                <ul id="menu" class="li-menu-items li-menu-mobile">
+                    
+                        <li><a href="/rbasicsintro"> R(eal) Basics </a></li>
+                    
+                        <li><a href="/methodsintro"> Econometric Methods </a></li>
+                    
+                        <li><a href="/timeseriesintro"> Time Series Topics </a></li>
+                    
+                        <li><a href="/networksintro"> Network Analysis </a></li>
+                    
+                        <li><a href="/links"> Links </a></li>
+                    
+                        <li><a href="/post"> Blog </a></li>
+                    
+                        <li><a href="/reproductionintro"> Reproduction Projects </a></li>
+                    
+                        <li><a href="/about"> About and Disclaimer </a></li>
+                    
+                </ul>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+
+
+
+
+  <meta
+     name="description"
+     content="An introduction on the concept of structural vector autoregressive (SVAR) models and how to estimate them in R."
+   />
+
+    <div class="container">
+        <div class="row">
+            <div class="sixteen columns">
+                <article class="li-article">
+                    <header class="li-article-header">
+                        <h1 class="li-article-title">An Introduction to Structural Vector Autoregression (SVAR)</h1>
+                        <span class="li-article-taxonomies">
+                            
+                                Posted in
+                                
+                                    <a href="https://www.r-econometrics.com//categories/r">r</a>
+                                
+                                    <a href="https://www.r-econometrics.com//categories/var">var</a>
+                                
+                            
+
+                            
+                                with tags
+                                
+                                    <a href="https://www.r-econometrics.com//tags/r">r</a>
+                                
+                                    <a href="https://www.r-econometrics.com//tags/var">var</a>
+                                
+                                    <a href="https://www.r-econometrics.com//tags/svar">svar</a>
+                                
+                                    <a href="https://www.r-econometrics.com//tags/vector-autoregression">vector autoregression</a>
+                                
+                            
+                        </span>
+                         - 
+                        <time class="li-article-date">Franz X. Mohr, August 13, 2020
+                        </time>
+                    </header>
+                    <section>
+                        
+
+
+<p><a href="https://www.r-econometrics.com/timeseries/varintro" target="_blank">Vector autoregressive (VAR) models</a> constitute a rather general approach to modelling multivariate time series. A critical drawback of those models in their standard form is their missing ability to describe contemporaneous relationships between the analysed variables. This becomes a central issue in the <a href="https://www.r-econometrics.com/timeseries/irf" target="_blank">impulse response analysis</a> for such models, where it is important to know the contemporaneous effects of a shock to the economy. Usually, researchers address this by using orthogonal impulse responses, where the correlation between the errors is obtained from the (lower) Cholesky decomposition of the error covariance matrix. This requires them to arrange the variables of the model in a suitable order. An alternative to this approach is to use so-called <em>structural vector autoregressive (SVAR)</em> models, where the relationship between contemporaneous variables is modelled more directly. This post provides an introduction to the concept of SVAR models and how they can be estimated in R.</p>
+<div id="what-does-the-term-structual-mean" class="section level2">
+<h2>What does the term “structual” mean?</h2>
+<p>To understand what a structural VAR model is, let’s repeat the main characteristics of a standard <em>reduced form</em> VAR model:</p>
+<p><span class="math display">\[y_{t} = A_{1} y_{t-1} + u_t \ \ \text{with} \ \ u_{t} \sim (0, \Sigma),\]</span>
+where <span class="math inline">\(y_{t}\)</span> is a <span class="math inline">\(k \times 1\)</span> vector of <span class="math inline">\(k\)</span> variables in period <span class="math inline">\(t\)</span>. <span class="math inline">\(A_1\)</span> is a <span class="math inline">\(k \times k\)</span> coefficent matrix and <span class="math inline">\(\epsilon_t\)</span> is a <span class="math inline">\(k \times 1\)</span> vector of errors, which have a multivariate normal distribution with zero mean and a <span class="math inline">\(k \times k\)</span> variance-covariance matrix <span class="math inline">\(\Sigma\)</span>.</p>
+<p>To understand SVAR models, it is important to look more closely at the <em>variance-covariance matrix</em> <span class="math inline">\(\Sigma\)</span>. It contains the variances of the endogenous variable on its diagonal elements and covariances of the errors on the off-diagonal elements. The covariances contain information about contemporaneous effects each variable has on the others. The covariance matrices of standard VAR models is <em>symmetric</em>, i.e. the elements to the top-right of the diagonal (the “upper triangular”) mirror the elements to the bottom-left of the diagonal (the “lower triangular”). This reflects the idea that the relations between the endogenous variables only reflect correlations and do not allow to make statements about causal relationships.</p>
+<p>Contemporaneous causality or, more precisely, the structural relationships between the variables is analysed in the context of SVAR models, which impose special restrictions on the covariance matrix and – depending on the model – on other coefficient matrices as well. The drawback of this approach is that it depends on the more or less subjective assumptions made by the researcher. For many researchers this is too much subjectiv information, even if sound economic theory is used to justify them. However, they can be useful tools and that is why it is worth to look into them.</p>
+<p>Lütkepohl (2007) mentions four approaches to model structural relationships between the endogenouse variables of a VAR model: The A-model, the B-model, the AB-model and long-run restrictions à la Blanchard and Quah (1989).</p>
+</div>
+<div id="the-a-model" class="section level2">
+<h2>The A-model</h2>
+<p>The A-model assumes that the covariance matrix is diagonal - i.e. it only contains the variances of the error term - and contemporaneous relationships between the observable variables are described by an additional matrix <span class="math inline">\(A\)</span> so that</p>
+<p><span class="math display">\[ A y_{t} = A^*_{1} y_{t-1} + ... + A^*_{p} y_{t-p} + \epsilon_t,\]</span>
+where <span class="math inline">\(A^*_j = A A_j\)</span> and <span class="math inline">\(\epsilon_{t} = A u_t \sim (0, \Sigma_\epsilon = A \Sigma_u A^{\prime})\)</span>.</p>
+<p>Matrix <span class="math inline">\(A\)</span> has the special form:</p>
+<p><span class="math display">\[
+A = 
+\begin{bmatrix}
+1 &amp; 0 &amp; \cdots &amp; 0 \\
+a_{21} &amp; 1 &amp;  &amp; 0 \\
+\vdots &amp; &amp;  \ddots &amp; \vdots  \\
+a_{K1} &amp; a_{K2} &amp; \cdots &amp; 1 \\
+\end{bmatrix}
+\]</span></p>
+<p>Beside the normalisation that is achieved by setting the diagonal elements of <span class="math inline">\(A\)</span> to one, the matrix contains <span class="math inline">\((K(K - 1) / 2\)</span> further restrictions, which are needed to obtain unique estimates of the structural coefficients. If less restirctions were provided, there would be mathematical problems - to express it in a simple way. In the above example, the upper triangular elements of the matrix are set to zero and the elements below the diagonal are freely estimated. However, it would also be possible to estimate a coefficient in the upper triangular area, if a value in the lower triangular area were set to zero. Furthermore, it would be possible to set more than <span class="math inline">\((K(K - 1) / 2\)</span> elements of <span class="math inline">\(A\)</span> to zero. In this case the model is said to be <em>over-identified</em>.</p>
+</div>
+<div id="the-b-model" class="section level2">
+<h2>The B-model</h2>
+<p>The B-model describes the structural relationships of the errors directly by adding a matrix <span class="math inline">\(B\)</span> to the error term and normalises the error variances to unity so that</p>
+<p><span class="math display">\[ y_{t} = A_{1} y_{t-1} + ... + A_{p} y_{t-p} + B \epsilon_t,\]</span>
+where <span class="math inline">\(u_{t} = B \epsilon_t\)</span> and <span class="math inline">\(\epsilon_t \sim (0, I_K)\)</span>. Again, <span class="math inline">\(B\)</span> must contain at least <span class="math inline">\((K(K - 1) / 2\)</span> restrictions.</p>
+</div>
+<div id="the-ab-model" class="section level2">
+<h2>The AB-model</h2>
+<p>The AB-model is a mixture of the A- and B-model, where the errors of the VAR are modelled as</p>
+<p><span class="math display">\[ A u_t = B \epsilon_t \text{ with } \epsilon_t \sim (0, I_K).\]</span></p>
+<p>This general form would require to specify more restrictions than in the A- or B-model. Thus, one of the matrices is usually replaced by an identiy matrix and the other contains the necessary restrictions. This model can be useful to estimate, for example, a system of equations, which describe the IS-LM-model.</p>
+</div>
+<div id="long-run-restirctions-à-la-blanchard-quah" class="section level2">
+<h2>Long-run restirctions à la Blanchard-Quah</h2>
+<p>Blanchard and Quah (1989) propose an approach, which does not require to directly impose restrictions on the structural matrices <span class="math inline">\(A\)</span> or <span class="math inline">\(B\)</span>. Instead, structural innovations can be identified by looking at the accumulated effects of shocks and placing zero restrictions on those accumulated relationships, which die out and become zero in the long run.</p>
+</div>
+<div id="estimation" class="section level2">
+<h2>Estimation</h2>
+<div id="data" class="section level3">
+<h3>Data</h3>
+<p>For this illustration we generate an artificial data set with three endogenous variables, which followe the data generating process</p>
+<p><span class="math display">\[y_t = A_1 y_{t - 1} + B \epsilon_t,\]</span></p>
+<p>where</p>
+<p><span class="math display">\[
+A_1 = \begin{bmatrix} 0.3 &amp; 0.12 &amp; 0.69 \\ 0 &amp; 0.3 &amp; 0.48 \\ 0.24 &amp; 0.24 &amp; 0.3 \end{bmatrix} \text{, }
+B = \begin{bmatrix} 1 &amp; 0 &amp; 0 \\ -0.14 &amp; 1 &amp; 0 \\ -0.06 &amp; 0.39 &amp; 1 \end{bmatrix} \text{ and } \epsilon_t \sim N(0, I_3).
+\]</span></p>
+<pre class="r"><code># Reset random number generator for reproducibility
+set.seed(24579)
+
+tt &lt;- 500 # Number of time series observations
+
+# Coefficient matrix
+A_1 &lt;- matrix(c(0.3, 0, 0.24,
+                0.12, 0.3, 0.24,
+                0.69, 0.48, 0.3), 3)
+
+# Structural coefficients
+B &lt;- diag(1, 3)
+B[lower.tri(B)] &lt;- c(-0.14, -0.06, 0.39)
+
+# Generate series
+series &lt;- matrix(rnorm(3, 0, 1), 3, tt + 1) # Raw series with zeros
+for (i in 2:(tt + 1)){
+  series[, i] &lt;- A_1 %*% series[, i - 1] +  B %*% rnorm(3, 0, 1)
+}
+
+series &lt;- ts(t(series)) # Convert to time series object
+dimnames(series)[[2]] &lt;- c(&quot;S1&quot;, &quot;S2&quot;, &quot;S3&quot;) # Rename variables
+
+# Plot the series
+plot.ts(series, main = &quot;Artificial time series&quot;)</code></pre>
+<p><img src="/timeseries/svarintro_files/figure-html/unnamed-chunk-1-1.png" width="480" style="display: block; margin: auto;" /></p>
+<p>The <code>vars</code> package (Pfaff, 2008) provides functions to estimate structural VARs in R. The workflow is divided into two steps, where the first consists in estimating a standard VAR model using the <code>VAR</code> function:</p>
+<pre class="r"><code>library(vars)
+
+# Estimate reduced form VAR
+var_est &lt;- VAR(series, p = 1, type = &quot;none&quot;)
+
+var_est</code></pre>
+<pre><code>## 
+## VAR Estimation Results:
+## ======================= 
+## 
+## Estimated coefficients for equation S1: 
+## ======================================= 
+## Call:
+## S1 = S1.l1 + S2.l1 + S3.l1 
+## 
+##     S1.l1     S2.l1     S3.l1 
+## 0.3288079 0.1124078 0.6809865 
+## 
+## 
+## Estimated coefficients for equation S2: 
+## ======================================= 
+## Call:
+## S2 = S1.l1 + S2.l1 + S3.l1 
+## 
+##        S1.l1        S2.l1        S3.l1 
+## -0.001530688  0.289578440  0.512701274 
+## 
+## 
+## Estimated coefficients for equation S3: 
+## ======================================= 
+## Call:
+## S3 = S1.l1 + S2.l1 + S3.l1 
+## 
+##     S1.l1     S2.l1     S3.l1 
+## 0.2401861 0.2519319 0.3186145</code></pre>
+<p>The estimated coefficients are reasonably close to the true coefficients. In the next step the resulting object is used in function <code>SVAR</code> to estimate the various structural models.</p>
+</div>
+<div id="a-model" class="section level3">
+<h3>A-model</h3>
+<p>The A-model requires to specify a matrix <code>Amat</code>, which contains the <span class="math inline">\(K (K - 1) / 2\)</span> restrictions. In the following example, we create a diagonal matrix with ones as diagonal elements and zeros in its upper triangle. The lower triangular elements are set to <code>NA</code>, which indicates that they should be estimated.</p>
+<pre class="r"><code># Estimate structural coefficients
+a &lt;- diag(1, 3)
+a[lower.tri(a)] &lt;- NA
+
+svar_est_a &lt;- SVAR(var_est, Amat = a, max.iter = 1000)
+
+svar_est_a</code></pre>
+<pre><code>## 
+## SVAR Estimation Results:
+## ======================== 
+## 
+## 
+## Estimated A matrix:
+##         S1      S2 S3
+## S1 1.00000  0.0000  0
+## S2 0.18177  1.0000  0
+## S3 0.05078 -0.3132  1</code></pre>
+<p>The result is not equal to matrix <span class="math inline">\(B\)</span>, because we estimated an A-model. In order to translate it into the structural coefficients of the B-model, we only have to obtain the inverse of the matrix:</p>
+<pre class="r"><code>solve(svar_est_a$A)</code></pre>
+<pre><code>##            S1        S2 S3
+## S1  1.0000000 0.0000000  0
+## S2 -0.1817747 1.0000000  0
+## S3 -0.1077103 0.3131988  1</code></pre>
+</div>
+<div id="b-model" class="section level3">
+<h3>B-model</h3>
+<p>B-modes are estimated in a similar way as A-models by specifying a matrix <code>Bmat</code>, which contains restrictions on the structural matrix <span class="math inline">\(B\)</span>. In the following example <span class="math inline">\(B\)</span> is equal to <code>Amat</code> above.</p>
+<pre class="r"><code># Create structural matrix with restrictions
+b &lt;- diag(1, 3)
+b[lower.tri(b)] &lt;- NA
+
+# Estimate
+svar_est_b &lt;- SVAR(var_est, Bmat = b)
+
+# Show result
+svar_est_b</code></pre>
+<pre><code>## 
+## SVAR Estimation Results:
+## ======================== 
+## 
+## 
+## Estimated B matrix:
+##         S1     S2 S3
+## S1  1.0000 0.0000  0
+## S2 -0.1818 1.0000  0
+## S3 -0.1077 0.3132  1</code></pre>
+</div>
+</div>
+<div id="literature" class="section level2">
+<h2>Literature</h2>
+<p>Blanchard, O., &amp; Quah, D. (1989). The dynamic effects of aggregate demand and supply disturbances. <em>American Economic Review 79</em>, 655-673.</p>
+<p>Lütkepohl, H. (2007). <em>New Introduction to Multiple Time Series Analyis</em> (2nd ed.). Berlin: Springer.</p>
+<p>Bernhard Pfaff (2008). VAR, SVAR and SVEC Models: Implementation Within R Package vars. <em>Journal of Statistical Software 27</em>(4).</p>
+<p>Sims, C. (1980). Macroeconomics and Reality. <em>Econometrica, 48</em>(1), 1-48.</p>
+</div>
+
+                    </section>
+                </article>
+                <div class="container">
+  <div class="row">
+    <div class="sixteen columns center">
+      <div class="addthis_tipjar_inline"></div>
+      <div class="addthis_inline_share_toolbox"></div>
+    </div>
+  </div>
+</div>
+
+                
+<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5a9c6c9b8a39890d"></script>
+                
+                <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+<footer class="li-page-footer">
+    <div class="container">
+        <div class="row">
+            <div class="sixteen columns center">
+              <div id="disqus_thread"></div>
+                <script type="text/javascript">
+                  (function() { 
+                  if (window.location.hostname == "localhost") return;
+                  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                  var disqus_shortname = 'r-econometrics';
+                  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                  })();
+                  </script>
+                  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+            </div>
+        </div>
+    </div>
+</footer>
+            </div>
+        </div>
+        
+    </div>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+<footer class="li-page-footer">
+    <div class="container">
+        <div class="row">
+            <div class="sixteen columns center">
+              <div class="li-page-footer-legal">
+                &copy; Franz X. Mohr. Powered by <a href="https://github.com/rstudio/blogdown" target="_blank" >Blogdown</a> and hosted by <a href="https://www.netlify.com/" target="_blank" >Netlify</a>. Source available on <a href="https://github.com/franzmohr/r-econometrics" target="_blank" >Github</a>.
+              </div>
+              <div class="li-page-footer-theme">
+                <span class=""><a href="https://github.com/eliasson/liquorice/">liquorice</a> is a theme for <a href="https://gohugo.io/">hugo</a>
+                </span>
+              </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+    <script src="//yihui.name/js/math-code.js"></script>
+    <script async
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
+    </script>
+
+    <script type="text/javascript">
+    
+    function toggle(id) {
+        var e = document.getElementById(id);
+        e.style.display == 'block' ? e.style.display = 'none' : e.style.display = 'block';
+    }
+
+    </script>
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-115075361-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+    </body>
+</html>
+

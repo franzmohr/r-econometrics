@@ -6,10 +6,19 @@
     <description>Recent content in Timeseries on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 09 Aug 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 13 Aug 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://www.r-econometrics.com/timeseries/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>An Introduction to Structural Vector Autoregression (SVAR)</title>
+      <link>https://www.r-econometrics.com/timeseries/svarintro/</link>
+      <pubDate>Thu, 13 Aug 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/timeseries/svarintro/</guid>
+      <description>Vector autoregressive (VAR) models constitute a rather general approach to modelling multivariate time series. A critical drawback of those models in their standard form is their missing ability to describe contemporaneous relationships between the analysed variables. This becomes a central issue in the impulse response analysis for such models, where it is important to know the contemporaneous effects of a shock to the economy. Usually, researchers address this by using orthogonal impulse responses, where the correlation between the errors is obtained from the (lower) Cholesky decomposition of the error covariance matrix.</description>
+    </item>
     
     <item>
       <title>An Introduction to Stationarity and Unit Roots in Time Series Analysis</title>

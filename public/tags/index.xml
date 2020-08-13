@@ -6,10 +6,46 @@
     <description>Recent content in Tags on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 09 Aug 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 13 Aug 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://www.r-econometrics.com/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>r</title>
+      <link>https://www.r-econometrics.com/tags/r/</link>
+      <pubDate>Thu, 13 Aug 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/tags/r/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>svar</title>
+      <link>https://www.r-econometrics.com/tags/svar/</link>
+      <pubDate>Thu, 13 Aug 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/tags/svar/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>var</title>
+      <link>https://www.r-econometrics.com/tags/var/</link>
+      <pubDate>Thu, 13 Aug 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/tags/var/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>vector autoregression</title>
+      <link>https://www.r-econometrics.com/tags/vector-autoregression/</link>
+      <pubDate>Thu, 13 Aug 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/tags/vector-autoregression/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>cointegration</title>
@@ -17,15 +53,6 @@
       <pubDate>Sun, 09 Aug 2020 00:00:00 +0000</pubDate>
       
       <guid>https://www.r-econometrics.com/tags/cointegration/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>r</title>
-      <link>https://www.r-econometrics.com/tags/r/</link>
-      <pubDate>Sun, 09 Aug 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://www.r-econometrics.com/tags/r/</guid>
       <description></description>
     </item>
     
@@ -66,29 +93,11 @@
     </item>
     
     <item>
-      <title>var</title>
-      <link>https://www.r-econometrics.com/tags/var/</link>
-      <pubDate>Sat, 21 Mar 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://www.r-econometrics.com/tags/var/</guid>
-      <description></description>
-    </item>
-    
-    <item>
       <title>vars</title>
       <link>https://www.r-econometrics.com/tags/vars/</link>
       <pubDate>Sat, 21 Mar 2020 00:00:00 +0000</pubDate>
       
       <guid>https://www.r-econometrics.com/tags/vars/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>vector autoregression</title>
-      <link>https://www.r-econometrics.com/tags/vector-autoregression/</link>
-      <pubDate>Sat, 21 Mar 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://www.r-econometrics.com/tags/vector-autoregression/</guid>
       <description></description>
     </item>
     
