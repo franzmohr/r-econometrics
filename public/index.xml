@@ -6,10 +6,19 @@
     <description>Recent content on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 13 Aug 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 16 Aug 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://www.r-econometrics.com/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Short Notes on Bayesian Inference of Vector Autoregressive Models</title>
+      <link>https://www.r-econometrics.com/timeseries/bayesnotes/</link>
+      <pubDate>Sun, 16 Aug 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/timeseries/bayesnotes/</guid>
+      <description>During the past years I realised that econometric analyis can be understood as a craft. You learn your basics at school from more or less motivated/talented professors and then you are sent out into wild, where you are confronted with real life challenges that differ from the stylised exmples you have become used to during your studies. This comes with a bunch new insights that I want to document on this page.</description>
+    </item>
     
     <item>
       <title>An Introduction to Structural Vector Autoregression (SVAR)</title>

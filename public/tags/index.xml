@@ -6,17 +6,53 @@
     <description>Recent content in Tags on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 13 Aug 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 16 Aug 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://www.r-econometrics.com/tags/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
+      <title>armadillo</title>
+      <link>https://www.r-econometrics.com/tags/armadillo/</link>
+      <pubDate>Sun, 16 Aug 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/tags/armadillo/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>bayes</title>
+      <link>https://www.r-econometrics.com/tags/bayes/</link>
+      <pubDate>Sun, 16 Aug 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/tags/bayes/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>r</title>
       <link>https://www.r-econometrics.com/tags/r/</link>
-      <pubDate>Thu, 13 Aug 2020 00:00:00 +0000</pubDate>
+      <pubDate>Sun, 16 Aug 2020 00:00:00 +0000</pubDate>
       
       <guid>https://www.r-econometrics.com/tags/r/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>rcpp</title>
+      <link>https://www.r-econometrics.com/tags/rcpp/</link>
+      <pubDate>Sun, 16 Aug 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/tags/rcpp/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>var</title>
+      <link>https://www.r-econometrics.com/tags/var/</link>
+      <pubDate>Sun, 16 Aug 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/tags/var/</guid>
       <description></description>
     </item>
     
@@ -26,15 +62,6 @@
       <pubDate>Thu, 13 Aug 2020 00:00:00 +0000</pubDate>
       
       <guid>https://www.r-econometrics.com/tags/svar/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>var</title>
-      <link>https://www.r-econometrics.com/tags/var/</link>
-      <pubDate>Thu, 13 Aug 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://www.r-econometrics.com/tags/var/</guid>
       <description></description>
     </item>
     
@@ -206,15 +233,6 @@
       <pubDate>Mon, 22 Jul 2019 00:00:00 +0000</pubDate>
       
       <guid>https://www.r-econometrics.com/tags/vec/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>bayes</title>
-      <link>https://www.r-econometrics.com/tags/bayes/</link>
-      <pubDate>Sun, 07 Jul 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://www.r-econometrics.com/tags/bayes/</guid>
       <description></description>
     </item>
     

@@ -1,0 +1,120 @@
+---
+title: "Short Notes on Bayesian Inference of Vector Autoregressive Models"
+author: "Franz X. Mohr"
+date: "2020-08-16"
+tags:
+  - r
+  - bayes
+  - var
+  - rcpp
+  - armadillo
+description: "A collection of notes on Bayesian VAR modelling that have become imporant to me over the last years."
+---
+
+
+
+<p>During the past years I realised that econometric analyis can be understood as a craft. You learn your basics at school from more or less motivated/talented professors and then you are sent out into wild, where you are confronted with real life challenges that differ from the stylised exmples you have become used to during your studies. This comes with a bunch new insights that I want to document on this page. It should become a collection of notes on Bayesian VAR modelling that have become imporant to me over the last years.</p>
+<div id="prior-specification" class="section level2">
+<h2>Prior specification</h2>
+<div id="general-issues" class="section level3">
+<h3>General issues</h3>
+<ul>
+<li><p><strong>The prior precision matrix is the inverse of the variance matrix.</strong> In Bayesian econometrics it is common to work with the precision matrix, since it is mathematically more convenient. Apart from algrebraic considerations you can express an uninformative prior by setting the respective value to zero. Otherwise you would have to work with infinite values, which is…well…just not good.</p></li>
+<li><p><strong>Be aware of potentially high mean values of intercepts.</strong> If you work with time series data, which fluctuates aroung a mean of 100, this should be reflected in the priors of the intercept terms. You might wish to change the prior mean to the mean of the series. Or you could set it to the first value, if you add a deterministic trend term as well.</p></li>
+<li><p><strong>Be aware of the scales of your errors.</strong> The prior variance of the error term should be reasonably proportional to the scale of the data. For example, when working with log-differenced growth rates of macroeconomic time series an increase of 1 percent is indicated by the value 0.01. However, a lot of economic data comes in a format, where 1 percent is indicated by a value of 1. Change the priors of your error terms accordingly!</p></li>
+<li><p><strong>Don’t use too large priors for SSVS and BVS.</strong> This might lead to a situation, where the algorithm cannot jump back to a state, where a certain variable should not be included in the model. See George et al. (2008) and Korobilis (2013).</p></li>
+<li><p><strong>Obtain (much) more draws from the posteriors than usual when using SSVS or BVS.</strong> This helps if the inclusion parameters tend to change very rarely.</p></li>
+</ul>
+</div>
+<div id="common-prior-specifications-for-time-series-models" class="section level3">
+<h3>Common prior specifications for time series models</h3>
+<table>
+<colgroup>
+<col width="37%" />
+<col width="31%" />
+<col width="31%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Variables</th>
+<th>Prior</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Non deterministic coefficients</td>
+<td><span class="math inline">\(N(0, I)\)</span></td>
+<td>Chan et al. (2019)</td>
+</tr>
+<tr class="even">
+<td>Intercepts for stationary data with zero mean</td>
+<td><span class="math inline">\(N(0, 10 I)\)</span></td>
+<td>Chan et al. (2019)</td>
+</tr>
+<tr class="odd">
+<td>Covariance matrix</td>
+<td><span class="math inline">\(IW(\text{df} = 3, \text{scale} = I_K)\)</span></td>
+<td>Chan et al. (2019)</td>
+</tr>
+<tr class="even">
+<td>Variances</td>
+<td><span class="math inline">\(IG(\text{shape} = 0.01, \text{rate} = 0.01)\)</span></td>
+<td>Chan et al. (2019), George et al. (2008)</td>
+</tr>
+<tr class="odd">
+<td>Inclusion probabilities</td>
+<td><span class="math inline">\(0.5\)</span></td>
+<td>George et al. (2008), Korobilis (2013)</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="computational-issues" class="section level2">
+<h2>Computational issues</h2>
+<div id="distribututions" class="section level3">
+<h3>Distribututions</h3>
+<div id="gamma-distribution" class="section level4">
+<h4>Gamma distribution</h4>
+<ul>
+<li><p><strong>Be aware that the gamma distribution has can be described by different parameterizations.</strong> Either use shape and scale or shape and rate. Sometimes the mean and variance of the distribution are provided.</p></li>
+<li><p><strong>The Wishart and gamma distributions are related.</strong></p></li>
+</ul>
+<pre class="r"><code>prior_df &lt;- 100
+prior_var &lt;- 10
+
+n &lt;- 10000</code></pre>
+<pre class="r"><code># Draw from Wishart distribution        
+set.seed(1)# Reset random number generator
+wish &lt;- 1 / rWishart(n, df = prior_df, Sigma = diag(1 / prior_var, 1))[1, 1, ]
+hist(wish, main = &quot;IW(100 ,10)&quot;, xlab = NULL)
+
+# Draw from Gamma distribution
+set.seed(1) # Reset random number generator
+gamm &lt;- 1 / rgamma(n, shape = prior_df / 2, scale = 1 / (prior_var / 2))
+hist(gamm, main = &quot;IG(100, 10)&quot;, xlab = NULL)</code></pre>
+<p><img src="/timeseries/bayesnotes_files/figure-html/unnamed-chunk-2-1.png" width="50%" /><img src="/timeseries/bayesnotes_files/figure-html/unnamed-chunk-2-2.png" width="50%" /></p>
+</div>
+</div>
+<div id="sparse-matrices" class="section level3">
+<h3>Sparse matrices</h3>
+<ul>
+<li><strong>Avoid switching between sparse and dense matrices.</strong></li>
+</ul>
+</div>
+<div id="using-rcpparmadillo" class="section level3">
+<h3>Using RcppArmadillo</h3>
+<ul>
+<li><p><strong>Consider programming loops in C++.</strong> It’s way faster! Or change the programming language.</p></li>
+<li><p><strong>Do everthing either in R or in C++, if you use sparse matrices.</strong></p></li>
+</ul>
+</div>
+</div>
+<div id="references" class="section level2">
+<h2>References</h2>
+<p>Chan, J., Koop, G., Poirier, D. J., &amp; Tobias J. L. (2019). <em>Bayesian econometric methods</em> (2nd ed.). Cambridge: Cambridge University Press.</p>
+<p>George, E. I., Sun, D., &amp; Ni, S. (2008). Bayesian stochastic search for VAR model restrictions. <em>Journal of Econometrics, 142</em>(1), 553-580. <a href="https://doi.org/10.1016/j.jeconom.2007.08.017" class="uri">https://doi.org/10.1016/j.jeconom.2007.08.017</a></p>
+<p>Koop, G., &amp; Korobilis, D. (2010). Bayesian multivariate time series methods for empirical macroeconomics. <em>Foundations and trends in econometrics, 3</em>(4), 267-358. <a href="https://dx.doi.org/10.1561/0800000013" class="uri">https://dx.doi.org/10.1561/0800000013</a></p>
+<p>Korobilis, D. (2013). VAR forecasting using Bayesian variable selection. <em>Journal of Applied Econometrics, 28</em>(2), 204-230.</p>
+</div>
