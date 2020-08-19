@@ -158,17 +158,17 @@ if (!doNotTrack) {
 <tbody>
 <tr class="odd">
 <td>Non deterministic coefficients</td>
-<td><span class="math inline">\(N(0, I)\)</span></td>
+<td><span class="math inline">\(N(0, I_M)\)</span></td>
 <td>Chan et al. (2019)</td>
 </tr>
 <tr class="even">
 <td>Intercepts for stationary data with zero mean</td>
-<td><span class="math inline">\(N(0, 10 I)\)</span></td>
+<td><span class="math inline">\(N(0, 10 I_N)\)</span></td>
 <td>Chan et al. (2019)</td>
 </tr>
 <tr class="odd">
 <td>Covariance matrix</td>
-<td><span class="math inline">\(IW(\text{df} = 3, \text{scale} = I_K)\)</span></td>
+<td><span class="math inline">\(IW(\text{df} = K + 3, \text{scale} = I_K)\)</span></td>
 <td>Chan et al. (2019)</td>
 </tr>
 <tr class="even">
@@ -179,10 +179,11 @@ if (!doNotTrack) {
 <tr class="odd">
 <td>Inclusion probabilities</td>
 <td><span class="math inline">\(0.5\)</span></td>
-<td>George et al. (2008), Korobilis (2013)</td>
+<td>Chan et al. (2019), George et al. (2008), Korobilis (2013)</td>
 </tr>
 </tbody>
 </table>
+<p><span class="math inline">\(K\)</span> is the number of endogenous variables. <span class="math inline">\(M\)</span> is the number of non-deterministic regressors and <span class="math inline">\(N\)</span> is the number of intercept terms.</p>
 </div>
 </div>
 <div id="computational-issues" class="section level2">
