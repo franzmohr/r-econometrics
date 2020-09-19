@@ -6,11 +6,7 @@
     <description>Recent content in bvec on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 11 Jun 2019 00:00:00 +0000</lastBuildDate>
-    
-	<atom:link href="https://www.r-econometrics.com/tags/bvec/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Tue, 11 Jun 2019 00:00:00 +0000</lastBuildDate><atom:link href="https://www.r-econometrics.com/tags/bvec/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Bayesian Error Correction Models with Priors on the Cointegration Space</title>
       <link>https://www.r-econometrics.com/timeseries/bvec/</link>

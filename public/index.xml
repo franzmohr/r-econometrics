@@ -6,11 +6,7 @@
     <description>Recent content on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 16 Aug 2020 00:00:00 +0000</lastBuildDate>
-    
-	<atom:link href="https://www.r-econometrics.com/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Sun, 16 Aug 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://www.r-econometrics.com/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Short Notes on Bayesian Inference of Vector Autoregressive Models</title>
       <link>https://www.r-econometrics.com/timeseries/bayesnotes/</link>

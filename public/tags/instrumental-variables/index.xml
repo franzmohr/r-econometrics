@@ -6,11 +6,7 @@
     <description>Recent content in instrumental-variables on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 06 Feb 2018 00:00:00 +0000</lastBuildDate>
-    
-	<atom:link href="https://www.r-econometrics.com/tags/instrumental-variables/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Tue, 06 Feb 2018 00:00:00 +0000</lastBuildDate><atom:link href="https://www.r-econometrics.com/tags/instrumental-variables/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Chapter 15: Instrumental Variables Estimation and Two Stage Least Squares</title>
       <link>https://www.r-econometrics.com/reproduction/wooldridge/wooldridge15/</link>

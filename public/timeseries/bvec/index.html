@@ -141,11 +141,11 @@ data(&quot;e6&quot;)
 plot(e6) # Plot the series</code></pre>
 <p><img src="/timeseries/bvec_files/figure-html/data-1.png" width="432" style="display: block; margin: auto;" /></p>
 <p>The <code>gen_vec</code> function produces the inputs <code>Y</code>, <code>W</code> and <code>X</code> for the BVEC estimator, where <code>Y</code> is the matrix of dependent variables, <code>W</code> is a matrix of potentially cointegrated regressors, and <code>X</code> is the matrix of non-cointegration regressors.</p>
-<pre class="r"><code>data &lt;- gen_vec(e6, p = 4, const = &quot;unrestricted&quot;, season = &quot;unrestricted&quot;)
+<pre class="r"><code>data &lt;- gen_vec(e6, p = 4, r = 1, const = &quot;unrestricted&quot;, season = &quot;unrestricted&quot;)
 
-y &lt;- data$Y
-w &lt;- data$W
-x &lt;- data$X</code></pre>
+y &lt;- t(data$data$Y)
+w &lt;- t(data$data$W)
+x &lt;- t(data$data$X)</code></pre>
 </div>
 <div id="estimation" class="section level2">
 <h2>Estimation</h2>
@@ -203,7 +203,7 @@ for (draw in 1:iter) {
   temp &lt;- post_coint_kls(y = y, beta = beta, w = w, x = x, sigma_i = u_sigma_i,
                            v_i = v_i, p_tau_i = p_tau_i, g_i = g_i,
                            gamma_mu_prior = a_mu_prior,
-                           gamma_V_i_prior = a_v_i_prior)
+                           gamma_v_i_prior = a_v_i_prior)
   alpha &lt;- temp$alpha
   beta &lt;- temp$beta
   Pi &lt;- temp$Pi
@@ -234,9 +234,9 @@ Gamma &lt;- round(Gamma, 3) # Round values
 dimnames(Gamma) &lt;- list(dimnames(y)[[1]], dimnames(x)[[1]]) # Rename matrix dimensions
 
 round(Gamma, 3) # Print</code></pre>
-<pre><code>##      d.R.1 d.Dp.1  d.R.2 d.Dp.2 d.R.3 d.Dp.3 const season.1 season.2
-## d.R  0.267 -0.187 -0.017 -0.207 0.225 -0.099 0.002    0.001    0.009
-## d.Dp 0.074 -0.383  0.000 -0.421 0.025 -0.361 0.011   -0.034   -0.018
+<pre><code>##      d.R.l1 d.Dp.l1 d.R.l2 d.Dp.l2 d.R.l3 d.Dp.l3 const season.1 season.2
+## d.R   0.267  -0.187 -0.017  -0.207  0.225  -0.099 0.002    0.001    0.009
+## d.Dp  0.074  -0.383  0.000  -0.421  0.025  -0.361 0.011   -0.034   -0.018
 ##      season.3
 ## d.R     0.000
 ## d.Dp   -0.017</code></pre>
@@ -266,19 +266,21 @@ Sigma # Print</code></pre>
 k_nondet &lt;- (k_x - 4) * k
 
 # Generate bvec object
-bvec_est &lt;- bvec(y = y, w = w, x = x,
-               Pi = draws_pi,
+bvec_est &lt;- bvec(y = data$data$Y, w = data$data$W,
+                 x = data$data$X[, 1:6],
+                 x_d = data$data$X[, 7:10],
+                 Pi = draws_pi,
                Gamma = draws_gamma[1:k_nondet,],
                C = draws_gamma[(k_nondet + 1):nrow(draws_gamma),],
                Sigma = draws_sigma)</code></pre>
 <p>Posterior draws can be thinned with function <code>thin</code>:</p>
-<pre class="r"><code>bvec_est &lt;- thin(bvec_est, thin = 5)</code></pre>
+<pre class="r"><code>bvec_est &lt;- thin_posterior(bvec_est, thin = 5)</code></pre>
 <p>The function <code>bvec_to_bvar</code> can be used to transform the VEC model into a VAR in levels:</p>
 <pre class="r"><code>bvar_form &lt;- bvec_to_bvar(bvec_est)</code></pre>
 </div>
 <div id="forecasts" class="section level2">
 <h2>Forecasts</h2>
-<pre class="r"><code>bvar_pred &lt;- predict(bvar_form, n.ahead = 10, new_D = t(bvar_form$x[9:12, 91:100]))
+<pre class="r"><code>bvar_pred &lt;- predict(bvar_form, n.ahead = 10, new_d = bvar_form$x[3 + 1:10, 9:12])
 
 plot(bvar_pred)</code></pre>
 <p><img src="/timeseries/bvec_files/figure-html/forecast,%20-1.png" width="528" /></p>

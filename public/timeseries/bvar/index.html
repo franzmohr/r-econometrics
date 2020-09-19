@@ -142,7 +142,10 @@ where <span class="math inline">\(y_t\)</span> is a <span class="math inline">\(
 <pre class="r"><code>library(bvartools)
 
 data(&quot;e1&quot;) # Load the data
-e1 &lt;- diff(log(e1)) # Calculate first-log-differences</code></pre>
+e1 &lt;- diff(log(e1)) # Calculate first-log-differences
+
+# Reduce number of oberservations
+e1 &lt;- window(e1, end = c(1978, 4))</code></pre>
 <p>Basically, it would be possible to proceed without any further transformation of the data. However, it is good practise to multiply log-differenced data by 100 so that, for example, the value 1% is indicated by 1 and not by 0.01.</p>
 <pre class="r"><code>e1 &lt;- e1 * 100 # Rescale data
 
@@ -153,8 +156,8 @@ plot(e1) # Plot the series</code></pre>
 with <span class="math inline">\(u_t \sim N(0, \Sigma)\)</span>. This is a more compact form of the model above, where the lags of the endogenous variables and the constant are already included in <span class="math inline">\(x_t\)</span>.</p>
 <pre class="r"><code>data &lt;- gen_var(e1, p = 2, deterministic = &quot;const&quot;)
 
-y &lt;- data$Y[, 1:73]
-x &lt;- data$Z[, 1:73]</code></pre>
+y &lt;- t(data$data$Y)
+x &lt;- t(data$data$Z)</code></pre>
 </div>
 <div id="estimation" class="section level2">
 <h2>Estimation</h2>
@@ -254,15 +257,75 @@ Sigma # Print</code></pre>
 <div id="bvar-objects" class="section level2">
 <h2><code>bvar</code> objects</h2>
 <p>The <code>bvar</code> function can be used to collect relevant output of the Gibbs sampler into a standardised object, which can be used by further functions such as <code>predict</code> to obtain forecasts or <code>irf</code> for <a href="/timeseries/irf">impulse respons analysis</a>.</p>
-<pre class="r"><code>bvar_est &lt;- bvar(y = y, x = x, A = draws_a[1:18,],
+<pre class="r"><code>bvar_est &lt;- bvar(y = data$data$Y, x = data$data$Z, A = draws_a[1:18,],
                  C = draws_a[19:21, ], Sigma = draws_sigma)</code></pre>
+<p>There is also a <code>summary</code> function, which calculates some summary statistics</p>
+<pre class="r"><code>summary(bvar_est)</code></pre>
+<pre><code>## 
+## Model:
+## 
+## y ~ invest.1 + income.1 + cons.1 + invest.2 + income.2 + cons.2 + const
+## 
+## Variable: invest 
+## 
+##             Mean     SD  Naive SD Time-series SD    2.5%     50%    97.5%
+## invest.1 -0.2844 0.1201 0.0009808      0.0009808 -0.5211 -0.2840 -0.04532
+## income.1  0.2002 0.4413 0.0036029      0.0035232 -0.6628  0.2007  1.05986
+## cons.1    0.5730 0.4895 0.0039965      0.0039965 -0.3833  0.5736  1.52662
+## invest.2 -0.1412 0.1213 0.0009908      0.0009746 -0.3800 -0.1424  0.09921
+## income.2  0.1704 0.4332 0.0035367      0.0035367 -0.6717  0.1682  1.01781
+## cons.2    0.5397 0.4883 0.0039868      0.0039868 -0.4246  0.5369  1.49972
+## const    -0.3535 0.8423 0.0068772      0.0068772 -1.9975 -0.3569  1.29657
+## 
+## Variable: income 
+## 
+##              Mean      SD  Naive SD Time-series SD     2.5%      50%  97.5%
+## invest.1  0.04132 0.03153 0.0002575      0.0002455 -0.02041  0.04137 0.1027
+## income.1 -0.13168 0.13447 0.0010980      0.0010936 -0.39691 -0.13156 0.1344
+## cons.1    0.32719 0.15914 0.0012994      0.0012980  0.01486  0.32633 0.6412
+## invest.2  0.04820 0.03159 0.0002579      0.0002579 -0.01474  0.04822 0.1110
+## income.2  0.03612 0.13057 0.0010661      0.0010699 -0.22046  0.03603 0.2928
+## cons.2    0.03473 0.16004 0.0013067      0.0013039 -0.27911  0.03425 0.3481
+## const     1.30700 0.38809 0.0031687      0.0031687  0.54084  1.30723 2.0596
+## 
+## Variable: cons 
+## 
+##                Mean      SD  Naive SD Time-series SD     2.5%        50%
+## invest.1 -0.0032834 0.02548 0.0002080      0.0002080 -0.05363 -0.0032451
+## income.1  0.2366413 0.10776 0.0008799      0.0008932  0.02461  0.2361275
+## cons.1   -0.2440363 0.12810 0.0010459      0.0010631 -0.49374 -0.2447420
+## invest.2  0.0332773 0.02532 0.0002067      0.0002067 -0.01658  0.0334376
+## income.2  0.3653053 0.10428 0.0008515      0.0008515  0.16126  0.3653724
+## cons.2    0.0003121 0.12840 0.0010484      0.0010484 -0.25214 -0.0007522
+## const     1.1448477 0.31103 0.0025396      0.0025396  0.52840  1.1449082
+##             97.5%
+## invest.1 0.046427
+## income.1 0.446671
+## cons.1   0.005891
+## invest.2 0.082497
+## income.2 0.572533
+## cons.2   0.251092
+## const    1.755069
+## 
+## Variance-covariance matrix:
+## 
+##                  Mean     SD Naive SD Time-series SD    2.5%     50%   97.5%
+## invest_invest 20.4491 3.5030 0.028602       0.030332 14.6936 20.0350 28.3671
+## invest_income  0.6355 0.6416 0.005239       0.005635 -0.5924  0.6194  1.9571
+## invest_cons    1.1484 0.5294 0.004323       0.004630  0.1991  1.1213  2.2745
+## income_invest  0.6355 0.6416 0.005239       0.005635 -0.5924  0.6194  1.9571
+## income_income  1.3486 0.2357 0.001925       0.002131  0.9656  1.3221  1.8823
+## income_cons    0.5947 0.1516 0.001238       0.001359  0.3383  0.5815  0.9311
+## cons_invest    1.1484 0.5294 0.004323       0.004630  0.1991  1.1213  2.2745
+## cons_income    0.5947 0.1516 0.001238       0.001359  0.3383  0.5815  0.9311
+## cons_cons      0.8770 0.1527 0.001246       0.001382  0.6252  0.8609  1.2227</code></pre>
 <p>Posterior draws can be thinned with the function <code>thin</code>:</p>
-<pre class="r"><code>bvar_est &lt;- thin(bvar_est, thin = 15)</code></pre>
+<pre class="r"><code>bvar_est &lt;- thin_posterior(bvar_est, thin = 15)</code></pre>
 </div>
 <div id="forecasts" class="section level2">
 <h2>Forecasts</h2>
-<p>Forecasts with credible bands can be obtained with the function <code>predict</code>. If the model contains deterministic terms, new values can be provided in the argument <code>new_D</code>. If no values are provided, the function sets them to zero. The number of rows of <code>new_D</code> must be the same as the argument <code>n.ahead</code>.</p>
-<pre class="r"><code>bvar_pred &lt;- predict(bvar_est, n.ahead = 10, new_D = rep(1, 10))
+<p>Forecasts with credible bands can be obtained with the function <code>predict</code>. If the model contains deterministic terms, new values can be provided in the argument <code>new_d</code>. If no values are provided, the function sets them to zero. The number of rows of <code>new_d</code> must be the same as the argument <code>n.ahead</code>.</p>
+<pre class="r"><code>bvar_pred &lt;- predict(bvar_est, n.ahead = 10, new_d = rep(1, 10))
 
 plot(bvar_pred)</code></pre>
 <p><img src="/timeseries/bvar_files/figure-html/forecasts-1.png" width="528" /></p>
@@ -308,6 +371,7 @@ plot(bvar_fevd_gir, main = &quot;GIR-based FEVD of consumption&quot;)</code></pr
 <div id="references" class="section level2">
 <h2>References</h2>
 <!-- Eddelbuettel, D., & Sanderson C. (2014). RcppArmadillo: Accelerating R with high-performance C++ linear algebra. *Computational Statistics and Data Analysis, 71*, 1054-1063. <https://doi.org/10.1016/j.csda.2013.02.005> -->
+<p>Chan, J., Koop, G., Poirier, D. J., &amp; Tobias, J. L. (2019). <em>Bayesian Econometric Methods</em> (2nd ed.). Cambridge: University Press.</p>
 <p>Koop, G., &amp; Korobilis, D. (2010). Bayesian multivariate time series methods for empirical macroeconomics. <em>Foundations and trends in econometrics, 3</em>(4), 267-358. <a href="https://dx.doi.org/10.1561/0800000013" class="uri">https://dx.doi.org/10.1561/0800000013</a></p>
 <p>Koop, G., Pesaran, M. H., &amp; Potter, S.M. (1996). Impulse response analysis in nonlinear multivariate models. <em>Journal of Econometrics 74</em>(1), 119-147. <a href="https://doi.org/10.1016/0304-4076(95)01753-4" class="uri">https://doi.org/10.1016/0304-4076(95)01753-4</a></p>
 <p>Lütkepohl, H. (2007). <em>New introduction to multiple time series analysis</em> (2nd ed.). Berlin: Springer.</p>
