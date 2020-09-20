@@ -117,6 +117,8 @@ if (!doNotTrack) {
                                 
                                     <a href="https://www.r-econometrics.com//tags/urca">urca</a>
                                 
+                                    <a href="https://www.r-econometrics.com//tags/tsdyn">tsDyn</a>
+                                
                             
                         </span>
                          - 
@@ -143,7 +145,7 @@ plot(e6) # Plot data</code></pre>
 </div>
 <div id="estimation" class="section level2">
 <h2>Estimation</h2>
-<p>There are multiple ways to estimate VEC models. A first approach would be to use ordinary least squares, which yields accurate result, but does not allow to estimate the cointegrating relations among the variables. The estimated generalised least squares (EGLS) approach would be an alternative. However, the most popular estimator for VECMs seems to be the maximum likelihood estimator of Johansen (1995), which is implemented in R by the <code>ca.jo</code> function of the <code>urca</code> package of Pfaff (2008a).<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></p>
+<p>There are multiple ways to estimate VEC models. A first approach would be to use ordinary least squares, which yields accurate result, but does not allow to estimate the cointegrating relations among the variables. The estimated generalised least squares (EGLS) approach would be an alternative. However, the most popular estimator for VECMs seems to be the maximum likelihood estimator of Johansen (1995), which is implemented in R by the <code>ca.jo</code> function of the <code>urca</code> package of Pfaff (2008a). Alternatively, function <code>VECM</code> of the <code>tsDyn</code> package of Di Narzo et al. (2020) can be used as well.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></p>
 <p>But before the VEC model can be estimated, the lag order <span class="math inline">\(p\)</span>, the rank of the cointegration matrix <span class="math inline">\(r\)</span> and deterministic terms have to be specified. A valid strategy to choose the lag order is to estimated the VAR in levels and choose the lag specification that minimises an Information criterion. Since the time series show strong seasonal pattern, we control for this by specifying <code>season = 4</code>, where 4 is the frequency of the data.</p>
 <pre class="r"><code>library(vars) # Load package
 
@@ -158,7 +160,7 @@ var_aic$p</code></pre>
 <p>The inclusion of deterministic terms in a VECM is a delicate issue. Without going into detail a common strategy is to add a linear trend to the error correction term and a constant to the non-cointegration part of the equation. For this example we follow Lütkepohl (2007) and add a constant term and seasonal dummies to the non-cointegration part of the equation.</p>
 <p>The <code>ca.jo</code> function does not just estimate the VECM. It also calculates the test statistics for different specificaions of <span class="math inline">\(r\)</span> and the user can choose between two alternative approaches, the trace and the eigenvalue test. For this example the trace test is used, i.e. <code>type = &quot;trace&quot;</code>.</p>
 <p>By default, the <code>ca.jo</code> function sets <code>spec = &quot;longrun&quot;</code> This specification would mean that the error correction term does not refer to the first lag of the variables in levels as decribed above, but to the <span class="math inline">\(p-1\)</span>th lag instead. By setting <code>spec = &quot;transitory&quot;</code> the first lag will be used instead. Further information on the interpretation the two alternatives can be found in the function’s documentation <code>?ca.jo</code>.</p>
-<p>For further details on VEC modelling I recommend Lütkepohl (2007, Chapters 6, 7 and 8).</p>
+<p>For further details on VEC modelling I recommend Lütkepohl (2006, Chapters 6, 7 and 8).</p>
 <pre class="r"><code>library(urca) # Load package
 
 # Estimate
@@ -211,7 +213,44 @@ round(vec@W, 2)</code></pre>
 <pre><code>##      constant  sd1  sd2  sd3 R.dl1 Dp.dl1 R.dl2 Dp.dl2 R.dl3 Dp.dl3
 ## R.d      0.01 0.01 0.00 0.00  0.29  -0.16  0.01  -0.19  0.25  -0.09
 ## Dp.d    -0.01 0.02 0.02 0.03  0.08  -0.31  0.01  -0.37  0.04  -0.34</code></pre>
-<p>The deterministic terms are different from the results in Lütkepohl (2007), because different reference dates are used.</p>
+<p>The deterministic terms are different from the results in Lütkepohl (2006), because different reference dates are used.</p>
+<p>Using the the <code>tsDyn</code> package, estimates of the coefficients can be obtained in the following way:</p>
+<pre class="r"><code># Load package
+library(tsDyn)
+
+# Obtain constant and seasonal dummies
+seas &lt;- gen_vec(data = e6, p = 4, r = 1, const = &quot;unrestricted&quot;, seasonal = &quot;unrestricted&quot;)
+# Lag order p is 4 since gen_vec assumes that p corresponds to VAR form
+seas &lt;- seas$data$X[, 7:10]
+
+# Estimate
+est_tsdyn &lt;- VECM(e6, lag = 3, r = 1, include = &quot;none&quot;, estim = &quot;ML&quot;, exogen = seas)
+
+# Print results
+summary(est_tsdyn)</code></pre>
+<pre><code>## #############
+## ###Model VECM 
+## #############
+## Full sample size: 107    End sample size: 103
+## Number of variables: 2   Number of estimated slope parameters 22
+## AIC -2142.333    BIC -2081.734   SSR 0.005033587
+## Cointegrating vector (estimated by ML):
+##    R        Dp
+## r1 1 -3.961937
+## 
+## 
+##             ECT                R -1               Dp -1              
+## Equation R  -0.1029(0.0471)*   0.2688(0.1062)*    -0.2102(0.1581)    
+## Equation Dp 0.1577(0.0445)***  0.0654(0.1003)     -0.3392(0.1493)*   
+##             R -2                Dp -2              R -3              
+## Equation R  -0.0178(0.1069)     -0.2230(0.1276).   0.2228(0.1032)*   
+## Equation Dp -0.0043(0.1010)     -0.3908(0.1205)**  0.0184(0.0975)    
+##             Dp -3               const              season.1          
+## Equation R  -0.1076(0.0855)     0.0015(0.0038)     0.0015(0.0051)    
+## Equation Dp -0.3472(0.0808)***  0.0102(0.0036)**   -0.0341(0.0048)***
+##             season.2           season.3           
+## Equation R  0.0089(0.0053).    -0.0004(0.0051)    
+## Equation Dp -0.0179(0.0050)*** -0.0164(0.0048)***</code></pre>
 <div id="impulse-response-analyis" class="section level3">
 <h3>Impulse response analyis</h3>
 <p>The impulse response function of a VECM is usually obtained from its VAR form. The function <code>vec2var</code> of the <code>vars</code> package can be used to transform the output of the <code>ca.jo</code> function into an object that can be handled by the <code>irf</code> function of the <code>vars</code> package. Note that since <code>ur.jo</code> does not set the rank <span class="math inline">\(r\)</span> of the cointegration matrix automatically, it has to be specified manually.</p>
@@ -229,7 +268,8 @@ plot(ir)</code></pre>
 </div>
 <div id="references" class="section level3">
 <h3>References</h3>
-<p>Lütkepohl, H. (2007). <em>New introduction to multiple time series analysis</em> (2nd ed.). Berlin: Springer.</p>
+<p>Lütkepohl, H. (2006). <em>New introduction to multiple time series analysis</em> (2nd ed.). Berlin: Springer.</p>
+<p>Di Narzo, A. F., Aznarte, J. L., Stigler, M., &amp;and Tsung-wu, H. (2020). tsDyn: Nonlinear Time Series Models with Regime Switching. R package version 10-1.2. <a href="https://CRAN.R-project.org/package=tsDyn">https://CRAN.R-project.org/package=tsDyn</a></p>
 <p>Pfaff, B. (2008a). <em>Analysis of Integrated and Cointegrated Time Series with R</em>. Second Edition. New York: Springer.</p>
 <p>Pfaff, B. (2008b). VAR, SVAR and SVEC Models: Implementation Within R Package vars. <em>Journal of Statistical Software 27</em>(4).</p>
 </div>
@@ -237,7 +277,7 @@ plot(ir)</code></pre>
 <div class="footnotes">
 <hr />
 <ol>
-<li id="fn1"><p>See Lütkepohl (2007) for more details.<a href="#fnref1" class="footnote-back">↩</a></p></li>
+<li id="fn1"><p>See Lütkepohl (2006) for more details.<a href="#fnref1" class="footnote-back">↩</a></p></li>
 <li id="fn2"><p>Not that if some variables in the model are known to be integrated, the VAR order must be at least one.<a href="#fnref2" class="footnote-back">↩</a></p></li>
 </ol>
 </div>
