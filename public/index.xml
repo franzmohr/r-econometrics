@@ -102,6 +102,16 @@ When using ggplot2 the main challenge in the visualisation of networks is to fin
     </item>
     
     <item>
+      <title>Machine Learning</title>
+      <link>https://www.r-econometrics.com/_mlintro/</link>
+      <pubDate>Mon, 03 Feb 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/_mlintro/</guid>
+      <description> With the increasing availability of computational capabilities and granular data, machine learning has become more important.
+Classification  Neural networks Random forests Support vector machines (SVM)   </description>
+    </item>
+    
+    <item>
       <title>Chapter 11: Monte Carlo Integration</title>
       <link>https://www.r-econometrics.com/reproduction/bayesmethods/bayesmethods11/</link>
       <pubDate>Wed, 25 Dec 2019 00:00:00 +0000</pubDate>
