@@ -3,6 +3,46 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://www.r-econometrics.com/timeseries/dynamicfactorintro/</loc>
+    <lastmod>2021-04-25T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/bvartools/</loc>
+    <lastmod>2021-04-25T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/dfm/</loc>
+    <lastmod>2021-04-25T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/dynamic-factor-models/</loc>
+    <lastmod>2021-04-25T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/r/</loc>
+    <lastmod>2021-04-25T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/</loc>
+    <lastmod>2021-04-25T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/tags/</loc>
+    <lastmod>2021-04-25T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://www.r-econometrics.com/timeseries/</loc>
+    <lastmod>2021-04-25T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://www.r-econometrics.com/tags/armadillo/</loc>
     <lastmod>2020-08-16T00:00:00+00:00</lastmod>
   </url>
@@ -13,16 +53,6 @@
   </url>
   
   <url>
-    <loc>https://www.r-econometrics.com/tags/r/</loc>
-    <lastmod>2021-03-20T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/</loc>
-    <lastmod>2021-03-20T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://www.r-econometrics.com/tags/rcpp/</loc>
     <lastmod>2020-08-16T00:00:00+00:00</lastmod>
   </url>
@@ -30,16 +60,6 @@
   <url>
     <loc>https://www.r-econometrics.com/timeseries/bayesnotes/</loc>
     <lastmod>2020-08-16T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/tags/</loc>
-    <lastmod>2021-03-20T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/timeseries/</loc>
-    <lastmod>2021-03-20T00:00:00+00:00</lastmod>
   </url>
   
   <url>
@@ -304,11 +324,6 @@
   
   <url>
     <loc>https://www.r-econometrics.com/tags/bvar/</loc>
-    <lastmod>2019-07-07T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://www.r-econometrics.com/tags/bvartools/</loc>
     <lastmod>2019-07-07T00:00:00+00:00</lastmod>
   </url>
   

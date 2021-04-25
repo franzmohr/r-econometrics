@@ -6,7 +6,18 @@
     <description>Recent content in Timeseries on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 16 Aug 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://www.r-econometrics.com/timeseries/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 25 Apr 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://www.r-econometrics.com/timeseries/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>An Introduction to Dynamic Factor Models</title>
+      <link>https://www.r-econometrics.com/timeseries/dynamicfactorintro/</link>
+      <pubDate>Sun, 25 Apr 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/timeseries/dynamicfactorintro/</guid>
+      <description>Introduction For some macroeconomic applications it might be interesting to see whether a set of obserable variables depends on common drivers. The estimation of such common factors can be done using so-called factor analytical models, which have the form
+\[x_t = \lambda f_t + u_t,\]
+where \(x_t\) is an \(M\)-dimensional vector of observable variables, \(f_t\) is an \(N \times 1\) vector of unobserved factors, \(\lambda\) is an \(M \times N\) matrix of factor loadings and \(u_t\) is an error term.</description>
+    </item>
+    
     <item>
       <title>Short Notes on Bayesian Inference of Vector Autoregressive Models</title>
       <link>https://www.r-econometrics.com/timeseries/bayesnotes/</link>

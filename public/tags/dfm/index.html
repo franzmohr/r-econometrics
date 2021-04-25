@@ -16,13 +16,13 @@
         <meta http-equiv="content-type" content="text/html; charset=utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
 
-        <title>bvartools &middot; r-econometrics</title>
+        <title>dfm &middot; r-econometrics</title>
         <link rel='stylesheet' href='//fonts.googleapis.com/css?family=Open+Sans:400,300,600' type='text/css'>
         <link rel="stylesheet" href="https://www.r-econometrics.com//libraries/normalize.3.0.1.css" />
         <link rel="stylesheet" href="https://www.r-econometrics.com//css/liquorice.css" />
         <link rel="shortcut icon" href="/favicon.ico" />
         <link rel="apple-touch-icon-precomposed" href="/apple-touch-icon-144-precomposed.png" sizes="144x144" />
-        <link rel="alternate" href="https://www.r-econometrics.com/tags/bvartools/index.xml" type="application/rss+xml" title="r-econometrics" />
+        <link rel="alternate" href="https://www.r-econometrics.com/tags/dfm/index.xml" type="application/rss+xml" title="r-econometrics" />
         
     </head>
     
@@ -90,7 +90,7 @@
     <div class="container">
         <div class="row">
             <div class="sixteen columns">
-                <h1>bvartools</h1>
+                <h1>dfm</h1>
                 <ul class="li-article-list">
                     
                         <li>
@@ -99,29 +99,6 @@
                             Introduction For some macroeconomic applications it might be interesting to see whether a set of obserable variables depends on common drivers. The estimation of such common factors can be done using so-called factor analytical models, which have the form
 \[x_t = \lambda f_t + u_t,\]
 where \(x_t\) is an \(M\)-dimensional vector of observable variables, \(f_t\) is an \(N \times 1\) vector of unobserved factors, \(\lambda\) is an \(M \times N\) matrix of factor loadings and \(u_t\) is an error term.
-                        </li>
-                    
-                        <li>
-                            <time class="li-article-date">July, 7, 2019</time>
-                            <h4><a href="https://www.r-econometrics.com/timeseries/bvar/">An Introduction to Bayesian VAR (BVAR) Models</a></h4>
-                            
-
-
-<p>Bayesian methods have significantly gained in popularity during the last decades as computers have become more powerful and new software has been developed. Their flexibility and other advantageous features have made these methods also more popular in econometrics. This post gives a brief introduction to Bayesian VAR (BVAR) models and provides the code to set up and estimate a basic model with the <a href="https://cran.r-project.org/package=bvartools"><code>bvartools</code></a> package.</p>
-
-                        </li>
-                    
-                        <li>
-                            <time class="li-article-date">June, 11, 2019</time>
-                            <h4><a href="https://www.r-econometrics.com/timeseries/bvec/">Bayesian Error Correction Models with Priors on the Cointegration Space</a></h4>
-                            Introduction This post provides the code to set up and estimate a basic Bayesian vector error correction (BVEC) model with the bvartools package. The presented Gibbs sampler is based on the approach of Koop et al. (2010), who propose a prior on the cointegration space.
- Data To illustrate the estimation process, the dataset E6 from Lütkepohl (2007) is used, which contains data on German long-term interest rates and inflation from 1972Q2 to 1998Q4.
-                        </li>
-                    
-                        <li>
-                            <time class="li-article-date">June, 11, 2019</time>
-                            <h4><a href="https://www.r-econometrics.com/timeseries/ssvs/">Stochastic Search Variable Selection</a></h4>
-                            Introduction A general drawback of vector autoregressive (VAR) models is that the number of estimated coefficients increases disproportionately with the number of lags. Therefore, fewer information per parameter is available for the estimation as the number of lags increases. In the Bayesian VAR literature one approach to mitigate this so-called curse of dimensionality is stochastic search variable selection (SSVS) as proposed by George et al. (2008). The basic idea of SSVS is to assign commonly used prior variances to parameters, which should be included in a model, and prior variances close to zero to irrelevant parameters.
                         </li>
                     
                 </ul>

@@ -6,7 +6,43 @@
     <description>Recent content in Tags on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 16 Aug 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://www.r-econometrics.com/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 25 Apr 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://www.r-econometrics.com/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>bvartools</title>
+      <link>https://www.r-econometrics.com/tags/bvartools/</link>
+      <pubDate>Sun, 25 Apr 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/tags/bvartools/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>dfm</title>
+      <link>https://www.r-econometrics.com/tags/dfm/</link>
+      <pubDate>Sun, 25 Apr 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/tags/dfm/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>dynamic factor models</title>
+      <link>https://www.r-econometrics.com/tags/dynamic-factor-models/</link>
+      <pubDate>Sun, 25 Apr 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/tags/dynamic-factor-models/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>r</title>
+      <link>https://www.r-econometrics.com/tags/r/</link>
+      <pubDate>Sun, 25 Apr 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/tags/r/</guid>
+      <description></description>
+    </item>
+    
     <item>
       <title>armadillo</title>
       <link>https://www.r-econometrics.com/tags/armadillo/</link>
@@ -22,15 +58,6 @@
       <pubDate>Sun, 16 Aug 2020 00:00:00 +0000</pubDate>
       
       <guid>https://www.r-econometrics.com/tags/bayes/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>r</title>
-      <link>https://www.r-econometrics.com/tags/r/</link>
-      <pubDate>Sun, 16 Aug 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://www.r-econometrics.com/tags/r/</guid>
       <description></description>
     </item>
     
@@ -256,15 +283,6 @@
       <pubDate>Sun, 07 Jul 2019 00:00:00 +0000</pubDate>
       
       <guid>https://www.r-econometrics.com/tags/bvar/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>bvartools</title>
-      <link>https://www.r-econometrics.com/tags/bvartools/</link>
-      <pubDate>Sun, 07 Jul 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://www.r-econometrics.com/tags/bvartools/</guid>
       <description></description>
     </item>
     

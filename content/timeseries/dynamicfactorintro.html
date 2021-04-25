@@ -1,0 +1,79 @@
+---
+title: "An Introduction to Dynamic Factor Models"
+author: "Franz X. Mohr"
+date: "2021-04-25"
+lastmod: "2021-04-25" 
+description: "The post provides a short introduction to the concept of dynamic factor models and how they can be estimated in R."
+tags:
+  - r
+  - dfm
+  - dynamic factor models
+  - bvartools
+---
+
+
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>For some macroeconomic applications it might be interesting to see whether a set of obserable variables depends on common drivers. The estimation of such common factors can be done using so-called <em>factor analytical models</em>, which have the form</p>
+<p><span class="math display">\[x_t = \lambda f_t + u_t,\]</span></p>
+<p>where <span class="math inline">\(x_t\)</span> is an <span class="math inline">\(M\)</span>-dimensional vector of observable variables, <span class="math inline">\(f_t\)</span> is an <span class="math inline">\(N \times 1\)</span> vector of unobserved factors, <span class="math inline">\(\lambda\)</span> is an <span class="math inline">\(M \times N\)</span> matrix of factor loadings and <span class="math inline">\(u_t\)</span> is an error term.</p>
+<p>The above model is static in the sense that it does not allow for autocorrelation of the factors. However, for time series applications it is common to model the factors by assuming an autoregressive process:</p>
+<p><span class="math display">\[f_t = A_1 f_{t-1} + ... + A_p f_{t-p} + v_t,\]</span>
+where <span class="math inline">\(A_i\)</span> is the <span class="math inline">\(N \times N\)</span> coefficient matrix correponding to the <span class="math inline">\(i\)</span>th lag of factor <span class="math inline">\(f_t\)</span> and <span class="math inline">\(v_t\)</span> is an error term. This makes the model more dynamic and, hence, the approach is called <em>dynamic factor model</em> (DFM).</p>
+<p>A basic DFM consists of two equation: First, the <em>measurement equation</em> (the first equation above), which describes the relationship between the observed variables and the factors. Second, the <em>transition equation</em> (the second equation above) describing the intertemporal relationships between the factors.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></p>
+<p>To ensure that DMFs can be estiamted from a mathematical perspective, some identifying assumptions need to be made. A popular approach is to assume that the covariance matrices of the error terms <span class="math inline">\(u_t\)</span> and <span class="math inline">\(v_t\)</span> are diagonal, so that they only include the variances of the variables. Furthermore, the matrix of factor loadings <span class="math inline">\(\lambda\)</span> is assumed to be lower triangular with ones on the main diagonal. For example, the measurement equation of a DFM with <span class="math inline">\(M\)</span> observable variables and 2 factors could be written as:</p>
+<p><span class="math display">\[
+\begin{pmatrix} x_{1,t} \\ x_{2,t} \\ x_{3,t} \\ \vdots \\ x_{M,t} \end{pmatrix} =
+\begin{bmatrix} 1 &amp; 0 \\ \lambda_{21} &amp; 1 \\ \lambda_{31} &amp; \lambda_{32} \\ \vdots &amp; \vdots \\ \lambda_{M1} &amp; \lambda_{M2} \end{bmatrix} 
+\begin{pmatrix} f_{1,t} \\ f_{2,t}  \end{pmatrix} +
+u_t
+\]</span>
+with <span class="math inline">\(u_t \sim N(0, \Sigma_u)\)</span> and
+<span class="math display">\[\Sigma_u =
+\begin{bmatrix}
+\sigma_{u, 11}^{2} &amp; 0 &amp; \dots  &amp; 0 \\
+0 &amp; \sigma_{u, 22}^{2} &amp; \ddots &amp; \vdots \\
+\vdots &amp; \ddots &amp; \ddots &amp; \vdots \\
+0 &amp; \dots &amp; \dots &amp; \sigma_{u, MM}^{2} 
+\end{bmatrix}.\]</span></p>
+<p>The corresponding transistion equation would have the usual form of a VAR(<span class="math inline">\(p\)</span>) with <span class="math inline">\(v_t \sim N(0, \Sigma_v)\)</span> and
+<span class="math inline">\(\Sigma_v = \begin{bmatrix} \sigma_{v, 11}^{2} &amp; 0 \\ 0 &amp; \sigma_{v, 22}^{2} \end{bmatrix}.\)</span></p>
+</div>
+<div id="application" class="section level2">
+<h2>Application</h2>
+<p>Since version 0.2.0 the <code>bvartools</code>package can be used to estimate dynamic factor models as described above using Bayesian inference. The implementation follows the Matlab code privided in the online annex to the textbook of Chan, Koop, Poirier and Tobias (2019). The following application is a reproduction of exercise 18.4 in the textbook, where quarterly time series data on 196 macroeconomic variables is used to extract a common factor for the US. The prepared data set is contained in the package.</p>
+<pre class="r"><code># Load package
+library(bvartools)
+
+# Load data
+data(&quot;bem_dfmdata&quot;)</code></pre>
+<p>Following the logic of the <code>bvartools</code> package, the estimation process is divided into four parts. First, using <code>gen_dfm</code> an object is created, which contains all information required by the estimation algorithm. For the current application we set the number of factors to 1 and the number of lags in the transition equation to 1 as well.</p>
+<pre class="r"><code># Generate input for estimation
+object &lt;- gen_dfm(x = bem_dfmdata, p = 1, n = 1, iterations = 5000, burnin = 1000)</code></pre>
+<p>Second, <code>add_priors</code> is used to add prior information to the model object. We use the same priors that as in Chan et al. (2019).</p>
+<pre class="r"><code># Priors
+object &lt;- add_priors(object,
+                     lambda = list(v_i = .01),
+                     a = list(v_i = .01),
+                     sigma_v = list(shape = 5, rate = 4),
+                     sigma_u = list(shape = 5, rate = 4))</code></pre>
+<p>Third, we obtain posterior draws, where the researcher can either implement her own algorithm or use the simple Gibbs sampler that comes with the package. For this application, the built-in sampler is used:</p>
+<pre class="r"><code># Procude posterior draws
+object &lt;- draw_posterior(object)</code></pre>
+<pre><code>## Estimating models...</code></pre>
+<p>Forth, evaluate the results. Currently, the package only allows to plot the factors:</p>
+<pre class="r"><code>plot(object)</code></pre>
+<p><img src="/timeseries/dynamicfactorintro_files/figure-html/oir-1.png" width="528" /></p>
+</div>
+<div id="references" class="section level2">
+<h2>References</h2>
+<p>Chan, J., Koop, G., Poirier, D. J., &amp; Tobias, J. L. (2019). <em>Bayesian Econometric Methods</em> (2nd ed.). Cambridge: University Press.</p>
+<p>Lütkepohl, H. (2007). <em>New introduction to multiple time series analysis</em> (2nd ed.). Berlin: Springer.</p>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>Note that the terms measurement and transition equation refer to the close relationshipo of the approach to so-called <em>state space models</em>.<a href="#fnref1" class="footnote-back">↩</a></p></li>
+</ol>
+</div>
