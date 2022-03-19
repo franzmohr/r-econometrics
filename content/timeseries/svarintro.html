@@ -159,6 +159,12 @@ svar_est_a</code></pre>
 ## S1  1.0000000 0.0000000  0
 ## S2 -0.1817747 1.0000000  0
 ## S3 -0.1077103 0.3131988  1</code></pre>
+<p>Confidence intervals for the structural coefficients can be obtained by directly accessing the respective element in <code>svar_est_a</code>:</p>
+<pre class="r"><code>svar_est_a$Ase</code></pre>
+<pre><code>##            S1         S2 S3
+## S1 0.00000000 0.00000000  0
+## S2 0.04472136 0.00000000  0
+## S3 0.04545420 0.04472136  0</code></pre>
 </div>
 <div id="b-model" class="section level3">
 <h3>B-model</h3>
@@ -182,6 +188,12 @@ svar_est_b</code></pre>
 ## S1  1.0000 0.0000  0
 ## S2 -0.1818 1.0000  0
 ## S3 -0.1077 0.3132  1</code></pre>
+<p>Again, confidence intervals of the structural coefficients can be obtained by directly accessing the respective element in <code>svar_est_b</code>:</p>
+<pre class="r"><code>svar_est_b$Bse</code></pre>
+<pre><code>##            S1         S2 S3
+## S1 0.00000000 0.00000000  0
+## S2 0.04472136 0.00000000  0
+## S3 0.04686349 0.04472136  0</code></pre>
 </div>
 </div>
 <div id="literature" class="section level2">
