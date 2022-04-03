@@ -6,11 +6,7 @@
     <description>Recent content in dynamic factor models on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 25 Apr 2021 00:00:00 +0000</lastBuildDate>
-    
-	<atom:link href="https://www.r-econometrics.com/tags/dynamic-factor-models/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Sun, 25 Apr 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://www.r-econometrics.com/tags/dynamic-factor-models/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>An Introduction to Dynamic Factor Models</title>
       <link>https://www.r-econometrics.com/timeseries/dynamicfactorintro/</link>

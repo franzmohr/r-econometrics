@@ -130,44 +130,44 @@ which becomes <code>\(y=Ak^{\alpha}\)</code> in per-capita terms, where <code>\(
 <p>Note that since TFP growth is the residual value after the contribution of capital growth was subtracted from output growth, TFP growth is also called the <em>Solow residual</em>.</p>
 <h2 id="application-in-r">Application in R</h2>
 <p>Applying this method in R is straightforward. A main source of data for growth-related analyses is <!-- raw HTML omitted -->Penn World Table<!-- raw HTML omitted -->, which is also available on CRAN.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e"># Load package</span>
-<span style="color:#a6e22e">library</span>(pwt9) <span style="color:#75715e"># install.packages(&#34;pwt9&#34;)</span>
-
-<span style="color:#75715e"># Load data</span>
-<span style="color:#a6e22e">data</span>(<span style="color:#e6db74">&#34;pwt9.0&#34;</span>)
-</code></pre></div><p>Next, we select some countries in the sample, where observations from 1960 to 2000 are available. This period is chosen, because this is also the period used for the growth accounting example in Aghion and Howitt (2009).</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">library</span>(dplyr)
-
-data <span style="color:#f92672">&lt;-</span> pwt9.0 <span style="color:#f92672">%&gt;%</span>
-  <span style="color:#a6e22e">filter</span>(country <span style="color:#f92672">%in%</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;Australia&#34;</span>, <span style="color:#e6db74">&#34;Austria&#34;</span>, <span style="color:#e6db74">&#34;Belgium&#34;</span>,
-                        <span style="color:#e6db74">&#34;Germany&#34;</span>, <span style="color:#e6db74">&#34;France&#34;</span>, <span style="color:#e6db74">&#34;United Kingdom&#34;</span>,
-                        <span style="color:#e6db74">&#34;United States of America&#34;</span>)) <span style="color:#f92672">%&gt;%</span>
-  <span style="color:#a6e22e">select</span>(year, isocode, rgdpna, rkna, emp, labsh) <span style="color:#f92672">%&gt;%</span>
-  <span style="color:#a6e22e">filter</span>(year <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">1960</span>,
-         year <span style="color:#f92672">&lt;=</span> <span style="color:#ae81ff">2000</span>) <span style="color:#f92672">%&gt;%</span>
-  <span style="color:#a6e22e">na.omit</span>()
-</code></pre></div><p>Then calculate the real output and capital per worker (in national currency), take logs and the first difference to obtain percentage changes. <code>\(\alpha\)</code> is one minus the share of labour compensation in GDP at current national prices, i.e. variable <code>labsh</code> in the dataset. You have to omit the first observation so that you have the same amount of observations as of output and capital growth.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">data <span style="color:#f92672">&lt;-</span> data <span style="color:#f92672">%&gt;%</span>
-  <span style="color:#a6e22e">mutate</span>(y_pc <span style="color:#f92672">=</span> <span style="color:#a6e22e">log</span>(rgdpna <span style="color:#f92672">/</span> emp), <span style="color:#75715e"># GDP per worker</span>
-         k_pc <span style="color:#f92672">=</span> <span style="color:#a6e22e">log</span>(rkna <span style="color:#f92672">/</span> emp), <span style="color:#75715e"># Capital per worker</span>
-         a <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">-</span> labsh) <span style="color:#f92672">%&gt;%</span> <span style="color:#75715e"># Capital share</span>
-  <span style="color:#a6e22e">arrange</span>(year) <span style="color:#f92672">%&gt;%</span> <span style="color:#75715e"># Order by year</span>
-  <span style="color:#a6e22e">group_by</span>(isocode) <span style="color:#f92672">%&gt;%</span> <span style="color:#75715e"># For each country calculate...</span>
-  <span style="color:#a6e22e">mutate</span>(g <span style="color:#f92672">=</span> (y_pc <span style="color:#f92672">-</span> <span style="color:#a6e22e">lag</span>(y_pc)) <span style="color:#f92672">*</span> <span style="color:#ae81ff">100</span>, <span style="color:#75715e"># ...the growth rate of GDP per capita</span>
-         dk <span style="color:#f92672">=</span> (k_pc <span style="color:#f92672">-</span> <span style="color:#a6e22e">lag</span>(k_pc)) <span style="color:#f92672">*</span> <span style="color:#ae81ff">100</span>, <span style="color:#75715e"># ...the growth rate of capital per capita</span>
-         dsolow <span style="color:#f92672">=</span> g <span style="color:#f92672">-</span> a <span style="color:#f92672">*</span> dk) <span style="color:#f92672">%&gt;%</span> <span style="color:#75715e"># ...the Solow residual</span>
-  <span style="color:#a6e22e">na.omit</span>()
-
-solow <span style="color:#f92672">&lt;-</span> data <span style="color:#f92672">%&gt;%</span>
-  <span style="color:#a6e22e">summarise</span>(g <span style="color:#f92672">=</span> <span style="color:#a6e22e">mean</span>(g),
-            tfp.growth <span style="color:#f92672">=</span> <span style="color:#a6e22e">mean</span>(dsolow),
-            capital.deepening <span style="color:#f92672">=</span> <span style="color:#a6e22e">mean</span>(a <span style="color:#f92672">*</span> dk),
-            tfp.share <span style="color:#f92672">=</span> <span style="color:#a6e22e">mean</span>(dsolow) <span style="color:#f92672">/</span> <span style="color:#a6e22e">mean</span>(g),
-            capital.share <span style="color:#f92672">=</span> <span style="color:#a6e22e">mean</span>(a))
-
-<span style="color:#75715e"># Print output</span>
-solow
-</code></pre></div><pre><code>## # A tibble: 7 x 6
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#75715e"># Load package</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">library</span>(pwt9) <span style="color:#75715e"># install.packages(&#34;pwt9&#34;)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Load data</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">data</span>(<span style="color:#e6db74">&#34;pwt9.0&#34;</span>)
+</span></span></code></pre></div><p>Next, we select some countries in the sample, where observations from 1960 to 2000 are available. This period is chosen, because this is also the period used for the growth accounting example in Aghion and Howitt (2009).</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#a6e22e">library</span>(dplyr)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>data <span style="color:#f92672">&lt;-</span> pwt9.0 <span style="color:#f92672">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">filter</span>(country <span style="color:#f92672">%in%</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;Australia&#34;</span>, <span style="color:#e6db74">&#34;Austria&#34;</span>, <span style="color:#e6db74">&#34;Belgium&#34;</span>,
+</span></span><span style="display:flex;"><span>                        <span style="color:#e6db74">&#34;Germany&#34;</span>, <span style="color:#e6db74">&#34;France&#34;</span>, <span style="color:#e6db74">&#34;United Kingdom&#34;</span>,
+</span></span><span style="display:flex;"><span>                        <span style="color:#e6db74">&#34;United States of America&#34;</span>)) <span style="color:#f92672">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">select</span>(year, isocode, rgdpna, rkna, emp, labsh) <span style="color:#f92672">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">filter</span>(year <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">1960</span>,
+</span></span><span style="display:flex;"><span>         year <span style="color:#f92672">&lt;=</span> <span style="color:#ae81ff">2000</span>) <span style="color:#f92672">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">na.omit</span>()
+</span></span></code></pre></div><p>Then calculate the real output and capital per worker (in national currency), take logs and the first difference to obtain percentage changes. <code>\(\alpha\)</code> is one minus the share of labour compensation in GDP at current national prices, i.e. variable <code>labsh</code> in the dataset. You have to omit the first observation so that you have the same amount of observations as of output and capital growth.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>data <span style="color:#f92672">&lt;-</span> data <span style="color:#f92672">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">mutate</span>(y_pc <span style="color:#f92672">=</span> <span style="color:#a6e22e">log</span>(rgdpna <span style="color:#f92672">/</span> emp), <span style="color:#75715e"># GDP per worker</span>
+</span></span><span style="display:flex;"><span>         k_pc <span style="color:#f92672">=</span> <span style="color:#a6e22e">log</span>(rkna <span style="color:#f92672">/</span> emp), <span style="color:#75715e"># Capital per worker</span>
+</span></span><span style="display:flex;"><span>         a <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">-</span> labsh) <span style="color:#f92672">%&gt;%</span> <span style="color:#75715e"># Capital share</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">arrange</span>(year) <span style="color:#f92672">%&gt;%</span> <span style="color:#75715e"># Order by year</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">group_by</span>(isocode) <span style="color:#f92672">%&gt;%</span> <span style="color:#75715e"># For each country calculate...</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">mutate</span>(g <span style="color:#f92672">=</span> (y_pc <span style="color:#f92672">-</span> <span style="color:#a6e22e">lag</span>(y_pc)) <span style="color:#f92672">*</span> <span style="color:#ae81ff">100</span>, <span style="color:#75715e"># ...the growth rate of GDP per capita</span>
+</span></span><span style="display:flex;"><span>         dk <span style="color:#f92672">=</span> (k_pc <span style="color:#f92672">-</span> <span style="color:#a6e22e">lag</span>(k_pc)) <span style="color:#f92672">*</span> <span style="color:#ae81ff">100</span>, <span style="color:#75715e"># ...the growth rate of capital per capita</span>
+</span></span><span style="display:flex;"><span>         dsolow <span style="color:#f92672">=</span> g <span style="color:#f92672">-</span> a <span style="color:#f92672">*</span> dk) <span style="color:#f92672">%&gt;%</span> <span style="color:#75715e"># ...the Solow residual</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">na.omit</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>solow <span style="color:#f92672">&lt;-</span> data <span style="color:#f92672">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">summarise</span>(g <span style="color:#f92672">=</span> <span style="color:#a6e22e">mean</span>(g),
+</span></span><span style="display:flex;"><span>            tfp.growth <span style="color:#f92672">=</span> <span style="color:#a6e22e">mean</span>(dsolow),
+</span></span><span style="display:flex;"><span>            capital.deepening <span style="color:#f92672">=</span> <span style="color:#a6e22e">mean</span>(a <span style="color:#f92672">*</span> dk),
+</span></span><span style="display:flex;"><span>            tfp.share <span style="color:#f92672">=</span> <span style="color:#a6e22e">mean</span>(dsolow) <span style="color:#f92672">/</span> <span style="color:#a6e22e">mean</span>(g),
+</span></span><span style="display:flex;"><span>            capital.share <span style="color:#f92672">=</span> <span style="color:#a6e22e">mean</span>(a))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Print output</span>
+</span></span><span style="display:flex;"><span>solow
+</span></span></code></pre></div><pre tabindex="0"><code>## # A tibble: 7 x 6
 ##   isocode     g tfp.growth capital.deepening tfp.share capital.share
 ##   &lt;fct&gt;   &lt;dbl&gt;      &lt;dbl&gt;             &lt;dbl&gt;     &lt;dbl&gt;         &lt;dbl&gt;
 ## 1 AUS      1.72       1.16             0.565     0.672         0.348
@@ -185,7 +185,7 @@ solow
 <hr>
 <ol>
 <li id="fn:1" role="doc-endnote">
-<p>This is based on the assumption of perfectly competitive captial markets, where the marginal product of capital is equal to the rental price of capital. <a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+<p>This is based on the assumption of perfectly competitive captial markets, where the marginal product of capital is equal to the rental price of capital.&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
 </ol>
 </section>
@@ -269,7 +269,6 @@ if (!doNotTrack) {
 	ga('send', 'pageview');
 }
 </script>
-
     </body>
 </html>
 
