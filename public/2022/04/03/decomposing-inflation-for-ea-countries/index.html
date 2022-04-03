@@ -110,25 +110,25 @@
                         </time>
                     </header>
                     <section>
-                        <p>As a result of supply chain disruptions due to the Covid-19 pandemic and the recent war in the Ukraine inflation has reached unusually high levels during the past months. 
+                        <p>As a result of supply chain disruptions due to the Covid-19 pandemic and the recent war in the Ukraine inflation has reached unusually high levels during the past months.
 A first approach to analyse the evolution of inflation over time is to look at its main components: energy, food, services and industrial goods. To do this, I use data from Eurostat, which can be easily loaded into R using the <code>eurostat</code> package for countries of the European Union.</p>
 <p>Before loading the data, define the set of countries, for which the decomposition should be done. The code below allows to compare the decompositions of inflation for multiple countries. Therefore, a vector can be provided. For this example, I use data on Austria and the euro area.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">ctry <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;AT&#34;</span>, <span style="color:#e6db74">&#34;EA19&#34;</span>)
 </code></pre></div><p>Define the start date:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">start_date <span style="color:#f92672">&lt;-</span> <span style="color:#e6db74">&#34;2019-01-01&#34;</span>
 </code></pre></div><p>Then, load the required packages.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e"># Load packages</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e"># Load packages</span>
 <span style="color:#a6e22e">library</span>(dplyr)
 <span style="color:#a6e22e">library</span>(eurostat)
 <span style="color:#a6e22e">library</span>(ggplot2)
 </code></pre></div><p>Download data on the weights of the individual components, which describe the relative importance of the respective component in overall inflation. They sum up to 1000.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e"># Weights</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e"># Weights</span>
 weights <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">get_eurostat</span>(id <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;prc_hicp_inw&#34;</span>,
                         filters <span style="color:#f92672">=</span> <span style="color:#a6e22e">list</span>(geo <span style="color:#f92672">=</span> ctry,
                                        coicop <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;FOOD&#34;</span>, <span style="color:#e6db74">&#34;NRG&#34;</span>, <span style="color:#e6db74">&#34;IGD_NNRG&#34;</span>, <span style="color:#e6db74">&#34;SERV&#34;</span>)))
 
 weights <span style="color:#f92672">&lt;-</span> weights <span style="color:#f92672">%&gt;%</span>
-  <span style="color:#75715e"># Generate year column for merge with monthly index-growth data</span>
+  <span style="color:#75715e"># Generate year column for merge with monthly index-growth data</span>
   <span style="color:#a6e22e">mutate</span>(year <span style="color:#f92672">=</span> <span style="color:#a6e22e">substring</span>(time, <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">4</span>)) <span style="color:#f92672">%&gt;%</span>
   <span style="color:#a6e22e">select</span>(<span style="color:#f92672">-</span>time) <span style="color:#f92672">%&gt;%</span>
   <span style="color:#a6e22e">rename</span>(weight <span style="color:#f92672">=</span> values)
@@ -138,54 +138,54 @@ weights <span style="color:#f92672">&lt;-</span> weights <span style="color:#f92
                                      coicop <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;CP00&#34;</span>, <span style="color:#e6db74">&#34;TOT_X_NRG_FOOD&#34;</span>, <span style="color:#e6db74">&#34;FOOD&#34;</span>, <span style="color:#e6db74">&#34;NRG&#34;</span>, <span style="color:#e6db74">&#34;IGD_NNRG&#34;</span>, <span style="color:#e6db74">&#34;SERV&#34;</span>))) <span style="color:#f92672">%&gt;%</span>
   <span style="color:#a6e22e">filter</span>(time <span style="color:#f92672">&gt;=</span> start_date,
          <span style="color:#f92672">!</span><span style="color:#a6e22e">is.na</span>(values)) <span style="color:#f92672">%&gt;%</span>
-  <span style="color:#75715e"># Prepare percentage data for ggplot</span>
+  <span style="color:#75715e"># Prepare percentage data for ggplot</span>
   <span style="color:#a6e22e">mutate</span>(values <span style="color:#f92672">=</span> values <span style="color:#f92672">/</span> <span style="color:#ae81ff">100</span>)
 </code></pre></div><p>Combine the series of component-specific growth rates with the weights.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">comp <span style="color:#f92672">&lt;-</span> index <span style="color:#f92672">%&gt;%</span>
-  <span style="color:#75715e"># Drop series, which are not used for decomposition</span>
+  <span style="color:#75715e"># Drop series, which are not used for decomposition</span>
   <span style="color:#a6e22e">filter</span>(<span style="color:#f92672">!</span>coicop <span style="color:#f92672">%in%</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;CP00&#34;</span>, <span style="color:#e6db74">&#34;TOT_X_NRG_FOOD&#34;</span>)) <span style="color:#f92672">%&gt;%</span>
-  <span style="color:#75715e"># Gernate year column for merge with weights</span>
+  <span style="color:#75715e"># Gernate year column for merge with weights</span>
   <span style="color:#a6e22e">mutate</span>(year <span style="color:#f92672">=</span> <span style="color:#a6e22e">substring</span>(time, <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">4</span>)) <span style="color:#f92672">%&gt;%</span>
-  <span style="color:#75715e"># Merge with weights</span>
+  <span style="color:#75715e"># Merge with weights</span>
   <span style="color:#a6e22e">left_join</span>(weights, by <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;year&#34;</span>, <span style="color:#e6db74">&#34;geo&#34;</span>, <span style="color:#e6db74">&#34;coicop&#34;</span>)) <span style="color:#f92672">%&gt;%</span>
-  <span style="color:#75715e"># Obtain values for composition</span>
+  <span style="color:#75715e"># Obtain values for composition</span>
   <span style="color:#a6e22e">group_by</span>(time, geo) <span style="color:#f92672">%&gt;%</span>
   <span style="color:#a6e22e">mutate</span>(weight <span style="color:#f92672">=</span> weight <span style="color:#f92672">/</span> <span style="color:#a6e22e">sum</span>(weight),
          values <span style="color:#f92672">=</span> values <span style="color:#f92672">*</span> weight) <span style="color:#f92672">%&gt;%</span>
   <span style="color:#a6e22e">ungroup</span>() <span style="color:#f92672">%&gt;%</span>
-  <span style="color:#75715e"># Last formatting for graph</span>
+  <span style="color:#75715e"># Last formatting for graph</span>
   <span style="color:#a6e22e">mutate</span>(var_en <span style="color:#f92672">=</span> <span style="color:#a6e22e">factor</span>(coicop, levels <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;SERV&#34;</span>, <span style="color:#e6db74">&#34;IGD_NNRG&#34;</span>, <span style="color:#e6db74">&#34;NRG&#34;</span>, <span style="color:#e6db74">&#34;FOOD&#34;</span>),
                          labels <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;Services&#34;</span>, <span style="color:#e6db74">&#34;Non-energy industrial goods&#34;</span>,
                                     <span style="color:#e6db74">&#34;Energy&#34;</span>, <span style="color:#e6db74">&#34;Food including alcohol and tobacco&#34;</span>)))
 </code></pre></div><p>Whereas headline inflation is usually reported by the media, core inflation is more relevant for interest rate decisions by central banks. Thus, I also add lines on headline and core inflation to the graph.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">line <span style="color:#f92672">&lt;-</span> index <span style="color:#f92672">%&gt;%</span>
-  <span style="color:#75715e"># Filter for series of the line plots</span>
+  <span style="color:#75715e"># Filter for series of the line plots</span>
   <span style="color:#a6e22e">filter</span>(coicop <span style="color:#f92672">%in%</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;CP00&#34;</span>, <span style="color:#e6db74">&#34;TOT_X_NRG_FOOD&#34;</span>),
          <span style="color:#f92672">!</span><span style="color:#a6e22e">is.na</span>(values)) <span style="color:#f92672">%&gt;%</span>
-  <span style="color:#75715e"># Last formatting for graph</span>
+  <span style="color:#75715e"># Last formatting for graph</span>
   <span style="color:#a6e22e">mutate</span>(line_en <span style="color:#f92672">=</span> <span style="color:#a6e22e">factor</span>(coicop, levels <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;CP00&#34;</span>, <span style="color:#e6db74">&#34;TOT_X_NRG_FOOD&#34;</span>),
                           labels <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;HCPI-inflation&#34;</span>, <span style="color:#e6db74">&#34;Core inflation (w/o energy, food)&#34;</span>)))
 </code></pre></div><p>Finally, plot the series. Here, I use the <code>ggplot2</code> package.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">ggplot</span>(comp, <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> time, y <span style="color:#f92672">=</span> values)) <span style="color:#f92672">+</span>
-  <span style="color:#75715e"># Add bars to plot the decomposition</span>
+  <span style="color:#75715e"># Add bars to plot the decomposition</span>
   <span style="color:#a6e22e">geom_col</span>(<span style="color:#a6e22e">aes</span>(fill <span style="color:#f92672">=</span> var_en), alpha <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">+</span>
-  <span style="color:#75715e"># Add leine for headline and core inflation</span>
+  <span style="color:#75715e"># Add leine for headline and core inflation</span>
   <span style="color:#a6e22e">geom_line</span>(data <span style="color:#f92672">=</span> line, <span style="color:#a6e22e">aes</span>(linetype <span style="color:#f92672">=</span> line_en), size <span style="color:#f92672">=</span> <span style="color:#ae81ff">1.2</span>) <span style="color:#f92672">+</span>
-  <span style="color:#75715e"># Finetune x-axis design</span>
+  <span style="color:#75715e"># Finetune x-axis design</span>
   <span style="color:#a6e22e">scale_x_date</span>(expand <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">.01</span>, <span style="color:#ae81ff">0</span>), date_labels <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;%YM%m&#34;</span>) <span style="color:#f92672">+</span>
-  <span style="color:#75715e"># Finetune y-axis design</span>
+  <span style="color:#75715e"># Finetune y-axis design</span>
   <span style="color:#a6e22e">scale_y_continuous</span>(labels <span style="color:#f92672">=</span> scales<span style="color:#f92672">::</span><span style="color:#a6e22e">percent_format</span>(accuracy <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>)) <span style="color:#f92672">+</span>
-  <span style="color:#75715e"># Facetting, since we look at more than one country</span>
+  <span style="color:#75715e"># Facetting, since we look at more than one country</span>
   <span style="color:#a6e22e">facet_wrap</span>(<span style="color:#f92672">~</span> geo, ncol <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>) <span style="color:#f92672">+</span>
-  <span style="color:#75715e"># Finetune legend design</span>
+  <span style="color:#75715e"># Finetune legend design</span>
   <span style="color:#a6e22e">guides</span>(fill <span style="color:#f92672">=</span> <span style="color:#a6e22e">guide_legend</span>(ncol <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>),
          linetype <span style="color:#f92672">=</span> <span style="color:#a6e22e">guide_legend</span>(ncol <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>, keywidth <span style="color:#f92672">=</span> <span style="color:#ae81ff">1.5</span>)) <span style="color:#f92672">+</span>
-  <span style="color:#75715e"># Labels</span>
+  <span style="color:#75715e"># Labels</span>
   <span style="color:#a6e22e">labs</span>(title <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Contribution to inflation&#34;</span>, 
        subtitle <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Inflation in %; Contribution of component in percentage points&#34;</span>,
        caption <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Source: Eurostat.&#34;</span>,
        x <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>, y <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>) <span style="color:#f92672">+</span>
-  <span style="color:#75715e"># Last finetuning</span>
+  <span style="color:#75715e"># Last finetuning</span>
   <span style="color:#a6e22e">theme</span>(legend.title <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_blank</span>(),
         legend.position <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;bottom&#34;</span>,
         legend.box <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;vertical&#34;</span>,

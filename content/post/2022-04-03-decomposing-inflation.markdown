@@ -131,5 +131,4 @@ ggplot(comp, aes(x = time, y = values)) +
 
 <img src="/post/2022-04-03-decomposing-inflation_files/figure-html/unnamed-chunk-8-1.png" width="480" />
 
-
 This post was inspired by a graph used in OeNB (June 2020). *Gesamtwirtschaftliche Prognose der OeNB für Österreich 2020 bis 2023*. <a href="https://www.oenb.at/dam/jcr:613c5956-9909-455a-8d57-2cd480179774/prognose_juni_2020.pdf" target="_blank">https://www.oenb.at/dam/jcr:613c5956-9909-455a-8d57-2cd480179774/prognose_juni_2020.pdf</a>
