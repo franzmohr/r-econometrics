@@ -1,0 +1,279 @@
+ 
+<!DOCTYPE html>
+<html xmlns="//www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+    <head>
+        
+
+        
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-115075361-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-115075361-1');
+</script>
+        
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+
+        <title>Decomposing Inflation for EA Countries &middot; r-econometrics</title>
+        <link rel='stylesheet' href='//fonts.googleapis.com/css?family=Open+Sans:400,300,600' type='text/css'>
+        <link rel="stylesheet" href="https://www.r-econometrics.com//libraries/normalize.3.0.1.css" />
+        <link rel="stylesheet" href="https://www.r-econometrics.com//css/liquorice.css" />
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <link rel="apple-touch-icon-precomposed" href="/apple-touch-icon-144-precomposed.png" sizes="144x144" />
+        </head>
+    <body class="li-body">
+
+<header class="li-page-header">
+    <div class="container">
+        <div class="row">
+            <div class="sixteen columns">
+                <div class="li-brand li-left">
+                <a href="https://www.r-econometrics.com/">r-econometrics</a></div>
+                <div class="li-menu li-right">
+                    <span class="li-menu-icon" onclick="javascript:toggle('menu');">&#9776;</span>
+                    <ul id="menu2" class="li-menu-items">
+                        
+                            <li><a href="/rbasicsintro"> R(eal) Basics </a></li>
+                        
+                            <li><a href="/methodsintro"> Econometric Methods </a></li>
+                        
+                            <li><a href="/timeseriesintro"> Time Series Topics </a></li>
+                        
+                            <li><a href="/networksintro"> Network Analysis </a></li>
+                        
+                            <li><a href="/links"> Links </a></li>
+                        
+                            <li><a href="/post"> Blog </a></li>
+                        
+                            <li><a href="/reproductionintro"> Reproduction Projects </a></li>
+                        
+                            <li><a href="/about"> About and Disclaimer </a></li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="sixteen columns">
+                <ul id="menu" class="li-menu-items li-menu-mobile">
+                    
+                        <li><a href="/rbasicsintro"> R(eal) Basics </a></li>
+                    
+                        <li><a href="/methodsintro"> Econometric Methods </a></li>
+                    
+                        <li><a href="/timeseriesintro"> Time Series Topics </a></li>
+                    
+                        <li><a href="/networksintro"> Network Analysis </a></li>
+                    
+                        <li><a href="/links"> Links </a></li>
+                    
+                        <li><a href="/post"> Blog </a></li>
+                    
+                        <li><a href="/reproductionintro"> Reproduction Projects </a></li>
+                    
+                        <li><a href="/about"> About and Disclaimer </a></li>
+                    
+                </ul>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+
+
+
+
+  <meta
+     name="description"
+     content="Decomposing inflation into four main components for euro area countries using data from Eurostat."
+   />
+
+    <div class="container">
+        <div class="row">
+            <div class="sixteen columns">
+                <article class="li-article">
+                    <header class="li-article-header">
+                        <h1 class="li-article-title">Decomposing Inflation for EA Countries</h1>
+                        <span class="li-article-taxonomies">
+                            
+
+                            
+                        </span>
+                        
+                        <time class="li-article-date">
+                          Franz X. Mohr, Created: April 3, 2022, Last update: April 3, 2022
+                         
+                        </time>
+                    </header>
+                    <section>
+                        <p>As a result of supply chain disruptions due to the Covid-19 pandemic and the recent war in the Ukraine inflation has reached unusually high levels during the past months. 
+A first approach to analyse the evolution of inflation over time is to look at its main components: energy, food, services and industrial goods. To do this, I use data from Eurostat, which can be easily loaded into R using the <code>eurostat</code> package for countries of the European Union.</p>
+<p>Before loading the data, define the set of countries, for which the decomposition should be done. The code below allows to compare the decompositions of inflation for multiple countries. Therefore, a vector can be provided. For this example, I use data on Austria and the euro area.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">ctry <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;AT&#34;</span>, <span style="color:#e6db74">&#34;EA19&#34;</span>)
+</code></pre></div><p>Define the start date:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">start_date <span style="color:#f92672">&lt;-</span> <span style="color:#e6db74">&#34;2019-01-01&#34;</span>
+</code></pre></div><p>Then, load the required packages.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e"># Load packages</span>
+<span style="color:#a6e22e">library</span>(dplyr)
+<span style="color:#a6e22e">library</span>(eurostat)
+<span style="color:#a6e22e">library</span>(ggplot2)
+</code></pre></div><p>Download data on the weights of the individual components, which describe the relative importance of the respective component in overall inflation. They sum up to 1000.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e"># Weights</span>
+weights <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">get_eurostat</span>(id <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;prc_hicp_inw&#34;</span>,
+                        filters <span style="color:#f92672">=</span> <span style="color:#a6e22e">list</span>(geo <span style="color:#f92672">=</span> ctry,
+                                       coicop <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;FOOD&#34;</span>, <span style="color:#e6db74">&#34;NRG&#34;</span>, <span style="color:#e6db74">&#34;IGD_NNRG&#34;</span>, <span style="color:#e6db74">&#34;SERV&#34;</span>)))
+
+weights <span style="color:#f92672">&lt;-</span> weights <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#75715e"># Generate year column for merge with monthly index-growth data</span>
+  <span style="color:#a6e22e">mutate</span>(year <span style="color:#f92672">=</span> <span style="color:#a6e22e">substring</span>(time, <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">4</span>)) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">select</span>(<span style="color:#f92672">-</span>time) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">rename</span>(weight <span style="color:#f92672">=</span> values)
+</code></pre></div><p>Download data on the annual growth rates of individual inflation components.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">index <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">get_eurostat</span>(id <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;prc_hicp_manr&#34;</span>,
+                      filters <span style="color:#f92672">=</span> <span style="color:#a6e22e">list</span>(geo <span style="color:#f92672">=</span> ctry,
+                                     coicop <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;CP00&#34;</span>, <span style="color:#e6db74">&#34;TOT_X_NRG_FOOD&#34;</span>, <span style="color:#e6db74">&#34;FOOD&#34;</span>, <span style="color:#e6db74">&#34;NRG&#34;</span>, <span style="color:#e6db74">&#34;IGD_NNRG&#34;</span>, <span style="color:#e6db74">&#34;SERV&#34;</span>))) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">filter</span>(time <span style="color:#f92672">&gt;=</span> start_date,
+         <span style="color:#f92672">!</span><span style="color:#a6e22e">is.na</span>(values)) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#75715e"># Prepare percentage data for ggplot</span>
+  <span style="color:#a6e22e">mutate</span>(values <span style="color:#f92672">=</span> values <span style="color:#f92672">/</span> <span style="color:#ae81ff">100</span>)
+</code></pre></div><p>Combine the series of component-specific growth rates with the weights.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">comp <span style="color:#f92672">&lt;-</span> index <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#75715e"># Drop series, which are not used for decomposition</span>
+  <span style="color:#a6e22e">filter</span>(<span style="color:#f92672">!</span>coicop <span style="color:#f92672">%in%</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;CP00&#34;</span>, <span style="color:#e6db74">&#34;TOT_X_NRG_FOOD&#34;</span>)) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#75715e"># Gernate year column for merge with weights</span>
+  <span style="color:#a6e22e">mutate</span>(year <span style="color:#f92672">=</span> <span style="color:#a6e22e">substring</span>(time, <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">4</span>)) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#75715e"># Merge with weights</span>
+  <span style="color:#a6e22e">left_join</span>(weights, by <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;year&#34;</span>, <span style="color:#e6db74">&#34;geo&#34;</span>, <span style="color:#e6db74">&#34;coicop&#34;</span>)) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#75715e"># Obtain values for composition</span>
+  <span style="color:#a6e22e">group_by</span>(time, geo) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(weight <span style="color:#f92672">=</span> weight <span style="color:#f92672">/</span> <span style="color:#a6e22e">sum</span>(weight),
+         values <span style="color:#f92672">=</span> values <span style="color:#f92672">*</span> weight) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">ungroup</span>() <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#75715e"># Last formatting for graph</span>
+  <span style="color:#a6e22e">mutate</span>(var_en <span style="color:#f92672">=</span> <span style="color:#a6e22e">factor</span>(coicop, levels <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;SERV&#34;</span>, <span style="color:#e6db74">&#34;IGD_NNRG&#34;</span>, <span style="color:#e6db74">&#34;NRG&#34;</span>, <span style="color:#e6db74">&#34;FOOD&#34;</span>),
+                         labels <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;Services&#34;</span>, <span style="color:#e6db74">&#34;Non-energy industrial goods&#34;</span>,
+                                    <span style="color:#e6db74">&#34;Energy&#34;</span>, <span style="color:#e6db74">&#34;Food including alcohol and tobacco&#34;</span>)))
+</code></pre></div><p>Whereas headline inflation is usually reported by the media, core inflation is more relevant for interest rate decisions by central banks. Thus, I also add lines on headline and core inflation to the graph.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">line <span style="color:#f92672">&lt;-</span> index <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#75715e"># Filter for series of the line plots</span>
+  <span style="color:#a6e22e">filter</span>(coicop <span style="color:#f92672">%in%</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;CP00&#34;</span>, <span style="color:#e6db74">&#34;TOT_X_NRG_FOOD&#34;</span>),
+         <span style="color:#f92672">!</span><span style="color:#a6e22e">is.na</span>(values)) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#75715e"># Last formatting for graph</span>
+  <span style="color:#a6e22e">mutate</span>(line_en <span style="color:#f92672">=</span> <span style="color:#a6e22e">factor</span>(coicop, levels <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;CP00&#34;</span>, <span style="color:#e6db74">&#34;TOT_X_NRG_FOOD&#34;</span>),
+                          labels <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;HCPI-inflation&#34;</span>, <span style="color:#e6db74">&#34;Core inflation (w/o energy, food)&#34;</span>)))
+</code></pre></div><p>Finally, plot the series. Here, I use the <code>ggplot2</code> package.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">ggplot</span>(comp, <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> time, y <span style="color:#f92672">=</span> values)) <span style="color:#f92672">+</span>
+  <span style="color:#75715e"># Add bars to plot the decomposition</span>
+  <span style="color:#a6e22e">geom_col</span>(<span style="color:#a6e22e">aes</span>(fill <span style="color:#f92672">=</span> var_en), alpha <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">+</span>
+  <span style="color:#75715e"># Add leine for headline and core inflation</span>
+  <span style="color:#a6e22e">geom_line</span>(data <span style="color:#f92672">=</span> line, <span style="color:#a6e22e">aes</span>(linetype <span style="color:#f92672">=</span> line_en), size <span style="color:#f92672">=</span> <span style="color:#ae81ff">1.2</span>) <span style="color:#f92672">+</span>
+  <span style="color:#75715e"># Finetune x-axis design</span>
+  <span style="color:#a6e22e">scale_x_date</span>(expand <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">.01</span>, <span style="color:#ae81ff">0</span>), date_labels <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;%YM%m&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#75715e"># Finetune y-axis design</span>
+  <span style="color:#a6e22e">scale_y_continuous</span>(labels <span style="color:#f92672">=</span> scales<span style="color:#f92672">::</span><span style="color:#a6e22e">percent_format</span>(accuracy <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>)) <span style="color:#f92672">+</span>
+  <span style="color:#75715e"># Facetting, since we look at more than one country</span>
+  <span style="color:#a6e22e">facet_wrap</span>(<span style="color:#f92672">~</span> geo, ncol <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>) <span style="color:#f92672">+</span>
+  <span style="color:#75715e"># Finetune legend design</span>
+  <span style="color:#a6e22e">guides</span>(fill <span style="color:#f92672">=</span> <span style="color:#a6e22e">guide_legend</span>(ncol <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>),
+         linetype <span style="color:#f92672">=</span> <span style="color:#a6e22e">guide_legend</span>(ncol <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>, keywidth <span style="color:#f92672">=</span> <span style="color:#ae81ff">1.5</span>)) <span style="color:#f92672">+</span>
+  <span style="color:#75715e"># Labels</span>
+  <span style="color:#a6e22e">labs</span>(title <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Contribution to inflation&#34;</span>, 
+       subtitle <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Inflation in %; Contribution of component in percentage points&#34;</span>,
+       caption <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Source: Eurostat.&#34;</span>,
+       x <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>, y <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#75715e"># Last finetuning</span>
+  <span style="color:#a6e22e">theme</span>(legend.title <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_blank</span>(),
+        legend.position <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;bottom&#34;</span>,
+        legend.box <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;vertical&#34;</span>,
+        axis.text.x <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_text</span>(angle <span style="color:#f92672">=</span> <span style="color:#ae81ff">45</span>, vjust <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>, hjust <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>))
+</code></pre></div><p><!-- raw HTML omitted --></p>
+<p>This post was inspired by a graph used in OeNB (June 2020). <em>Gesamtwirtschaftliche Prognose der OeNB für Österreich 2020 bis 2023</em>. <!-- raw HTML omitted --><a href="https://www.oenb.at/dam/jcr:613c5956-9909-455a-8d57-2cd480179774/prognose_juni_2020.pdf">https://www.oenb.at/dam/jcr:613c5956-9909-455a-8d57-2cd480179774/prognose_juni_2020.pdf</a><!-- raw HTML omitted --></p>
+
+                    </section>
+                </article>
+                 <div class="container">
+  <div class="row">
+    <div class="sixteen columns center">
+      <div class="addthis_tipjar_inline"></div>
+      <div class="addthis_inline_share_toolbox"></div>
+    </div>
+  </div>
+</div>
+
+                 
+<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5a9c6c9b8a39890d"></script>
+                
+                <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+<footer class="li-page-footer">
+    <div class="container">
+        <div class="row">
+            <div class="sixteen columns center">
+              
+              <div class="commentbox"></div>
+<script src="https://unpkg.com/commentbox.io/dist/commentBox.min.js"></script>
+<script>commentBox('5679369011855360-proj')</script>
+              
+                  
+                  
+                  
+                  
+            </div>
+        </div>
+    </div>
+</footer>
+            </div>
+        </div>
+        
+    </div>
+<footer class="li-page-footer">
+    <div class="container">
+        <div class="row">
+            <div class="sixteen columns center">
+              <div class="li-page-footer-legal">
+                &copy; Franz X. Mohr. Powered by <a href="https://github.com/rstudio/blogdown" target="_blank" >Blogdown</a> and hosted by <a href="https://www.netlify.com/" target="_blank" >Netlify</a>. Source available on <a href="https://github.com/franzmohr/r-econometrics" target="_blank" >Github</a>.
+              </div>
+              <div class="li-page-footer-theme">
+                <span class=""><a href="https://github.com/eliasson/liquorice/">liquorice</a> is a theme for <a href="https://gohugo.io/">hugo</a>
+                </span>
+              </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+    <script src="//yihui.name/js/math-code.js"></script>
+    <script async
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
+    </script>
+
+    <script type="text/javascript">
+    
+    function toggle(id) {
+        var e = document.getElementById(id);
+        e.style.display == 'block' ? e.style.display = 'none' : e.style.display = 'block';
+    }
+
+    </script>
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-115075361-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+    </body>
+</html>
+

@@ -111,41 +111,41 @@
                     </header>
                     <section>
                         <p>Yeah, I know. It&rsquo;s pretty obvious which countries contribute most to euro area GDP growth: the larger economies. But let&rsquo;s do this exercise anyways. We will use the <code>eurostat</code> package to obtain data from Eurostat and calculate a euro area member state&rsquo;s contribution to overal euro area GDP growth.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#a6e22e">library</span>(dplyr)
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">library</span>(eurostat)
-</span></span></code></pre></div><pre tabindex="0"><code>## Warning: package &#39;eurostat&#39; was built under R version 3.6.3
-</code></pre><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#a6e22e">library</span>(ggplot2)
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">library</span>(zoo)
-</span></span></code></pre></div><h3 id="data">Data</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">library</span>(dplyr)
+<span style="color:#a6e22e">library</span>(eurostat)
+</code></pre></div><pre><code>## Warning: package 'eurostat' was built under R version 3.6.3
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">library</span>(ggplot2)
+<span style="color:#a6e22e">library</span>(zoo)
+</code></pre></div><h3 id="data">Data</h3>
 <p>The <code>eurostat</code> package comes with a list of euro area countries. This is very useful when you only want to download data for euro area countries.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>ctr <span style="color:#f92672">&lt;-</span> <span style="color:#e6db74">&#34;AT&#34;</span>
-</span></span></code></pre></div><p>We use real GDP in million EUR.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>unemp <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">get_eurostat</span>(id <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;une_rt_m&#34;</span>,
-</span></span><span style="display:flex;"><span>                      filters <span style="color:#f92672">=</span> <span style="color:#a6e22e">list</span>(s_adj <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;NSA&#34;</span>, <span style="color:#e6db74">&#34;SA&#34;</span>),
-</span></span><span style="display:flex;"><span>                                     geo <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;AT&#34;</span>),
-</span></span><span style="display:flex;"><span>                      stringsAsFactors <span style="color:#f92672">=</span> <span style="color:#66d9ef">FALSE</span>) <span style="color:#f92672">%&gt;%</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">filter</span>(<span style="color:#f92672">!</span><span style="color:#a6e22e">is.na</span>(values)) <span style="color:#75715e"># Drop NAs</span>
-</span></span></code></pre></div><h3 id="unemployment">Unemployment</h3>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>temp <span style="color:#f92672">&lt;-</span> unemp <span style="color:#f92672">%&gt;%</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">filter</span>(s_adj <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;NSA&#34;</span>,
-</span></span><span style="display:flex;"><span>         sex <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;T&#34;</span>,
-</span></span><span style="display:flex;"><span>         age <span style="color:#f92672">%in%</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;Y25-74&#34;</span>, <span style="color:#e6db74">&#34;Y_LT25&#34;</span>),
-</span></span><span style="display:flex;"><span>         unit <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;THS_PER&#34;</span>,
-</span></span><span style="display:flex;"><span>         time <span style="color:#f92672">&gt;=</span> <span style="color:#e6db74">&#34;2019-01-01&#34;</span>)
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">ggplot</span>(temp, <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> time, y <span style="color:#f92672">=</span> values, fill <span style="color:#f92672">=</span> age)) <span style="color:#f92672">+</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">geom_col</span>()
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>temp <span style="color:#f92672">&lt;-</span> unemp <span style="color:#f92672">%&gt;%</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">filter</span>(s_adj <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;NSA&#34;</span>,
-</span></span><span style="display:flex;"><span>         sex <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;T&#34;</span>,
-</span></span><span style="display:flex;"><span>         age <span style="color:#f92672">%in%</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;Y25-74&#34;</span>, <span style="color:#e6db74">&#34;Y_LT25&#34;</span>),
-</span></span><span style="display:flex;"><span>         unit <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;PC_ACT&#34;</span>,
-</span></span><span style="display:flex;"><span>         time <span style="color:#f92672">&gt;=</span> <span style="color:#e6db74">&#34;2019-01-01&#34;</span>)
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">ggplot</span>(temp, <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> time, y <span style="color:#f92672">=</span> values, colour <span style="color:#f92672">=</span> age)) <span style="color:#f92672">+</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">geom_line</span>()
-</span></span></code></pre></div><p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">ctr <span style="color:#f92672">&lt;-</span> <span style="color:#e6db74">&#34;AT&#34;</span>
+</code></pre></div><p>We use real GDP in million EUR.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">unemp <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">get_eurostat</span>(id <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;une_rt_m&#34;</span>,
+                      filters <span style="color:#f92672">=</span> <span style="color:#a6e22e">list</span>(s_adj <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;NSA&#34;</span>, <span style="color:#e6db74">&#34;SA&#34;</span>),
+                                     geo <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;AT&#34;</span>),
+                      stringsAsFactors <span style="color:#f92672">=</span> <span style="color:#66d9ef">FALSE</span>) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">filter</span>(<span style="color:#f92672">!</span><span style="color:#a6e22e">is.na</span>(values)) <span style="color:#75715e"># Drop NAs</span>
+</code></pre></div><h3 id="unemployment">Unemployment</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">temp <span style="color:#f92672">&lt;-</span> unemp <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">filter</span>(s_adj <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;NSA&#34;</span>,
+         sex <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;T&#34;</span>,
+         age <span style="color:#f92672">%in%</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;Y25-74&#34;</span>, <span style="color:#e6db74">&#34;Y_LT25&#34;</span>),
+         unit <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;THS_PER&#34;</span>,
+         time <span style="color:#f92672">&gt;=</span> <span style="color:#e6db74">&#34;2019-01-01&#34;</span>)
+
+<span style="color:#a6e22e">ggplot</span>(temp, <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> time, y <span style="color:#f92672">=</span> values, fill <span style="color:#f92672">=</span> age)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_col</span>()
+
+temp <span style="color:#f92672">&lt;-</span> unemp <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">filter</span>(s_adj <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;NSA&#34;</span>,
+         sex <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;T&#34;</span>,
+         age <span style="color:#f92672">%in%</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;Y25-74&#34;</span>, <span style="color:#e6db74">&#34;Y_LT25&#34;</span>),
+         unit <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;PC_ACT&#34;</span>,
+         time <span style="color:#f92672">&gt;=</span> <span style="color:#e6db74">&#34;2019-01-01&#34;</span>)
+
+<span style="color:#a6e22e">ggplot</span>(temp, <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> time, y <span style="color:#f92672">=</span> values, colour <span style="color:#f92672">=</span> age)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_line</span>()
+</code></pre></div><p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
                     </section>
                 </article>
                  <div class="container">
@@ -226,6 +226,7 @@ if (!doNotTrack) {
 	ga('send', 'pageview');
 }
 </script>
+
     </body>
 </html>
 

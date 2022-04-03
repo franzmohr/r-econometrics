@@ -6,7 +6,11 @@
     <description>Recent content in global-value-chain on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 20 May 2019 00:00:00 +0000</lastBuildDate><atom:link href="https://www.r-econometrics.com/tags/global-value-chain/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 20 May 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://www.r-econometrics.com/tags/global-value-chain/index.xml" rel="self" type="application/rss+xml" />
+    
+    
     <item>
       <title>Reproduction: Timmer, M. P., Dietzenbacher, E., Los, B., Stehrer, R., &amp; De Vries, G. J. (2015). An illustrated user guide to the world input–output database: the case of global automotive production.</title>
       <link>https://www.r-econometrics.com/reproduction/2015_timmer_wiod/</link>

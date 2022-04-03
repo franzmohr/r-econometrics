@@ -6,7 +6,11 @@
     <description>Recent content in trade on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 30 Jan 2018 00:00:00 +0000</lastBuildDate><atom:link href="https://www.r-econometrics.com/tags/trade/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 30 Jan 2018 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://www.r-econometrics.com/tags/trade/index.xml" rel="self" type="application/rss+xml" />
+    
+    
     <item>
       <title>Reproduction: Sheperd, B. (2016). The gravity model of international trade: A user guide.</title>
       <link>https://www.r-econometrics.com/reproduction/2016_sheperd_gravity/</link>

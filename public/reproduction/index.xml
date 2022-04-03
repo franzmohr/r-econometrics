@@ -6,7 +6,11 @@
     <description>Recent content in Reproductions on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 25 Dec 2019 00:00:00 +0000</lastBuildDate><atom:link href="https://www.r-econometrics.com/reproduction/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 25 Dec 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://www.r-econometrics.com/reproduction/index.xml" rel="self" type="application/rss+xml" />
+    
+    
     <item>
       <title>Chapter 11: Monte Carlo Integration</title>
       <link>https://www.r-econometrics.com/reproduction/bayesmethods/bayesmethods11/</link>
