@@ -6,14 +6,27 @@
     <description>Recent content on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 03 Apr 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://www.r-econometrics.com/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 11 Sep 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://www.r-econometrics.com/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Bayesian Inference of Structural Vector Autoregressions (SVAR) with the `bvartools` package</title>
+      <link>https://www.r-econometrics.com/timeseries/bayes-svar-intro/</link>
+      <pubDate>Mon, 11 Sep 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/timeseries/bayes-svar-intro/</guid>
+      <description>The bvartools allows to perform Bayesian inference of Vector autoregressive (VAR) models, including structural VARs. This post guides through the Bayesian inference of SVAR models in R using the bvartools package.
+Data For this illustration we generate an artificial data set with three endogenous variables, which follows the data generating process
+\[y_t = A_1 y_{t - 1} + B \epsilon_t,\]
+where
+\[ A_1 = \begin{bmatrix} 0.3 &amp;amp; 0.12 &amp;amp; 0.</description>
+    </item>
+    
     <item>
       <title>Decomposing Inflation for EA Countries</title>
       <link>https://www.r-econometrics.com/2022/04/03/decomposing-inflation-for-ea-countries/</link>
       <pubDate>Sun, 03 Apr 2022 00:00:00 +0000</pubDate>
       
       <guid>https://www.r-econometrics.com/2022/04/03/decomposing-inflation-for-ea-countries/</guid>
-      <description>As a result of supply chain disruptions due to the Covid-19 pandemic and the recent war in the Ukraine inflation has reached unusually high levels during the past months.A first approach to analyse the evolution of inflation over time is to look at its main components: energy, food, services and industrial goods. To do this, I use data from Eurostat, which can be easily loaded into R using the eurostat package for countries of the European Union.</description>
+      <description>As a result of supply chain disruptions due to the Covid-19 pandemic and the recent war in the Ukraine inflation has reached unusually high levels during the past months. A first approach to analyse the evolution of inflation over time is to look at its main components: energy, food, services and industrial goods. To do this, I use data from Eurostat, which can be easily loaded into R using the eurostat package for countries of the European Union.</description>
     </item>
     
     <item>
@@ -89,7 +102,7 @@ To illustrate this concept, let’s look at quarterly data on disposable income 
       
       <guid>https://www.r-econometrics.com/networks/igraph/</guid>
       <description>There are multiple packages for the analysis of networks in R. This page concentrates on the igraph package, which allows for a broad range of applications. But before we get into it in more detail, it is useful to know that there are two possible ways to represent the edges, i.e. the connections, of a network:
- Adjacency matrix: This is a square matrix, where each row and column corresponds to an entity.</description>
+Adjacency matrix: This is a square matrix, where each row and column corresponds to an entity.</description>
     </item>
     
     <item>
@@ -99,7 +112,7 @@ To illustrate this concept, let’s look at quarterly data on disposable income 
       
       <guid>https://www.r-econometrics.com/networksintro/</guid>
       <description> With the increasing availability of granular data on the relationships between individual entities - such as persons (social media), countries (internatinal trade) and financial institutions (supervisory reporting) - network analysis offers many possibilities to extract useful information from such data. This section provides brief introductions to the analysis of network data in R.
- Basics of the igraph package Summary statistics with the igraph Network visualisation with ggraph  </description>
+Basics of the igraph package Summary statistics with the igraph Network visualisation with ggraph </description>
     </item>
     
     <item>
@@ -128,7 +141,7 @@ When using ggplot2 the main challenge in the visualisation of networks is to fin
       
       <guid>https://www.r-econometrics.com/_mlintro/</guid>
       <description> With the increasing availability of computational capabilities and granular data, machine learning has become more important.
-Classification  Neural networks Random forests Support vector machines (SVM)   </description>
+Classification Neural networks Random forests Support vector machines (SVM) </description>
     </item>
     
     <item>
@@ -148,7 +161,7 @@ Classification  Neural networks Random forests Support vector machines (SVM)   <
       <guid>https://www.r-econometrics.com/reproduction/bayesmethods/bayesmethods20/</guid>
       <description>Load required packages
 library(bvartools) library(dplyr) library(ggplot2) library(spam) library(tidyr) Data US macro data until 2007Q4
-# Specify URL url &amp;lt;- &amp;quot;https://web.ics.purdue.edu/~jltobias/second_edition/Chapter20/code_for_exercise_1/US_macrodata.csv&amp;quot; # Load data us_macro_2007 &amp;lt;- read.csv(url, col.names = c(&amp;quot;date&amp;quot;, &amp;quot;Dp&amp;quot;, &amp;quot;u&amp;quot;, &amp;quot;r&amp;quot;)) # Omit NA values us_macro_2007 &amp;lt;- na.omit(us_macro_2007) # Transform into time-series object us_macro_2007 &amp;lt;- ts(us_macro_2007[, -1], start = c(1959, 2), frequency = 4)  Exercise 20.1 Prepare the data
+# Specify URL url &amp;lt;- &amp;quot;https://web.ics.purdue.edu/~jltobias/second_edition/Chapter20/code_for_exercise_1/US_macrodata.csv&amp;quot; # Load data us_macro_2007 &amp;lt;- read.csv(url, col.names = c(&amp;quot;date&amp;quot;, &amp;quot;Dp&amp;quot;, &amp;quot;u&amp;quot;, &amp;quot;r&amp;quot;)) # Omit NA values us_macro_2007 &amp;lt;- na.omit(us_macro_2007) # Transform into time-series object us_macro_2007 &amp;lt;- ts(us_macro_2007[, -1], start = c(1959, 2), frequency = 4) Exercise 20.1 Prepare the data
 temp &amp;lt;- gen_var(us_macro_2007, p = 2, deterministic = &amp;quot;const&amp;quot;) y &amp;lt;- temp$Y x &amp;lt;- temp$Z k &amp;lt;- NROW(y) tt &amp;lt;- ncol(y) z &amp;lt;- kronecker(t(x), diag(1, k)) m &amp;lt;- ncol(z) Specify the priors</description>
     </item>
     
@@ -167,7 +180,7 @@ temp &amp;lt;- gen_var(us_macro_2007, p = 2, deterministic = &amp;quot;const&amp
       <pubDate>Sun, 01 Dec 2019 00:00:00 +0000</pubDate>
       
       <guid>https://www.r-econometrics.com/reproduction/bayesmethods/bayesmethods18/</guid>
-      <description>Exercise 18.1: The local level model Data: US PCE inflation until 2015Q4 # Specify URL url &amp;lt;- &amp;quot;https://web.ics.purdue.edu/~jltobias/second_edition/Chapter18/code_for_exercise_1/USPCE_2015Q4.csv&amp;quot; # Load data pce &amp;lt;- read.csv(url, header = FALSE, col.names = &amp;quot;pci&amp;quot;) # Log growth rates pce &amp;lt;- diff(ts(log(pce), start = 1959, frequency = 4)) # Rescale y &amp;lt;- matrix(pce * 100 * 4, 1) tt &amp;lt;- ncol(y) # T z &amp;lt;- diag(1, tt) # Data matrix  Estimation Prior
+      <description>Exercise 18.1: The local level model Data: US PCE inflation until 2015Q4 # Specify URL url &amp;lt;- &amp;quot;https://web.ics.purdue.edu/~jltobias/second_edition/Chapter18/code_for_exercise_1/USPCE_2015Q4.csv&amp;quot; # Load data pce &amp;lt;- read.csv(url, header = FALSE, col.names = &amp;quot;pci&amp;quot;) # Log growth rates pce &amp;lt;- diff(ts(log(pce), start = 1959, frequency = 4)) # Rescale y &amp;lt;- matrix(pce * 100 * 4, 1) tt &amp;lt;- ncol(y) # T z &amp;lt;- diag(1, tt) # Data matrix Estimation Prior
 a0 &amp;lt;- 5 b0 &amp;lt;- 100 Initial values</description>
     </item>
     
@@ -214,7 +227,7 @@ a0 &amp;lt;- 5 b0 &amp;lt;- 100 Initial values</description>
       
       <guid>https://www.r-econometrics.com/rbasicsintro/</guid>
       <description>This section should help you to
- get R and RStudio started on your computer understand the structure of the program prepare your workspace for an analysis import data, get help and some more important vocabulary manipulate data with the dplyr package create graphics with the ggplot2 package.  Recently, I have finished the first version of a below 30 pages introduction to R. It uses an exemplary workflow to explain some basics of the language and the application of the packages dplyr, ggplot2 and openxlsx.</description>
+get R and RStudio started on your computer understand the structure of the program prepare your workspace for an analysis import data, get help and some more important vocabulary manipulate data with the dplyr package create graphics with the ggplot2 package. Recently, I have finished the first version of a below 30 pages introduction to R. It uses an exemplary workflow to explain some basics of the language and the application of the packages dplyr, ggplot2 and openxlsx.</description>
     </item>
     
     <item>
@@ -246,7 +259,7 @@ a0 &amp;lt;- 5 b0 &amp;lt;- 100 Initial values</description>
       
       <guid>https://www.r-econometrics.com/timeseries/bvec/</guid>
       <description>Introduction This post provides the code to set up and estimate a basic Bayesian vector error correction (BVEC) model with the bvartools package. The presented Gibbs sampler is based on the approach of Koop et al. (2010), who propose a prior on the cointegration space.
- Data To illustrate the estimation process, the dataset E6 from Lütkepohl (2007) is used, which contains data on German long-term interest rates and inflation from 1972Q2 to 1998Q4.</description>
+Data To illustrate the estimation process, the dataset E6 from Lütkepohl (2007) is used, which contains data on German long-term interest rates and inflation from 1972Q2 to 1998Q4.</description>
     </item>
     
     <item>
@@ -275,7 +288,7 @@ Codeschool: R-Tutorials
 Endmemo: R-Tutorials
 Wikibook on R Programming
 Wikibook on R Programming
- Data Financial portfolio and benchmark data provided by Kenneth R.</description>
+Data Financial portfolio and benchmark data provided by Kenneth R.</description>
     </item>
     
     <item>
@@ -471,7 +484,7 @@ The data sets are from the wooldridge package, which is a collection of all data
       <pubDate>Sat, 04 Aug 2018 00:00:00 +0000</pubDate>
       
       <guid>https://www.r-econometrics.com/timeseriesintro/</guid>
-      <description>Work in progress (April 2021). I will try to update this page over the next few months.
+      <description>Work in progress (September 2023). I will try to update this page over the next few months.
 This section is intended to provide an overview of the relevant issues in (macro)economic time series analysis. Again the standard disclaimer: This site does not replace a good textbook, but it should help you to get a grasp of the basic concepts more quickly than if you learned it on your own.</description>
     </item>
     
@@ -579,7 +592,8 @@ ggplot graphs are built with some kind of blocks, which usually start with the f
       
       <guid>https://www.r-econometrics.com/rbasics/installation/</guid>
       <description>For this introduction I recommend to install two software packages on your system:
- R: The software, which does all the calculations. RStudio: The working environment, where all the code will developed.  Note that the instructions of this section were written for a standard installation on a private computer. If you work on a corporate machine, the installation could be different due to different IT requirements of your company.</description>
+R: The software, which does all the calculations. RStudio: The working environment, where all the code will developed. Note that the instructions of this section were written for a standard installation on a private computer. If you work on a corporate machine, the installation could be different due to different IT requirements of your company.
+Installing R A proper installation of R is the prerequisite of everything that will follow.</description>
     </item>
     
     <item>
@@ -599,7 +613,7 @@ rm(list = ls()) setwd(&amp;quot;C:/path/to/the/working/directory&amp;quot;) libr
       
       <guid>https://www.r-econometrics.com/reproduction/2016_sheperd_gravity/</guid>
       <description>The updated paper and dataset can be downloaded from UNESCAP.
-Load libraries and read data library(AER) library(dplyr) library(foreign) library(ggplot2) library(lmtest) library(multiwayvcov) library(sampleSelection) data &amp;lt;- read.dta(&amp;quot;servicesdataset_2016.dta&amp;quot;)  Correlations Table 1
+Load libraries and read data library(AER) library(dplyr) library(foreign) library(ggplot2) library(lmtest) library(multiwayvcov) library(sampleSelection) data &amp;lt;- read.dta(&amp;quot;servicesdataset_2016.dta&amp;quot;) Correlations Table 1
 data &amp;lt;- data %&amp;gt;% mutate(ln_trade = log(trade), ln_distance = log(dist), ln_gdp_exp = log(gdp_exp), ln_gdp_imp = log(gdp_imp)) cor.data &amp;lt;- data %&amp;gt;% filter(sector == &amp;quot;SER&amp;quot;) %&amp;gt;% select(ln_trade, ln_gdp_exp, ln_gdp_imp, ln_distance) %&amp;gt;% na.omit %&amp;gt;% filter(ln_trade &amp;gt; -Inf) round(cor(cor.data), 4) ## ln_trade ln_gdp_exp ln_gdp_imp ln_distance ## ln_trade 1.</description>
     </item>
     

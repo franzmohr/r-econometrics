@@ -24,7 +24,7 @@
       <guid>https://www.r-econometrics.com/reproduction/bayesmethods/bayesmethods20/</guid>
       <description>Load required packages
 library(bvartools) library(dplyr) library(ggplot2) library(spam) library(tidyr) Data US macro data until 2007Q4
-# Specify URL url &amp;lt;- &amp;quot;https://web.ics.purdue.edu/~jltobias/second_edition/Chapter20/code_for_exercise_1/US_macrodata.csv&amp;quot; # Load data us_macro_2007 &amp;lt;- read.csv(url, col.names = c(&amp;quot;date&amp;quot;, &amp;quot;Dp&amp;quot;, &amp;quot;u&amp;quot;, &amp;quot;r&amp;quot;)) # Omit NA values us_macro_2007 &amp;lt;- na.omit(us_macro_2007) # Transform into time-series object us_macro_2007 &amp;lt;- ts(us_macro_2007[, -1], start = c(1959, 2), frequency = 4)  Exercise 20.1 Prepare the data
+# Specify URL url &amp;lt;- &amp;quot;https://web.ics.purdue.edu/~jltobias/second_edition/Chapter20/code_for_exercise_1/US_macrodata.csv&amp;quot; # Load data us_macro_2007 &amp;lt;- read.csv(url, col.names = c(&amp;quot;date&amp;quot;, &amp;quot;Dp&amp;quot;, &amp;quot;u&amp;quot;, &amp;quot;r&amp;quot;)) # Omit NA values us_macro_2007 &amp;lt;- na.omit(us_macro_2007) # Transform into time-series object us_macro_2007 &amp;lt;- ts(us_macro_2007[, -1], start = c(1959, 2), frequency = 4) Exercise 20.1 Prepare the data
 temp &amp;lt;- gen_var(us_macro_2007, p = 2, deterministic = &amp;quot;const&amp;quot;) y &amp;lt;- temp$Y x &amp;lt;- temp$Z k &amp;lt;- NROW(y) tt &amp;lt;- ncol(y) z &amp;lt;- kronecker(t(x), diag(1, k)) m &amp;lt;- ncol(z) Specify the priors</description>
     </item>
     
@@ -34,7 +34,7 @@ temp &amp;lt;- gen_var(us_macro_2007, p = 2, deterministic = &amp;quot;const&amp
       <pubDate>Sun, 01 Dec 2019 00:00:00 +0000</pubDate>
       
       <guid>https://www.r-econometrics.com/reproduction/bayesmethods/bayesmethods18/</guid>
-      <description>Exercise 18.1: The local level model Data: US PCE inflation until 2015Q4 # Specify URL url &amp;lt;- &amp;quot;https://web.ics.purdue.edu/~jltobias/second_edition/Chapter18/code_for_exercise_1/USPCE_2015Q4.csv&amp;quot; # Load data pce &amp;lt;- read.csv(url, header = FALSE, col.names = &amp;quot;pci&amp;quot;) # Log growth rates pce &amp;lt;- diff(ts(log(pce), start = 1959, frequency = 4)) # Rescale y &amp;lt;- matrix(pce * 100 * 4, 1) tt &amp;lt;- ncol(y) # T z &amp;lt;- diag(1, tt) # Data matrix  Estimation Prior
+      <description>Exercise 18.1: The local level model Data: US PCE inflation until 2015Q4 # Specify URL url &amp;lt;- &amp;quot;https://web.ics.purdue.edu/~jltobias/second_edition/Chapter18/code_for_exercise_1/USPCE_2015Q4.csv&amp;quot; # Load data pce &amp;lt;- read.csv(url, header = FALSE, col.names = &amp;quot;pci&amp;quot;) # Log growth rates pce &amp;lt;- diff(ts(log(pce), start = 1959, frequency = 4)) # Rescale y &amp;lt;- matrix(pce * 100 * 4, 1) tt &amp;lt;- ncol(y) # T z &amp;lt;- diag(1, tt) # Data matrix Estimation Prior
 a0 &amp;lt;- 5 b0 &amp;lt;- 100 Initial values</description>
     </item>
     
@@ -243,7 +243,7 @@ rm(list = ls()) setwd(&amp;quot;C:/path/to/the/working/directory&amp;quot;) libr
       
       <guid>https://www.r-econometrics.com/reproduction/2016_sheperd_gravity/</guid>
       <description>The updated paper and dataset can be downloaded from UNESCAP.
-Load libraries and read data library(AER) library(dplyr) library(foreign) library(ggplot2) library(lmtest) library(multiwayvcov) library(sampleSelection) data &amp;lt;- read.dta(&amp;quot;servicesdataset_2016.dta&amp;quot;)  Correlations Table 1
+Load libraries and read data library(AER) library(dplyr) library(foreign) library(ggplot2) library(lmtest) library(multiwayvcov) library(sampleSelection) data &amp;lt;- read.dta(&amp;quot;servicesdataset_2016.dta&amp;quot;) Correlations Table 1
 data &amp;lt;- data %&amp;gt;% mutate(ln_trade = log(trade), ln_distance = log(dist), ln_gdp_exp = log(gdp_exp), ln_gdp_imp = log(gdp_imp)) cor.data &amp;lt;- data %&amp;gt;% filter(sector == &amp;quot;SER&amp;quot;) %&amp;gt;% select(ln_trade, ln_gdp_exp, ln_gdp_imp, ln_distance) %&amp;gt;% na.omit %&amp;gt;% filter(ln_trade &amp;gt; -Inf) round(cor(cor.data), 4) ## ln_trade ln_gdp_exp ln_gdp_imp ln_distance ## ln_trade 1.</description>
     </item>
     

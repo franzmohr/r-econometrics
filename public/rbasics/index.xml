@@ -60,7 +60,8 @@ ggplot graphs are built with some kind of blocks, which usually start with the f
       
       <guid>https://www.r-econometrics.com/rbasics/installation/</guid>
       <description>For this introduction I recommend to install two software packages on your system:
- R: The software, which does all the calculations. RStudio: The working environment, where all the code will developed.  Note that the instructions of this section were written for a standard installation on a private computer. If you work on a corporate machine, the installation could be different due to different IT requirements of your company.</description>
+R: The software, which does all the calculations. RStudio: The working environment, where all the code will developed. Note that the instructions of this section were written for a standard installation on a private computer. If you work on a corporate machine, the installation could be different due to different IT requirements of your company.
+Installing R A proper installation of R is the prerequisite of everything that will follow.</description>
     </item>
     
   </channel>

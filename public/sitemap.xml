@@ -2,19 +2,49 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://www.r-econometrics.com/2022/04/03/decomposing-inflation-for-ea-countries/</loc>
-    <lastmod>2022-04-03T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://www.r-econometrics.com/post/</loc>
-    <lastmod>2022-04-03T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://www.r-econometrics.com/</loc>
-    <lastmod>2022-04-03T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://www.r-econometrics.com/timeseries/dynamicfactorintro/</loc>
-    <lastmod>2021-04-25T00:00:00+00:00</lastmod>
+    <loc>https://www.r-econometrics.com/timeseries/bayes-svar-intro/</loc>
+    <lastmod>2023-09-11T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://www.r-econometrics.com/tags/bvartools/</loc>
+    <lastmod>2023-09-11T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://www.r-econometrics.com/categories/</loc>
+    <lastmod>2023-09-11T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://www.r-econometrics.com/tags/r/</loc>
+    <lastmod>2023-09-11T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://www.r-econometrics.com/categories/r/</loc>
+    <lastmod>2023-09-11T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://www.r-econometrics.com/</loc>
+    <lastmod>2023-09-11T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://www.r-econometrics.com/tags/svar/</loc>
+    <lastmod>2023-09-11T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://www.r-econometrics.com/tags/</loc>
+    <lastmod>2023-09-11T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://www.r-econometrics.com/timeseries/</loc>
+    <lastmod>2023-09-11T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://www.r-econometrics.com/tags/var/</loc>
+    <lastmod>2023-09-11T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://www.r-econometrics.com/categories/var/</loc>
+    <lastmod>2023-09-11T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://www.r-econometrics.com/tags/vector-autoregression/</loc>
+    <lastmod>2023-09-11T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://www.r-econometrics.com/2022/04/03/decomposing-inflation-for-ea-countries/</loc>
+    <lastmod>2022-04-04T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://www.r-econometrics.com/post/</loc>
+    <lastmod>2022-04-04T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://www.r-econometrics.com/timeseries/dynamicfactorintro/</loc>
     <lastmod>2021-04-25T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://www.r-econometrics.com/tags/dfm/</loc>
@@ -22,15 +52,6 @@
   </url><url>
     <loc>https://www.r-econometrics.com/tags/dynamic-factor-models/</loc>
     <lastmod>2021-04-25T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://www.r-econometrics.com/tags/r/</loc>
-    <lastmod>2022-03-19T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://www.r-econometrics.com/tags/</loc>
-    <lastmod>2022-03-19T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://www.r-econometrics.com/timeseries/</loc>
-    <lastmod>2022-03-19T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://www.r-econometrics.com/tags/armadillo/</loc>
     <lastmod>2020-08-16T00:00:00+00:00</lastmod>
@@ -44,25 +65,7 @@
     <loc>https://www.r-econometrics.com/timeseries/bayesnotes/</loc>
     <lastmod>2020-08-16T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://www.r-econometrics.com/tags/var/</loc>
-    <lastmod>2022-03-19T00:00:00+00:00</lastmod>
-  </url><url>
     <loc>https://www.r-econometrics.com/timeseries/svarintro/</loc>
-    <lastmod>2022-03-19T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://www.r-econometrics.com/categories/</loc>
-    <lastmod>2022-03-19T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://www.r-econometrics.com/categories/r/</loc>
-    <lastmod>2022-03-19T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://www.r-econometrics.com/tags/svar/</loc>
-    <lastmod>2022-03-19T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://www.r-econometrics.com/categories/var/</loc>
-    <lastmod>2022-03-19T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://www.r-econometrics.com/tags/vector-autoregression/</loc>
     <lastmod>2022-03-19T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://www.r-econometrics.com/timeseries/stationarity/</loc>
@@ -119,10 +122,10 @@
     <loc>https://www.r-econometrics.com/tags/network-analysis/</loc>
     <lastmod>2020-03-01T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://www.r-econometrics.com/networks/</loc>
+    <loc>https://www.r-econometrics.com/tags/networks/</loc>
     <lastmod>2020-03-01T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://www.r-econometrics.com/tags/networks/</loc>
+    <loc>https://www.r-econometrics.com/networks/</loc>
     <lastmod>2020-03-01T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://www.r-econometrics.com/_mlintro/</loc>
@@ -189,7 +192,7 @@
     <lastmod>2019-07-22T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://www.r-econometrics.com/tags/vec/</loc>
-    <lastmod>2021-04-25T00:00:00+00:00</lastmod>
+    <lastmod>2023-09-11T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://www.r-econometrics.com/timeseries/bvar/</loc>
     <lastmod>2019-07-07T00:00:00+00:00</lastmod>
@@ -198,7 +201,7 @@
     <lastmod>2019-07-07T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://www.r-econometrics.com/tags/bvar/</loc>
-    <lastmod>2021-04-25T00:00:00+00:00</lastmod>
+    <lastmod>2023-09-11T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://www.r-econometrics.com/tags/gibbs-sampler/</loc>
     <lastmod>2019-07-07T00:00:00+00:00</lastmod>
@@ -207,10 +210,10 @@
     <lastmod>2019-06-11T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://www.r-econometrics.com/tags/bvec/</loc>
-    <lastmod>2021-04-25T00:00:00+00:00</lastmod>
+    <lastmod>2023-09-11T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://www.r-econometrics.com/tags/ssvs/</loc>
-    <lastmod>2021-04-25T00:00:00+00:00</lastmod>
+    <lastmod>2023-09-11T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://www.r-econometrics.com/timeseries/ssvs/</loc>
     <lastmod>2019-06-11T00:00:00+00:00</lastmod>
@@ -333,13 +336,13 @@
     <lastmod>2018-08-31T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://www.r-econometrics.com/tags/bayesian/</loc>
-    <lastmod>2021-04-25T00:00:00+00:00</lastmod>
+    <lastmod>2023-09-11T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://www.r-econometrics.com/timeseriesintro/</loc>
-    <lastmod>2021-04-25T00:00:00+00:00</lastmod>
+    <lastmod>2023-09-11T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://www.r-econometrics.com/tags/timeseries/</loc>
-    <lastmod>2021-04-25T00:00:00+00:00</lastmod>
+    <lastmod>2023-09-11T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://www.r-econometrics.com/rbasics/rstructure/</loc>
     <lastmod>2018-07-20T00:00:00+00:00</lastmod>

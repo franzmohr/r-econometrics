@@ -14,7 +14,7 @@
       
       <guid>https://www.r-econometrics.com/networks/igraph/</guid>
       <description>There are multiple packages for the analysis of networks in R. This page concentrates on the igraph package, which allows for a broad range of applications. But before we get into it in more detail, it is useful to know that there are two possible ways to represent the edges, i.e. the connections, of a network:
- Adjacency matrix: This is a square matrix, where each row and column corresponds to an entity.</description>
+Adjacency matrix: This is a square matrix, where each row and column corresponds to an entity.</description>
     </item>
     
     <item>

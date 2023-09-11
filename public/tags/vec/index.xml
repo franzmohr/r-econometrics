@@ -23,7 +23,7 @@
       
       <guid>https://www.r-econometrics.com/timeseries/bvec/</guid>
       <description>Introduction This post provides the code to set up and estimate a basic Bayesian vector error correction (BVEC) model with the bvartools package. The presented Gibbs sampler is based on the approach of Koop et al. (2010), who propose a prior on the cointegration space.
- Data To illustrate the estimation process, the dataset E6 from Lütkepohl (2007) is used, which contains data on German long-term interest rates and inflation from 1972Q2 to 1998Q4.</description>
+Data To illustrate the estimation process, the dataset E6 from Lütkepohl (2007) is used, which contains data on German long-term interest rates and inflation from 1972Q2 to 1998Q4.</description>
     </item>
     
     <item>
@@ -32,7 +32,7 @@
       <pubDate>Sat, 04 Aug 2018 00:00:00 +0000</pubDate>
       
       <guid>https://www.r-econometrics.com/timeseriesintro/</guid>
-      <description>Work in progress (April 2021). I will try to update this page over the next few months.
+      <description>Work in progress (September 2023). I will try to update this page over the next few months.
 This section is intended to provide an overview of the relevant issues in (macro)economic time series analysis. Again the standard disclaimer: This site does not replace a good textbook, but it should help you to get a grasp of the basic concepts more quickly than if you learned it on your own.</description>
     </item>
     

@@ -93,7 +93,7 @@
                             <time class="li-article-date">January, 30, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/2016_sheperd_gravity/">Reproduction: Sheperd, B. (2016). The gravity model of international trade: A user guide.</a></h4>
                             The updated paper and dataset can be downloaded from UNESCAP.
-Load libraries and read data library(AER) library(dplyr) library(foreign) library(ggplot2) library(lmtest) library(multiwayvcov) library(sampleSelection) data &lt;- read.dta(&quot;servicesdataset_2016.dta&quot;)  Correlations Table 1
+Load libraries and read data library(AER) library(dplyr) library(foreign) library(ggplot2) library(lmtest) library(multiwayvcov) library(sampleSelection) data &lt;- read.dta(&quot;servicesdataset_2016.dta&quot;) Correlations Table 1
 data &lt;- data %&gt;% mutate(ln_trade = log(trade), ln_distance = log(dist), ln_gdp_exp = log(gdp_exp), ln_gdp_imp = log(gdp_imp)) cor.data &lt;- data %&gt;% filter(sector == &quot;SER&quot;) %&gt;% select(ln_trade, ln_gdp_exp, ln_gdp_imp, ln_distance) %&gt;% na.omit %&gt;% filter(ln_trade &gt; -Inf) round(cor(cor.data), 4) ## ln_trade ln_gdp_exp ln_gdp_imp ln_distance ## ln_trade 1.
                         </li>
                     

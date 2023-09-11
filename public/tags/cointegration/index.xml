@@ -33,7 +33,7 @@ To illustrate this concept, let’s look at quarterly data on disposable income 
       
       <guid>https://www.r-econometrics.com/timeseries/bvec/</guid>
       <description>Introduction This post provides the code to set up and estimate a basic Bayesian vector error correction (BVEC) model with the bvartools package. The presented Gibbs sampler is based on the approach of Koop et al. (2010), who propose a prior on the cointegration space.
- Data To illustrate the estimation process, the dataset E6 from Lütkepohl (2007) is used, which contains data on German long-term interest rates and inflation from 1972Q2 to 1998Q4.</description>
+Data To illustrate the estimation process, the dataset E6 from Lütkepohl (2007) is used, which contains data on German long-term interest rates and inflation from 1972Q2 to 1998Q4.</description>
     </item>
     
   </channel>

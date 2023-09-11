@@ -6,7 +6,20 @@
     <description>Recent content in svar on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 13 Aug 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://www.r-econometrics.com/tags/svar/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 11 Sep 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://www.r-econometrics.com/tags/svar/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Bayesian Inference of Structural Vector Autoregressions (SVAR) with the `bvartools` package</title>
+      <link>https://www.r-econometrics.com/timeseries/bayes-svar-intro/</link>
+      <pubDate>Mon, 11 Sep 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/timeseries/bayes-svar-intro/</guid>
+      <description>The bvartools allows to perform Bayesian inference of Vector autoregressive (VAR) models, including structural VARs. This post guides through the Bayesian inference of SVAR models in R using the bvartools package.
+Data For this illustration we generate an artificial data set with three endogenous variables, which follows the data generating process
+\[y_t = A_1 y_{t - 1} + B \epsilon_t,\]
+where
+\[ A_1 = \begin{bmatrix} 0.3 &amp;amp; 0.12 &amp;amp; 0.</description>
+    </item>
+    
     <item>
       <title>An Introduction to Structural Vector Autoregression (SVAR)</title>
       <link>https://www.r-econometrics.com/timeseries/svarintro/</link>

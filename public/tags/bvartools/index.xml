@@ -6,7 +6,20 @@
     <description>Recent content in bvartools on r-econometrics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 25 Apr 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://www.r-econometrics.com/tags/bvartools/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 11 Sep 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://www.r-econometrics.com/tags/bvartools/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Bayesian Inference of Structural Vector Autoregressions (SVAR) with the `bvartools` package</title>
+      <link>https://www.r-econometrics.com/timeseries/bayes-svar-intro/</link>
+      <pubDate>Mon, 11 Sep 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.r-econometrics.com/timeseries/bayes-svar-intro/</guid>
+      <description>The bvartools allows to perform Bayesian inference of Vector autoregressive (VAR) models, including structural VARs. This post guides through the Bayesian inference of SVAR models in R using the bvartools package.
+Data For this illustration we generate an artificial data set with three endogenous variables, which follows the data generating process
+\[y_t = A_1 y_{t - 1} + B \epsilon_t,\]
+where
+\[ A_1 = \begin{bmatrix} 0.3 &amp;amp; 0.12 &amp;amp; 0.</description>
+    </item>
+    
     <item>
       <title>An Introduction to Dynamic Factor Models</title>
       <link>https://www.r-econometrics.com/timeseries/dynamicfactorintro/</link>
@@ -38,7 +51,7 @@ where \(x_t\) is an \(M\)-dimensional vector of observable variables, \(f_t\) is
       
       <guid>https://www.r-econometrics.com/timeseries/bvec/</guid>
       <description>Introduction This post provides the code to set up and estimate a basic Bayesian vector error correction (BVEC) model with the bvartools package. The presented Gibbs sampler is based on the approach of Koop et al. (2010), who propose a prior on the cointegration space.
- Data To illustrate the estimation process, the dataset E6 from Lütkepohl (2007) is used, which contains data on German long-term interest rates and inflation from 1972Q2 to 1998Q4.</description>
+Data To illustrate the estimation process, the dataset E6 from Lütkepohl (2007) is used, which contains data on German long-term interest rates and inflation from 1972Q2 to 1998Q4.</description>
     </item>
     
     <item>

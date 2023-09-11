@@ -14,7 +14,7 @@
       
       <guid>https://www.r-econometrics.com/reproduction/2016_sheperd_gravity/</guid>
       <description>The updated paper and dataset can be downloaded from UNESCAP.
-Load libraries and read data library(AER) library(dplyr) library(foreign) library(ggplot2) library(lmtest) library(multiwayvcov) library(sampleSelection) data &amp;lt;- read.dta(&amp;quot;servicesdataset_2016.dta&amp;quot;)  Correlations Table 1
+Load libraries and read data library(AER) library(dplyr) library(foreign) library(ggplot2) library(lmtest) library(multiwayvcov) library(sampleSelection) data &amp;lt;- read.dta(&amp;quot;servicesdataset_2016.dta&amp;quot;) Correlations Table 1
 data &amp;lt;- data %&amp;gt;% mutate(ln_trade = log(trade), ln_distance = log(dist), ln_gdp_exp = log(gdp_exp), ln_gdp_imp = log(gdp_imp)) cor.data &amp;lt;- data %&amp;gt;% filter(sector == &amp;quot;SER&amp;quot;) %&amp;gt;% select(ln_trade, ln_gdp_exp, ln_gdp_imp, ln_distance) %&amp;gt;% na.omit %&amp;gt;% filter(ln_trade &amp;gt; -Inf) round(cor(cor.data), 4) ## ln_trade ln_gdp_exp ln_gdp_imp ln_distance ## ln_trade 1.</description>
     </item>
     

@@ -14,7 +14,7 @@
       
       <guid>https://www.r-econometrics.com/networksintro/</guid>
       <description> With the increasing availability of granular data on the relationships between individual entities - such as persons (social media), countries (internatinal trade) and financial institutions (supervisory reporting) - network analysis offers many possibilities to extract useful information from such data. This section provides brief introductions to the analysis of network data in R.
- Basics of the igraph package Summary statistics with the igraph Network visualisation with ggraph  </description>
+Basics of the igraph package Summary statistics with the igraph Network visualisation with ggraph </description>
     </item>
     
   </channel>
