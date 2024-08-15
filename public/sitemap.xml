@@ -5,6 +5,9 @@
     <loc>https://www.r-econometrics.com/</loc>
     <lastmod>2024-08-30T00:00:00+00:00</lastmod>
   </url><url>
+    <loc>https://www.r-econometrics.com/index_dummy/</loc>
+    <lastmod>2024-08-15T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>https://www.r-econometrics.com/timeseries/bayes-svar-intro/</loc>
     <lastmod>2023-09-11T00:00:00+00:00</lastmod>
   </url><url>
@@ -400,7 +403,5 @@
   </url><url>
     <loc>https://www.r-econometrics.com/about/</loc>
     <lastmod>2018-01-15T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://www.r-econometrics.com/index_dummy/</loc>
   </url>
 </urlset>

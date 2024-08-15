@@ -6,8 +6,15 @@
     <description>Recent content on r-econometrics</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 11 Sep 2023 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 15 Aug 2024 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://www.r-econometrics.com/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>r-econometrics</title>
+      <link>https://www.r-econometrics.com/index_dummy/</link>
+      <pubDate>Thu, 15 Aug 2024 00:00:00 +0000</pubDate>
+      <guid>https://www.r-econometrics.com/index_dummy/</guid>
+      <description>You want to learn the basics of the R programming language and how to use the software for econometric analyses? Great! This site could be useful for you. It is about learning how to use the free statistical software R for basic econometric applications and shall provide an intuition of the basic structure of the program and statistical functions, which are needed to pass introductory or intermediate courses in econometrics.</description>
+    </item>
     <item>
       <title>Bayesian Inference of Structural Vector Autoregressions (SVAR) with the `bvartools` package</title>
       <link>https://www.r-econometrics.com/timeseries/bayes-svar-intro/</link>
@@ -434,13 +441,6 @@
       <pubDate>Mon, 15 Jan 2018 00:00:00 +0000</pubDate>
       <guid>https://www.r-econometrics.com/about/</guid>
       <description>My name is Franz Mohr and I am an Austrian graduate from Johannes Kepler University Linz, where I also worked as a TA at the department of economics (public finance and macro-related fields). After working for the Oesterreichische Nationalbank (OeNB) - the Austrian central bank - I am currently employed at the Austrian Financial Market Authority (FMA).&#xA;Disclaimer: The opinions expressed on this website are those of the author and do not necessarily reflect the official viewpoint of the Austrian Financial Market Authority.</description>
-    </item>
-    <item>
-      <title></title>
-      <link>https://www.r-econometrics.com/index_dummy/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://www.r-econometrics.com/index_dummy/</guid>
-      <description>&lt;!DOCTYPE html&gt; r-econometrics r-econometrics Franz X. Mohr 2024-08-15 You want to learn the basics of the R programming language and how to use the software for econometric analyses? Great! This site could be useful for you. It is about learning how to use the free statistical software R for basic econometric applications and shall provide an intuition of the basic structure of the program and statistical functions, which are needed to pass introductory or intermediate courses in econometrics.</description>
     </item>
   </channel>
 </rss>
