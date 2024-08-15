@@ -1,21 +1,19 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>gvc on r-econometrics</title>
+    <title>Gvc on r-econometrics</title>
     <link>https://www.r-econometrics.com/tags/gvc/</link>
-    <description>Recent content in gvc on r-econometrics</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <description>Recent content in Gvc on r-econometrics</description>
+    <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 20 May 2019 00:00:00 +0000</lastBuildDate><atom:link href="https://www.r-econometrics.com/tags/gvc/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 20 May 2019 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://www.r-econometrics.com/tags/gvc/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Reproduction: Timmer, M. P., Dietzenbacher, E., Los, B., Stehrer, R., &amp; De Vries, G. J. (2015). An illustrated user guide to the world input–output database: the case of global automotive production.</title>
       <link>https://www.r-econometrics.com/reproduction/2015_timmer_wiod/</link>
       <pubDate>Mon, 20 May 2019 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/reproduction/2015_timmer_wiod/</guid>
-      <description>As international trade has become increasingly fragmented over the past decades the analysis of global value chains (GVC) has gained popularity in economic research. This post reproduces Timmer et al. (2015), who introduce the world input-output database (WIOD) and present basic concepts of GVC analysis.
-Data Timmer et al. (2015) use the 2013 vintage of the world input-output database (WIOD). The following code downloads the data from the project’s website, unzips it and loads the resulting STATA file into R using the readstata13 package.</description>
+      <description>As international trade has become increasingly fragmented over the past decades the analysis of global value chains (GVC) has gained popularity in economic research. This post reproduces Timmer et al. (2015), who introduce the world input-output database (WIOD) and present basic concepts of GVC analysis.&#xA;Data Timmer et al. (2015) use the 2013 vintage of the world input-output database (WIOD). The following code downloads the data from the project’s website, unzips it and loads the resulting STATA file into R using the readstata13 package.</description>
     </item>
-    
   </channel>
 </rss>

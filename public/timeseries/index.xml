@@ -4,128 +4,93 @@
     <title>Timeseries on r-econometrics</title>
     <link>https://www.r-econometrics.com/timeseries/</link>
     <description>Recent content in Timeseries on r-econometrics</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 11 Sep 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://www.r-econometrics.com/timeseries/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 11 Sep 2023 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://www.r-econometrics.com/timeseries/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Bayesian Inference of Structural Vector Autoregressions (SVAR) with the `bvartools` package</title>
       <link>https://www.r-econometrics.com/timeseries/bayes-svar-intro/</link>
       <pubDate>Mon, 11 Sep 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/timeseries/bayes-svar-intro/</guid>
-      <description>The bvartools allows to perform Bayesian inference of Vector autoregressive (VAR) models, including structural VARs. This post guides through the Bayesian inference of SVAR models in R using the bvartools package.
-Data For this illustration we generate an artificial data set with three endogenous variables, which follows the data generating process
-\[y_t = A_1 y_{t - 1} + B \epsilon_t,\]
-where
-\[ A_1 = \begin{bmatrix} 0.3 &amp;amp; 0.12 &amp;amp; 0.</description>
+      <description>The bvartools allows to perform Bayesian inference of Vector autoregressive (VAR) models, including structural VARs. This post guides through the Bayesian inference of SVAR models in R using the bvartools package.&#xA;Data For this illustration we generate an artificial data set with three endogenous variables, which follows the data generating process&#xA;\[y_t = A_1 y_{t - 1} + B \epsilon_t,\]&#xA;where&#xA;\[ A_1 = \begin{bmatrix} 0.3 &amp;amp; 0.12 &amp;amp; 0.</description>
     </item>
-    
     <item>
       <title>An Introduction to Dynamic Factor Models</title>
       <link>https://www.r-econometrics.com/timeseries/dynamicfactorintro/</link>
       <pubDate>Sun, 25 Apr 2021 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/timeseries/dynamicfactorintro/</guid>
-      <description>Introduction For some macroeconomic applications it might be interesting to see whether a set of obserable variables depends on common drivers. The estimation of such common factors can be done using so-called factor analytical models, which have the form
-\[x_t = \lambda f_t + u_t,\]
-where \(x_t\) is an \(M\)-dimensional vector of observable variables, \(f_t\) is an \(N \times 1\) vector of unobserved factors, \(\lambda\) is an \(M \times N\) matrix of factor loadings and \(u_t\) is an error term.</description>
+      <description>Introduction For some macroeconomic applications it might be interesting to see whether a set of obserable variables depends on common drivers. The estimation of such common factors can be done using so-called factor analytical models, which have the form&#xA;\[x_t = \lambda f_t + u_t,\]&#xA;where \(x_t\) is an \(M\)-dimensional vector of observable variables, \(f_t\) is an \(N \times 1\) vector of unobserved factors, \(\lambda\) is an \(M \times N\) matrix of factor loadings and \(u_t\) is an error term.</description>
     </item>
-    
     <item>
       <title>Short Notes on Bayesian Inference of Vector Autoregressive Models</title>
       <link>https://www.r-econometrics.com/timeseries/bayesnotes/</link>
       <pubDate>Sun, 16 Aug 2020 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/timeseries/bayesnotes/</guid>
       <description>During the past years I realised that econometric analyis can be understood as a craft. You learn your basics at school from more or less motivated/talented professors and then you are sent out into wild, where you are confronted with real life challenges that differ from the stylised exmples you have become used to during your studies. This comes with a bunch new insights that I want to document on this page.</description>
     </item>
-    
     <item>
       <title>An Introduction to Structural Vector Autoregression (SVAR)</title>
       <link>https://www.r-econometrics.com/timeseries/svarintro/</link>
       <pubDate>Thu, 13 Aug 2020 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/timeseries/svarintro/</guid>
       <description>Vector autoregressive (VAR) models constitute a rather general approach to modelling multivariate time series. A critical drawback of those models in their standard form is their missing ability to describe contemporaneous relationships between the analysed variables. This becomes a central issue in the impulse response analysis for such models, where it is important to know the contemporaneous effects of a shock to the economy. Usually, researchers address this by using orthogonal impulse responses, where the correlation between the errors is obtained from the (lower) Cholesky decomposition of the error covariance matrix.</description>
     </item>
-    
     <item>
       <title>An Introduction to Stationarity and Unit Roots in Time Series Analysis</title>
       <link>https://www.r-econometrics.com/timeseries/stationarity/</link>
       <pubDate>Sun, 09 Aug 2020 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/timeseries/stationarity/</guid>
-      <description>Concepts Basically stationarity means that a time series has a constant mean and constant variance over time. Althouth not particularly imporant for the estimation of parameters of econometric models these features are essential for the calculation of reliable test statistics and, hence, can have a significant impact on model selection.
-To illustrate this concept, let’s look at quarterly data on disposable income in billion DM from 1960 to 1982, which is data set E1 from Luetkepohl (2007).</description>
+      <description>Concepts Basically stationarity means that a time series has a constant mean and constant variance over time. Althouth not particularly imporant for the estimation of parameters of econometric models these features are essential for the calculation of reliable test statistics and, hence, can have a significant impact on model selection.&#xA;To illustrate this concept, let’s look at quarterly data on disposable income in billion DM from 1960 to 1982, which is data set E1 from Luetkepohl (2007).</description>
     </item>
-    
     <item>
       <title>An Introduction to Impulse Response Analysis of VAR Models</title>
       <link>https://www.r-econometrics.com/timeseries/irf/</link>
       <pubDate>Sat, 21 Mar 2020 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/timeseries/irf/</guid>
       <description>Impulse response analysis is an important step in econometric analyes, which employ vector autoregressive models. Their main purpose is to describe the evolution of a model’s variables in reaction to a shock in one or more variables. This feature allows to trace the transmission of a single shock within an otherwise noisy system of equations and, thus, makes them very useful tools in the assessment of economic policies. This post provides an introduction to the concept and interpretation of impulse response functions as they are commonly used in the VAR literature and provides code for their calculation in R.</description>
     </item>
-    
     <item>
       <title>An Introduction to Vector Error Correction Models (VECMs)</title>
       <link>https://www.r-econometrics.com/timeseries/vecintro/</link>
       <pubDate>Mon, 22 Jul 2019 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/timeseries/vecintro/</guid>
       <description>One of the prerequisits for the estimation of a vector autoregressive (VAR) model is that the analysed time series are stationary. However, economic theory suggests that there exist equilibrium relations between economic variables in their levels, which can render these variables stationary without taking differences. This is called cointegration. Since knowing the size of such relationships can improve the results of an analysis, it would be desireable to have an econometric model, which is able to capture them.</description>
     </item>
-    
     <item>
       <title>An Introduction to Bayesian VAR (BVAR) Models</title>
       <link>https://www.r-econometrics.com/timeseries/bvar/</link>
       <pubDate>Sun, 07 Jul 2019 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/timeseries/bvar/</guid>
-      <description>
-
-
-&lt;p&gt;Bayesian methods have significantly gained in popularity during the last decades as computers have become more powerful and new software has been developed. Their flexibility and other advantageous features have made these methods also more popular in econometrics. This post gives a brief introduction to Bayesian VAR (BVAR) models and provides the code to set up and estimate a basic model with the &lt;a href=&#34;https://cran.r-project.org/package=bvartools&#34;&gt;&lt;code&gt;bvartools&lt;/code&gt;&lt;/a&gt; package.&lt;/p&gt;
-</description>
+      <description>&#xA;&#xA;&#xA;&lt;p&gt;Bayesian methods have significantly gained in popularity during the last decades as computers have become more powerful and new software has been developed. Their flexibility and other advantageous features have made these methods also more popular in econometrics. This post gives a brief introduction to Bayesian VAR (BVAR) models and provides the code to set up and estimate a basic model with the &lt;a href=&#34;https://cran.r-project.org/package=bvartools&#34;&gt;&lt;code&gt;bvartools&lt;/code&gt;&lt;/a&gt; package.&lt;/p&gt;&#xA;</description>
     </item>
-    
     <item>
       <title>Bayesian Error Correction Models with Priors on the Cointegration Space</title>
       <link>https://www.r-econometrics.com/timeseries/bvec/</link>
       <pubDate>Tue, 11 Jun 2019 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/timeseries/bvec/</guid>
-      <description>Introduction This post provides the code to set up and estimate a basic Bayesian vector error correction (BVEC) model with the bvartools package. The presented Gibbs sampler is based on the approach of Koop et al. (2010), who propose a prior on the cointegration space.
-Data To illustrate the estimation process, the dataset E6 from Lütkepohl (2007) is used, which contains data on German long-term interest rates and inflation from 1972Q2 to 1998Q4.</description>
+      <description>Introduction This post provides the code to set up and estimate a basic Bayesian vector error correction (BVEC) model with the bvartools package. The presented Gibbs sampler is based on the approach of Koop et al. (2010), who propose a prior on the cointegration space.&#xA;Data To illustrate the estimation process, the dataset E6 from Lütkepohl (2007) is used, which contains data on German long-term interest rates and inflation from 1972Q2 to 1998Q4.</description>
     </item>
-    
     <item>
       <title>Stochastic Search Variable Selection</title>
       <link>https://www.r-econometrics.com/timeseries/ssvs/</link>
       <pubDate>Tue, 11 Jun 2019 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/timeseries/ssvs/</guid>
       <description>Introduction A general drawback of vector autoregressive (VAR) models is that the number of estimated coefficients increases disproportionately with the number of lags. Therefore, fewer information per parameter is available for the estimation as the number of lags increases. In the Bayesian VAR literature one approach to mitigate this so-called curse of dimensionality is stochastic search variable selection (SSVS) as proposed by George et al. (2008). The basic idea of SSVS is to assign commonly used prior variances to parameters, which should be included in a model, and prior variances close to zero to irrelevant parameters.</description>
     </item>
-    
     <item>
       <title>Extracting Cyclical Components From Economic Time Series</title>
       <link>https://www.r-econometrics.com/timeseries/economic-cycle-extraction/</link>
       <pubDate>Thu, 27 Dec 2018 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/timeseries/economic-cycle-extraction/</guid>
       <description>The analysis of economic time series often requires the extraction of their cyclical components. This post presents some methods, which can be used to decompose time series into their different components. It is based on the chapter on business cycles by Stock and Watson (1999) in the Handbook of Macroeconomics, but also presents some more recent methods like Hamilton’s (2018) alternative to the HP-filter, wavelet filtering and empirical mode decomposition.</description>
     </item>
-    
     <item>
       <title>An Introduction to Vector Autoregression (VAR)</title>
       <link>https://www.r-econometrics.com/timeseries/varintro/</link>
       <pubDate>Fri, 31 Aug 2018 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/timeseries/varintro/</guid>
       <description>Since the seminal paper of Sims (1980) vector autoregressive models have become a key instrument in macroeconomic research. This post presents the basic concept of VAR analysis and guides through the estimation procedure of a simple model. When I started my undergraduate program in economics I occasionally encountered the abbreviation VAR in some macro papers. I was fascinated by those waves in the boxes titled impulse responses and wondered how difficult it would be to do such reseach on my own.</description>
     </item>
-    
   </channel>
 </rss>

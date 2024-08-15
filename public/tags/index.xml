@@ -4,557 +4,436 @@
     <title>Tags on r-econometrics</title>
     <link>https://www.r-econometrics.com/tags/</link>
     <description>Recent content in Tags on r-econometrics</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 11 Sep 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://www.r-econometrics.com/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 11 Sep 2023 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://www.r-econometrics.com/tags/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>bvartools</title>
+      <title>Bvartools</title>
       <link>https://www.r-econometrics.com/tags/bvartools/</link>
       <pubDate>Mon, 11 Sep 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/bvartools/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>r</title>
+      <title>R</title>
       <link>https://www.r-econometrics.com/tags/r/</link>
       <pubDate>Mon, 11 Sep 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/r/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>svar</title>
+      <title>Svar</title>
       <link>https://www.r-econometrics.com/tags/svar/</link>
       <pubDate>Mon, 11 Sep 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/svar/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>var</title>
+      <title>Var</title>
       <link>https://www.r-econometrics.com/tags/var/</link>
       <pubDate>Mon, 11 Sep 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/var/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>vector autoregression</title>
+      <title>Vector Autoregression</title>
       <link>https://www.r-econometrics.com/tags/vector-autoregression/</link>
       <pubDate>Mon, 11 Sep 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/vector-autoregression/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>dfm</title>
+      <title>Dfm</title>
       <link>https://www.r-econometrics.com/tags/dfm/</link>
       <pubDate>Sun, 25 Apr 2021 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/dfm/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>dynamic factor models</title>
+      <title>Dynamic Factor Models</title>
       <link>https://www.r-econometrics.com/tags/dynamic-factor-models/</link>
       <pubDate>Sun, 25 Apr 2021 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/dynamic-factor-models/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>armadillo</title>
+      <title>Armadillo</title>
       <link>https://www.r-econometrics.com/tags/armadillo/</link>
       <pubDate>Sun, 16 Aug 2020 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/armadillo/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>bayes</title>
+      <title>Bayes</title>
       <link>https://www.r-econometrics.com/tags/bayes/</link>
       <pubDate>Sun, 16 Aug 2020 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/bayes/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>rcpp</title>
+      <title>Rcpp</title>
       <link>https://www.r-econometrics.com/tags/rcpp/</link>
       <pubDate>Sun, 16 Aug 2020 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/rcpp/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>cointegration</title>
+      <title>Cointegration</title>
       <link>https://www.r-econometrics.com/tags/cointegration/</link>
       <pubDate>Sun, 09 Aug 2020 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/cointegration/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>stationarity</title>
+      <title>Stationarity</title>
       <link>https://www.r-econometrics.com/tags/stationarity/</link>
       <pubDate>Sun, 09 Aug 2020 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/stationarity/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>time-series</title>
+      <title>Time-Series</title>
       <link>https://www.r-econometrics.com/tags/time-series/</link>
       <pubDate>Sun, 09 Aug 2020 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/time-series/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>unit-root</title>
+      <title>Unit-Root</title>
       <link>https://www.r-econometrics.com/tags/unit-root/</link>
       <pubDate>Sun, 09 Aug 2020 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/unit-root/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>irf</title>
+      <title>Irf</title>
       <link>https://www.r-econometrics.com/tags/irf/</link>
       <pubDate>Sat, 21 Mar 2020 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/irf/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>vars</title>
+      <title>Vars</title>
       <link>https://www.r-econometrics.com/tags/vars/</link>
       <pubDate>Sat, 21 Mar 2020 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/vars/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>ggraph</title>
+      <title>Ggraph</title>
       <link>https://www.r-econometrics.com/tags/ggraph/</link>
       <pubDate>Sun, 01 Mar 2020 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/ggraph/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>igraph</title>
+      <title>Igraph</title>
       <link>https://www.r-econometrics.com/tags/igraph/</link>
       <pubDate>Sun, 01 Mar 2020 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/igraph/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>network</title>
+      <title>Network</title>
       <link>https://www.r-econometrics.com/tags/network/</link>
       <pubDate>Sun, 01 Mar 2020 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/network/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>network-analysis</title>
+      <title>Network-Analysis</title>
       <link>https://www.r-econometrics.com/tags/network-analysis/</link>
       <pubDate>Sun, 01 Mar 2020 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/network-analysis/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>networks</title>
+      <title>Networks</title>
       <link>https://www.r-econometrics.com/tags/networks/</link>
       <pubDate>Sun, 01 Mar 2020 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/networks/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>F-test</title>
+      <title>F-Test</title>
       <link>https://www.r-econometrics.com/tags/f-test/</link>
       <pubDate>Mon, 25 Nov 2019 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/f-test/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>hausman-test</title>
+      <title>Hausman-Test</title>
       <link>https://www.r-econometrics.com/tags/hausman-test/</link>
       <pubDate>Mon, 25 Nov 2019 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/hausman-test/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>normality-test</title>
+      <title>Normality-Test</title>
       <link>https://www.r-econometrics.com/tags/normality-test/</link>
       <pubDate>Mon, 25 Nov 2019 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/normality-test/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>t-test</title>
+      <title>T-Test</title>
       <link>https://www.r-econometrics.com/tags/t-test/</link>
       <pubDate>Mon, 25 Nov 2019 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/t-test/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>dplyr</title>
+      <title>Dplyr</title>
       <link>https://www.r-econometrics.com/tags/dplyr/</link>
       <pubDate>Mon, 07 Oct 2019 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/dplyr/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>tsDyn</title>
+      <title>TsDyn</title>
       <link>https://www.r-econometrics.com/tags/tsdyn/</link>
       <pubDate>Mon, 22 Jul 2019 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/tsdyn/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>urca</title>
+      <title>Urca</title>
       <link>https://www.r-econometrics.com/tags/urca/</link>
       <pubDate>Mon, 22 Jul 2019 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/urca/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>vec</title>
+      <title>Vec</title>
       <link>https://www.r-econometrics.com/tags/vec/</link>
       <pubDate>Mon, 22 Jul 2019 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/vec/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>bayesian-var</title>
+      <title>Bayesian-Var</title>
       <link>https://www.r-econometrics.com/tags/bayesian-var/</link>
       <pubDate>Sun, 07 Jul 2019 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/bayesian-var/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>bvar</title>
+      <title>Bvar</title>
       <link>https://www.r-econometrics.com/tags/bvar/</link>
       <pubDate>Sun, 07 Jul 2019 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/bvar/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>gibbs-sampler</title>
+      <title>Gibbs-Sampler</title>
       <link>https://www.r-econometrics.com/tags/gibbs-sampler/</link>
       <pubDate>Sun, 07 Jul 2019 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/gibbs-sampler/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>bvec</title>
+      <title>Bvec</title>
       <link>https://www.r-econometrics.com/tags/bvec/</link>
       <pubDate>Tue, 11 Jun 2019 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/bvec/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>ssvs</title>
+      <title>Ssvs</title>
       <link>https://www.r-econometrics.com/tags/ssvs/</link>
       <pubDate>Tue, 11 Jun 2019 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/ssvs/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>global-value-chain</title>
+      <title>Global-Value-Chain</title>
       <link>https://www.r-econometrics.com/tags/global-value-chain/</link>
       <pubDate>Mon, 20 May 2019 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/global-value-chain/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>gvc</title>
+      <title>Gvc</title>
       <link>https://www.r-econometrics.com/tags/gvc/</link>
       <pubDate>Mon, 20 May 2019 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/gvc/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>leontief-decomposition</title>
+      <title>Leontief-Decomposition</title>
       <link>https://www.r-econometrics.com/tags/leontief-decomposition/</link>
       <pubDate>Mon, 20 May 2019 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/leontief-decomposition/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>growth-accounting</title>
+      <title>Growth-Accounting</title>
       <link>https://www.r-econometrics.com/tags/growth-accounting/</link>
       <pubDate>Sun, 30 Dec 2018 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/growth-accounting/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>pwt</title>
+      <title>Pwt</title>
       <link>https://www.r-econometrics.com/tags/pwt/</link>
       <pubDate>Sun, 30 Dec 2018 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/pwt/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>solow-residual</title>
+      <title>Solow-Residual</title>
       <link>https://www.r-econometrics.com/tags/solow-residual/</link>
       <pubDate>Sun, 30 Dec 2018 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/solow-residual/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>text-mining</title>
+      <title>Text-Mining</title>
       <link>https://www.r-econometrics.com/tags/text-mining/</link>
       <pubDate>Sun, 30 Dec 2018 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/text-mining/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>wordcloud</title>
+      <title>Wordcloud</title>
       <link>https://www.r-econometrics.com/tags/wordcloud/</link>
       <pubDate>Sun, 30 Dec 2018 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/wordcloud/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>baxter-king</title>
+      <title>Baxter-King</title>
       <link>https://www.r-econometrics.com/tags/baxter-king/</link>
       <pubDate>Thu, 27 Dec 2018 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/baxter-king/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>business-cycles</title>
+      <title>Business-Cycles</title>
       <link>https://www.r-econometrics.com/tags/business-cycles/</link>
       <pubDate>Thu, 27 Dec 2018 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/business-cycles/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>detrend</title>
+      <title>Detrend</title>
       <link>https://www.r-econometrics.com/tags/detrend/</link>
       <pubDate>Thu, 27 Dec 2018 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/detrend/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>emd</title>
+      <title>Emd</title>
       <link>https://www.r-econometrics.com/tags/emd/</link>
       <pubDate>Thu, 27 Dec 2018 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/emd/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>empirical-mode-decomposition</title>
+      <title>Empirical-Mode-Decomposition</title>
       <link>https://www.r-econometrics.com/tags/empirical-mode-decomposition/</link>
       <pubDate>Thu, 27 Dec 2018 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/empirical-mode-decomposition/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>hamilton</title>
+      <title>Hamilton</title>
       <link>https://www.r-econometrics.com/tags/hamilton/</link>
       <pubDate>Thu, 27 Dec 2018 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/hamilton/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>hodrick-prescott</title>
+      <title>Hodrick-Prescott</title>
       <link>https://www.r-econometrics.com/tags/hodrick-prescott/</link>
       <pubDate>Thu, 27 Dec 2018 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/hodrick-prescott/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>hp-filter</title>
+      <title>Hp-Filter</title>
       <link>https://www.r-econometrics.com/tags/hp-filter/</link>
       <pubDate>Thu, 27 Dec 2018 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/hp-filter/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>wavelet</title>
+      <title>Wavelet</title>
       <link>https://www.r-econometrics.com/tags/wavelet/</link>
       <pubDate>Thu, 27 Dec 2018 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/wavelet/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>heteroskedasticity</title>
+      <title>Heteroskedasticity</title>
       <link>https://www.r-econometrics.com/tags/heteroskedasticity/</link>
       <pubDate>Mon, 24 Dec 2018 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/heteroskedasticity/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>robust-error</title>
+      <title>Robust-Error</title>
       <link>https://www.r-econometrics.com/tags/robust-error/</link>
       <pubDate>Mon, 24 Dec 2018 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/robust-error/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>bayesian</title>
+      <title>Bayesian</title>
       <link>https://www.r-econometrics.com/tags/bayesian/</link>
       <pubDate>Sat, 04 Aug 2018 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/bayesian/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>timeseries</title>
+      <title>Timeseries</title>
       <link>https://www.r-econometrics.com/tags/timeseries/</link>
       <pubDate>Sat, 04 Aug 2018 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/timeseries/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>instrumental-variables</title>
+      <title>Instrumental-Variables</title>
       <link>https://www.r-econometrics.com/tags/instrumental-variables/</link>
       <pubDate>Tue, 06 Feb 2018 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/instrumental-variables/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>iv</title>
+      <title>Iv</title>
       <link>https://www.r-econometrics.com/tags/iv/</link>
       <pubDate>Tue, 06 Feb 2018 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/iv/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>ggplot2</title>
+      <title>Ggplot2</title>
       <link>https://www.r-econometrics.com/tags/ggplot2/</link>
       <pubDate>Sun, 04 Feb 2018 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/ggplot2/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>graphics</title>
+      <title>Graphics</title>
       <link>https://www.r-econometrics.com/tags/graphics/</link>
       <pubDate>Sun, 04 Feb 2018 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/graphics/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>gravity</title>
+      <title>Gravity</title>
       <link>https://www.r-econometrics.com/tags/gravity/</link>
       <pubDate>Tue, 30 Jan 2018 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/gravity/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>trade</title>
+      <title>Trade</title>
       <link>https://www.r-econometrics.com/tags/trade/</link>
       <pubDate>Tue, 30 Jan 2018 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/tags/trade/</guid>
       <description></description>
     </item>
-    
   </channel>
 </rss>

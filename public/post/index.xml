@@ -4,53 +4,44 @@
     <title>Posts on r-econometrics</title>
     <link>https://www.r-econometrics.com/post/</link>
     <description>Recent content in Posts on r-econometrics</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 03 Apr 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://www.r-econometrics.com/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 04 Apr 2022 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://www.r-econometrics.com/post/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Decomposing Inflation for EA Countries</title>
       <link>https://www.r-econometrics.com/2022/04/03/decomposing-inflation-for-ea-countries/</link>
       <pubDate>Sun, 03 Apr 2022 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/2022/04/03/decomposing-inflation-for-ea-countries/</guid>
       <description>As a result of supply chain disruptions due to the Covid-19 pandemic and the recent war in the Ukraine inflation has reached unusually high levels during the past months. A first approach to analyse the evolution of inflation over time is to look at its main components: energy, food, services and industrial goods. To do this, I use data from Eurostat, which can be easily loaded into R using the eurostat package for countries of the European Union.</description>
     </item>
-    
     <item>
       <title>Producing a labour market dashboard using Eurostat data</title>
       <link>https://www.r-econometrics.com/2020/04/19/producing-a-labour-market-dashboard-using-eurostat-data/</link>
       <pubDate>Sun, 19 Apr 2020 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/2020/04/19/producing-a-labour-market-dashboard-using-eurostat-data/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>An Introduction to Network Analysis in R</title>
       <link>https://www.r-econometrics.com/2020/03/01/an-introduction-to-network-analysis-in-r/</link>
       <pubDate>Sun, 01 Mar 2020 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/2020/03/01/an-introduction-to-network-analysis-in-r/</guid>
       <description>With the increasing availability of granular data on the relationships between individual entities - such as persons (social media), countries (internatinal trade) and financial institutions (supervisory reporting) - network analysis offers many possibilities to extract useful information from such data. This post provides an introduction to network analysis in R using the powerful igraph package for the calculation of metrics and ggraph for visualisation. It marks the beginning of a more comprehensive treatment of network analysis on r-econometrics.</description>
     </item>
-    
     <item>
       <title>An Exercise in Growth Accounting</title>
       <link>https://www.r-econometrics.com/2018/12/30/an-exercise-in-growth-accounting/</link>
       <pubDate>Sun, 30 Dec 2018 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/2018/12/30/an-exercise-in-growth-accounting/</guid>
       <description>&lt;p&gt;The discipline of growth accounting tries to assess the relative contribution of labour, capital and technology to the economic growth of a country. This post provides a short theoretical introduction to the concept of growth accounting and uses Penn World Table data to calculate total factor productivity (TFP) growth rates for a series of countries using the simple Solow-method.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>William Shakespeare&#39;s Work in a Word Cloud</title>
       <link>https://www.r-econometrics.com/2018/12/30/william-shakespeares-work-in-a-word-cloud/</link>
       <pubDate>Sun, 30 Dec 2018 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/2018/12/30/william-shakespeares-work-in-a-word-cloud/</guid>
       <description>&lt;p&gt;Word or tag clouds seem to be quite popular at the moment. Although their analytical power might be limited, they do serve an aesthetic purpose and, for example, could be put on the cover page of a thesis or a presentation using the content of your work or the literature you went through. This post uses text data from the Gutenberg project to give a step-by-step introduction on how to create a wordcould in R.&lt;/p&gt;</description>
     </item>
-    
   </channel>
 </rss>

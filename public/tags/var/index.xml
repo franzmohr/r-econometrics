@@ -1,92 +1,68 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>var on r-econometrics</title>
+    <title>Var on r-econometrics</title>
     <link>https://www.r-econometrics.com/tags/var/</link>
-    <description>Recent content in var on r-econometrics</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <description>Recent content in Var on r-econometrics</description>
+    <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 11 Sep 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://www.r-econometrics.com/tags/var/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 11 Sep 2023 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://www.r-econometrics.com/tags/var/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Bayesian Inference of Structural Vector Autoregressions (SVAR) with the `bvartools` package</title>
       <link>https://www.r-econometrics.com/timeseries/bayes-svar-intro/</link>
       <pubDate>Mon, 11 Sep 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/timeseries/bayes-svar-intro/</guid>
-      <description>The bvartools allows to perform Bayesian inference of Vector autoregressive (VAR) models, including structural VARs. This post guides through the Bayesian inference of SVAR models in R using the bvartools package.
-Data For this illustration we generate an artificial data set with three endogenous variables, which follows the data generating process
-\[y_t = A_1 y_{t - 1} + B \epsilon_t,\]
-where
-\[ A_1 = \begin{bmatrix} 0.3 &amp;amp; 0.12 &amp;amp; 0.</description>
+      <description>The bvartools allows to perform Bayesian inference of Vector autoregressive (VAR) models, including structural VARs. This post guides through the Bayesian inference of SVAR models in R using the bvartools package.&#xA;Data For this illustration we generate an artificial data set with three endogenous variables, which follows the data generating process&#xA;\[y_t = A_1 y_{t - 1} + B \epsilon_t,\]&#xA;where&#xA;\[ A_1 = \begin{bmatrix} 0.3 &amp;amp; 0.12 &amp;amp; 0.</description>
     </item>
-    
     <item>
       <title>Short Notes on Bayesian Inference of Vector Autoregressive Models</title>
       <link>https://www.r-econometrics.com/timeseries/bayesnotes/</link>
       <pubDate>Sun, 16 Aug 2020 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/timeseries/bayesnotes/</guid>
       <description>During the past years I realised that econometric analyis can be understood as a craft. You learn your basics at school from more or less motivated/talented professors and then you are sent out into wild, where you are confronted with real life challenges that differ from the stylised exmples you have become used to during your studies. This comes with a bunch new insights that I want to document on this page.</description>
     </item>
-    
     <item>
       <title>An Introduction to Structural Vector Autoregression (SVAR)</title>
       <link>https://www.r-econometrics.com/timeseries/svarintro/</link>
       <pubDate>Thu, 13 Aug 2020 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/timeseries/svarintro/</guid>
       <description>Vector autoregressive (VAR) models constitute a rather general approach to modelling multivariate time series. A critical drawback of those models in their standard form is their missing ability to describe contemporaneous relationships between the analysed variables. This becomes a central issue in the impulse response analysis for such models, where it is important to know the contemporaneous effects of a shock to the economy. Usually, researchers address this by using orthogonal impulse responses, where the correlation between the errors is obtained from the (lower) Cholesky decomposition of the error covariance matrix.</description>
     </item>
-    
     <item>
       <title>An Introduction to Impulse Response Analysis of VAR Models</title>
       <link>https://www.r-econometrics.com/timeseries/irf/</link>
       <pubDate>Sat, 21 Mar 2020 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/timeseries/irf/</guid>
       <description>Impulse response analysis is an important step in econometric analyes, which employ vector autoregressive models. Their main purpose is to describe the evolution of a model’s variables in reaction to a shock in one or more variables. This feature allows to trace the transmission of a single shock within an otherwise noisy system of equations and, thus, makes them very useful tools in the assessment of economic policies. This post provides an introduction to the concept and interpretation of impulse response functions as they are commonly used in the VAR literature and provides code for their calculation in R.</description>
     </item>
-    
     <item>
       <title>An Introduction to Bayesian VAR (BVAR) Models</title>
       <link>https://www.r-econometrics.com/timeseries/bvar/</link>
       <pubDate>Sun, 07 Jul 2019 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/timeseries/bvar/</guid>
-      <description>
-
-
-&lt;p&gt;Bayesian methods have significantly gained in popularity during the last decades as computers have become more powerful and new software has been developed. Their flexibility and other advantageous features have made these methods also more popular in econometrics. This post gives a brief introduction to Bayesian VAR (BVAR) models and provides the code to set up and estimate a basic model with the &lt;a href=&#34;https://cran.r-project.org/package=bvartools&#34;&gt;&lt;code&gt;bvartools&lt;/code&gt;&lt;/a&gt; package.&lt;/p&gt;
-</description>
+      <description>&#xA;&#xA;&#xA;&lt;p&gt;Bayesian methods have significantly gained in popularity during the last decades as computers have become more powerful and new software has been developed. Their flexibility and other advantageous features have made these methods also more popular in econometrics. This post gives a brief introduction to Bayesian VAR (BVAR) models and provides the code to set up and estimate a basic model with the &lt;a href=&#34;https://cran.r-project.org/package=bvartools&#34;&gt;&lt;code&gt;bvartools&lt;/code&gt;&lt;/a&gt; package.&lt;/p&gt;&#xA;</description>
     </item>
-    
     <item>
       <title>Stochastic Search Variable Selection</title>
       <link>https://www.r-econometrics.com/timeseries/ssvs/</link>
       <pubDate>Tue, 11 Jun 2019 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/timeseries/ssvs/</guid>
       <description>Introduction A general drawback of vector autoregressive (VAR) models is that the number of estimated coefficients increases disproportionately with the number of lags. Therefore, fewer information per parameter is available for the estimation as the number of lags increases. In the Bayesian VAR literature one approach to mitigate this so-called curse of dimensionality is stochastic search variable selection (SSVS) as proposed by George et al. (2008). The basic idea of SSVS is to assign commonly used prior variances to parameters, which should be included in a model, and prior variances close to zero to irrelevant parameters.</description>
     </item>
-    
     <item>
       <title>An Introduction to Vector Autoregression (VAR)</title>
       <link>https://www.r-econometrics.com/timeseries/varintro/</link>
       <pubDate>Fri, 31 Aug 2018 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/timeseries/varintro/</guid>
       <description>Since the seminal paper of Sims (1980) vector autoregressive models have become a key instrument in macroeconomic research. This post presents the basic concept of VAR analysis and guides through the estimation procedure of a simple model. When I started my undergraduate program in economics I occasionally encountered the abbreviation VAR in some macro papers. I was fascinated by those waves in the boxes titled impulse responses and wondered how difficult it would be to do such reseach on my own.</description>
     </item>
-    
     <item>
       <title>Time Series Topics</title>
       <link>https://www.r-econometrics.com/timeseriesintro/</link>
       <pubDate>Sat, 04 Aug 2018 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/timeseriesintro/</guid>
-      <description>Work in progress (September 2023). I will try to update this page over the next few months.
-This section is intended to provide an overview of the relevant issues in (macro)economic time series analysis. Again the standard disclaimer: This site does not replace a good textbook, but it should help you to get a grasp of the basic concepts more quickly than if you learned it on your own.</description>
+      <description>Work in progress (September 2023). I will try to update this page over the next few months.&#xA;This section is intended to provide an overview of the relevant issues in (macro)economic time series analysis. Again the standard disclaimer: This site does not replace a good textbook, but it should help you to get a grasp of the basic concepts more quickly than if you learned it on your own.</description>
     </item>
-    
   </channel>
 </rss>

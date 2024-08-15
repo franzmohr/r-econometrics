@@ -1,49 +1,40 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>network-analysis on r-econometrics</title>
+    <title>Network-Analysis on r-econometrics</title>
     <link>https://www.r-econometrics.com/tags/network-analysis/</link>
-    <description>Recent content in network-analysis on r-econometrics</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <description>Recent content in Network-Analysis on r-econometrics</description>
+    <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 01 Mar 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://www.r-econometrics.com/tags/network-analysis/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 01 Mar 2020 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://www.r-econometrics.com/tags/network-analysis/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>An Introduction to Network Analysis in R</title>
       <link>https://www.r-econometrics.com/2020/03/01/an-introduction-to-network-analysis-in-r/</link>
       <pubDate>Sun, 01 Mar 2020 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/2020/03/01/an-introduction-to-network-analysis-in-r/</guid>
       <description>With the increasing availability of granular data on the relationships between individual entities - such as persons (social media), countries (internatinal trade) and financial institutions (supervisory reporting) - network analysis offers many possibilities to extract useful information from such data. This post provides an introduction to network analysis in R using the powerful igraph package for the calculation of metrics and ggraph for visualisation. It marks the beginning of a more comprehensive treatment of network analysis on r-econometrics.</description>
     </item>
-    
     <item>
       <title>Network Analysis in R</title>
       <link>https://www.r-econometrics.com/networksintro/</link>
       <pubDate>Sun, 01 Mar 2020 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/networksintro/</guid>
-      <description> With the increasing availability of granular data on the relationships between individual entities - such as persons (social media), countries (internatinal trade) and financial institutions (supervisory reporting) - network analysis offers many possibilities to extract useful information from such data. This section provides brief introductions to the analysis of network data in R.
-Basics of the igraph package Summary statistics with the igraph Network visualisation with ggraph </description>
+      <description> With the increasing availability of granular data on the relationships between individual entities - such as persons (social media), countries (internatinal trade) and financial institutions (supervisory reporting) - network analysis offers many possibilities to extract useful information from such data. This section provides brief introductions to the analysis of network data in R.&#xA;Basics of the igraph package Summary statistics with the igraph Network visualisation with ggraph </description>
     </item>
-    
     <item>
       <title>Network Summary Statistics</title>
       <link>https://www.r-econometrics.com/networks/network-summary/</link>
       <pubDate>Sun, 01 Mar 2020 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/networks/network-summary/</guid>
       <description>If a network is small, it can be easily summarised by its graph or a figure. But once a network reaches a certain size, it becomes more meaningful to use more formal summary statistics in order to describe its features. This post covers some basic network summary statistics as presented in Jackson (2008). The metrics are based on the concept of centrality, which describes the importance of a node in a given network of nodes.</description>
     </item>
-    
     <item>
       <title>Network Visualisation in R</title>
       <link>https://www.r-econometrics.com/networks/network-visual/</link>
       <pubDate>Sun, 01 Mar 2020 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/networks/network-visual/</guid>
-      <description>Beside the calculation of summarising network metrics, the visualisation of a graph can also be a very informative step in network analysis. Since visualisations in R usually involve the ggplot2 package, I focus on the ggraph package, which is based on the ggplot2 architecture. For illustration I use the artificial data set from my post on network analysis, which is an igraph object names graph_df.
-When using ggplot2 the main challenge in the visualisation of networks is to find suitable x- and y-coordinates for the nodes of a graph.</description>
+      <description>Beside the calculation of summarising network metrics, the visualisation of a graph can also be a very informative step in network analysis. Since visualisations in R usually involve the ggplot2 package, I focus on the ggraph package, which is based on the ggplot2 architecture. For illustration I use the artificial data set from my post on network analysis, which is an igraph object names graph_df.&#xA;When using ggplot2 the main challenge in the visualisation of networks is to find suitable x- and y-coordinates for the nodes of a graph.</description>
     </item>
-    
   </channel>
 </rss>

@@ -2,6 +2,9 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
+    <loc>https://www.r-econometrics.com/</loc>
+    <lastmod>2024-08-30T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>https://www.r-econometrics.com/timeseries/bayes-svar-intro/</loc>
     <lastmod>2023-09-11T00:00:00+00:00</lastmod>
   </url><url>
@@ -15,9 +18,6 @@
     <lastmod>2023-09-11T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://www.r-econometrics.com/categories/r/</loc>
-    <lastmod>2023-09-11T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://www.r-econometrics.com/</loc>
     <lastmod>2023-09-11T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://www.r-econometrics.com/tags/svar/</loc>
@@ -138,9 +138,6 @@
     <lastmod>2019-12-25T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://www.r-econometrics.com/reproduction/bayesmethods/bayesmethods20/</loc>
-    <lastmod>2019-12-09T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://www.r-econometrics.com/index_dummy/</loc>
     <lastmod>2019-12-09T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://www.r-econometrics.com/reproduction/bayesmethods/bayesmethods18/</loc>
@@ -403,5 +400,7 @@
   </url><url>
     <loc>https://www.r-econometrics.com/about/</loc>
     <lastmod>2018-01-15T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://www.r-econometrics.com/index_dummy/</loc>
   </url>
 </urlset>

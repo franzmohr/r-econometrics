@@ -1,40 +1,33 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>vec on r-econometrics</title>
+    <title>Vec on r-econometrics</title>
     <link>https://www.r-econometrics.com/tags/vec/</link>
-    <description>Recent content in vec on r-econometrics</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <description>Recent content in Vec on r-econometrics</description>
+    <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 22 Jul 2019 00:00:00 +0000</lastBuildDate><atom:link href="https://www.r-econometrics.com/tags/vec/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 11 Sep 2023 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://www.r-econometrics.com/tags/vec/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>An Introduction to Vector Error Correction Models (VECMs)</title>
       <link>https://www.r-econometrics.com/timeseries/vecintro/</link>
       <pubDate>Mon, 22 Jul 2019 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/timeseries/vecintro/</guid>
       <description>One of the prerequisits for the estimation of a vector autoregressive (VAR) model is that the analysed time series are stationary. However, economic theory suggests that there exist equilibrium relations between economic variables in their levels, which can render these variables stationary without taking differences. This is called cointegration. Since knowing the size of such relationships can improve the results of an analysis, it would be desireable to have an econometric model, which is able to capture them.</description>
     </item>
-    
     <item>
       <title>Bayesian Error Correction Models with Priors on the Cointegration Space</title>
       <link>https://www.r-econometrics.com/timeseries/bvec/</link>
       <pubDate>Tue, 11 Jun 2019 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/timeseries/bvec/</guid>
-      <description>Introduction This post provides the code to set up and estimate a basic Bayesian vector error correction (BVEC) model with the bvartools package. The presented Gibbs sampler is based on the approach of Koop et al. (2010), who propose a prior on the cointegration space.
-Data To illustrate the estimation process, the dataset E6 from Lütkepohl (2007) is used, which contains data on German long-term interest rates and inflation from 1972Q2 to 1998Q4.</description>
+      <description>Introduction This post provides the code to set up and estimate a basic Bayesian vector error correction (BVEC) model with the bvartools package. The presented Gibbs sampler is based on the approach of Koop et al. (2010), who propose a prior on the cointegration space.&#xA;Data To illustrate the estimation process, the dataset E6 from Lütkepohl (2007) is used, which contains data on German long-term interest rates and inflation from 1972Q2 to 1998Q4.</description>
     </item>
-    
     <item>
       <title>Time Series Topics</title>
       <link>https://www.r-econometrics.com/timeseriesintro/</link>
       <pubDate>Sat, 04 Aug 2018 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/timeseriesintro/</guid>
-      <description>Work in progress (September 2023). I will try to update this page over the next few months.
-This section is intended to provide an overview of the relevant issues in (macro)economic time series analysis. Again the standard disclaimer: This site does not replace a good textbook, but it should help you to get a grasp of the basic concepts more quickly than if you learned it on your own.</description>
+      <description>Work in progress (September 2023). I will try to update this page over the next few months.&#xA;This section is intended to provide an overview of the relevant issues in (macro)economic time series analysis. Again the standard disclaimer: This site does not replace a good textbook, but it should help you to get a grasp of the basic concepts more quickly than if you learned it on your own.</description>
     </item>
-    
   </channel>
 </rss>

@@ -1,33 +1,26 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>svar on r-econometrics</title>
+    <title>Svar on r-econometrics</title>
     <link>https://www.r-econometrics.com/tags/svar/</link>
-    <description>Recent content in svar on r-econometrics</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <description>Recent content in Svar on r-econometrics</description>
+    <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 11 Sep 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://www.r-econometrics.com/tags/svar/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 11 Sep 2023 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://www.r-econometrics.com/tags/svar/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Bayesian Inference of Structural Vector Autoregressions (SVAR) with the `bvartools` package</title>
       <link>https://www.r-econometrics.com/timeseries/bayes-svar-intro/</link>
       <pubDate>Mon, 11 Sep 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/timeseries/bayes-svar-intro/</guid>
-      <description>The bvartools allows to perform Bayesian inference of Vector autoregressive (VAR) models, including structural VARs. This post guides through the Bayesian inference of SVAR models in R using the bvartools package.
-Data For this illustration we generate an artificial data set with three endogenous variables, which follows the data generating process
-\[y_t = A_1 y_{t - 1} + B \epsilon_t,\]
-where
-\[ A_1 = \begin{bmatrix} 0.3 &amp;amp; 0.12 &amp;amp; 0.</description>
+      <description>The bvartools allows to perform Bayesian inference of Vector autoregressive (VAR) models, including structural VARs. This post guides through the Bayesian inference of SVAR models in R using the bvartools package.&#xA;Data For this illustration we generate an artificial data set with three endogenous variables, which follows the data generating process&#xA;\[y_t = A_1 y_{t - 1} + B \epsilon_t,\]&#xA;where&#xA;\[ A_1 = \begin{bmatrix} 0.3 &amp;amp; 0.12 &amp;amp; 0.</description>
     </item>
-    
     <item>
       <title>An Introduction to Structural Vector Autoregression (SVAR)</title>
       <link>https://www.r-econometrics.com/timeseries/svarintro/</link>
       <pubDate>Thu, 13 Aug 2020 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/timeseries/svarintro/</guid>
       <description>Vector autoregressive (VAR) models constitute a rather general approach to modelling multivariate time series. A critical drawback of those models in their standard form is their missing ability to describe contemporaneous relationships between the analysed variables. This becomes a central issue in the impulse response analysis for such models, where it is important to know the contemporaneous effects of a shock to the economy. Usually, researchers address this by using orthogonal impulse responses, where the correlation between the errors is obtained from the (lower) Cholesky decomposition of the error covariance matrix.</description>
     </item>
-    
   </channel>
 </rss>

@@ -5,8 +5,7 @@ theme = "liquorice"
 ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$", "\\.dta$", "\\.gitignore$"]
 uglyURLs = false
 pygmentsUseClassic = true
-disqusShortname = "r-econometrics"
-googleAnalytics = "UA-115075361-1"
+googleAnalytics = "G-VTHEW640NX"
 
 [permalinks]
     post = "/:year/:month/:day/:slug/"
@@ -23,6 +22,10 @@ googleAnalytics = "UA-115075361-1"
     name = "Time Series Topics"
     url = "/timeseriesintro"
     weight = 30
+[[menu.main]]
+    name = "bvartools"
+    url = "/bvartools"
+    weight = 32
 [[menu.main]]
     name = "Network Analysis"
     url = "/networksintro"

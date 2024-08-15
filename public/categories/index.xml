@@ -4,26 +4,23 @@
     <title>Categories on r-econometrics</title>
     <link>https://www.r-econometrics.com/categories/</link>
     <description>Recent content in Categories on r-econometrics</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 11 Sep 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://www.r-econometrics.com/categories/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 11 Sep 2023 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://www.r-econometrics.com/categories/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>r</title>
+      <title>R</title>
       <link>https://www.r-econometrics.com/categories/r/</link>
       <pubDate>Mon, 11 Sep 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/categories/r/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>var</title>
+      <title>Var</title>
       <link>https://www.r-econometrics.com/categories/var/</link>
       <pubDate>Mon, 11 Sep 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://www.r-econometrics.com/categories/var/</guid>
       <description></description>
     </item>
-    
   </channel>
 </rss>
