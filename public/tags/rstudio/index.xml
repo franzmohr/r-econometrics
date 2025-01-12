@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Rstudio on r-econometrics</title>
+    <link>https://www.r-econometrics.com/tags/rstudio/</link>
+    <description>Recent content in Rstudio on r-econometrics</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 11 Jan 2025 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://www.r-econometrics.com/tags/rstudio/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Preparing Your Workplace for an Analysis</title>
+      <link>https://www.r-econometrics.com/rbasics/beforestart/</link>
+      <pubDate>Sun, 06 Oct 2019 00:00:00 +0000</pubDate>
+      <guid>https://www.r-econometrics.com/rbasics/beforestart/</guid>
+      <description>&lt;div id=&#34;create-a-working-directory&#34; class=&#34;section level2&#34;&gt;&#xA;&lt;h2&gt;Create a working directory&lt;/h2&gt;&#xA;&lt;p&gt;Usually, people want to keep the folder structure on their computers tidy, so that they and their co-workers understand, which documents and data were used for a particular project – even if that project was finished months ago. This should also be the case when you work with R. Therefore, I recommend to create a new folder for every new project, which becomes the so-called working directory. There you put all the files, which are necessary for a project. For example, for this introduction I created the folder &lt;em&gt;r_intro&lt;/em&gt; in my file explorer and I recommend to do the same on your computer now.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

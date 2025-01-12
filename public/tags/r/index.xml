@@ -6,7 +6,7 @@
     <description>Recent content in R on r-econometrics</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 11 Sep 2023 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 11 Jan 2025 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://www.r-econometrics.com/tags/r/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Bayesian Inference of Structural Vector Autoregressions (SVAR) with the `bvartools` package</title>
@@ -56,6 +56,13 @@
       <pubDate>Mon, 07 Oct 2019 00:00:00 +0000</pubDate>
       <guid>https://www.r-econometrics.com/rbasics/dplyrintro/</guid>
       <description>&lt;p&gt;The cleaning and transformation of data belong to the most time consuming parts of any economic analysis. Many graphical or statistical functions in R require specifically formatted data to work properly. Although the standard functions of R can be used to prepare your data for further analysis, some people find them a bit laborious for daily applications. Therefore, alternatives have been developed, which make data transformation in R easier and also faster. One of these alternatives is the &lt;code&gt;dplyr&lt;/code&gt; package of the &lt;a href=&#34;https://www.tidyverse.org/&#34; target=&#34;_blank&#34;&gt;tidyverse&lt;/a&gt;. It has gained great popularity among R users and being familiar with its syntax can be considered a standard skill in R.&lt;a href=&#34;#fn1&#34; class=&#34;footnote-ref&#34; id=&#34;fnref1&#34;&gt;&lt;sup&gt;1&lt;/sup&gt;&lt;/a&gt; In the following I give an introduction to some main functions of &lt;code&gt;dplyr&lt;/code&gt;, which I also use extensively at work.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Preparing Your Workplace for an Analysis</title>
+      <link>https://www.r-econometrics.com/rbasics/beforestart/</link>
+      <pubDate>Sun, 06 Oct 2019 00:00:00 +0000</pubDate>
+      <guid>https://www.r-econometrics.com/rbasics/beforestart/</guid>
+      <description>&lt;div id=&#34;create-a-working-directory&#34; class=&#34;section level2&#34;&gt;&#xA;&lt;h2&gt;Create a working directory&lt;/h2&gt;&#xA;&lt;p&gt;Usually, people want to keep the folder structure on their computers tidy, so that they and their co-workers understand, which documents and data were used for a particular project – even if that project was finished months ago. This should also be the case when you work with R. Therefore, I recommend to create a new folder for every new project, which becomes the so-called working directory. There you put all the files, which are necessary for a project. For example, for this introduction I created the folder &lt;em&gt;r_intro&lt;/em&gt; in my file explorer and I recommend to do the same on your computer now.&lt;/p&gt;</description>
     </item>
     <item>
       <title>An Introduction to Vector Error Correction Models (VECMs)</title>
