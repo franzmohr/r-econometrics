@@ -16,13 +16,6 @@
       <description>&lt;p&gt;This section should help you to&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://www.r-econometrics.com/timeseries/bvar&#34;&gt;estimate simple Bayesian VAR models&lt;/a&gt;.&lt;/li&gt;&#xA;&lt;/ul&gt;</description>
     </item>
     <item>
-      <title>r-econometrics</title>
-      <link>https://www.r-econometrics.com/index_dummy/</link>
-      <pubDate>Thu, 15 Aug 2024 00:00:00 +0000</pubDate>
-      <guid>https://www.r-econometrics.com/index_dummy/</guid>
-      <description>&lt;p&gt;You want to learn the basics of the R programming language and how to use the software for econometric analyses? Great! This site could be useful for you. It is about learning how to use the free statistical software R for basic econometric applications and shall provide an intuition of the basic structure of the program and statistical functions, which are needed to pass introductory or intermediate courses in econometrics. The focus is less on the math behind the statistical methods and more on their application, so that newcomers become familiar with the language quickly.&lt;/p&gt;</description>
-    </item>
-    <item>
       <title>Bayesian Inference of Structural Vector Autoregressions (SVAR) with the `bvartools` package</title>
       <link>https://www.r-econometrics.com/timeseries/bayes-svar-intro/</link>
       <pubDate>Mon, 11 Sep 2023 00:00:00 +0000</pubDate>
@@ -427,6 +420,13 @@
       <pubDate>Sun, 04 Feb 2018 00:00:00 +0000</pubDate>
       <guid>https://www.r-econometrics.com/rbasics/installation/</guid>
       <description>&lt;p&gt;For this introduction I recommend to install two software packages on your system:&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;em&gt;R&lt;/em&gt;: The software, which does all the calculations.&lt;/li&gt;&#xA;&lt;li&gt;&lt;em&gt;RStudio&lt;/em&gt;: The working environment, where all the code will be developed.&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;&lt;em&gt;Note that the instructions of this section were written for a standard installation on a private computer. If you work on a corporate machine, the installation could be different due to different IT requirements of your company.&lt;/em&gt;&lt;/p&gt;&#xA;&lt;div id=&#34;installing-r&#34; class=&#34;section level2&#34;&gt;&#xA;&lt;h2&gt;Installing R&lt;/h2&gt;&#xA;&lt;p&gt;A proper installation of R is the prerequisite of everything that will follow. Fortunately, installing R is easy and can be done quickly by following these steps:&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>r-econometrics</title>
+      <link>https://www.r-econometrics.com/index_dummy/</link>
+      <pubDate>Sun, 04 Feb 2018 00:00:00 +0000</pubDate>
+      <guid>https://www.r-econometrics.com/index_dummy/</guid>
+      <description>&lt;p&gt;You want to learn the basics of the R programming language and how to use the software for econometric analyses? Great! This site could be useful for you. It is about learning how to use the free statistical software R for basic econometric applications and shall provide an intuition of the basic structure of the program and statistical functions, which are needed to pass introductory or intermediate courses in econometrics. The focus is less on the math behind the statistical methods and more on their application, so that newcomers become familiar with the language quickly.&lt;/p&gt;</description>
     </item>
     <item>
       <title>Statistical Inference</title>
