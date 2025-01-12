@@ -96,40 +96,50 @@
                         <li>
                             <time class="li-article-date">October, 7, 2019</time>
                             <h4><a href="https://www.r-econometrics.com/rbasics/dplyrintro/">Introduction to dplyr</a></h4>
-                            The cleaning and transformation of data belong to the most time consuming parts of any economic analysis. Many graphical or statistical functions in R require specifically formated data to work properly. Although the standard functions of R can be used to prepare your data for further analysis, some people find them a bit labourious for daily applications. Therefore, alternatives have been developed, which make data transformation in R easier and also faster.
+                            <p>The cleaning and transformation of data belong to the most time consuming parts of any economic analysis. Many graphical or statistical functions in R require specifically formated data to work properly. Although the standard functions of R can be used to prepare your data for further analysis, some people find them a bit labourious for daily applications. Therefore, alternatives have been developed, which make data transformation in R easier and also faster. One of these alternatives is the <code>dplyr</code> package of the <a href="https://www.tidyverse.org/" target="_blank">tidyverse</a>. It has gained great popularity among R users and being familiar with its syntax can be considered a standard skill in R.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> In the following I give an introduction to some main functions of <code>dplyr</code>, which I also use extensively at work.</p>
                         </li>
                     
                         <li>
                             <time class="li-article-date">October, 6, 2019</time>
                             <h4><a href="https://www.r-econometrics.com/rbasics/help_and_data_import_etc/">Getting Help, Importing Data and Some More Vocabulary</a></h4>
-                            Getting help An important part of any R package is its documentation. The documentation of any function can be obtained by using ? followed by the name of the function or by using help(&quot;function_name&quot;). After the execution of a help command a new page should appear in the lower right window in RStudio. If not, click on the tab Help in the lower right window. The help page contains the title of the function followed by a short description.
+                            <div id="getting-help" class="section level3">
+<h3>Getting help</h3>
+<p>An important part of any R package is its documentation. The documentation of any function can be obtained by using <code>?</code> followed by the name of the function or by using <code>help(&quot;function_name&quot;)</code>. After the execution of a help command a new page should appear in the lower right window in RStudio. If not, click on the tab <em>Help</em> in the lower right window. The help page contains the title of the function followed by a short description. For now the most important parts of the documentation are the following:</p>
                         </li>
                     
                         <li>
                             <time class="li-article-date">October, 6, 2019</time>
                             <h4><a href="https://www.r-econometrics.com/rbasics/beforestart/">Preparing Your Workplace for an Analysis</a></h4>
-                            Create a working directory Usually, people want to keep the folder structure on their computers tidy, so that they and their co-workers understand, which documents and data were used for a particular project – even if that project was finished months ago. This should also be the case when you work with R. Therefore, I recommend to create a new folder for every new project, which becomes the so-called working directory.
+                            <div id="create-a-working-directory" class="section level2">
+<h2>Create a working directory</h2>
+<p>Usually, people want to keep the folder structure on their computers tidy, so that they and their co-workers understand, which documents and data were used for a particular project – even if that project was finished months ago. This should also be the case when you work with R. Therefore, I recommend to create a new folder for every new project, which becomes the so-called working directory. There you put all the files, which are necessary for a project. For example, for this introduction I created the folder <em>r_intro</em> in my file explorer and I recommend to do the same on your computer now.</p>
                         </li>
                     
                         <li>
                             <time class="li-article-date">July, 20, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/rbasics/rstructure/">The Structure of R</a></h4>
-                            R can be comprehended as a language that provides the basis for a system of code chunks, which have been developed by many people across the globe, who wanted to share their work. These code chunks are called packages. And each of those packages usually consist of at least one function.1 This structure is presented in the following graph. Beside a schematic description of a package and its functions in the upper part of the graph it also contains some real world examples using the packages ggplot2 and dplyr.
+                            <p>R can be comprehended as a language that provides the basis for a system of code chunks, which have been developed by many people across the globe, who wanted to share their work. These code chunks are called <em>packages</em>. And each of those packages usually consist of at least one <em>function</em>.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> This structure is presented in the following graph. Beside a schematic description of a package and its functions in the upper part of the graph it also contains some real world examples using the packages <code>ggplot2</code> and <code>dplyr</code>.</p>
                         </li>
                     
                         <li>
                             <time class="li-article-date">February, 4, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/rbasics/ggplotintro/">Data Visualisation in R Using ggplot2</a></h4>
-                            A major challenge in data analysis is to summarise and present data with informative graphs. The ggplot2 package was specifically designed to help with this task. Since it is a very powerful and well documented package1, this introduction will only focus on its basic syntax, so that the user gets a better understanding of how to read the supporting material on the internet.
-ggplot graphs are built with some kind of blocks, which usually start with the function ggplot.
+                            <p>A major challenge in data analysis is to summarise and present data with informative graphs. The <code>ggplot2</code> package was specifically designed to help with this task. Since it is a very powerful and well documented package<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>, this introduction will only focus on its basic syntax, so that the user gets a better understanding of how to read the supporting material on the internet.</p>
+<p>ggplot graphs are built with some kind of blocks, which usually start with the function <code>ggplot</code>. Its first argument contains the data object and the second argument is a further function called <code>aes</code>.<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a> It controls, which columns of the data frame are used for the axes, colours, shapes of the data points and further features of the graph. The remaining blocks are separated by plus <code>+</code> signs and – if not specified otherwise – take the information from the first block and add a certain aspect to the graph, for example additional lines or data points. To understand what this all means, let us look at some basic examples.</p>
                         </li>
                     
                         <li>
                             <time class="li-article-date">February, 4, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/rbasics/installation/">Installing R and RStudio</a></h4>
-                            For this introduction I recommend to install two software packages on your system:
-R: The software, which does all the calculations. RStudio: The working environment, where all the code will developed. Note that the instructions of this section were written for a standard installation on a private computer. If you work on a corporate machine, the installation could be different due to different IT requirements of your company.
-Installing R A proper installation of R is the prerequisite of everything that will follow.
+                            <p>For this introduction I recommend to install two software packages on your system:</p>
+<ul>
+<li><em>R</em>: The software, which does all the calculations.</li>
+<li><em>RStudio</em>: The working environment, where all the code will developed.</li>
+</ul>
+<p>Note that the instructions of this section were written for a standard installation on a private computer. If you work on a corporate machine, the installation could be different due to different IT requirements of your company.</p>
+<div id="installing-r" class="section level2">
+<h2>Installing R</h2>
+<p>A proper installation of R is the prerequisite of everything that will follow. Fortunately, installing R is easy and can be done quickly by following these steps:</p>
                         </li>
                     
                 </ul>
@@ -167,8 +177,6 @@ Installing R A proper installation of R is the prerequisite of everything that w
 
     </script>
     
-  
-    
       <script async src="https://www.googletagmanager.com/gtag/js?id=G-VTHEW640NX"></script>
       <script>
         var doNotTrack = false;
@@ -183,10 +191,6 @@ Installing R A proper installation of R is the prerequisite of everything that w
           gtag('config', 'G-VTHEW640NX');
         }
       </script>
-    
-  
-
-
     </body>
 </html>
 

@@ -13,7 +13,7 @@
       <link>https://www.r-econometrics.com/timeseries/irf/</link>
       <pubDate>Sat, 21 Mar 2020 00:00:00 +0000</pubDate>
       <guid>https://www.r-econometrics.com/timeseries/irf/</guid>
-      <description>Impulse response analysis is an important step in econometric analyes, which employ vector autoregressive models. Their main purpose is to describe the evolution of a model’s variables in reaction to a shock in one or more variables. This feature allows to trace the transmission of a single shock within an otherwise noisy system of equations and, thus, makes them very useful tools in the assessment of economic policies. This post provides an introduction to the concept and interpretation of impulse response functions as they are commonly used in the VAR literature and provides code for their calculation in R.</description>
+      <description>&lt;p&gt;Impulse response analysis is an important step in econometric analyes, which employ &lt;a href=&#34;https://www.r-econometrics.com/timeseries/varintro&#34; target=&#34;_blank&#34;&gt;vector autoregressive models&lt;/a&gt;. Their main purpose is to describe the evolution of a model’s variables in reaction to a shock in one or more variables. This feature allows to trace the transmission of a single shock within an otherwise noisy system of equations and, thus, makes them very useful tools in the assessment of economic policies. This post provides an introduction to the concept and interpretation of impulse response functions as they are commonly used in the VAR literature and provides code for their calculation in R.&lt;/p&gt;</description>
     </item>
   </channel>
 </rss>

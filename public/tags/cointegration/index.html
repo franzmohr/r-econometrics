@@ -96,21 +96,28 @@
                         <li>
                             <time class="li-article-date">August, 9, 2020</time>
                             <h4><a href="https://www.r-econometrics.com/timeseries/stationarity/">An Introduction to Stationarity and Unit Roots in Time Series Analysis</a></h4>
-                            Concepts Basically stationarity means that a time series has a constant mean and constant variance over time. Althouth not particularly imporant for the estimation of parameters of econometric models these features are essential for the calculation of reliable test statistics and, hence, can have a significant impact on model selection.
-To illustrate this concept, let’s look at quarterly data on disposable income in billion DM from 1960 to 1982, which is data set E1 from Luetkepohl (2007).
+                            <div id="concepts" class="section level2">
+<h2>Concepts</h2>
+<p>Basically <strong>stationarity</strong> means that a time series has a constant mean and constant variance over time. Althouth not particularly imporant for the estimation of parameters of econometric models these features are essential for the calculation of reliable test statistics and, hence, can have a significant impact on model selection.</p>
+<p>To illustrate this concept, let’s look at quarterly data on disposable income in billion DM from 1960 to 1982, which is data set E1 from Luetkepohl (2007).</p>
                         </li>
                     
                         <li>
                             <time class="li-article-date">July, 22, 2019</time>
                             <h4><a href="https://www.r-econometrics.com/timeseries/vecintro/">An Introduction to Vector Error Correction Models (VECMs)</a></h4>
-                            One of the prerequisits for the estimation of a vector autoregressive (VAR) model is that the analysed time series are stationary. However, economic theory suggests that there exist equilibrium relations between economic variables in their levels, which can render these variables stationary without taking differences. This is called cointegration. Since knowing the size of such relationships can improve the results of an analysis, it would be desireable to have an econometric model, which is able to capture them.
+                            <p>One of the prerequisits for the estimation of a <a href="/timeseries/varintro">vector autoregressive (VAR)</a> model is that the analysed time series are stationary. However, economic theory suggests that there exist equilibrium relations between economic variables in their levels, which can render these variables stationary without taking differences. This is called <em>cointegration</em>. Since knowing the size of such relationships can improve the results of an analysis, it would be desireable to have an econometric model, which is able to capture them. So-called <em>vector error correction models</em> (VECMs) belong to this class of models. The following text presents the basic concept of VECMs and guides through the estimation of such a model in R.</p>
                         </li>
                     
                         <li>
                             <time class="li-article-date">June, 11, 2019</time>
                             <h4><a href="https://www.r-econometrics.com/timeseries/bvec/">Bayesian Error Correction Models with Priors on the Cointegration Space</a></h4>
-                            Introduction This post provides the code to set up and estimate a basic Bayesian vector error correction (BVEC) model with the bvartools package. The presented Gibbs sampler is based on the approach of Koop et al. (2010), who propose a prior on the cointegration space.
-Data To illustrate the estimation process, the dataset E6 from Lütkepohl (2007) is used, which contains data on German long-term interest rates and inflation from 1972Q2 to 1998Q4.
+                            <div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>This post provides the code to set up and estimate a basic Bayesian vector error correction (BVEC) model with the <code>bvartools</code> package. The presented Gibbs sampler is based on the approach of Koop et al. (2010), who propose a prior on the cointegration space.</p>
+</div>
+<div id="data" class="section level2">
+<h2>Data</h2>
+<p>To illustrate the estimation process, the dataset E6 from Lütkepohl (2007) is used, which contains data on German long-term interest rates and inflation from 1972Q2 to 1998Q4.</p>
                         </li>
                     
                 </ul>
@@ -148,8 +155,6 @@ Data To illustrate the estimation process, the dataset E6 from Lütkepohl (2007)
 
     </script>
     
-  
-    
       <script async src="https://www.googletagmanager.com/gtag/js?id=G-VTHEW640NX"></script>
       <script>
         var doNotTrack = false;
@@ -164,10 +169,6 @@ Data To illustrate the estimation process, the dataset E6 from Lütkepohl (2007)
           gtag('config', 'G-VTHEW640NX');
         }
       </script>
-    
-  
-
-
     </body>
 </html>
 

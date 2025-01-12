@@ -96,9 +96,44 @@
                         <li>
                             <time class="li-article-date">January, 30, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/2016_sheperd_gravity/">Reproduction: Sheperd, B. (2016). The gravity model of international trade: A user guide.</a></h4>
-                            The updated paper and dataset can be downloaded from UNESCAP.
-Load libraries and read data library(AER) library(dplyr) library(foreign) library(ggplot2) library(lmtest) library(multiwayvcov) library(sampleSelection) data &lt;- read.dta(&quot;servicesdataset_2016.dta&quot;) Correlations Table 1
-data &lt;- data %&gt;% mutate(ln_trade = log(trade), ln_distance = log(dist), ln_gdp_exp = log(gdp_exp), ln_gdp_imp = log(gdp_imp)) cor.data &lt;- data %&gt;% filter(sector == &quot;SER&quot;) %&gt;% select(ln_trade, ln_gdp_exp, ln_gdp_imp, ln_distance) %&gt;% na.omit %&gt;% filter(ln_trade &gt; -Inf) round(cor(cor.data), 4) ## ln_trade ln_gdp_exp ln_gdp_imp ln_distance ## ln_trade 1.
+                            <p>The updated paper and dataset can be downloaded from <a href="http://www.unescap.org/resources/gravity-model-international-trade-user-guide-updated-version" target="_blank">UNESCAP</a>.</p>
+<div id="load-libraries-and-read-data" class="section level2">
+<h2>Load libraries and read data</h2>
+<pre class="r"><code>library(AER)
+library(dplyr)
+library(foreign)
+library(ggplot2)
+library(lmtest)
+library(multiwayvcov)
+library(sampleSelection)
+
+data &lt;- read.dta(&quot;servicesdataset_2016.dta&quot;)</code></pre>
+</div>
+<div id="correlations" class="section level2">
+<h2>Correlations</h2>
+<p>Table 1</p>
+<pre class="r"><code>data &lt;- data %&gt;% 
+  mutate(ln_trade = log(trade),
+         ln_distance = log(dist),
+         ln_gdp_exp = log(gdp_exp),
+         ln_gdp_imp = log(gdp_imp))
+
+cor.data &lt;- data %&gt;% 
+  filter(sector == &quot;SER&quot;) %&gt;% 
+  select(ln_trade, ln_gdp_exp, ln_gdp_imp, ln_distance) %&gt;%
+  na.omit %&gt;% 
+  filter(ln_trade &gt; -Inf)
+
+round(cor(cor.data), 4)</code></pre>
+<pre><code>##             ln_trade ln_gdp_exp ln_gdp_imp ln_distance
+## ln_trade      1.0000     0.3643     0.3731     -0.2648
+## ln_gdp_exp    0.3643     1.0000    -0.3103      0.0518
+## ln_gdp_imp    0.3731    -0.3103     1.0000      0.0431
+## ln_distance  -0.2648     0.0518     0.0431      1.0000</code></pre>
+</div>
+<div id="graphics" class="section level2">
+<h2>Graphics</h2>
+<p>Prepare data</p>
                         </li>
                     
                 </ul>
@@ -136,8 +171,6 @@ data &lt;- data %&gt;% mutate(ln_trade = log(trade), ln_distance = log(dist), ln
 
     </script>
     
-  
-    
       <script async src="https://www.googletagmanager.com/gtag/js?id=G-VTHEW640NX"></script>
       <script>
         var doNotTrack = false;
@@ -152,10 +185,6 @@ data &lt;- data %&gt;% mutate(ln_trade = log(trade), ln_distance = log(dist), ln
           gtag('config', 'G-VTHEW640NX');
         }
       </script>
-    
-  
-
-
     </body>
 </html>
 

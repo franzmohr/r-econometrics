@@ -13,7 +13,7 @@
       <link>https://www.r-econometrics.com/reproduction/2015_timmer_wiod/</link>
       <pubDate>Mon, 20 May 2019 00:00:00 +0000</pubDate>
       <guid>https://www.r-econometrics.com/reproduction/2015_timmer_wiod/</guid>
-      <description>As international trade has become increasingly fragmented over the past decades the analysis of global value chains (GVC) has gained popularity in economic research. This post reproduces Timmer et al. (2015), who introduce the world input-output database (WIOD) and present basic concepts of GVC analysis.&#xA;Data Timmer et al. (2015) use the 2013 vintage of the world input-output database (WIOD). The following code downloads the data from the project’s website, unzips it and loads the resulting STATA file into R using the readstata13 package.</description>
+      <description>&lt;p&gt;As international trade has become increasingly fragmented over the past decades the analysis of global value chains (GVC) has gained popularity in economic research. This post reproduces Timmer et al. (2015), who introduce the world input-output database (WIOD) and present basic concepts of GVC analysis.&lt;/p&gt;&#xA;&lt;div id=&#34;data&#34; class=&#34;section level2&#34;&gt;&#xA;&lt;h2&gt;Data&lt;/h2&gt;&#xA;&lt;p&gt;Timmer et al. (2015) use the 2013 vintage of the world input-output database (&lt;a href=&#34;http://www.wiod.org/database/wiots13&#34; target=&#34;_blank&#34;&gt;WIOD&lt;/a&gt;). The following code downloads the data from the project’s website, unzips it and loads the resulting STATA file into R using the &lt;code&gt;readstata13&lt;/code&gt; package.&lt;a href=&#34;#fn1&#34; class=&#34;footnoteRef&#34; id=&#34;fnref1&#34;&gt;&lt;sup&gt;1&lt;/sup&gt;&lt;/a&gt;&lt;/p&gt;</description>
     </item>
   </channel>
 </rss>

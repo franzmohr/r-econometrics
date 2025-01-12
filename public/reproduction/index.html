@@ -96,169 +96,1790 @@
                         <li>
                             <time class="li-article-date">December, 25, 2019</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/bayesmethods/bayesmethods11/">Chapter 11: Monte Carlo Integration</a></h4>
-                            Exercise 11.2: Drawing frmm standard distributions # Sample size n1 &lt;- 10L n2 &lt;- 100L n3 &lt;- 100000L # We use integers as indicated by the &quot;L&quot; at the end of the number. # This only makes the results look nicer # Reset random number generator for reproducibilty set.seed(123456) Uniform The standard specification of R’s random number generator (RNG) runif is min = 0 and max = 1, which is exactly what we need.
+                            <div id="exercise-11.2-drawing-frmm-standard-distributions" class="section level2">
+<h2>Exercise 11.2: Drawing frmm standard distributions</h2>
+<pre class="r"><code># Sample size
+n1 &lt;- 10L
+n2 &lt;- 100L
+n3 &lt;- 100000L
+# We use integers as indicated by the &quot;L&quot; at the end of the number.
+# This only makes the results look nicer
+
+# Reset random number generator for reproducibilty
+set.seed(123456)</code></pre>
+<div id="uniform" class="section level3">
+<h3>Uniform</h3>
+<p>The standard specification of R’s random number generator (RNG) <code>runif</code> is <code>min = 0</code> and <code>max = 1</code>, which is exactly what we need. So we only have to specify the number of draws.</p>
                         </li>
                     
                         <li>
                             <time class="li-article-date">December, 9, 2019</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/bayesmethods/bayesmethods20/">Chapter 20: Multivariate Time Series Methods</a></h4>
-                            Load required packages
-library(bvartools) library(dplyr) library(ggplot2) library(spam) library(tidyr) Data US macro data until 2007Q4
-# Specify URL url &lt;- &quot;https://web.ics.purdue.edu/~jltobias/second_edition/Chapter20/code_for_exercise_1/US_macrodata.csv&quot; # Load data us_macro_2007 &lt;- read.csv(url, col.names = c(&quot;date&quot;, &quot;Dp&quot;, &quot;u&quot;, &quot;r&quot;)) # Omit NA values us_macro_2007 &lt;- na.omit(us_macro_2007) # Transform into time-series object us_macro_2007 &lt;- ts(us_macro_2007[, -1], start = c(1959, 2), frequency = 4) Exercise 20.1 Prepare the data
-temp &lt;- gen_var(us_macro_2007, p = 2, deterministic = &quot;const&quot;) y &lt;- temp$Y x &lt;- temp$Z k &lt;- NROW(y) tt &lt;- ncol(y) z &lt;- kronecker(t(x), diag(1, k)) m &lt;- ncol(z) Specify the priors
+                            <p>Load required packages</p>
+<pre class="r"><code>library(bvartools)
+library(dplyr)
+library(ggplot2)
+library(spam)
+library(tidyr)</code></pre>
+<div id="data" class="section level2">
+<h2>Data</h2>
+<p>US macro data until 2007Q4</p>
+<pre class="r"><code># Specify URL
+url &lt;- &quot;https://web.ics.purdue.edu/~jltobias/second_edition/Chapter20/code_for_exercise_1/US_macrodata.csv&quot;
+# Load data
+us_macro_2007 &lt;- read.csv(url, col.names = c(&quot;date&quot;, &quot;Dp&quot;, &quot;u&quot;, &quot;r&quot;))
+# Omit NA values
+us_macro_2007 &lt;- na.omit(us_macro_2007)
+# Transform into time-series object
+us_macro_2007 &lt;- ts(us_macro_2007[, -1], start = c(1959, 2), frequency = 4)</code></pre>
+</div>
+<div id="exercise-20.1" class="section level2">
+<h2>Exercise 20.1</h2>
+<p>Prepare the data</p>
+<pre class="r"><code>temp &lt;- gen_var(us_macro_2007, p = 2, deterministic = &quot;const&quot;)
+y &lt;- temp$Y
+x &lt;- temp$Z
+
+k &lt;- NROW(y)
+tt &lt;- ncol(y)
+z &lt;- kronecker(t(x), diag(1, k))
+m &lt;- ncol(z)</code></pre>
+<p>Specify the priors</p>
                         </li>
                     
                         <li>
                             <time class="li-article-date">December, 1, 2019</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/bayesmethods/bayesmethods18/">Chapter 18: State Space and Unobserved Components Models</a></h4>
-                            Exercise 18.1: The local level model Data: US PCE inflation until 2015Q4 # Specify URL url &lt;- &quot;https://web.ics.purdue.edu/~jltobias/second_edition/Chapter18/code_for_exercise_1/USPCE_2015Q4.csv&quot; # Load data pce &lt;- read.csv(url, header = FALSE, col.names = &quot;pci&quot;) # Log growth rates pce &lt;- diff(ts(log(pce), start = 1959, frequency = 4)) # Rescale y &lt;- matrix(pce * 100 * 4, 1) tt &lt;- ncol(y) # T z &lt;- diag(1, tt) # Data matrix Estimation Prior
-a0 &lt;- 5 b0 &lt;- 100 Initial values
+                            <div id="exercise-18.1-the-local-level-model" class="section level2">
+<h2>Exercise 18.1: The local level model</h2>
+<div id="data-us-pce-inflation-until-2015q4" class="section level3">
+<h3>Data: US PCE inflation until 2015Q4</h3>
+<pre class="r"><code># Specify URL
+url &lt;- &quot;https://web.ics.purdue.edu/~jltobias/second_edition/Chapter18/code_for_exercise_1/USPCE_2015Q4.csv&quot;
+
+# Load data
+pce &lt;- read.csv(url, header = FALSE, col.names = &quot;pci&quot;)
+
+# Log growth rates
+pce &lt;- diff(ts(log(pce), start = 1959, frequency = 4))
+
+# Rescale
+y &lt;- matrix(pce * 100 * 4, 1)
+tt &lt;- ncol(y) # T
+z &lt;- diag(1, tt) # Data matrix</code></pre>
+</div>
+<div id="estimation" class="section level3">
+<h3>Estimation</h3>
+<p>Prior</p>
+<pre class="r"><code>a0 &lt;- 5
+b0 &lt;- 100</code></pre>
+<p>Initial values</p>
                         </li>
                     
                         <li>
                             <time class="li-article-date">May, 20, 2019</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/2015_timmer_wiod/">Reproduction: Timmer, M. P., Dietzenbacher, E., Los, B., Stehrer, R., &amp; De Vries, G. J. (2015). An illustrated user guide to the world input–output database: the case of global automotive production.</a></h4>
-                            As international trade has become increasingly fragmented over the past decades the analysis of global value chains (GVC) has gained popularity in economic research. This post reproduces Timmer et al. (2015), who introduce the world input-output database (WIOD) and present basic concepts of GVC analysis.
-Data Timmer et al. (2015) use the 2013 vintage of the world input-output database (WIOD). The following code downloads the data from the project’s website, unzips it and loads the resulting STATA file into R using the readstata13 package.
+                            <p>As international trade has become increasingly fragmented over the past decades the analysis of global value chains (GVC) has gained popularity in economic research. This post reproduces Timmer et al. (2015), who introduce the world input-output database (WIOD) and present basic concepts of GVC analysis.</p>
+<div id="data" class="section level2">
+<h2>Data</h2>
+<p>Timmer et al. (2015) use the 2013 vintage of the world input-output database (<a href="http://www.wiod.org/database/wiots13" target="_blank">WIOD</a>). The following code downloads the data from the project’s website, unzips it and loads the resulting STATA file into R using the <code>readstata13</code> package.<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a></p>
                         </li>
                     
                         <li>
                             <time class="li-article-date">December, 1, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/bayesmethods/bayesmethodsintro/">Chan et al. (2019): Bayesian Econometric Methods</a></h4>
-                            This section is based on Chan et al. (2019). Bayesian econometric methods (2nded.). The following links contain examples in the main text of the book and use R to estimate the models.
-Chapter 11: Monte Carlo Integration
-Chapter 18: State Space and Unobserved Components Models
-Chapter 20: Multivariate Time Series Methods
+                            <p>This section is based on Chan et al. (2019). Bayesian econometric methods (2<sup>nd</sup>ed.). The following links contain examples in the main text of the book and use R to estimate the models.</p>
+<p><a href="/reproduction/bayesmethods/bayesmethods11">Chapter 11: Monte Carlo Integration</a></p>
+<p><a href="/reproduction/bayesmethods/bayesmethods18">Chapter 18: State Space and Unobserved Components Models</a></p>
+<p><a href="/reproduction/bayesmethods/bayesmethods20">Chapter 20: Multivariate Time Series Methods</a></p>
                         </li>
                     
                         <li>
                             <time class="li-article-date">December, 1, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/wooldridge/wooldridge08/">Chapter 8: Heteroskedasticity</a></h4>
-                            library(wooldridge) Example 8.1 After loading the data and generating the dummy variables from chapter 7 estimate the model in the already familiar way.
-data(&quot;wage1&quot;) marrmale &lt;- as.numeric(wage1$female == 0 &amp; wage1$married == 1) marrfem &lt;- as.numeric(wage1$female == 1 &amp; wage1$married == 1) singfem &lt;- as.numeric(wage1$female == 1 &amp; wage1$married == 0) lm.8.1 &lt;- lm(lwage ~ marrmale + marrfem + singfem + educ + exper + expersq + tenure + tenursq, data = wage1) summary(lm.
+                            <pre class="r"><code>library(wooldridge)</code></pre>
+<div id="example-8.1" class="section level3">
+<h3>Example 8.1</h3>
+<p>After loading the data and generating the dummy variables from chapter 7 estimate the model in the already familiar way.</p>
+<pre class="r"><code>data(&quot;wage1&quot;)
+
+marrmale &lt;- as.numeric(wage1$female == 0 &amp; wage1$married == 1)
+marrfem &lt;- as.numeric(wage1$female == 1 &amp; wage1$married == 1)
+singfem &lt;- as.numeric(wage1$female == 1 &amp; wage1$married == 0)
+
+lm.8.1 &lt;- lm(lwage ~ marrmale + marrfem + singfem + educ + exper + expersq + tenure + tenursq, data = wage1)
+
+summary(lm.8.1)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = lwage ~ marrmale + marrfem + singfem + educ + exper + 
+##     expersq + tenure + tenursq, data = wage1)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -1.89697 -0.24060 -0.02689  0.23144  1.09197 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  0.3213781  0.1000090   3.213 0.001393 ** 
+## marrmale     0.2126757  0.0553572   3.842 0.000137 ***
+## marrfem     -0.1982676  0.0578355  -3.428 0.000656 ***
+## singfem     -0.1103502  0.0557421  -1.980 0.048272 *  
+## educ         0.0789103  0.0066945  11.787  &lt; 2e-16 ***
+## exper        0.0268006  0.0052428   5.112 4.50e-07 ***
+## expersq     -0.0005352  0.0001104  -4.847 1.66e-06 ***
+## tenure       0.0290875  0.0067620   4.302 2.03e-05 ***
+## tenursq     -0.0005331  0.0002312  -2.306 0.021531 *  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.3933 on 517 degrees of freedom
+## Multiple R-squared:  0.4609, Adjusted R-squared:  0.4525 
+## F-statistic: 55.25 on 8 and 517 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>The function <code>coeftest</code> from the <code>lmtest</code> package can be used to obtain the heteroskedasticity robust standard errors. The first argument of the function contains the result of the original estimation, i.e. <code>lm.8.1.</code>. The second argument tells R how to calculate the heteroskedasticity robust standard errors. Basically, you could just enter the first part and R would do the rest. However, since the standard procedure of <code>coeftest</code> would not give the same results as in the book, we have to specify them a bit. Thus, we use the <code>vcovHC</code> function from the <code>sandwich</code> package, which requires the output of the estimated model and a specification of the type of robust standard errors that should be calculated. In our case we want a simple White standard error, which is indicated by <code>type = &quot;HC0&quot;</code>. Other, more sophisticated methods are described in the documentation of the function.</p>
                         </li>
                     
                         <li>
                             <time class="li-article-date">October, 7, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/wooldridge/wooldridge10/">Chapter 10: Basic Regression Analysis with Time Series Data</a></h4>
-                            library(wooldridge) Example 10.1 data(&quot;phillips&quot;) lm.10.1 &lt;- lm(inf ~ unem, data = phillips) summary(lm.10.1) ## ## Call: ## lm(formula = inf ~ unem, data = phillips) ## ## Residuals: ## Min 1Q Median 3Q Max ## -5.2176 -1.7812 -0.6659 1.1473 8.8795 ## ## Coefficients: ## Estimate Std. Error t value Pr(&gt;|t|) ## (Intercept) 1.0536 1.5480 0.681 0.4990 ## unem 0.5024 0.2656 1.892 0.0639 . ## --- ## Signif. codes: 0 &#39;***&#39; 0.
+                            <pre class="r"><code>library(wooldridge)</code></pre>
+<div id="example-10.1" class="section level3">
+<h3>Example 10.1</h3>
+<pre class="r"><code>data(&quot;phillips&quot;)
+
+lm.10.1 &lt;- lm(inf ~ unem, data = phillips)
+summary(lm.10.1)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = inf ~ unem, data = phillips)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -5.2176 -1.7812 -0.6659  1.1473  8.8795 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)  
+## (Intercept)   1.0536     1.5480   0.681   0.4990  
+## unem          0.5024     0.2656   1.892   0.0639 .
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 2.972 on 54 degrees of freedom
+## Multiple R-squared:  0.06215,    Adjusted R-squared:  0.04479 
+## F-statistic: 3.579 on 1 and 54 DF,  p-value: 0.06389</code></pre>
+</div>
+<div id="example-10.2" class="section level3">
+<h3>Example 10.2</h3>
+<pre class="r"><code>data(&quot;intdef&quot;)
+
+lm.10.2 &lt;- lm(i3 ~ inf + def, data = intdef)
+summary(lm.10.2)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = i3 ~ inf + def, data = intdef)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -3.9948 -1.1694  0.1959  0.9602  4.7224 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  1.73327    0.43197   4.012  0.00019 ***
+## inf          0.60587    0.08213   7.376 1.12e-09 ***
+## def          0.51306    0.11838   4.334 6.57e-05 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.843 on 53 degrees of freedom
+## Multiple R-squared:  0.6021, Adjusted R-squared:  0.5871 
+## F-statistic: 40.09 on 2 and 53 DF,  p-value: 2.483e-11</code></pre>
+</div>
+<div id="example-10.3" class="section level3">
+<h3>Example 10.3</h3>
+<pre class="r"><code>data(&quot;prminwge&quot;)
+
+lm.10.3 &lt;- lm(lprepop ~ lmincov + lusgnp, data = prminwge)
+summary(lm.10.3)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = lprepop ~ lmincov + lusgnp, data = prminwge)
+## 
+## Residuals:
+##       Min        1Q    Median        3Q       Max 
+## -0.117133 -0.036998 -0.005943  0.028182  0.113938 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)  
+## (Intercept) -1.05442    0.76541  -1.378   0.1771  
+## lmincov     -0.15444    0.06490  -2.380   0.0229 *
+## lusgnp      -0.01219    0.08851  -0.138   0.8913  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.0557 on 35 degrees of freedom
+## Multiple R-squared:  0.6605, Adjusted R-squared:  0.6411 
+## F-statistic: 34.04 on 2 and 35 DF,  p-value: 6.17e-09</code></pre>
+</div>
+<div id="example-10.4" class="section level3">
+<h3>Example 10.4</h3>
+<pre class="r"><code>data(&quot;fertil3&quot;)
+
+lm.10.4.1 &lt;- lm(gfr ~ pe + ww2 + pill, data = fertil3)
+summary(lm.10.4.1)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = gfr ~ pe + ww2 + pill, data = fertil3)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -27.0187  -9.6195   0.3393   9.4746  28.0730 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  98.68176    3.20813  30.760  &lt; 2e-16 ***
+## pe            0.08254    0.02965   2.784  0.00694 ** 
+## ww2         -24.23840    7.45825  -3.250  0.00180 ** 
+## pill        -31.59403    4.08107  -7.742 6.46e-11 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 14.69 on 68 degrees of freedom
+## Multiple R-squared:  0.4734, Adjusted R-squared:  0.4502 
+## F-statistic: 20.38 on 3 and 68 DF,  p-value: 1.575e-09</code></pre>
+<pre class="r"><code>lm.10.4.2 &lt;- lm(gfr ~ pe + pe_1 + pe_2 + ww2 + pill, data = fertil3)
+summary(lm.10.4.2)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = gfr ~ pe + pe_1 + pe_2 + ww2 + pill, data = fertil3)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -24.6461  -9.5409  -0.0312   8.3378  29.1295 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  95.87050    3.28196  29.211  &lt; 2e-16 ***
+## pe            0.07267    0.12553   0.579   0.5647    
+## pe_1         -0.00578    0.15566  -0.037   0.9705    
+## pe_2          0.03383    0.12626   0.268   0.7896    
+## ww2         -22.12650   10.73197  -2.062   0.0433 *  
+## pill        -31.30499    3.98156  -7.862 5.63e-11 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 14.27 on 64 degrees of freedom
+##   (2 observations deleted due to missingness)
+## Multiple R-squared:  0.4986, Adjusted R-squared:  0.4594 
+## F-statistic: 12.73 on 5 and 64 DF,  p-value: 1.353e-08</code></pre>
+<pre class="r"><code># Joint significance of pe values
+lm.10.4.2res &lt;- lm(gfr ~ ww2 + pill, data = fertil3, subset = (is.na(pe_2) == FALSE))
+anova(lm.10.4.2, lm.10.4.2res)</code></pre>
+<pre><code>## Analysis of Variance Table
+## 
+## Model 1: gfr ~ pe + pe_1 + pe_2 + ww2 + pill
+## Model 2: gfr ~ ww2 + pill
+##   Res.Df   RSS Df Sum of Sq     F  Pr(&gt;F)  
+## 1     64 13033                             
+## 2     67 15460 -3   -2427.1 3.973 0.01165 *
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code># Joint significance of lagged pe values
+lm.10.4.2res2 &lt;- lm(gfr ~ pe + ww2 + pill, data = fertil3, subset = (is.na(pe_2) == FALSE))
+anova(lm.10.4.2, lm.10.4.2res2)</code></pre>
+<pre><code>## Analysis of Variance Table
+## 
+## Model 1: gfr ~ pe + pe_1 + pe_2 + ww2 + pill
+## Model 2: gfr ~ pe + ww2 + pill
+##   Res.Df   RSS Df Sum of Sq      F Pr(&gt;F)
+## 1     64 13033                           
+## 2     66 13054 -2   -21.761 0.0534  0.948</code></pre>
+<pre class="r"><code># Standard error of the long run propensity
+summary(lm(gfr ~ pe + I(pe_1 - pe) + I(pe_2 - pe_1) + ww2 + pill, data = fertil3))</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = gfr ~ pe + I(pe_1 - pe) + I(pe_2 - pe_1) + ww2 + 
+##     pill, data = fertil3)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -24.6461  -9.5409  -0.0312   8.3378  29.1295 
+## 
+## Coefficients:
+##                 Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)     95.87050    3.28196  29.211  &lt; 2e-16 ***
+## pe               0.10072    0.02980   3.380  0.00124 ** 
+## I(pe_1 - pe)     0.02805    0.11890   0.236  0.81427    
+## I(pe_2 - pe_1)   0.03383    0.12626   0.268  0.78962    
+## ww2            -22.12650   10.73197  -2.062  0.04330 *  
+## pill           -31.30499    3.98156  -7.862 5.63e-11 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 14.27 on 64 degrees of freedom
+##   (2 observations deleted due to missingness)
+## Multiple R-squared:  0.4986, Adjusted R-squared:  0.4594 
+## F-statistic: 12.73 on 5 and 64 DF,  p-value: 1.353e-08</code></pre>
+</div>
+<div id="example-10.5" class="section level3">
+<h3>Example 10.5</h3>
+<pre class="r"><code>data(&quot;barium&quot;)
+
+lm.10.5 &lt;- lm(lchnimp ~ lchempi + lgas + lrtwex + befile6 + affile6 + afdec6, data = barium)
+summary(lm.10.5)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = lchnimp ~ lchempi + lgas + lrtwex + befile6 + affile6 + 
+##     afdec6, data = barium)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -2.03356 -0.39080  0.03048  0.40248  1.51719 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -17.80300   21.04537  -0.846   0.3992    
+## lchempi       3.11719    0.47920   6.505 1.72e-09 ***
+## lgas          0.19635    0.90662   0.217   0.8289    
+## lrtwex        0.98302    0.40015   2.457   0.0154 *  
+## befile6       0.05957    0.26097   0.228   0.8198    
+## affile6      -0.03241    0.26430  -0.123   0.9026    
+## afdec6       -0.56524    0.28584  -1.978   0.0502 .  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.5974 on 124 degrees of freedom
+## Multiple R-squared:  0.3049, Adjusted R-squared:  0.2712 
+## F-statistic: 9.064 on 6 and 124 DF,  p-value: 3.255e-08</code></pre>
+</div>
+<div id="example-10.6" class="section level3">
+<h3>Example 10.6</h3>
+<pre class="r"><code>data(&quot;fair&quot;)
+
+lm.10.6 &lt;- lm(demvote ~ partyWH + incum + I(partyWH*gnews) + I(partyWH*inf), data = fair)
+summary(lm.10.6)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = demvote ~ partyWH + incum + I(partyWH * gnews) + 
+##     I(partyWH * inf), data = fair)
+## 
+## Residuals:
+##       Min        1Q    Median        3Q       Max 
+## -0.059843 -0.035554 -0.001095  0.015049  0.104859 
+## 
+## Coefficients:
+##                     Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)         0.484219   0.011472  42.210   &lt;2e-16 ***
+## partyWH            -0.032380   0.037550  -0.862   0.4013    
+## incum               0.056369   0.023017   2.449   0.0262 *  
+## I(partyWH * gnews)  0.009666   0.003807   2.539   0.0219 *  
+## I(partyWH * inf)   -0.008338   0.003121  -2.672   0.0167 *  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.049 on 16 degrees of freedom
+## Multiple R-squared:  0.6588, Adjusted R-squared:  0.5735 
+## F-statistic: 7.725 on 4 and 16 DF,  p-value: 0.001151</code></pre>
+<p>Slightly different results since the book uses 20 observations to 1992. But the results are the same when we drop the last observation.</p>
                         </li>
                     
                         <li>
                             <time class="li-article-date">October, 7, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/wooldridge/wooldridge11/">Chapter 11: Further Issues in Using OLS with Time Series Data</a></h4>
-                            library(wooldridge) Example 11.4 For this regression the lagged values of return are already contained in the dataset. Thus, we do not have to calculated them ourselves and can simply run the regression.
-data(&quot;nyse&quot;) lm.11.4 &lt;- lm(return ~ return_1, data = nyse) summary(lm.11.4) ## ## Call: ## lm(formula = return ~ return_1, data = nyse) ## ## Residuals: ## Min 1Q Median 3Q Max ## -15.261 -1.302 0.098 1.316 8.065 ## ## Coefficients: ## Estimate Std.
+                            <pre class="r"><code>library(wooldridge)</code></pre>
+<div id="example-11.4" class="section level3">
+<h3>Example 11.4</h3>
+<p>For this regression the lagged values of return are already contained in the dataset. Thus, we do not have to calculated them ourselves and can simply run the regression.</p>
+<pre class="r"><code>data(&quot;nyse&quot;)
+
+lm.11.4  &lt;-  lm(return ~ return_1, data = nyse)
+summary(lm.11.4)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = return ~ return_1, data = nyse)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -15.261  -1.302   0.098   1.316   8.065 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)  
+## (Intercept)  0.17963    0.08074   2.225   0.0264 *
+## return_1     0.05890    0.03802   1.549   0.1218  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 2.11 on 687 degrees of freedom
+##   (2 observations deleted due to missingness)
+## Multiple R-squared:  0.003481,   Adjusted R-squared:  0.00203 
+## F-statistic: 2.399 on 1 and 687 DF,  p-value: 0.1218</code></pre>
+</div>
+<div id="equation-11.17" class="section level3">
+<h3>Equation 11.17</h3>
+<p>To estimate this model we have to calculate the lagged values ourselves. First, I created a vector of the return values from the nyse data set. To create the series with the first lagged returns I omitted the first value in the list of returns of the nyse data set by adding [-1]. But since this causes the length of the resulting series to decrease by one observation, we have to add an NA so that R can estimate the model. I added this NA by creating a list with c() which contains the values from the first lag list “nyse$return[-1]” and put an NA at the end. For the second list of lagged values I proceeded similarly. I omitted the first and second observation from the return list of the nyse data set and added two NAs. The estimation works as usual.</p>
                         </li>
                     
                         <li>
                             <time class="li-article-date">October, 7, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/wooldridge/wooldridge16/">Chapter 16: Simultaneous Equations Models</a></h4>
-                            library(AER) library(wooldridge) Example 16.5 data(&quot;mroz&quot;) s.iv.1 &lt;- summary(iv.1 &lt;- ivreg(hours ~ lwage + educ + age + kidslt6 + nwifeinc | educ + age + kidslt6 + nwifeinc + exper + expersq, data = mroz)) s.iv.1 ## ## Call: ## ivreg(formula = hours ~ lwage + educ + age + kidslt6 + nwifeinc | ## educ + age + kidslt6 + nwifeinc + exper + expersq, data = mroz) ## ## Residuals: ## Min 1Q Median 3Q Max ## -4570.
+                            <pre class="r"><code>library(AER)
+library(wooldridge)</code></pre>
+<div id="example-16.5" class="section level3">
+<h3>Example 16.5</h3>
+<pre class="r"><code>data(&quot;mroz&quot;)
+
+s.iv.1 &lt;- summary(iv.1 &lt;- ivreg(hours ~ lwage + educ + age + kidslt6 + nwifeinc |
+                                  educ + age + kidslt6 + nwifeinc + exper + expersq,
+                                data = mroz))
+s.iv.1</code></pre>
+<pre><code>## 
+## Call:
+## ivreg(formula = hours ~ lwage + educ + age + kidslt6 + nwifeinc | 
+##     educ + age + kidslt6 + nwifeinc + exper + expersq, data = mroz)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -4570.13  -654.08   -36.94   569.86  8372.91 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 2225.662    574.564   3.874 0.000124 ***
+## lwage       1639.556    470.576   3.484 0.000545 ***
+## educ        -183.751     59.100  -3.109 0.002003 ** 
+## age           -7.806      9.378  -0.832 0.405664    
+## kidslt6     -198.154    182.929  -1.083 0.279325    
+## nwifeinc     -10.170      6.615  -1.537 0.124942    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1354 on 422 degrees of freedom
+## Multiple R-Squared: -2.008,  Adjusted R-squared: -2.043 
+## Wald test: 3.441 on 5 and 422 DF,  p-value: 0.004648</code></pre>
+<pre class="r"><code>lm.1 &lt;- lm(lwage ~ educ + age + kidslt6 + nwifeinc + exper + expersq,
+           data = mroz[mroz$inlf==1,])
+
+lm.2 &lt;- lm(hours ~ lwage + educ + age + kidslt6 + nwifeinc + lm.1$residuals,
+           data = mroz[mroz$inlf==1,])
+
+summary(lm.2)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = hours ~ lwage + educ + age + kidslt6 + nwifeinc + 
+##     lm.1$residuals, data = mroz[mroz$inlf == 1, ])
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -1600.5  -548.6   107.7   461.4  3075.2 
+## 
+## Coefficients:
+##                 Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)     2225.662    309.976   7.180 3.18e-12 ***
+## lwage           1639.556    253.875   6.458 2.93e-10 ***
+## educ            -183.751     31.884  -5.763 1.60e-08 ***
+## age               -7.806      5.059  -1.543  0.12361    
+## kidslt6         -198.154     98.690  -2.008  0.04530 *  
+## nwifeinc         -10.170      3.569  -2.850  0.00459 ** 
+## lm.1$residuals -1714.358    259.439  -6.608 1.18e-10 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 730.6 on 421 degrees of freedom
+## Multiple R-squared:  0.1267, Adjusted R-squared:  0.1142 
+## F-statistic: 10.18 on 6 and 421 DF,  p-value: 1.592e-10</code></pre>
+</div>
+<div id="example-16.6" class="section level3">
+<h3>Example 16.6</h3>
+<pre class="r"><code>data(&quot;openness&quot;)
+
+s.lm.1 &lt;- summary(lm.1 &lt;- lm(open ~ lpcinc + lland, data = openness))
+s.lm.1</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = open ~ lpcinc + lland, data = openness)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -31.907  -8.843  -3.109   6.057  82.792 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 117.0845    15.8483   7.388 2.97e-11 ***
+## lpcinc        0.5465     1.4932   0.366    0.715    
+## lland        -7.5671     0.8142  -9.294 1.51e-15 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 17.8 on 111 degrees of freedom
+## Multiple R-squared:  0.4487, Adjusted R-squared:  0.4387 
+## F-statistic: 45.17 on 2 and 111 DF,  p-value: 4.451e-15</code></pre>
+<pre class="r"><code>s.iv.1 &lt;- summary(iv.1 &lt;- ivreg(inf ~ open +lpcinc |
+                                  lpcinc + lland,
+                                data = openness))
+s.iv.1</code></pre>
+<pre><code>## 
+## Call:
+## ivreg(formula = inf ~ open + lpcinc | lpcinc + lland, data = openness)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -21.686 -10.176  -5.857   2.912 184.875 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)  
+## (Intercept)  26.8993    15.4012   1.747   0.0835 .
+## open         -0.3375     0.1441  -2.342   0.0210 *
+## lpcinc        0.3758     2.0151   0.187   0.8524  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 23.84 on 111 degrees of freedom
+## Multiple R-Squared: 0.03088, Adjusted R-squared: 0.01341 
+## Wald test:  2.79 on 2 and 111 DF,  p-value: 0.06574</code></pre>
+</div>
+<div id="example-16.7" class="section level3">
+<h3>Example 16.7</h3>
+<pre class="r"><code>data(&quot;consump&quot;)
+
+s.iv.1 &lt;- summary(iv.1 &lt;- ivreg(gc ~ gy + r3 |
+                                  gc_1 + gy_1 +r3_1,
+                                data = consump))
+s.iv.1</code></pre>
+<pre><code>## 
+## Call:
+## ivreg(formula = gc ~ gy + r3 | gc_1 + gy_1 + r3_1, data = consump)
+## 
+## Residuals:
+##        Min         1Q     Median         3Q        Max 
+## -0.0135627 -0.0035412 -0.0006202  0.0036514  0.0128639 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  0.0080597  0.0032327   2.493 0.018026 *  
+## gy           0.5861880  0.1345737   4.356 0.000128 ***
+## r3          -0.0002694  0.0007640  -0.353 0.726698    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.007471 on 32 degrees of freedom
+## Multiple R-Squared: 0.6779,  Adjusted R-squared: 0.6578 
+## Wald test: 9.586 on 2 and 32 DF,  p-value: 0.0005468</code></pre>
+</div>
+<div id="example-16.8" class="section level3">
+<h3>Example 16.8</h3>
+<pre class="r"><code>data(&quot;prison&quot;)
+
+s.lm.1 &lt;- summary(lm.1 &lt;- lm(gcriv ~ y81 + y82 + y83 + y84 + y85 + y86 + y87 + y88 +
+                               y89 + y90 + y91 + y92 + y93 + gpris + gpolpc + gincpc +
+                               cunem + cblack + cmetro + cag0_14 + cag15_17 + cag18_24 +
+                               cag25_34,
+                             data = prison))
+s.lm.1</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = gcriv ~ y81 + y82 + y83 + y84 + y85 + y86 + y87 + 
+##     y88 + y89 + y90 + y91 + y92 + y93 + gpris + gpolpc + gincpc + 
+##     cunem + cblack + cmetro + cag0_14 + cag15_17 + cag18_24 + 
+##     cag25_34, data = prison)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.32282 -0.04186  0.00283  0.04109  0.50580 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -0.005671   0.021558  -0.263 0.792597    
+## y81         -0.068626   0.017409  -3.942 8.91e-05 ***
+## y82         -0.040773   0.020196  -2.019 0.043894 *  
+## y83         -0.042178   0.019804  -2.130 0.033550 *  
+## y84         -0.013660   0.022350  -0.611 0.541290    
+## y85          0.009404   0.020782   0.453 0.651037    
+## y86          0.044095   0.022736   1.939 0.052854 .  
+## y87         -0.023960   0.021713  -1.103 0.270212    
+## y88          0.034758   0.021613   1.608 0.108253    
+## y89          0.025357   0.021867   1.160 0.246603    
+## y90          0.087170   0.021185   4.115 4.35e-05 ***
+## y91          0.038884   0.021359   1.821 0.069111 .  
+## y92          0.008150   0.022659   0.360 0.719183    
+## y93          0.008714   0.024004   0.363 0.716698    
+## gpris       -0.180897   0.047628  -3.798 0.000159 ***
+## gpolpc       0.051424   0.055516   0.926 0.354619    
+## gincpc       0.738368   0.166378   4.438 1.06e-05 ***
+## cunem        0.411260   0.393670   1.045 0.296536    
+## cblack      -0.014743   0.033157  -0.445 0.656708    
+## cmetro       0.538306   0.995660   0.541 0.588922    
+## cag0_14      0.989306   2.006539   0.493 0.622140    
+## cag15_17     4.983840   4.740475   1.051 0.293472    
+## cag18_24     2.412758   2.191017   1.101 0.271192    
+## cag25_34     2.879946   2.228829   1.292 0.196743    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.07893 on 690 degrees of freedom
+## Multiple R-squared:  0.2311, Adjusted R-squared:  0.2055 
+## F-statistic: 9.019 on 23 and 690 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>s.iv.1 &lt;- summary(iv.1 &lt;- ivreg(gcriv ~ y81 + y82 + y83 + y84 + y85 + y86 + y87 + y88 +
+                                  y89 + y90 + y91 + y92 + y93 + gpris + gpolpc + gincpc +
+                                  cunem + cblack + cmetro + cag0_14 + cag15_17 + cag18_24 +
+                                  cag25_34 |
+                                  y81 + y82 + y83 + y84 + y85 + y86 + y87 + y88 +
+                                  y89 + y90 + y91 + y92 + y93 + gpolpc + gincpc +
+                                  cunem + cblack + cmetro + cag0_14 + cag15_17 + cag18_24 +
+                                  cag25_34 + final1 + final2,
+                                data = prison))
+s.iv.1</code></pre>
+<pre><code>## 
+## Call:
+## ivreg(formula = gcriv ~ y81 + y82 + y83 + y84 + y85 + y86 + y87 + 
+##     y88 + y89 + y90 + y91 + y92 + y93 + gpris + gpolpc + gincpc + 
+##     cunem + cblack + cmetro + cag0_14 + cag15_17 + cag18_24 + 
+##     cag25_34 | y81 + y82 + y83 + y84 + y85 + y86 + y87 + y88 + 
+##     y89 + y90 + y91 + y92 + y93 + gpolpc + gincpc + cunem + cblack + 
+##     cmetro + cag0_14 + cag15_17 + cag18_24 + cag25_34 + final1 + 
+##     final2, data = prison)
+## 
+## Residuals:
+##        Min         1Q     Median         3Q        Max 
+## -0.3863488 -0.0567073 -0.0002044  0.0509309  0.4133336 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  0.014838   0.027520   0.539  0.58995    
+## y81         -0.056073   0.021735  -2.580  0.01009 *  
+## y82          0.028462   0.038477   0.740  0.45973    
+## y83          0.024703   0.037397   0.661  0.50911    
+## y84          0.012870   0.029334   0.439  0.66098    
+## y85          0.035403   0.027502   1.287  0.19844    
+## y86          0.092186   0.034388   2.681  0.00752 ** 
+## y87          0.004771   0.029015   0.164  0.86944    
+## y88          0.053271   0.027322   1.950  0.05161 .  
+## y89          0.043086   0.027520   1.566  0.11790    
+## y90          0.144265   0.035462   4.068 5.29e-05 ***
+## y91          0.061848   0.027650   2.237  0.02562 *  
+## y92          0.026657   0.028533   0.934  0.35050    
+## y93          0.022274   0.029610   0.752  0.45216    
+## gpris       -1.031956   0.369963  -2.789  0.00543 ** 
+## gpolpc       0.035315   0.067499   0.523  0.60101    
+## gincpc       0.910199   0.214327   4.247 2.47e-05 ***
+## cunem        0.523696   0.478563   1.094  0.27420    
+## cblack      -0.015848   0.040104  -0.395  0.69285    
+## cmetro      -0.591517   1.298252  -0.456  0.64880    
+## cag0_14      3.379384   2.634893   1.283  0.20008    
+## cag15_17     3.549945   5.766302   0.616  0.53834    
+## cag18_24     3.358348   2.680839   1.253  0.21073    
+## cag25_34     2.319993   2.706345   0.857  0.39161    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.09547 on 690 degrees of freedom
+## Multiple R-Squared: -0.1246, Adjusted R-squared: -0.1621 
+## Wald test: 6.075 on 23 and 690 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
                         </li>
                     
                         <li>
                             <time class="li-article-date">October, 7, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/wooldridge/wooldridge17/">Chapter 17: Limited Dependent Variable Models and Sample Selection Corrections</a></h4>
-                            Example 17.1 First, look at the linear model.
-data(&quot;mroz&quot;) lm.17.1 &lt;- lm(inlf ~ nwifeinc + educ + exper + expersq + age + kidslt6 + kidsge6, data = mroz) summary(lm.17.1) ## ## Call: ## lm(formula = inlf ~ nwifeinc + educ + exper + expersq + age + ## kidslt6 + kidsge6, data = mroz) ## ## Residuals: ## Min 1Q Median 3Q Max ## -0.93432 -0.37526 0.08833 0.34404 0.
+                            <div id="example-17.1" class="section level3">
+<h3>Example 17.1</h3>
+<p>First, look at the linear model.</p>
+<pre class="r"><code>data(&quot;mroz&quot;)
+
+lm.17.1 &lt;- lm(inlf ~ nwifeinc + educ + exper + expersq + age +
+                kidslt6 + kidsge6, data = mroz)
+summary(lm.17.1)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = inlf ~ nwifeinc + educ + exper + expersq + age + 
+##     kidslt6 + kidsge6, data = mroz)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.93432 -0.37526  0.08833  0.34404  0.99417 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  0.5855192  0.1541780   3.798 0.000158 ***
+## nwifeinc    -0.0034052  0.0014485  -2.351 0.018991 *  
+## educ         0.0379953  0.0073760   5.151 3.32e-07 ***
+## exper        0.0394924  0.0056727   6.962 7.38e-12 ***
+## expersq     -0.0005963  0.0001848  -3.227 0.001306 ** 
+## age         -0.0160908  0.0024847  -6.476 1.71e-10 ***
+## kidslt6     -0.2618105  0.0335058  -7.814 1.89e-14 ***
+## kidsge6      0.0130122  0.0131960   0.986 0.324415    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.4271 on 745 degrees of freedom
+## Multiple R-squared:  0.2642, Adjusted R-squared:  0.2573 
+## F-statistic: 38.22 on 7 and 745 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>To calculated the percentage share of correct predictions I create dummy variables, which equal unity when the fitted values are above or equal to 0.5 and zero else. Next, I create a vector of dummies that are unity when both the fitted prediction and the observation of the dependent variable are unity. If they have different values, i.e. (1,0) or (0,1), the dummy is zero. The mean of this latter vector gives the percentage share of correctly predicted observations.</p>
                         </li>
                     
                         <li>
                             <time class="li-article-date">October, 7, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/wooldridge/wooldridge12/">Chapter12: Serial Correlation and Heteroskedasticity in Time Series Regressions</a></h4>
-                            library(lmtest) library(sandwich) library(tseries) library(wooldridge) Example 12.1 data(&quot;phillips&quot;) Static Phillips curve
-lm.12.1.1 &lt;- lm(inf ~ unem, data = phillips) res.static &lt;- lm.12.1.1$res res.static_1 &lt;- c(NA, lm.12.1.1$res[-(length(res.static))]) lm.12.1.1.test &lt;- lm(res.static ~ res.static_1) summary(lm.12.1.1.test) ## ## Call: ## lm(formula = res.static ~ res.static_1) ## ## Residuals: ## Min 1Q Median 3Q Max ## -8.047 -1.104 -0.248 1.028 6.684 ## ## Coefficients: ## Estimate Std. Error t value Pr(&gt;|t|) ## (Intercept) -0.1118 0.3180 -0.
+                            <pre class="r"><code>library(lmtest)
+library(sandwich)
+library(tseries)
+library(wooldridge)</code></pre>
+<div id="example-12.1" class="section level3">
+<h3>Example 12.1</h3>
+<pre class="r"><code>data(&quot;phillips&quot;)</code></pre>
+<p>Static Phillips curve</p>
+<pre class="r"><code>lm.12.1.1 &lt;- lm(inf ~ unem, data = phillips)
+res.static &lt;- lm.12.1.1$res
+res.static_1 &lt;- c(NA, lm.12.1.1$res[-(length(res.static))])
+lm.12.1.1.test &lt;- lm(res.static ~ res.static_1)
+summary(lm.12.1.1.test)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = res.static ~ res.static_1)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -8.047 -1.104 -0.248  1.028  6.684 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)   -0.1118     0.3180  -0.352    0.727    
+## res.static_1   0.5725     0.1084   5.283 2.43e-06 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 2.358 on 53 degrees of freedom
+##   (1 observation deleted due to missingness)
+## Multiple R-squared:  0.345,  Adjusted R-squared:  0.3326 
+## F-statistic: 27.91 on 1 and 53 DF,  p-value: 2.43e-06</code></pre>
+<p>Augmented Phillips curve</p>
                         </li>
                     
                         <li>
                             <time class="li-article-date">October, 4, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/wooldridge/wooldridge02/">Chapter 2: Simple OLS</a></h4>
-                            In R the function for basic linear regression models is lm, which is short for linear model. Its first argument is a formula of the regression model, which has the form y ~ a. The tilde between y and a indicates that y is the dependent variable and a is the explanatory variable. It is also possible to add a further explanatory variable - for example b - to the regression by adding a plus sign followed by the the name of the additional variable to the formula.
+                            <p>In R the function for basic linear regression models is <code>lm</code>, which is short for <em>linear model</em>. Its first argument is a formula of the regression model, which has the form <code>y ~ a</code>. The tilde between <em>y</em> and <em>a</em> indicates that <em>y</em> is the dependent variable and <em>a</em> is the explanatory variable. It is also possible to add a further explanatory variable - for example <em>b</em> - to the regression by adding a plus sign followed by the the name of the additional variable to the formula. In our example this would result in <code>y ~ a + b</code>. But since this chapter only covers models with a single explanatory variable, we postpone this issue to the next chapter.</p>
                         </li>
                     
                         <li>
                             <time class="li-article-date">October, 4, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/wooldridge/wooldridge05/">Chapter 5: OLS Asymptotics</a></h4>
-                            Make a histogram of the variable “prate”.
-data(&quot;k401k&quot;) hist(k401k$prate) Example 5.2
-data(&quot;bwght&quot;) lm.1 &lt;- lm(lbwght ~ cigs + lfaminc, data = bwght[1:694,]) s.1 &lt;- summary(lm.1) lm.2 &lt;- lm(lbwght ~ cigs + lfaminc, data = bwght) s.2 &lt;- summary(lm.2) s.2$coefficients[2, 2] / s.1$coefficients[2, 2] ## [1] 0.6443341 lm.3 &lt;- lm(cigs ~ lfaminc, data = bwght[1:694,]) s.3 &lt;- summary(lm.3) sigma.j &lt;- s.3$coefficients[2, 2] sigma &lt;- s.3$sigma r2 &lt;- s.3$r.squared sigma / (sqrt(1388) * sigma.
+                            <p>Make a histogram of the variable “prate”.</p>
+<pre class="r"><code>data(&quot;k401k&quot;)
+
+hist(k401k$prate)</code></pre>
+<p><img src="/reproduction/wooldridge/wooldridge05_files/figure-html/unnamed-chunk-2-1.png" width="384" /></p>
+<p><strong>Example 5.2</strong></p>
+<pre class="r"><code>data(&quot;bwght&quot;)
+
+lm.1 &lt;- lm(lbwght ~ cigs + lfaminc, data = bwght[1:694,])
+s.1 &lt;- summary(lm.1)
+
+lm.2 &lt;- lm(lbwght ~ cigs + lfaminc, data = bwght)
+s.2 &lt;- summary(lm.2)
+
+s.2$coefficients[2, 2] / s.1$coefficients[2, 2]</code></pre>
+<pre><code>## [1] 0.6443341</code></pre>
+<pre class="r"><code>lm.3 &lt;- lm(cigs ~ lfaminc, data = bwght[1:694,])
+s.3 &lt;- summary(lm.3)
+
+sigma.j &lt;- s.3$coefficients[2, 2]
+sigma &lt;- s.3$sigma
+r2 &lt;- s.3$r.squared
+sigma / (sqrt(1388) * sigma.j * sqrt(1 - r2))</code></pre>
+<pre><code>## [1] 0.6609623</code></pre>
+<p><strong>Example 5.3</strong></p>
                         </li>
                     
                         <li>
                             <time class="li-article-date">October, 4, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/wooldridge/wooldridgeintro/">Wooldridge (2013): Introductory Econometrics</a></h4>
-                            This section is based on Wooldridge, J.M. (2013). Introductory econometrics: A modern approach (5thed.). The following links contain examples in the main text of the book and use R to estimate the models. Alternatively, Heiss, F. (2016) Using R for Introductory Econometrics is a standalone textbook, which covers the same topics as Wooldridge (2013) and provides an introduction to R as well.
-The data sets are from the wooldridge package, which is a collection of all data sets used in the Wooldridge textbook.
+                            <p>This section is based on Wooldridge, J.M. (2013). Introductory econometrics: A modern approach (5<sup>th</sup>ed.). The following links contain examples in the main text of the book and use R to estimate the models. Alternatively, <a href="http://urfie.net/" target="_blank">Heiss, F. (2016) Using R for Introductory Econometrics</a> is a standalone textbook, which covers the same topics as Wooldridge (2013) and provides an introduction to R as well.</p>
+<p>The data sets are from the <em>wooldridge</em> package, which is a collection of all data sets used in the Wooldridge textbook. Similar to my page, the package also has a <a href="https://cran.r-project.org/web/packages/wooldridge/vignettes/Introductory-Econometrics-Examples.html" target="_blank">vignette</a> which contains a comprehensive collection of the Wooldridge textbook examples.</p>
                         </li>
                     
                         <li>
                             <time class="li-article-date">May, 8, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/1997_cincera_patents/">Reproduction: Cincera, M. (1997). Patents, R&amp;D, and technological spillovers at the firm level.</a></h4>
-                            Get the data The data set can be downloaded from the Journal of Applied Econometrics Data Archive.
-download.file(&quot;http://qed.econ.queensu.ca/jae/1997-v12.3/cincera/mc-data.zip&quot;, destfile = &quot;1997_cincera_data.zip&quot;) unzip(&quot;1997_cincera_data.zip&quot;) data &lt;- read.delim(&quot;data.mc&quot;, header = FALSE) names(data) &lt;- c(&quot;fi&quot;, &quot;s&quot;, &quot;g&quot;, &quot;p83&quot;, &quot;p84&quot;, &quot;p85&quot;, &quot;p86&quot;, &quot;p87&quot;, &quot;p88&quot;, &quot;p89&quot;, &quot;p90&quot;, &quot;p91&quot;, &quot;lr83&quot;, &quot;lr84&quot;, &quot;lr85&quot;, &quot;lr86&quot;, &quot;lr87&quot;, &quot;lr88&quot;, &quot;lr89&quot;, &quot;lr90&quot;, &quot;lr91&quot;, &quot;ls83&quot;, &quot;ls84&quot;, &quot;ls85&quot;, &quot;ls86&quot;, &quot;ls87&quot;, &quot;ls88&quot;, &quot;ls89&quot;, &quot;ls90&quot;, &quot;ls91&quot;) p &lt;- matrix(as.matrix(data[, c(&quot;p83&quot;, &quot;p84&quot;, &quot;p85&quot;, &quot;p86&quot;, &quot;p87&quot;, &quot;p88&quot;, &quot;p89&quot;, &quot;p90&quot;, &quot;p91&quot;)])) k &lt;- matrix(as.
+                            <div id="get-the-data" class="section level2">
+<h2>Get the data</h2>
+<p>The data set can be downloaded from the <a href="http://qed.econ.queensu.ca/jae/1997-v12.3/cincera/" target="_blank">Journal of Applied Econometrics Data Archive</a>.</p>
+<pre class="r"><code>download.file(&quot;http://qed.econ.queensu.ca/jae/1997-v12.3/cincera/mc-data.zip&quot;, destfile = &quot;1997_cincera_data.zip&quot;)
+unzip(&quot;1997_cincera_data.zip&quot;)
+
+data &lt;- read.delim(&quot;data.mc&quot;, header = FALSE)</code></pre>
+<pre class="r"><code>names(data) &lt;- c(&quot;fi&quot;, &quot;s&quot;, &quot;g&quot;,
+                 &quot;p83&quot;, &quot;p84&quot;, &quot;p85&quot;, &quot;p86&quot;, &quot;p87&quot;, &quot;p88&quot;, &quot;p89&quot;, &quot;p90&quot;, &quot;p91&quot;,
+                 &quot;lr83&quot;, &quot;lr84&quot;, &quot;lr85&quot;, &quot;lr86&quot;, &quot;lr87&quot;, &quot;lr88&quot;, &quot;lr89&quot;, &quot;lr90&quot;, &quot;lr91&quot;,
+                 &quot;ls83&quot;, &quot;ls84&quot;, &quot;ls85&quot;, &quot;ls86&quot;, &quot;ls87&quot;, &quot;ls88&quot;, &quot;ls89&quot;, &quot;ls90&quot;, &quot;ls91&quot;)
+
+p &lt;- matrix(as.matrix(data[, c(&quot;p83&quot;, &quot;p84&quot;, &quot;p85&quot;, &quot;p86&quot;, &quot;p87&quot;, &quot;p88&quot;, &quot;p89&quot;, &quot;p90&quot;, &quot;p91&quot;)]))
+k &lt;- matrix(as.matrix(data[, c(&quot;lr83&quot;, &quot;lr84&quot;, &quot;lr85&quot;, &quot;lr86&quot;, &quot;lr87&quot;, &quot;lr88&quot;, &quot;lr89&quot;, &quot;lr90&quot;, &quot;lr91&quot;)]))
+spill &lt;- matrix(as.matrix(data[, c(&quot;ls83&quot;, &quot;ls84&quot;, &quot;ls85&quot;, &quot;ls86&quot;, &quot;ls87&quot;, &quot;ls88&quot;, &quot;ls89&quot;, &quot;ls90&quot;, &quot;ls91&quot;)]))
+
+# Firm IDs
+fi &lt;- rep(1:181, 9)
+
+# Years
+year &lt;- c()
+for (i in 1983:1991){
+  year &lt;- append(year, rep(i, 181))
+}
+ 
+# Geographic dummies
+g &lt;- rep(data$g, 9)
+
+g.1 &lt;- as.numeric(g == 1)
+g.2 &lt;- as.numeric(g == 2)
+g.3 &lt;- as.numeric(g == 3)
+g.4 &lt;- as.numeric(g == 4)
+ 
+# Technological dummies
+s &lt;- rep(data$s, 9)
+ 
+s.1 &lt;- as.numeric(s == 1)
+s.2 &lt;- as.numeric(s == 2)
+s.3 &lt;- as.numeric(s == 3)
+s.4 &lt;- as.numeric(s == 4)
+s.5 &lt;- as.numeric(s == 5)
+s.6 &lt;- as.numeric(s == 6)
+s.7 &lt;- as.numeric(s == 7)
+s.8 &lt;- as.numeric(s == 8)
+s.9 &lt;- as.numeric(s == 9)
+s.10 &lt;- as.numeric(s == 10)
+s.11 &lt;- as.numeric(s == 11)
+s.12 &lt;- as.numeric(s == 12)
+s.13 &lt;- as.numeric(s == 13)
+s.14 &lt;- as.numeric(s == 14)
+s.15 &lt;- as.numeric(s == 15)
+ 
+# Lags of R&amp;D Spending
+k.1 &lt;- as.vector(c(rep(NA, 181), k[1:(length(k) - 181)]))
+k.2 &lt;- as.vector(c(rep(NA, 2 * 181), k[1:(length(k) - 2 * 181)]))
+k.3 &lt;- as.vector(c(rep(NA, 3 * 181), k[1:(length(k) - 3 * 181)]))
+k.4 &lt;- as.vector(c(rep(NA, 4 * 181), k[1:(length(k) - 4 * 181)]))
+ 
+# Lags of spillovers
+spill.1 &lt;- as.vector(c(rep(NA, 181), spill[1:(length(spill) - 181)]))
+spill.2 &lt;- as.vector(c(rep(NA, 2 * 181), spill[1:(length(spill) - 2 * 181)]))
+spill.3 &lt;- as.vector(c(rep(NA, 3 * 181), spill[1:(length(spill) - 3 * 181)]))
+spill.4 &lt;- as.vector(c(rep(NA, 4 * 181), spill[1:(length(spill) - 4 * 181)]))
+ 
+# Generate the finale data frame
+data &lt;- data.frame(year, fi, p, k, k.1, k.2, k.3, k.4, spill, spill.1, spill.2, spill.3, spill.4,
+                   g.1, g.2, g.3, g.4, s.1, s.2, s.3, s.4, s.5, s.6, s.7, s.8, s.9, s.10,
+                   s.11, s.12, s.13, s.14, s.15)
+ 
+# Give labels to the variables
+attributes(data)$var.labels &lt;-c(&#39;Year&#39;,&#39;FirmID&#39;,&#39;# of patents&#39;,&#39;R&amp;D spending&#39;,&#39;Lag R&amp;D 1&#39;,
+                               &#39;Lag R&amp;D 2&#39;,&#39;Lag R&amp;D 3&#39;,&#39;Lag R&amp;D 4&#39;,&#39;Spillover&#39;,&#39;Lag spillover 1&#39;,
+                               &#39;Lag spillover 2&#39;,&#39;Lag spillover 3&#39;,&#39;Lag spillover 4&#39;,
+                               &#39;Geographic dummy 1&#39;,&#39;Geographic dummy 2&#39;,&#39;Geographic dummy 3&#39;,
+                               &#39;Geographic dummy 4&#39;,&#39;Sector dummy 1&#39;,&#39;Sector dummy 2&#39;,
+                               &#39;Sector dummy 3&#39;,&#39;Sector dummy 4&#39;,&#39;Sector dummy 5&#39;,
+                               &#39;Sector dummy 6&#39;,&#39;Sector dummy 7&#39;,&#39;Sector dummy 8&#39;,
+                               &#39;Sector dummy 9&#39;,&#39;Sector dummy 10&#39;,&#39;Sector dummy 11&#39;,
+                               &#39;Sector dummy 12&#39;,&#39;Sector dummy 13&#39;,&#39;Sector dummy 14&#39;,
+                               &#39;Sector dummy 15&#39;)</code></pre>
+<p>If you want, you can save the modified data on your disk:</p>
                         </li>
                     
                         <li>
                             <time class="li-article-date">February, 6, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/wooldridge/wooldridge14/">Chapter 14: Advanced Panel Data Methods</a></h4>
-                            library(wooldridge) In order to estimate panel data models, I use the plm function from the plm package. The intuition behind its structure is similar to the ordinary linear model, except that it allows you to specify the panel’s group and time variables and the effects model.
-Example 14.1 Similar to the lm function, you can specify your model’s equation and the sample. Since you want to use panel data methods for you estimation, you also have to specify which variables in your sample contain the information used to distinguish different groups and which variable contains the time measurement.
+                            <pre class="r"><code>library(wooldridge)</code></pre>
+<p>In order to estimate panel data models, I use the <code>plm</code> function from the <code>plm</code> package. The intuition behind its structure is similar to the ordinary linear model, except that it allows you to specify the panel’s group and time variables and the effects model.</p>
+<div id="example-14.1" class="section level3">
+<h3>Example 14.1</h3>
+<p>Similar to the <code>lm</code> function, you can specify your model’s equation and the sample. Since you want to use panel data methods for you estimation, you also have to specify which variables in your sample contain the information used to distinguish different groups and which variable contains the time measurement. In our example this is done with <code>index = c(&quot;fcode&quot;, &quot;year&quot;)</code>. Note, that the order of the variables is important. The group variable always has to be at the first and the time variable at the second position.</p>
                         </li>
                     
                         <li>
                             <time class="li-article-date">February, 6, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/wooldridge/wooldridge15/">Chapter 15: Instrumental Variables Estimation and Two Stage Least Squares</a></h4>
-                            library(AER) library(wooldridge) Example 15.1 data(&quot;mroz&quot;) OLS
-s.lm.1 &lt;- summary(lm(lwage ~ educ, data = mroz)) s.lm.1 ## ## Call: ## lm(formula = lwage ~ educ, data = mroz) ## ## Residuals: ## Min 1Q Median 3Q Max ## -3.10256 -0.31473 0.06434 0.40081 2.10029 ## ## Coefficients: ## Estimate Std. Error t value Pr(&gt;|t|) ## (Intercept) -0.1852 0.1852 -1.000 0.318 ## educ 0.1086 0.0144 7.545 2.76e-13 *** ## --- ## Signif. codes: 0 &#39;***&#39; 0.
+                            <pre class="r"><code>library(AER)
+library(wooldridge)</code></pre>
+<div id="example-15.1" class="section level3">
+<h3>Example 15.1</h3>
+<pre class="r"><code>data(&quot;mroz&quot;)</code></pre>
+<p>OLS</p>
+<pre class="r"><code>s.lm.1 &lt;- summary(lm(lwage ~ educ, data = mroz))
+s.lm.1</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = lwage ~ educ, data = mroz)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -3.10256 -0.31473  0.06434  0.40081  2.10029 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  -0.1852     0.1852  -1.000    0.318    
+## educ          0.1086     0.0144   7.545 2.76e-13 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.68 on 426 degrees of freedom
+##   (325 observations deleted due to missingness)
+## Multiple R-squared:  0.1179, Adjusted R-squared:  0.1158 
+## F-statistic: 56.93 on 1 and 426 DF,  p-value: 2.761e-13</code></pre>
+<p><em>fatheduc</em> as IV for <em>educ</em></p>
                         </li>
                     
                         <li>
                             <time class="li-article-date">February, 5, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/wooldridge/wooldridge13/">Chapter13: Simple Panel Data Methods</a></h4>
-                            library(wooldridge) Example 13.1 data(&quot;fertil1&quot;) s.lm.1 &lt;- summary(lm.1 &lt;- lm(kids ~ educ + age + agesq + black + east + northcen + west + farm + othrural + town + smcity + y74 + y76 + y78 + y80 + y82 + y84, data = fertil1)) s.lm.1 ## ## Call: ## lm(formula = kids ~ educ + age + agesq + black + east + northcen + ## west + farm + othrural + town + smcity + y74 + y76 + y78 + ## y80 + y82 + y84, data = fertil1) ## ## Residuals: ## Min 1Q Median 3Q Max ## -3.
+                            <pre class="r"><code>library(wooldridge)</code></pre>
+<div id="example-13.1" class="section level3">
+<h3>Example 13.1</h3>
+<pre class="r"><code>data(&quot;fertil1&quot;)
+
+s.lm.1 &lt;- summary(lm.1 &lt;- lm(kids ~ educ + age + agesq + black + east + northcen + west +
+                          farm + othrural + town + smcity +
+                          y74 + y76 + y78 + y80 + y82 + y84, data = fertil1))
+
+s.lm.1</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = kids ~ educ + age + agesq + black + east + northcen + 
+##     west + farm + othrural + town + smcity + y74 + y76 + y78 + 
+##     y80 + y82 + y84, data = fertil1)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -3.9878 -1.0086 -0.0767  0.9331  4.6548 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -7.742457   3.051767  -2.537 0.011315 *  
+## educ        -0.128427   0.018349  -6.999 4.44e-12 ***
+## age          0.532135   0.138386   3.845 0.000127 ***
+## agesq       -0.005804   0.001564  -3.710 0.000217 ***
+## black        1.075658   0.173536   6.198 8.02e-10 ***
+## east         0.217324   0.132788   1.637 0.101992    
+## northcen     0.363114   0.120897   3.004 0.002729 ** 
+## west         0.197603   0.166913   1.184 0.236719    
+## farm        -0.052557   0.147190  -0.357 0.721105    
+## othrural    -0.162854   0.175442  -0.928 0.353481    
+## town         0.084353   0.124531   0.677 0.498314    
+## smcity       0.211879   0.160296   1.322 0.186507    
+## y74          0.268183   0.172716   1.553 0.120771    
+## y76         -0.097379   0.179046  -0.544 0.586633    
+## y78         -0.068666   0.181684  -0.378 0.705544    
+## y80         -0.071305   0.182771  -0.390 0.696511    
+## y82         -0.522484   0.172436  -3.030 0.002502 ** 
+## y84         -0.545166   0.174516  -3.124 0.001831 ** 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.555 on 1111 degrees of freedom
+## Multiple R-squared:  0.1295, Adjusted R-squared:  0.1162 
+## F-statistic: 9.723 on 17 and 1111 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>s.lm.2 &lt;- summary(lm.2 &lt;- lm(kids ~ educ + age + agesq + black + east + northcen + west +
+                          farm + othrural + town + smcity,data = fertil1))
+
+anova(lm.1, lm.2)</code></pre>
+<pre><code>## Analysis of Variance Table
+## 
+## Model 1: kids ~ educ + age + agesq + black + east + northcen + west + 
+##     farm + othrural + town + smcity + y74 + y76 + y78 + y80 + 
+##     y82 + y84
+## Model 2: kids ~ educ + age + agesq + black + east + northcen + west + 
+##     farm + othrural + town + smcity
+##   Res.Df    RSS Df Sum of Sq      F    Pr(&gt;F)    
+## 1   1111 2685.9                                  
+## 2   1117 2771.0 -6   -85.139 5.8695 4.855e-06 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+</div>
+<div id="example-13.2" class="section level3">
+<h3>Example 13.2</h3>
+<pre class="r"><code>data(&quot;cps78_85&quot;)
+
+s.lm.1 &lt;- summary(lm.1 &lt;- lm(lwage ~ y85 + educ + y85educ + exper + expersq +
+                               union + female + y85fem, data = cps78_85))
+
+s.lm.1</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = lwage ~ y85 + educ + y85educ + exper + expersq + 
+##     union + female + y85fem, data = cps78_85)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -2.56098 -0.25828  0.00864  0.26571  2.11669 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  4.589e-01  9.345e-02   4.911 1.05e-06 ***
+## y85          1.178e-01  1.238e-01   0.952   0.3415    
+## educ         7.472e-02  6.676e-03  11.192  &lt; 2e-16 ***
+## y85educ      1.846e-02  9.354e-03   1.974   0.0487 *  
+## exper        2.958e-02  3.567e-03   8.293 3.27e-16 ***
+## expersq     -3.994e-04  7.754e-05  -5.151 3.08e-07 ***
+## union        2.021e-01  3.029e-02   6.672 4.03e-11 ***
+## female      -3.167e-01  3.662e-02  -8.648  &lt; 2e-16 ***
+## y85fem       8.505e-02  5.131e-02   1.658   0.0977 .  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.4127 on 1075 degrees of freedom
+## Multiple R-squared:  0.4262, Adjusted R-squared:  0.4219 
+## F-statistic:  99.8 on 8 and 1075 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+<div id="example-13.3" class="section level3">
+<h3>Example 13.3</h3>
+<pre class="r"><code>data(&quot;kielmc&quot;)
+
+s.lm.1 &lt;- summary(lm.1 &lt;- lm(rprice ~ nearinc, data = kielmc[kielmc$year==1981,]))
+s.lm.1</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = rprice ~ nearinc, data = kielmc[kielmc$year == 1981, 
+##     ])
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -60678 -19832  -2997  21139 136754 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)   101308       3093  32.754  &lt; 2e-16 ***
+## nearinc       -30688       5828  -5.266 5.14e-07 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 31240 on 140 degrees of freedom
+## Multiple R-squared:  0.1653, Adjusted R-squared:  0.1594 
+## F-statistic: 27.73 on 1 and 140 DF,  p-value: 5.139e-07</code></pre>
+<pre class="r"><code>s.lm.2 &lt;- summary(lm.2 &lt;- lm(rprice ~ nearinc, data = kielmc[kielmc$year == 1978,]))
+s.lm.2</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = rprice ~ nearinc, data = kielmc[kielmc$year == 1978, 
+##     ])
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -56517 -16605  -3193   8683 236307 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)    82517       2654  31.094  &lt; 2e-16 ***
+## nearinc       -18824       4745  -3.968 0.000105 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 29430 on 177 degrees of freedom
+## Multiple R-squared:  0.08167,    Adjusted R-squared:  0.07648 
+## F-statistic: 15.74 on 1 and 177 DF,  p-value: 0.0001054</code></pre>
+<pre class="r"><code>s.lm.3.1 &lt;- summary(lm.3.1 &lt;- lm(rprice ~ y81 + nearinc + y81nrinc, data = kielmc))
+s.lm.3.1</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = rprice ~ y81 + nearinc + y81nrinc, data = kielmc)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -60678 -17693  -3031  12483 236307 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)    82517       2727  30.260  &lt; 2e-16 ***
+## y81            18790       4050   4.640 5.12e-06 ***
+## nearinc       -18824       4875  -3.861 0.000137 ***
+## y81nrinc      -11864       7457  -1.591 0.112595    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 30240 on 317 degrees of freedom
+## Multiple R-squared:  0.1739, Adjusted R-squared:  0.1661 
+## F-statistic: 22.25 on 3 and 317 DF,  p-value: 4.224e-13</code></pre>
+<pre class="r"><code>s.lm.3.2 &lt;- summary(lm.3.2 &lt;- lm(rprice ~ y81 + nearinc + y81nrinc + age + agesq, data = kielmc))
+s.lm.3.2</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = rprice ~ y81 + nearinc + y81nrinc + age + agesq, 
+##     data = kielmc)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -79349 -14431  -1711  10069 201486 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  8.912e+04  2.406e+03  37.039  &lt; 2e-16 ***
+## y81          2.132e+04  3.444e+03   6.191 1.86e-09 ***
+## nearinc      9.398e+03  4.812e+03   1.953 0.051713 .  
+## y81nrinc    -2.192e+04  6.360e+03  -3.447 0.000644 ***
+## age         -1.494e+03  1.319e+02 -11.333  &lt; 2e-16 ***
+## agesq        8.691e+00  8.481e-01  10.248  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 25540 on 315 degrees of freedom
+## Multiple R-squared:  0.4144, Adjusted R-squared:  0.4052 
+## F-statistic: 44.59 on 5 and 315 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>s.lm.3.3 &lt;- summary(lm.3.3 &lt;- lm(rprice ~ y81 + nearinc + y81nrinc + age + agesq +
+                                   intst + land + area + rooms + baths, data = kielmc))
+s.lm.3.3</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = rprice ~ y81 + nearinc + y81nrinc + age + agesq + 
+##     intst + land + area + rooms + baths, data = kielmc)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -76721  -8885   -252   8433 136649 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  1.381e+04  1.117e+04   1.237  0.21720    
+## y81          1.393e+04  2.799e+03   4.977 1.07e-06 ***
+## nearinc      3.780e+03  4.453e+03   0.849  0.39661    
+## y81nrinc    -1.418e+04  4.987e+03  -2.843  0.00477 ** 
+## age         -7.395e+02  1.311e+02  -5.639 3.85e-08 ***
+## agesq        3.453e+00  8.128e-01   4.248 2.86e-05 ***
+## intst       -5.386e-01  1.963e-01  -2.743  0.00643 ** 
+## land         1.414e-01  3.108e-02   4.551 7.69e-06 ***
+## area         1.809e+01  2.306e+00   7.843 7.16e-14 ***
+## rooms        3.304e+03  1.661e+03   1.989  0.04758 *  
+## baths        6.977e+03  2.581e+03   2.703  0.00725 ** 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 19620 on 310 degrees of freedom
+## Multiple R-squared:   0.66,  Adjusted R-squared:  0.6491 
+## F-statistic: 60.19 on 10 and 310 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>s.lm.4.1 &lt;- summary(lm.4.1 &lt;- lm(lprice ~ y81 + nearinc + y81nrinc, data = kielmc))
+s.lm.4.1</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = lprice ~ y81 + nearinc + y81nrinc, data = kielmc)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -1.11957 -0.20328  0.02226  0.18909  1.66604 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 11.28542    0.03051 369.839  &lt; 2e-16 ***
+## y81          0.45700    0.04532  10.084  &lt; 2e-16 ***
+## nearinc     -0.33992    0.05456  -6.231 1.48e-09 ***
+## y81nrinc    -0.06265    0.08344  -0.751    0.453    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.3384 on 317 degrees of freedom
+## Multiple R-squared:  0.4091, Adjusted R-squared:  0.4035 
+## F-statistic: 73.15 on 3 and 317 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>s.lm.4.2 &lt;- summary(lm.4.2 &lt;- lm(lrprice ~ y81 + nearinc + y81nrinc + age + agesq + 
+                                   lintst + lland + larea + rooms + baths, data = kielmc))
+s.lm.4.2</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = lrprice ~ y81 + nearinc + y81nrinc + age + agesq + 
+##     lintst + lland + larea + rooms + baths, data = kielmc)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -1.18441 -0.09947  0.01478  0.10985  0.74872 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  7.652e+00  4.159e-01  18.399  &lt; 2e-16 ***
+## y81          1.621e-01  2.850e-02   5.687 2.99e-08 ***
+## nearinc      3.223e-02  4.749e-02   0.679 0.497805    
+## y81nrinc    -1.315e-01  5.197e-02  -2.531 0.011885 *  
+## age         -8.359e-03  1.411e-03  -5.924 8.36e-09 ***
+## agesq        3.764e-05  8.668e-06   4.342 1.92e-05 ***
+## lintst      -6.145e-02  3.151e-02  -1.950 0.052045 .  
+## lland        9.985e-02  2.449e-02   4.077 5.81e-05 ***
+## larea        3.508e-01  5.149e-02   6.813 4.98e-11 ***
+## rooms        4.733e-02  1.733e-02   2.732 0.006661 ** 
+## baths        9.428e-02  2.773e-02   3.400 0.000761 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.2038 on 310 degrees of freedom
+## Multiple R-squared:  0.7326, Adjusted R-squared:  0.7239 
+## F-statistic: 84.92 on 10 and 310 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+<div id="example-13.4" class="section level3">
+<h3>Example 13.4</h3>
+<pre class="r"><code>data(&quot;injury&quot;)
+
+s.lm.1 &lt;- summary(lm.1 &lt;- lm(ldurat ~ afchnge + highearn + afhigh, data = injury))
+s.lm.1</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = ldurat ~ afchnge + highearn + afhigh, data = injury)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -3.0128 -0.7214 -0.0171  0.7714  4.0047 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  1.19934    0.02711  44.241  &lt; 2e-16 ***
+## afchnge      0.02364    0.03970   0.595  0.55164    
+## highearn     0.21520    0.04336   4.963 7.11e-07 ***
+## afhigh       0.18835    0.06279   2.999  0.00271 ** 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.298 on 7146 degrees of freedom
+## Multiple R-squared:  0.01584,    Adjusted R-squared:  0.01543 
+## F-statistic: 38.34 on 3 and 7146 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>Hmmm, more observations in this estimation and the results differ…</p>
                         </li>
                     
                         <li>
                             <time class="li-article-date">February, 4, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/wooldridge/wooldridge03/">Chapter 3: Multiple Regression Analysis</a></h4>
-                            Below you find the script for all examples in chapter 3 of Wooldridge (2013). The only difference to the last chapter is how to use multiple independent variables in the lm function. This is easily achieved by separating each exogenous variable that should enter the model with a plus sign, e.g. lm(colGPA ~ hsGPA + ACT).
-The other commands that appear new are quite helpful and you should take a minute to think about them:
+                            <p>Below you find the script for all examples in chapter 3 of Wooldridge (2013). The only difference to the last chapter is how to use multiple independent variables in the <code>lm</code> function. This is easily achieved by separating each exogenous variable that should enter the model with a plus sign, e.g. <code>lm(colGPA ~ hsGPA + ACT)</code>.</p>
+<p>The other commands that appear new are quite helpful and you should take a minute to think about them:</p>
                         </li>
                     
                         <li>
                             <time class="li-article-date">February, 4, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/wooldridge/wooldridge06/">Chapter 6: Further Issues</a></h4>
-                            Chapter 6 in Wooldridge (2013) deals with some more issues that might have an impact on your estimates. Among these are a change in the scale of your variables, so-called beta-factors and the interpretation of variables that appear together with their squared values, i.e. interaction terms.
-Before you start, set your working directory, load the foreign library and download the data we are going to use in this chapter.
+                            <p>Chapter 6 in Wooldridge (2013) deals with some more issues that might have an impact on your estimates. Among these are a change in the scale of your variables, so-called beta-factors and the interpretation of variables that appear together with their squared values, i.e. interaction terms.</p>
+<p>Before you start, set your working directory, load the <code>foreign</code> library and download the data we are going to use in this chapter.</p>
+<pre class="r"><code>library(QuantPsyc)
+library(wooldridge)</code></pre>
+<p><strong>The impact of scales on the estimated coefficients</strong></p>
                         </li>
                     
                         <li>
                             <time class="li-article-date">February, 4, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/wooldridge/wooldridge07/">Chapter 7: Multiple Regression Analysis with Qualitative Information</a></h4>
-                            library(wooldridge) Estimating dummy variables that reflect qualitative information works quite the same way in R as it does with quantitative variables. You just add it as an independent variable into the formula of the model.
-# Example 7.1 data(&quot;wage1&quot;) lm.7.1.1 &lt;- lm(wage ~ female + educ + exper + tenure, data = wage1) summary(lm.7.1.1) ## ## Call: ## lm(formula = wage ~ female + educ + exper + tenure, data = wage1) ## ## Residuals: ## Min 1Q Median 3Q Max ## -7.
+                            <pre class="r"><code>library(wooldridge)</code></pre>
+<p>Estimating dummy variables that reflect qualitative information works quite the same way in R as it does with quantitative variables. You just add it as an independent variable into the formula of the model.</p>
+<pre class="r"><code># Example 7.1
+data(&quot;wage1&quot;)
+
+lm.7.1.1 &lt;- lm(wage ~ female + educ + exper + tenure, data = wage1)
+summary(lm.7.1.1)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = wage ~ female + educ + exper + tenure, data = wage1)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -7.7675 -1.8080 -0.4229  1.0467 14.0075 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -1.56794    0.72455  -2.164   0.0309 *  
+## female      -1.81085    0.26483  -6.838 2.26e-11 ***
+## educ         0.57150    0.04934  11.584  &lt; 2e-16 ***
+## exper        0.02540    0.01157   2.195   0.0286 *  
+## tenure       0.14101    0.02116   6.663 6.83e-11 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 2.958 on 521 degrees of freedom
+## Multiple R-squared:  0.3635, Adjusted R-squared:  0.3587 
+## F-statistic:  74.4 on 4 and 521 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>lm.7.1.2 &lt;- lm(wage ~ female, data = wage1)
+summary(lm.7.1.2)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = wage ~ female, data = wage1)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -5.5995 -1.8495 -0.9877  1.4260 17.8805 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)   7.0995     0.2100  33.806  &lt; 2e-16 ***
+## female       -2.5118     0.3034  -8.279 1.04e-15 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 3.476 on 524 degrees of freedom
+## Multiple R-squared:  0.1157, Adjusted R-squared:  0.114 
+## F-statistic: 68.54 on 1 and 524 DF,  p-value: 1.042e-15</code></pre>
+<pre class="r"><code># Example 7.2
+data(&quot;gpa1&quot;)
+
+lm.7.2 &lt;- lm(colGPA ~ PC + hsGPA + ACT, data = gpa1)
+summary(lm.7.2)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = colGPA ~ PC + hsGPA + ACT, data = gpa1)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -0.7901 -0.2622 -0.0107  0.2334  0.7570 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 1.263520   0.333125   3.793 0.000223 ***
+## PC          0.157309   0.057287   2.746 0.006844 ** 
+## hsGPA       0.447242   0.093647   4.776 4.54e-06 ***
+## ACT         0.008659   0.010534   0.822 0.412513    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.3325 on 137 degrees of freedom
+## Multiple R-squared:  0.2194, Adjusted R-squared:  0.2023 
+## F-statistic: 12.83 on 3 and 137 DF,  p-value: 1.932e-07</code></pre>
+<pre class="r"><code># Example 7.3
+data(&quot;jtrain&quot;)
+  # Since we do not use the whole data, but just observations from 1988
+  # we have to manipulate the sampe
+jtrain &lt;- jtrain[jtrain$d88==1,]
+  # We choose those observation, where in each row of the sampel it holds
+  # that jtrain$d88==1.
+  # Then we estimate the usual regression.
+lm.7.3 &lt;- lm(hrsemp ~ grant + lsales + lemploy, data = jtrain)
+summary(lm.7.3)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = hrsemp ~ grant + lsales + lemploy, data = jtrain)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -36.874 -13.128  -3.642   4.770 119.618 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  46.6651    43.4121   1.075    0.285    
+## grant        26.2545     5.5918   4.695  8.4e-06 ***
+## lsales       -0.9846     3.5399  -0.278    0.781    
+## lemploy      -6.0699     3.8829  -1.563    0.121    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 24.38 on 101 degrees of freedom
+##   (52 observations deleted due to missingness)
+## Multiple R-squared:  0.2368, Adjusted R-squared:  0.2141 
+## F-statistic: 10.44 on 3 and 101 DF,  p-value: 4.804e-06</code></pre>
+<pre class="r"><code># Example 7.4
+data(&quot;hprice1&quot;)
+lm.7.4 &lt;- lm(lprice ~ llotsize + lsqrft + bdrms + colonial, data = hprice1)
+summary(lm.7.4)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = lprice ~ llotsize + lsqrft + bdrms + colonial, data = hprice1)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.69479 -0.09750 -0.01619  0.09151  0.70228 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -1.34959    0.65104  -2.073   0.0413 *  
+## llotsize     0.16782    0.03818   4.395 3.25e-05 ***
+## lsqrft       0.70719    0.09280   7.620 3.69e-11 ***
+## bdrms        0.02683    0.02872   0.934   0.3530    
+## colonial     0.05380    0.04477   1.202   0.2330    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.1841 on 83 degrees of freedom
+## Multiple R-squared:  0.6491, Adjusted R-squared:  0.6322 
+## F-statistic: 38.38 on 4 and 83 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code># Example 7.5
+lm.7.5 &lt;- lm(lwage ~ female + educ + exper + expersq + tenure + tenursq, data = wage1)
+summary(lm.7.5)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = lwage ~ female + educ + exper + expersq + tenure + 
+##     tenursq, data = wage1)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -1.83160 -0.25658 -0.02126  0.25500  1.13370 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  0.4166910  0.0989279   4.212 2.98e-05 ***
+## female      -0.2965110  0.0358055  -8.281 1.04e-15 ***
+## educ         0.0801967  0.0067573  11.868  &lt; 2e-16 ***
+## exper        0.0294324  0.0049752   5.916 6.00e-09 ***
+## expersq     -0.0005827  0.0001073  -5.431 8.65e-08 ***
+## tenure       0.0317139  0.0068452   4.633 4.56e-06 ***
+## tenursq     -0.0005852  0.0002347  -2.493    0.013 *  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.3998 on 519 degrees of freedom
+## Multiple R-squared:  0.4408, Adjusted R-squared:  0.4343 
+## F-statistic: 68.18 on 6 and 519 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>For the more accurate estimate extract the coefficient on female from the summary function, paste it into the <code>exp</code> function and subract 1.</p>
                         </li>
                     
                         <li>
                             <time class="li-article-date">February, 4, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/wooldridge/wooldridge09/">Chapter 9: More on Specification and Data Issues</a></h4>
-                            library(wooldridge) Example 9.1 data(&quot;crime1&quot;) lm.9.1.1 &lt;- lm(narr86 ~ pcnv + avgsen + tottime + ptime86 + qemp86 + inc86 + black + hispan, data = crime1) summary(lm.9.1.1) ## ## Call: ## lm(formula = narr86 ~ pcnv + avgsen + tottime + ptime86 + qemp86 + ## inc86 + black + hispan, data = crime1) ## ## Residuals: ## Min 1Q Median 3Q Max ## -1.0108 -0.4518 -0.2392 0.2707 11.5284 ## ## Coefficients: ## Estimate Std.
+                            <pre class="r"><code>library(wooldridge)</code></pre>
+<div id="example-9.1" class="section level3">
+<h3>Example 9.1</h3>
+<pre class="r"><code>data(&quot;crime1&quot;)
+
+lm.9.1.1 &lt;- lm(narr86 ~ pcnv + avgsen + tottime + ptime86 + 
+                 qemp86 + inc86 + black + hispan, data = crime1)
+summary(lm.9.1.1)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = narr86 ~ pcnv + avgsen + tottime + ptime86 + qemp86 + 
+##     inc86 + black + hispan, data = crime1)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -1.0108 -0.4518 -0.2392  0.2707 11.5284 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  0.5686855  0.0360461  15.777  &lt; 2e-16 ***
+## pcnv        -0.1332344  0.0403502  -3.302 0.000973 ***
+## avgsen      -0.0113177  0.0122401  -0.925 0.355233    
+## tottime      0.0120224  0.0094352   1.274 0.202698    
+## ptime86     -0.0408417  0.0088120  -4.635 3.74e-06 ***
+## qemp86      -0.0505398  0.0144397  -3.500 0.000473 ***
+## inc86       -0.0014887  0.0003406  -4.370 1.29e-05 ***
+## black        0.3265035  0.0454156   7.189 8.38e-13 ***
+## hispan       0.1939144  0.0397113   4.883 1.10e-06 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.8286 on 2716 degrees of freedom
+## Multiple R-squared:  0.07232,    Adjusted R-squared:  0.06959 
+## F-statistic: 26.47 on 8 and 2716 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code># Seems to be an error in the book.
+# Although all coefficients and their standard errors are equal
+# the intercept term is 0.569 instead of 0.596.</code></pre>
+<pre class="r"><code>lm.9.1.2 &lt;- lm(narr86 ~ pcnv + avgsen + tottime + ptime86 + 
+                 qemp86 + inc86 + black + hispan + pcnvsq + 
+                 pt86sq + inc86sq, data = crime1)
+summary(lm.9.1.2)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = narr86 ~ pcnv + avgsen + tottime + ptime86 + qemp86 + 
+##     inc86 + black + hispan + pcnvsq + pt86sq + inc86sq, data = crime1)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -1.5248 -0.4646 -0.2151  0.2276 11.4286 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  5.046e-01  3.684e-02  13.699  &lt; 2e-16 ***
+## pcnv         5.525e-01  1.542e-01   3.582 0.000347 ***
+## avgsen      -1.702e-02  1.205e-02  -1.412 0.158028    
+## tottime      1.195e-02  9.282e-03   1.288 0.197924    
+## ptime86      2.874e-01  4.426e-02   6.494 9.88e-11 ***
+## qemp86      -1.409e-02  1.736e-02  -0.812 0.416970    
+## inc86       -3.415e-03  8.037e-04  -4.249 2.22e-05 ***
+## black        2.923e-01  4.483e-02   6.520 8.35e-11 ***
+## hispan       1.636e-01  3.945e-02   4.147 3.47e-05 ***
+## pcnvsq      -7.302e-01  1.561e-01  -4.677 3.05e-06 ***
+## pt86sq      -2.961e-02  3.863e-03  -7.664 2.50e-14 ***
+## inc86sq      7.186e-06  2.556e-06   2.811 0.004969 ** 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.8151 on 2713 degrees of freedom
+## Multiple R-squared:  0.1035, Adjusted R-squared:  0.09982 
+## F-statistic: 28.46 on 11 and 2713 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>anova(lm.9.1.1, lm.9.1.2)</code></pre>
+<pre><code>## Analysis of Variance Table
+## 
+## Model 1: narr86 ~ pcnv + avgsen + tottime + ptime86 + qemp86 + inc86 + 
+##     black + hispan
+## Model 2: narr86 ~ pcnv + avgsen + tottime + ptime86 + qemp86 + inc86 + 
+##     black + hispan + pcnvsq + pt86sq + inc86sq
+##   Res.Df    RSS Df Sum of Sq      F    Pr(&gt;F)    
+## 1   2716 1865.0                                  
+## 2   2713 1802.4  3    62.589 31.404 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+</div>
+<div id="example-9.2" class="section level3">
+<h3>Example 9.2</h3>
+<pre class="r"><code>data(&quot;hprice1&quot;)
+
+lm.9.2.1 &lt;- lm(price ~ lotsize + sqrft + bdrms, data = hprice1)
+fit2.1 &lt;- lm.9.2.1$fitted.values^2
+fit3.1 &lt;- lm.9.2.1$fitted.values^3
+lm.9.2.1.reset &lt;- lm(price ~ lotsize + sqrft + bdrms + fit2.1 + fit3.1, data = hprice1)
+anova(lm.9.2.1, lm.9.2.1.reset)</code></pre>
+<pre><code>## Analysis of Variance Table
+## 
+## Model 1: price ~ lotsize + sqrft + bdrms
+## Model 2: price ~ lotsize + sqrft + bdrms + fit2.1 + fit3.1
+##   Res.Df    RSS Df Sum of Sq      F  Pr(&gt;F)  
+## 1     84 300724                              
+## 2     82 269984  2     30740 4.6682 0.01202 *
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>lm.9.2.2 &lt;- lm(lprice ~ llotsize + lsqrft + bdrms, data = hprice1)
+fit2.2 &lt;- lm.9.2.2$fitted.values^2
+fit3.2 &lt;- lm.9.2.2$fitted.values^3
+lm.9.2.2.reset &lt;- lm(lprice ~ llotsize + lsqrft + bdrms + fit2.2 + fit3.2, data = hprice1)
+anova(lm.9.2.2, lm.9.2.2.reset)</code></pre>
+<pre><code>## Analysis of Variance Table
+## 
+## Model 1: lprice ~ llotsize + lsqrft + bdrms
+## Model 2: lprice ~ llotsize + lsqrft + bdrms + fit2.2 + fit3.2
+##   Res.Df    RSS Df Sum of Sq     F  Pr(&gt;F)  
+## 1     84 2.8626                             
+## 2     82 2.6940  2   0.16854 2.565 0.08308 .
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+</div>
+<div id="table-9.2" class="section level3">
+<h3>Table 9.2</h3>
+<pre class="r"><code>data(&quot;wage2&quot;)
+
+lm.t9.2.1 &lt;- lm(lwage ~ educ + exper + tenure + married + south + urban + 
+                  black, data = wage2)
+summary(lm.t9.2.1)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = lwage ~ educ + exper + tenure + married + south + 
+##     urban + black, data = wage2)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -1.98069 -0.21996  0.00707  0.24288  1.22822 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  5.395497   0.113225  47.653  &lt; 2e-16 ***
+## educ         0.065431   0.006250  10.468  &lt; 2e-16 ***
+## exper        0.014043   0.003185   4.409 1.16e-05 ***
+## tenure       0.011747   0.002453   4.789 1.95e-06 ***
+## married      0.199417   0.039050   5.107 3.98e-07 ***
+## south       -0.090904   0.026249  -3.463 0.000558 ***
+## urban        0.183912   0.026958   6.822 1.62e-11 ***
+## black       -0.188350   0.037667  -5.000 6.84e-07 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.3655 on 927 degrees of freedom
+## Multiple R-squared:  0.2526, Adjusted R-squared:  0.2469 
+## F-statistic: 44.75 on 7 and 927 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>lm.t9.2.2 &lt;- lm(lwage ~ educ + exper + tenure + married + south + urban + 
+                  black + IQ, data=wage2)
+summary(lm.t9.2.2)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = lwage ~ educ + exper + tenure + married + south + 
+##     urban + black + IQ, data = wage2)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -2.01203 -0.22244  0.01017  0.22951  1.27478 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  5.1764392  0.1280006  40.441  &lt; 2e-16 ***
+## educ         0.0544106  0.0069285   7.853 1.12e-14 ***
+## exper        0.0141458  0.0031651   4.469 8.82e-06 ***
+## tenure       0.0113951  0.0024394   4.671 3.44e-06 ***
+## married      0.1997644  0.0388025   5.148 3.21e-07 ***
+## south       -0.0801695  0.0262529  -3.054 0.002325 ** 
+## urban        0.1819463  0.0267929   6.791 1.99e-11 ***
+## black       -0.1431253  0.0394925  -3.624 0.000306 ***
+## IQ           0.0035591  0.0009918   3.589 0.000350 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.3632 on 926 degrees of freedom
+## Multiple R-squared:  0.2628, Adjusted R-squared:  0.2564 
+## F-statistic: 41.27 on 8 and 926 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>lm.t9.2.3 &lt;- lm(lwage ~ educ + exper + tenure + married + south + urban + 
+                black + IQ + IQ*educ, data = wage2)
+summary(lm.t9.2.3)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = lwage ~ educ + exper + tenure + married + south + 
+##     urban + black + IQ + IQ * educ, data = wage2)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -2.00733 -0.21715  0.01177  0.23456  1.27305 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  5.6482483  0.5462963  10.339  &lt; 2e-16 ***
+## educ         0.0184559  0.0410608   0.449 0.653192    
+## exper        0.0139072  0.0031768   4.378 1.34e-05 ***
+## tenure       0.0113929  0.0024397   4.670 3.46e-06 ***
+## married      0.2008658  0.0388267   5.173 2.82e-07 ***
+## south       -0.0802354  0.0262560  -3.056 0.002308 ** 
+## urban        0.1835758  0.0268586   6.835 1.49e-11 ***
+## black       -0.1466989  0.0397013  -3.695 0.000233 ***
+## IQ          -0.0009418  0.0051625  -0.182 0.855289    
+## educ:IQ      0.0003399  0.0003826   0.888 0.374564    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.3632 on 925 degrees of freedom
+## Multiple R-squared:  0.2634, Adjusted R-squared:  0.2563 
+## F-statistic: 36.76 on 9 and 925 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+<div id="example-9.4" class="section level3">
+<h3>Example 9.4</h3>
+<pre class="r"><code>data(&quot;crime2&quot;)
+
+lm.9.4.1 &lt;- lm(lcrmrte ~ unem + llawexpc, data = crime2, subset = (d87==1))
+summary(lm.9.4.1)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = lcrmrte ~ unem + llawexpc, data = crime2, subset = (d87 == 
+##     1))
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.64786 -0.22955 -0.06368  0.22183  0.71164 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)  
+## (Intercept)  3.34290    1.25053   2.673   0.0106 *
+## unem        -0.02900    0.03234  -0.897   0.3748  
+## llawexpc     0.20337    0.17265   1.178   0.2453  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.3231 on 43 degrees of freedom
+## Multiple R-squared:  0.05712,    Adjusted R-squared:  0.01326 
+## F-statistic: 1.302 on 2 and 43 DF,  p-value: 0.2824</code></pre>
+<pre class="r"><code>lm.9.4.2 &lt;- lm(lcrmrte ~ unem + llawexpc + lcrmrt_1, data = crime2, subset = (d87==1))
+summary(lm.9.4.2)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = lcrmrte ~ unem + llawexpc + lcrmrt_1, data = crime2, 
+##     subset = (d87 == 1))
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.48081 -0.12202  0.00659  0.14658  0.34428 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  0.076451   0.821143   0.093    0.926    
+## unem         0.008621   0.019517   0.442    0.661    
+## llawexpc    -0.139576   0.108641  -1.285    0.206    
+## lcrmrt_1     1.193923   0.132099   9.038  2.1e-11 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.1905 on 42 degrees of freedom
+## Multiple R-squared:  0.6798, Adjusted R-squared:  0.657 
+## F-statistic: 29.73 on 3 and 42 DF,  p-value: 1.799e-10</code></pre>
+</div>
+<div id="example-9.8" class="section level3">
+<h3>Example 9.8</h3>
+<pre class="r"><code>data(&quot;rdchem&quot;)
+
+lm.9.8.1 &lt;- lm(rdintens ~ sales + profmarg, data = rdchem)
+summary(lm.9.8.1)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = rdintens ~ sales + profmarg, data = rdchem)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -2.2221 -1.1414 -0.6068  0.5008  6.3702 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 2.625e+00  5.855e-01   4.484 0.000106 ***
+## sales       5.338e-05  4.407e-05   1.211 0.235638    
+## profmarg    4.462e-02  4.618e-02   0.966 0.341966    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.862 on 29 degrees of freedom
+## Multiple R-squared:  0.07612,    Adjusted R-squared:  0.0124 
+## F-statistic: 1.195 on 2 and 29 DF,  p-value: 0.3173</code></pre>
+<pre class="r"><code># See the outliers
+with(rdchem, plot(sales, rdintens, pch = 16))</code></pre>
+<p><img src="/reproduction/wooldridge/wooldridge09_files/figure-html/unnamed-chunk-13-1.png" width="480" style="display: block; margin: auto;" /></p>
                         </li>
                     
                         <li>
                             <time class="li-article-date">February, 4, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/wooldridge/wooldridge04/">Statistical Inference</a></h4>
-                            Before we start, let’s clear our memory, set the working directory and load the wooldridge data package.
-rm(list = ls()) setwd(&quot;C:/path/to/the/working/directory&quot;) library(wooldridge) data(wage1) lm.1 &lt;- lm(lwage ~ educ + exper + tenure, data = wage1) s.1 &lt;- summary(lm.1) s.1 ## ## Call: ## lm(formula = lwage ~ educ + exper + tenure, data = wage1) ## ## Residuals: ## Min 1Q Median 3Q Max ## -2.05802 -0.29645 -0.03265 0.28788 1.
+                            <p>Before we start, let’s clear our memory, set the working directory and load the <code>wooldridge</code> data package.</p>
+<pre class="r"><code>rm(list = ls())
+
+setwd(&quot;C:/path/to/the/working/directory&quot;)
+
+library(wooldridge)</code></pre>
+<pre class="r"><code>data(wage1)
+
+lm.1 &lt;- lm(lwage ~ educ + exper + tenure, data = wage1)
+s.1 &lt;- summary(lm.1)
+s.1</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = lwage ~ educ + exper + tenure, data = wage1)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -2.05802 -0.29645 -0.03265  0.28788  1.42809 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 0.284360   0.104190   2.729  0.00656 ** 
+## educ        0.092029   0.007330  12.555  &lt; 2e-16 ***
+## exper       0.004121   0.001723   2.391  0.01714 *  
+## tenure      0.022067   0.003094   7.133 3.29e-12 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.4409 on 522 degrees of freedom
+## Multiple R-squared:  0.316,  Adjusted R-squared:  0.3121 
+## F-statistic: 80.39 on 3 and 522 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>In order to be able to use the values of the coefficients for further calculations, you can use copy and paste with the numbers provided in the summary <code>s.1</code>. Alternatively, and for the sake of more precision, you can access the coefficients directly. If you use the <code>names</code> function and run <code>names(s.1)</code>, you will notice a subdirectory called <em>coefficients</em>, which contains the coefficients, standard errors, t-statistics and p-values of the regression. Entering <code>s.1$coefficients</code> or <code>coefficients(s.1)</code> gives those values for all coefficients, but you can also extract them separately using the <code>[row, column]</code> signs, where the first value defines the row index and the second the column index. If no value is specified for a row or column, R will use all available values. This happens in the third line of the following code, where the t-values are calculated from the betas and their respective standard errors. The forth line of the code specifies a certain row which means that the t-value is calculated only for the parameter listed third in the coefficient list.</p>
                         </li>
                     
                         <li>
                             <time class="li-article-date">January, 30, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/2016_sheperd_gravity/">Reproduction: Sheperd, B. (2016). The gravity model of international trade: A user guide.</a></h4>
-                            The updated paper and dataset can be downloaded from UNESCAP.
-Load libraries and read data library(AER) library(dplyr) library(foreign) library(ggplot2) library(lmtest) library(multiwayvcov) library(sampleSelection) data &lt;- read.dta(&quot;servicesdataset_2016.dta&quot;) Correlations Table 1
-data &lt;- data %&gt;% mutate(ln_trade = log(trade), ln_distance = log(dist), ln_gdp_exp = log(gdp_exp), ln_gdp_imp = log(gdp_imp)) cor.data &lt;- data %&gt;% filter(sector == &quot;SER&quot;) %&gt;% select(ln_trade, ln_gdp_exp, ln_gdp_imp, ln_distance) %&gt;% na.omit %&gt;% filter(ln_trade &gt; -Inf) round(cor(cor.data), 4) ## ln_trade ln_gdp_exp ln_gdp_imp ln_distance ## ln_trade 1.
+                            <p>The updated paper and dataset can be downloaded from <a href="http://www.unescap.org/resources/gravity-model-international-trade-user-guide-updated-version" target="_blank">UNESCAP</a>.</p>
+<div id="load-libraries-and-read-data" class="section level2">
+<h2>Load libraries and read data</h2>
+<pre class="r"><code>library(AER)
+library(dplyr)
+library(foreign)
+library(ggplot2)
+library(lmtest)
+library(multiwayvcov)
+library(sampleSelection)
+
+data &lt;- read.dta(&quot;servicesdataset_2016.dta&quot;)</code></pre>
+</div>
+<div id="correlations" class="section level2">
+<h2>Correlations</h2>
+<p>Table 1</p>
+<pre class="r"><code>data &lt;- data %&gt;% 
+  mutate(ln_trade = log(trade),
+         ln_distance = log(dist),
+         ln_gdp_exp = log(gdp_exp),
+         ln_gdp_imp = log(gdp_imp))
+
+cor.data &lt;- data %&gt;% 
+  filter(sector == &quot;SER&quot;) %&gt;% 
+  select(ln_trade, ln_gdp_exp, ln_gdp_imp, ln_distance) %&gt;%
+  na.omit %&gt;% 
+  filter(ln_trade &gt; -Inf)
+
+round(cor(cor.data), 4)</code></pre>
+<pre><code>##             ln_trade ln_gdp_exp ln_gdp_imp ln_distance
+## ln_trade      1.0000     0.3643     0.3731     -0.2648
+## ln_gdp_exp    0.3643     1.0000    -0.3103      0.0518
+## ln_gdp_imp    0.3731    -0.3103     1.0000      0.0431
+## ln_distance  -0.2648     0.0518     0.0431      1.0000</code></pre>
+</div>
+<div id="graphics" class="section level2">
+<h2>Graphics</h2>
+<p>Prepare data</p>
                         </li>
                     
                 </ul>
@@ -296,8 +1917,6 @@ data &lt;- data %&gt;% mutate(ln_trade = log(trade), ln_distance = log(dist), ln
 
     </script>
     
-  
-    
       <script async src="https://www.googletagmanager.com/gtag/js?id=G-VTHEW640NX"></script>
       <script>
         var doNotTrack = false;
@@ -312,10 +1931,6 @@ data &lt;- data %&gt;% mutate(ln_trade = log(trade), ln_distance = log(dist), ln
           gtag('config', 'G-VTHEW640NX');
         }
       </script>
-    
-  
-
-
     </body>
 </html>
 

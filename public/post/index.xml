@@ -13,7 +13,7 @@
       <link>https://www.r-econometrics.com/2022/04/03/decomposing-inflation-for-ea-countries/</link>
       <pubDate>Sun, 03 Apr 2022 00:00:00 +0000</pubDate>
       <guid>https://www.r-econometrics.com/2022/04/03/decomposing-inflation-for-ea-countries/</guid>
-      <description>As a result of supply chain disruptions due to the Covid-19 pandemic and the recent war in the Ukraine inflation has reached unusually high levels during the past months. A first approach to analyse the evolution of inflation over time is to look at its main components: energy, food, services and industrial goods. To do this, I use data from Eurostat, which can be easily loaded into R using the eurostat package for countries of the European Union.</description>
+      <description>&lt;p&gt;As a result of supply chain disruptions due to the Covid-19 pandemic and the recent war in the Ukraine inflation has reached unusually high levels during the past months.&#xA;A first approach to analyse the evolution of inflation over time is to look at its main components: energy, food, services and industrial goods. To do this, I use data from Eurostat, which can be easily loaded into R using the &lt;code&gt;eurostat&lt;/code&gt; package for countries of the European Union.&lt;/p&gt;</description>
     </item>
     <item>
       <title>Producing a labour market dashboard using Eurostat data</title>
@@ -27,7 +27,7 @@
       <link>https://www.r-econometrics.com/2020/03/01/an-introduction-to-network-analysis-in-r/</link>
       <pubDate>Sun, 01 Mar 2020 00:00:00 +0000</pubDate>
       <guid>https://www.r-econometrics.com/2020/03/01/an-introduction-to-network-analysis-in-r/</guid>
-      <description>With the increasing availability of granular data on the relationships between individual entities - such as persons (social media), countries (internatinal trade) and financial institutions (supervisory reporting) - network analysis offers many possibilities to extract useful information from such data. This post provides an introduction to network analysis in R using the powerful igraph package for the calculation of metrics and ggraph for visualisation. It marks the beginning of a more comprehensive treatment of network analysis on r-econometrics.</description>
+      <description>&lt;p&gt;With the increasing availability of granular data on the relationships between individual entities - such as persons (social media), countries (internatinal trade) and financial institutions (supervisory reporting) - network analysis offers many possibilities to extract useful information from such data. This post provides an introduction to network analysis in R using the powerful &lt;code&gt;igraph&lt;/code&gt; package for the calculation of metrics and &lt;code&gt;ggraph&lt;/code&gt; for visualisation. It marks the beginning of a more comprehensive treatment of &lt;a href=&#34;https://www.r-econometrics.com/networksintro/&#34; target=&#34;_blank&#34;&gt;network analysis on r-econometrics&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
     <item>
       <title>An Exercise in Growth Accounting</title>

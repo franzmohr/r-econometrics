@@ -96,86 +96,100 @@
                         <li>
                             <time class="li-article-date">September, 11, 2023</time>
                             <h4><a href="https://www.r-econometrics.com/timeseries/bayes-svar-intro/">Bayesian Inference of Structural Vector Autoregressions (SVAR) with the `bvartools` package</a></h4>
-                            The bvartools allows to perform Bayesian inference of Vector autoregressive (VAR) models, including structural VARs. This post guides through the Bayesian inference of SVAR models in R using the bvartools package.
-Data For this illustration we generate an artificial data set with three endogenous variables, which follows the data generating process
-\[y_t = A_1 y_{t - 1} + B \epsilon_t,\]
-where
-\[ A_1 = \begin{bmatrix} 0.3 &amp; 0.12 &amp; 0.
+                            <p>The <a href="https://cran.r-project.org/package=bvartools" target="_blank">bvartools</a> allows to perform Bayesian inference of <a href="https://www.r-econometrics.com/timeseries/varintro" target="_blank">Vector autoregressive (VAR) models</a>, including <a href="https://www.r-econometrics.com/timeseries/svarintro" target="_blank">structural VARs</a>. This post guides through the Bayesian inference of SVAR models in R using the <code>bvartools</code> package.</p>
+<div id="data" class="section level2">
+<h2>Data</h2>
+<p>For this illustration we generate an artificial data set with three endogenous variables, which follows the data generating process</p>
+<p><span class="math display">\[y_t = A_1 y_{t - 1} + B \epsilon_t,\]</span></p>
+<p>where</p>
+<p><span class="math display">\[
+A_1 = \begin{bmatrix} 0.3 &amp; 0.12 &amp; 0.69 \\ 0 &amp; 0.3 &amp; 0.48 \\ 0.24 &amp; 0.24 &amp; 0.3 \end{bmatrix} \text{, }
+B = \begin{bmatrix} 1 &amp; 0 &amp; 0 \\ -0.14 &amp; 1 &amp; 0 \\ -0.06 &amp; 0.39 &amp; 1 \end{bmatrix} \text{ and } \epsilon_t \sim N(0, I_3).
+\]</span></p>
                         </li>
                     
                         <li>
                             <time class="li-article-date">April, 25, 2021</time>
                             <h4><a href="https://www.r-econometrics.com/timeseries/dynamicfactorintro/">An Introduction to Dynamic Factor Models</a></h4>
-                            Introduction For some macroeconomic applications it might be interesting to see whether a set of obserable variables depends on common drivers. The estimation of such common factors can be done using so-called factor analytical models, which have the form
-\[x_t = \lambda f_t + u_t,\]
-where \(x_t\) is an \(M\)-dimensional vector of observable variables, \(f_t\) is an \(N \times 1\) vector of unobserved factors, \(\lambda\) is an \(M \times N\) matrix of factor loadings and \(u_t\) is an error term.
+                            <div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>For some macroeconomic applications it might be interesting to see whether a set of obserable variables depends on common drivers. The estimation of such common factors can be done using so-called <em>factor analytical models</em>, which have the form</p>
+<p><span class="math display">\[x_t = \lambda f_t + u_t,\]</span></p>
+<p>where <span class="math inline">\(x_t\)</span> is an <span class="math inline">\(M\)</span>-dimensional vector of observable variables, <span class="math inline">\(f_t\)</span> is an <span class="math inline">\(N \times 1\)</span> vector of unobserved factors, <span class="math inline">\(\lambda\)</span> is an <span class="math inline">\(M \times N\)</span> matrix of factor loadings and <span class="math inline">\(u_t\)</span> is an error term.</p>
                         </li>
                     
                         <li>
                             <time class="li-article-date">August, 16, 2020</time>
                             <h4><a href="https://www.r-econometrics.com/timeseries/bayesnotes/">Short Notes on Bayesian Inference of Vector Autoregressive Models</a></h4>
-                            During the past years I realised that econometric analyis can be understood as a craft. You learn your basics at school from more or less motivated/talented professors and then you are sent out into wild, where you are confronted with real life challenges that differ from the stylised exmples you have become used to during your studies. This comes with a bunch new insights that I want to document on this page.
+                            <p>During the past years I realised that econometric analyis can be understood as a craft. You learn your basics at school from more or less motivated/talented professors and then you are sent out into wild, where you are confronted with real life challenges that differ from the stylised exmples you have become used to during your studies. This comes with a bunch new insights that I want to document on this page. It should become a collection of notes on Bayesian VAR modelling that have become imporant to me over the last years.</p>
                         </li>
                     
                         <li>
                             <time class="li-article-date">August, 13, 2020</time>
                             <h4><a href="https://www.r-econometrics.com/timeseries/svarintro/">An Introduction to Structural Vector Autoregression (SVAR)</a></h4>
-                            Vector autoregressive (VAR) models constitute a rather general approach to modelling multivariate time series. A critical drawback of those models in their standard form is their missing ability to describe contemporaneous relationships between the analysed variables. This becomes a central issue in the impulse response analysis for such models, where it is important to know the contemporaneous effects of a shock to the economy. Usually, researchers address this by using orthogonal impulse responses, where the correlation between the errors is obtained from the (lower) Cholesky decomposition of the error covariance matrix.
+                            <p><a href="https://www.r-econometrics.com/timeseries/varintro" target="_blank">Vector autoregressive (VAR) models</a> constitute a rather general approach to modelling multivariate time series. A critical drawback of those models in their standard form is their missing ability to describe contemporaneous relationships between the analysed variables. This becomes a central issue in the <a href="https://www.r-econometrics.com/timeseries/irf" target="_blank">impulse response analysis</a> for such models, where it is important to know the contemporaneous effects of a shock to the economy. Usually, researchers address this by using orthogonal impulse responses, where the correlation between the errors is obtained from the (lower) Cholesky decomposition of the error covariance matrix. This requires them to arrange the variables of the model in a suitable order. An alternative to this approach is to use so-called <em>structural vector autoregressive (SVAR)</em> models, where the relationship between contemporaneous variables is modelled more directly. This post provides an introduction to the concept of SVAR models and how they can be estimated in R.</p>
                         </li>
                     
                         <li>
                             <time class="li-article-date">August, 9, 2020</time>
                             <h4><a href="https://www.r-econometrics.com/timeseries/stationarity/">An Introduction to Stationarity and Unit Roots in Time Series Analysis</a></h4>
-                            Concepts Basically stationarity means that a time series has a constant mean and constant variance over time. Althouth not particularly imporant for the estimation of parameters of econometric models these features are essential for the calculation of reliable test statistics and, hence, can have a significant impact on model selection.
-To illustrate this concept, let’s look at quarterly data on disposable income in billion DM from 1960 to 1982, which is data set E1 from Luetkepohl (2007).
+                            <div id="concepts" class="section level2">
+<h2>Concepts</h2>
+<p>Basically <strong>stationarity</strong> means that a time series has a constant mean and constant variance over time. Althouth not particularly imporant for the estimation of parameters of econometric models these features are essential for the calculation of reliable test statistics and, hence, can have a significant impact on model selection.</p>
+<p>To illustrate this concept, let’s look at quarterly data on disposable income in billion DM from 1960 to 1982, which is data set E1 from Luetkepohl (2007).</p>
                         </li>
                     
                         <li>
                             <time class="li-article-date">March, 21, 2020</time>
                             <h4><a href="https://www.r-econometrics.com/timeseries/irf/">An Introduction to Impulse Response Analysis of VAR Models</a></h4>
-                            Impulse response analysis is an important step in econometric analyes, which employ vector autoregressive models. Their main purpose is to describe the evolution of a model’s variables in reaction to a shock in one or more variables. This feature allows to trace the transmission of a single shock within an otherwise noisy system of equations and, thus, makes them very useful tools in the assessment of economic policies. This post provides an introduction to the concept and interpretation of impulse response functions as they are commonly used in the VAR literature and provides code for their calculation in R.
+                            <p>Impulse response analysis is an important step in econometric analyes, which employ <a href="/timeseries/varintro" target="_blank">vector autoregressive models</a>. Their main purpose is to describe the evolution of a model’s variables in reaction to a shock in one or more variables. This feature allows to trace the transmission of a single shock within an otherwise noisy system of equations and, thus, makes them very useful tools in the assessment of economic policies. This post provides an introduction to the concept and interpretation of impulse response functions as they are commonly used in the VAR literature and provides code for their calculation in R.</p>
                         </li>
                     
                         <li>
                             <time class="li-article-date">October, 7, 2019</time>
                             <h4><a href="https://www.r-econometrics.com/rbasics/dplyrintro/">Introduction to dplyr</a></h4>
-                            The cleaning and transformation of data belong to the most time consuming parts of any economic analysis. Many graphical or statistical functions in R require specifically formated data to work properly. Although the standard functions of R can be used to prepare your data for further analysis, some people find them a bit labourious for daily applications. Therefore, alternatives have been developed, which make data transformation in R easier and also faster.
+                            <p>The cleaning and transformation of data belong to the most time consuming parts of any economic analysis. Many graphical or statistical functions in R require specifically formated data to work properly. Although the standard functions of R can be used to prepare your data for further analysis, some people find them a bit labourious for daily applications. Therefore, alternatives have been developed, which make data transformation in R easier and also faster. One of these alternatives is the <code>dplyr</code> package of the <a href="https://www.tidyverse.org/" target="_blank">tidyverse</a>. It has gained great popularity among R users and being familiar with its syntax can be considered a standard skill in R.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> In the following I give an introduction to some main functions of <code>dplyr</code>, which I also use extensively at work.</p>
                         </li>
                     
                         <li>
                             <time class="li-article-date">July, 22, 2019</time>
                             <h4><a href="https://www.r-econometrics.com/timeseries/vecintro/">An Introduction to Vector Error Correction Models (VECMs)</a></h4>
-                            One of the prerequisits for the estimation of a vector autoregressive (VAR) model is that the analysed time series are stationary. However, economic theory suggests that there exist equilibrium relations between economic variables in their levels, which can render these variables stationary without taking differences. This is called cointegration. Since knowing the size of such relationships can improve the results of an analysis, it would be desireable to have an econometric model, which is able to capture them.
+                            <p>One of the prerequisits for the estimation of a <a href="/timeseries/varintro">vector autoregressive (VAR)</a> model is that the analysed time series are stationary. However, economic theory suggests that there exist equilibrium relations between economic variables in their levels, which can render these variables stationary without taking differences. This is called <em>cointegration</em>. Since knowing the size of such relationships can improve the results of an analysis, it would be desireable to have an econometric model, which is able to capture them. So-called <em>vector error correction models</em> (VECMs) belong to this class of models. The following text presents the basic concept of VECMs and guides through the estimation of such a model in R.</p>
                         </li>
                     
                         <li>
                             <time class="li-article-date">July, 7, 2019</time>
                             <h4><a href="https://www.r-econometrics.com/timeseries/bvar/">An Introduction to Bayesian VAR (BVAR) Models</a></h4>
-                            
-
-
-<p>Bayesian methods have significantly gained in popularity during the last decades as computers have become more powerful and new software has been developed. Their flexibility and other advantageous features have made these methods also more popular in econometrics. This post gives a brief introduction to Bayesian VAR (BVAR) models and provides the code to set up and estimate a basic model with the <a href="https://cran.r-project.org/package=bvartools"><code>bvartools</code></a> package.</p>
-
+                            <p>Bayesian methods have significantly gained in popularity during the last decades as computers have become more powerful and new software has been developed. Their flexibility and other advantageous features have made these methods also more popular in econometrics. This post gives a brief introduction to Bayesian VAR (BVAR) models and provides the code to set up and estimate a basic model with the <a href="https://cran.r-project.org/package=bvartools"><code>bvartools</code></a> package.</p>
                         </li>
                     
                         <li>
                             <time class="li-article-date">June, 11, 2019</time>
                             <h4><a href="https://www.r-econometrics.com/timeseries/bvec/">Bayesian Error Correction Models with Priors on the Cointegration Space</a></h4>
-                            Introduction This post provides the code to set up and estimate a basic Bayesian vector error correction (BVEC) model with the bvartools package. The presented Gibbs sampler is based on the approach of Koop et al. (2010), who propose a prior on the cointegration space.
-Data To illustrate the estimation process, the dataset E6 from Lütkepohl (2007) is used, which contains data on German long-term interest rates and inflation from 1972Q2 to 1998Q4.
+                            <div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>This post provides the code to set up and estimate a basic Bayesian vector error correction (BVEC) model with the <code>bvartools</code> package. The presented Gibbs sampler is based on the approach of Koop et al. (2010), who propose a prior on the cointegration space.</p>
+</div>
+<div id="data" class="section level2">
+<h2>Data</h2>
+<p>To illustrate the estimation process, the dataset E6 from Lütkepohl (2007) is used, which contains data on German long-term interest rates and inflation from 1972Q2 to 1998Q4.</p>
                         </li>
                     
                         <li>
                             <time class="li-article-date">June, 11, 2019</time>
                             <h4><a href="https://www.r-econometrics.com/timeseries/ssvs/">Stochastic Search Variable Selection</a></h4>
-                            Introduction A general drawback of vector autoregressive (VAR) models is that the number of estimated coefficients increases disproportionately with the number of lags. Therefore, fewer information per parameter is available for the estimation as the number of lags increases. In the Bayesian VAR literature one approach to mitigate this so-called curse of dimensionality is stochastic search variable selection (SSVS) as proposed by George et al. (2008). The basic idea of SSVS is to assign commonly used prior variances to parameters, which should be included in a model, and prior variances close to zero to irrelevant parameters.
+                            <div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>A general drawback of vector autoregressive (VAR) models is that the number of estimated coefficients increases disproportionately with the number of lags. Therefore, fewer information per parameter is available for the estimation as the number of lags increases. In the Bayesian VAR literature one approach to mitigate this so-called <em>curse of dimensionality</em> is <em>stochastic search variable selection</em> (SSVS) as proposed by George et al. (2008). The basic idea of SSVS is to assign commonly used prior variances to parameters, which should be included in a model, and prior variances close to zero to irrelevant parameters. By that, relevant parameters are estimated in the usual way and posterior draws of irrelevant variables are close to zero so that they have no significant effect on forecasts and impulse responses. This is achieved by adding a hierarchial prior to the model, where the relevance of a variable is assessed in each step of the sampling algorithm.<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a></p>
                         </li>
                     
                         <li>
                             <time class="li-article-date">May, 20, 2019</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/2015_timmer_wiod/">Reproduction: Timmer, M. P., Dietzenbacher, E., Los, B., Stehrer, R., &amp; De Vries, G. J. (2015). An illustrated user guide to the world input–output database: the case of global automotive production.</a></h4>
-                            As international trade has become increasingly fragmented over the past decades the analysis of global value chains (GVC) has gained popularity in economic research. This post reproduces Timmer et al. (2015), who introduce the world input-output database (WIOD) and present basic concepts of GVC analysis.
-Data Timmer et al. (2015) use the 2013 vintage of the world input-output database (WIOD). The following code downloads the data from the project’s website, unzips it and loads the resulting STATA file into R using the readstata13 package.
+                            <p>As international trade has become increasingly fragmented over the past decades the analysis of global value chains (GVC) has gained popularity in economic research. This post reproduces Timmer et al. (2015), who introduce the world input-output database (WIOD) and present basic concepts of GVC analysis.</p>
+<div id="data" class="section level2">
+<h2>Data</h2>
+<p>Timmer et al. (2015) use the 2013 vintage of the world input-output database (<a href="http://www.wiod.org/database/wiots13" target="_blank">WIOD</a>). The following code downloads the data from the project’s website, unzips it and loads the resulting STATA file into R using the <code>readstata13</code> package.<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a></p>
                         </li>
                     
                         <li>
@@ -187,22 +201,57 @@ Data Timmer et al. (2015) use the 2013 vintage of the world input-output databas
                         <li>
                             <time class="li-article-date">August, 31, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/timeseries/varintro/">An Introduction to Vector Autoregression (VAR)</a></h4>
-                            Since the seminal paper of Sims (1980) vector autoregressive models have become a key instrument in macroeconomic research. This post presents the basic concept of VAR analysis and guides through the estimation procedure of a simple model. When I started my undergraduate program in economics I occasionally encountered the abbreviation VAR in some macro papers. I was fascinated by those waves in the boxes titled impulse responses and wondered how difficult it would be to do such reseach on my own.
+                            <p>Since the seminal paper of Sims (1980) vector autoregressive models have become a key instrument in macroeconomic research. This post presents the basic concept of VAR analysis and guides through the estimation procedure of a simple model. When I started my undergraduate program in economics I occasionally encountered the abbreviation <em>VAR</em> in some macro papers. I was fascinated by those waves in the boxes titled <em>impulse responses</em> and wondered how difficult it would be to do such reseach on my own. I was motivated, but my first attempts were admittedly embarrassing. It took me quite a long time to figure out which kind of data can be analysed, how to estimate a VAR model and how to obtain meaningful impulse responses. Today, I think that there is nothing fancy about VAR models at all once you keep in mind some points.</p>
                         </li>
                     
                         <li>
                             <time class="li-article-date">February, 4, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/rbasics/ggplotintro/">Data Visualisation in R Using ggplot2</a></h4>
-                            A major challenge in data analysis is to summarise and present data with informative graphs. The ggplot2 package was specifically designed to help with this task. Since it is a very powerful and well documented package1, this introduction will only focus on its basic syntax, so that the user gets a better understanding of how to read the supporting material on the internet.
-ggplot graphs are built with some kind of blocks, which usually start with the function ggplot.
+                            <p>A major challenge in data analysis is to summarise and present data with informative graphs. The <code>ggplot2</code> package was specifically designed to help with this task. Since it is a very powerful and well documented package<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>, this introduction will only focus on its basic syntax, so that the user gets a better understanding of how to read the supporting material on the internet.</p>
+<p>ggplot graphs are built with some kind of blocks, which usually start with the function <code>ggplot</code>. Its first argument contains the data object and the second argument is a further function called <code>aes</code>.<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a> It controls, which columns of the data frame are used for the axes, colours, shapes of the data points and further features of the graph. The remaining blocks are separated by plus <code>+</code> signs and – if not specified otherwise – take the information from the first block and add a certain aspect to the graph, for example additional lines or data points. To understand what this all means, let us look at some basic examples.</p>
                         </li>
                     
                         <li>
                             <time class="li-article-date">January, 30, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/reproduction/2016_sheperd_gravity/">Reproduction: Sheperd, B. (2016). The gravity model of international trade: A user guide.</a></h4>
-                            The updated paper and dataset can be downloaded from UNESCAP.
-Load libraries and read data library(AER) library(dplyr) library(foreign) library(ggplot2) library(lmtest) library(multiwayvcov) library(sampleSelection) data &lt;- read.dta(&quot;servicesdataset_2016.dta&quot;) Correlations Table 1
-data &lt;- data %&gt;% mutate(ln_trade = log(trade), ln_distance = log(dist), ln_gdp_exp = log(gdp_exp), ln_gdp_imp = log(gdp_imp)) cor.data &lt;- data %&gt;% filter(sector == &quot;SER&quot;) %&gt;% select(ln_trade, ln_gdp_exp, ln_gdp_imp, ln_distance) %&gt;% na.omit %&gt;% filter(ln_trade &gt; -Inf) round(cor(cor.data), 4) ## ln_trade ln_gdp_exp ln_gdp_imp ln_distance ## ln_trade 1.
+                            <p>The updated paper and dataset can be downloaded from <a href="http://www.unescap.org/resources/gravity-model-international-trade-user-guide-updated-version" target="_blank">UNESCAP</a>.</p>
+<div id="load-libraries-and-read-data" class="section level2">
+<h2>Load libraries and read data</h2>
+<pre class="r"><code>library(AER)
+library(dplyr)
+library(foreign)
+library(ggplot2)
+library(lmtest)
+library(multiwayvcov)
+library(sampleSelection)
+
+data &lt;- read.dta(&quot;servicesdataset_2016.dta&quot;)</code></pre>
+</div>
+<div id="correlations" class="section level2">
+<h2>Correlations</h2>
+<p>Table 1</p>
+<pre class="r"><code>data &lt;- data %&gt;% 
+  mutate(ln_trade = log(trade),
+         ln_distance = log(dist),
+         ln_gdp_exp = log(gdp_exp),
+         ln_gdp_imp = log(gdp_imp))
+
+cor.data &lt;- data %&gt;% 
+  filter(sector == &quot;SER&quot;) %&gt;% 
+  select(ln_trade, ln_gdp_exp, ln_gdp_imp, ln_distance) %&gt;%
+  na.omit %&gt;% 
+  filter(ln_trade &gt; -Inf)
+
+round(cor(cor.data), 4)</code></pre>
+<pre><code>##             ln_trade ln_gdp_exp ln_gdp_imp ln_distance
+## ln_trade      1.0000     0.3643     0.3731     -0.2648
+## ln_gdp_exp    0.3643     1.0000    -0.3103      0.0518
+## ln_gdp_imp    0.3731    -0.3103     1.0000      0.0431
+## ln_distance  -0.2648     0.0518     0.0431      1.0000</code></pre>
+</div>
+<div id="graphics" class="section level2">
+<h2>Graphics</h2>
+<p>Prepare data</p>
                         </li>
                     
                 </ul>
@@ -240,8 +289,6 @@ data &lt;- data %&gt;% mutate(ln_trade = log(trade), ln_distance = log(dist), ln
 
     </script>
     
-  
-    
       <script async src="https://www.googletagmanager.com/gtag/js?id=G-VTHEW640NX"></script>
       <script>
         var doNotTrack = false;
@@ -256,10 +303,6 @@ data &lt;- data %&gt;% mutate(ln_trade = log(trade), ln_distance = log(dist), ln
           gtag('config', 'G-VTHEW640NX');
         }
       </script>
-    
-  
-
-
     </body>
 </html>
 

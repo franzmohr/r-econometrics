@@ -13,14 +13,14 @@
       <link>https://www.r-econometrics.com/methods/teststats/</link>
       <pubDate>Mon, 25 Nov 2019 00:00:00 +0000</pubDate>
       <guid>https://www.r-econometrics.com/methods/teststats/</guid>
-      <description>Model testing belongs to the main tasks of any econometric analysis. This post gives an overview of tests, which should be applied to OLS regressions, and illustrates how to calculate them in R. The focus of the post is rather on the calcuation of the tests. For a treatment of mathematical details, please, consult a standard textbook. This list of statistical tests is necessarily incomplete. However, if you have a strong opinion that a specific test is missing, feel free to leave a comment below.</description>
+      <description>&lt;p&gt;Model testing belongs to the main tasks of any econometric analysis. This post gives an overview of tests, which should be applied to OLS regressions, and illustrates how to calculate them in R. The focus of the post is rather on the calcuation of the tests. For a treatment of mathematical details, please, consult a standard textbook. This list of statistical tests is necessarily incomplete. However, if you have a strong opinion that a specific test is missing, feel free to leave a comment below.&lt;/p&gt;</description>
     </item>
     <item>
       <title>Heteroskedasticity Robust Standard Errors in R</title>
       <link>https://www.r-econometrics.com/methods/hcrobusterrors/</link>
       <pubDate>Mon, 24 Dec 2018 00:00:00 +0000</pubDate>
       <guid>https://www.r-econometrics.com/methods/hcrobusterrors/</guid>
-      <description>Although heteroskedasticity does not produce biased OLS estimates, it leads to a bias in the variance-covariance matrix. This means that standard model testing methods such as t tests or F tests cannot be relied on any longer. This post provides an intuitive illustration of heteroskedasticity and covers the calculation of standard errors that are robust to it.&#xA;Data A popular illustration of heteroskedasticity is the relationship between saving and income, which is shown in the following graph.</description>
+      <description>&lt;p&gt;Although heteroskedasticity does not produce biased &lt;a href=&#34;https://www.r-econometrics.com/methods/ols&#34;&gt;OLS&lt;/a&gt; estimates, it leads to a bias in the variance-covariance matrix. This means that standard model testing methods such as t tests or F tests cannot be relied on any longer. This post provides an intuitive illustration of heteroskedasticity and covers the calculation of standard errors that are robust to it.&lt;/p&gt;&#xA;&lt;div id=&#34;data&#34; class=&#34;section level2&#34;&gt;&#xA;&lt;h2&gt;Data&lt;/h2&gt;&#xA;&lt;p&gt;A popular illustration of heteroskedasticity is the relationship between saving and income, which is shown in the following graph. The dataset is contained the &lt;em&gt;wooldridge&lt;/em&gt; package.&lt;a href=&#34;#fn1&#34; class=&#34;footnoteRef&#34; id=&#34;fnref1&#34;&gt;&lt;sup&gt;1&lt;/sup&gt;&lt;/a&gt;&lt;/p&gt;</description>
     </item>
   </channel>
 </rss>

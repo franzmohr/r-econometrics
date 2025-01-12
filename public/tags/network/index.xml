@@ -13,7 +13,7 @@
       <link>https://www.r-econometrics.com/networksintro/</link>
       <pubDate>Sun, 01 Mar 2020 00:00:00 +0000</pubDate>
       <guid>https://www.r-econometrics.com/networksintro/</guid>
-      <description> With the increasing availability of granular data on the relationships between individual entities - such as persons (social media), countries (internatinal trade) and financial institutions (supervisory reporting) - network analysis offers many possibilities to extract useful information from such data. This section provides brief introductions to the analysis of network data in R.&#xA;Basics of the igraph package Summary statistics with the igraph Network visualisation with ggraph </description>
+      <description>&lt;p&gt;With the increasing availability of granular data on the relationships between individual entities - such as persons (social media), countries (internatinal trade) and financial institutions (supervisory reporting) - network analysis offers many possibilities to extract useful information from such data. This section provides brief introductions to the analysis of network data in R.&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://www.r-econometrics.com/networks/igraph&#34;&gt;Basics of the igraph package&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://www.r-econometrics.com/networks/network-summary&#34;&gt;Summary statistics with the igraph&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://www.r-econometrics.com/networks/network-visual&#34;&gt;Network visualisation with ggraph&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;</description>
     </item>
   </channel>
 </rss>

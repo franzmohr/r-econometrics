@@ -96,24 +96,23 @@
                         <li>
                             <time class="li-article-date">July, 7, 2019</time>
                             <h4><a href="https://www.r-econometrics.com/timeseries/bvar/">An Introduction to Bayesian VAR (BVAR) Models</a></h4>
-                            
-
-
-<p>Bayesian methods have significantly gained in popularity during the last decades as computers have become more powerful and new software has been developed. Their flexibility and other advantageous features have made these methods also more popular in econometrics. This post gives a brief introduction to Bayesian VAR (BVAR) models and provides the code to set up and estimate a basic model with the <a href="https://cran.r-project.org/package=bvartools"><code>bvartools</code></a> package.</p>
-
+                            <p>Bayesian methods have significantly gained in popularity during the last decades as computers have become more powerful and new software has been developed. Their flexibility and other advantageous features have made these methods also more popular in econometrics. This post gives a brief introduction to Bayesian VAR (BVAR) models and provides the code to set up and estimate a basic model with the <a href="https://cran.r-project.org/package=bvartools"><code>bvartools</code></a> package.</p>
                         </li>
                     
                         <li>
                             <time class="li-article-date">June, 11, 2019</time>
                             <h4><a href="https://www.r-econometrics.com/timeseries/ssvs/">Stochastic Search Variable Selection</a></h4>
-                            Introduction A general drawback of vector autoregressive (VAR) models is that the number of estimated coefficients increases disproportionately with the number of lags. Therefore, fewer information per parameter is available for the estimation as the number of lags increases. In the Bayesian VAR literature one approach to mitigate this so-called curse of dimensionality is stochastic search variable selection (SSVS) as proposed by George et al. (2008). The basic idea of SSVS is to assign commonly used prior variances to parameters, which should be included in a model, and prior variances close to zero to irrelevant parameters.
+                            <div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>A general drawback of vector autoregressive (VAR) models is that the number of estimated coefficients increases disproportionately with the number of lags. Therefore, fewer information per parameter is available for the estimation as the number of lags increases. In the Bayesian VAR literature one approach to mitigate this so-called <em>curse of dimensionality</em> is <em>stochastic search variable selection</em> (SSVS) as proposed by George et al. (2008). The basic idea of SSVS is to assign commonly used prior variances to parameters, which should be included in a model, and prior variances close to zero to irrelevant parameters. By that, relevant parameters are estimated in the usual way and posterior draws of irrelevant variables are close to zero so that they have no significant effect on forecasts and impulse responses. This is achieved by adding a hierarchial prior to the model, where the relevance of a variable is assessed in each step of the sampling algorithm.<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a></p>
                         </li>
                     
                         <li>
                             <time class="li-article-date">August, 4, 2018</time>
                             <h4><a href="https://www.r-econometrics.com/timeseriesintro/">Time Series Topics</a></h4>
-                            Work in progress (September 2023). I will try to update this page over the next few months.
-This section is intended to provide an overview of the relevant issues in (macro)economic time series analysis. Again the standard disclaimer: This site does not replace a good textbook, but it should help you to get a grasp of the basic concepts more quickly than if you learned it on your own.
+                            <p><em>Work in progress (September 2023). I will try to update this page over the next few months.</em></p>
+<p>This section is intended to provide an overview of the relevant issues in (macro)economic time series analysis. Again the standard disclaimer: This site does not replace a good textbook, but it should help you to get a grasp of the basic concepts more quickly than if you learned it on your own.</p>
+<p>The intended structure of this site is:</p>
                         </li>
                     
                 </ul>
@@ -151,8 +150,6 @@ This section is intended to provide an overview of the relevant issues in (macro
 
     </script>
     
-  
-    
       <script async src="https://www.googletagmanager.com/gtag/js?id=G-VTHEW640NX"></script>
       <script>
         var doNotTrack = false;
@@ -167,10 +164,6 @@ This section is intended to provide an overview of the relevant issues in (macro
           gtag('config', 'G-VTHEW640NX');
         }
       </script>
-    
-  
-
-
     </body>
 </html>
 
