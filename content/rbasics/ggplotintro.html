@@ -58,7 +58,7 @@ ggplot(data_multi, aes(x = year, y = GDP.pc / 1000, colour = country)) +
   # theme() changes further features of a graph.
   theme(axis.title.y = element_blank()) # Here: delete the title of the y axis</code></pre>
 <p><img src="/rbasics/ggplotintro_files/figure-html/unnamed-chunk-4-1.png" width="384" /></p>
-<p>If you do not want to use colours, but instead prefer different line types to separate the countries’ values, this can be done by replacing the <code>colour</code> argument with <code>linetype</code>. Furthermore, you can rename the title of the legend with the <code>scale_abc_xyz</code> function by specifying the <code>name</code> argument, i.e. <code>scale_linetype_discrete(name = &quot;Country&quot;)</code> in this example.</p>
+<p>If you do not want to use colours, but instead prefer different line types to separate the countries’ values, this can be done by replacing the <code>colour</code> argument with <code>linetype</code>. Furthermore, you can rename the title of the legend with the <code>scale_abc_xyz</code> function by specifying the <code>name</code> argument, i.e. <code>scale_linetype_discrete(name = "Country")</code> in this example.</p>
 <pre class="r"><code># Specify the data and rescale the values of the y axis
 ggplot(data_multi, aes(x = year, y = GDP.pc / 1000, linetype = country)) + 
   geom_line() + # Add a line to the plot
@@ -99,9 +99,9 @@ ggplot(data_gdp, aes(x = Year, y = GDP / 1000, fill = Country)) +
 <p>The only differences are:</p>
 <ul>
 <li>A new data source, <code>data_gdp</code>, is used.</li>
-<li>Instead of <code>geom_line()</code> we use <code>geom_bar()</code> to indicate that the output should be a bar chart. Note that in this case the argument <code>stat = &quot;identity&quot;</code> must be used. Otherwise this will result in an error message. Furthermore, if you were exclusively interested in the distribution of the countries’ shares in aggregate GDP and not in the overall size of GDP, you could add the argument <code>position = &quot;fill&quot;</code> to the <code>geom_bar</code> function and see what happens.</li>
+<li>Instead of <code>geom_line()</code> we use <code>geom_bar()</code> to indicate that the output should be a bar chart. Note that in this case the argument <code>stat = "identity"</code> must be used. Otherwise this will result in an error message. Furthermore, if you were exclusively interested in the distribution of the countries’ shares in aggregate GDP and not in the overall size of GDP, you could add the argument <code>position = "fill"</code> to the <code>geom_bar</code> function and see what happens.</li>
 <li>The colour argument from above was replaced by <code>fill = Country</code> in the <code>aes</code> function. If this had not been done, the resulting graph would consist of grey bars with coloured frames.</li>
-<li>Instead of filling the bars with standard colours we use a different palette by adding the block <code>scale_fill_brewer(palette = &quot;Set1&quot;)</code>. Note that this is also possible with line plots, but if the argument <code>colour = Country</code> is used in the <code>aes</code> function, we will have to use <code>scale_colour_brewer(palette = &quot;Set1&quot;)</code> instead.</li>
+<li>Instead of filling the bars with standard colours we use a different palette by adding the block <code>scale_fill_brewer(palette = "Set1")</code>. Note that this is also possible with line plots, but if the argument <code>colour = Country</code> is used in the <code>aes</code> function, we will have to use <code>scale_colour_brewer(palette = "Set1")</code> instead.</li>
 </ul>
 <p>Note that if we had not specified the fill argument in the <code>aes</code> function, ggplot would just have summed up the values over all countries per year.</p>
 </div>
@@ -144,10 +144,10 @@ g # Plot graph</code></pre>
 <p><img src="/rbasics/ggplotintro_files/figure-html/unnamed-chunk-9-1.png" width="384" /></p>
 <p>The positive relationship in the graph appears more clearly now, although the effect seems to weaken as the value of human capital increases, which might indicate decreasing marginal returns of human capital in terms of GDP per worker. But that is not important here.</p>
 </div>
-<div class="footnotes">
+<div class="footnotes footnotes-end-of-document">
 <hr />
 <ol>
-<li id="fn1"><p>Beside the help function in R the <a href="http://ggplot2.tidyverse.org/reference/">website of the <code>ggplot2</code> package</a> contains very good documentation and examples of the package’s functions. There is also a <a href="https://www.rstudio.com/resources/cheatsheets/">cheatsheet on the website of RStudio</a>.<a href="#fnref1" class="footnote-back">↩</a></p></li>
-<li id="fn2"><p>This is short for “aesthetic mappings”.<a href="#fnref2" class="footnote-back">↩</a></p></li>
+<li id="fn1"><p>Beside the help function in R the <a href="http://ggplot2.tidyverse.org/reference/">website of the <code>ggplot2</code> package</a> contains very good documentation and examples of the package’s functions. There is also a <a href="https://www.rstudio.com/resources/cheatsheets/">cheatsheet on the website of RStudio</a>.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>This is short for “aesthetic mappings”.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
