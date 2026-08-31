@@ -1,11 +1,20 @@
 baseURL = "https://www.r-econometrics.com/"
-languageCode = "en-us"
+locale = "en-us"
 title = "r-econometrics"
 theme = "liquorice"
 ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$", "\\.dta$", "\\.gitignore$"]
 uglyURLs = false
 pygmentsUseClassic = true
 googleAnalytics = "G-VTHEW640NX"
+
+[security]
+  # blogdown/rmarkdown knits content straight to .html; Hugo's default
+  # security policy blocks raw text/html content files, so allow it here.
+  allowContent = ['.*']
+
+[markup.goldmark.renderer]
+  # Knitted R Markdown output (widgets, iframes) relies on embedded raw HTML.
+  unsafe = true
 
 [permalinks]
     post = "/:year/:month/:day/:slug/"
