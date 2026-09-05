@@ -38,7 +38,7 @@ summary(lm.9.1.1)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.8286 on 2716 degrees of freedom
-## Multiple R-squared:  0.07232,    Adjusted R-squared:  0.06959 
+## Multiple R-squared:  0.07232,	Adjusted R-squared:  0.06959 
 ## F-statistic: 26.47 on 8 and 2716 DF,  p-value: &lt; 2.2e-16</code></pre>
 <pre class="r"><code># Seems to be an error in the book.
 # Although all coefficients and their standard errors are equal
@@ -74,7 +74,7 @@ summary(lm.9.1.2)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.8151 on 2713 degrees of freedom
-## Multiple R-squared:  0.1035, Adjusted R-squared:  0.09982 
+## Multiple R-squared:  0.1035,	Adjusted R-squared:  0.09982 
 ## F-statistic: 28.46 on 11 and 2713 DF,  p-value: &lt; 2.2e-16</code></pre>
 <pre class="r"><code>anova(lm.9.1.1, lm.9.1.2)</code></pre>
 <pre><code>## Analysis of Variance Table
@@ -152,7 +152,7 @@ summary(lm.t9.2.1)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.3655 on 927 degrees of freedom
-## Multiple R-squared:  0.2526, Adjusted R-squared:  0.2469 
+## Multiple R-squared:  0.2526,	Adjusted R-squared:  0.2469 
 ## F-statistic: 44.75 on 7 and 927 DF,  p-value: &lt; 2.2e-16</code></pre>
 <pre class="r"><code>lm.t9.2.2 &lt;- lm(lwage ~ educ + exper + tenure + married + south + urban + 
                   black + IQ, data=wage2)
@@ -181,7 +181,7 @@ summary(lm.t9.2.2)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.3632 on 926 degrees of freedom
-## Multiple R-squared:  0.2628, Adjusted R-squared:  0.2564 
+## Multiple R-squared:  0.2628,	Adjusted R-squared:  0.2564 
 ## F-statistic: 41.27 on 8 and 926 DF,  p-value: &lt; 2.2e-16</code></pre>
 <pre class="r"><code>lm.t9.2.3 &lt;- lm(lwage ~ educ + exper + tenure + married + south + urban + 
                 black + IQ + IQ*educ, data = wage2)
@@ -211,7 +211,7 @@ summary(lm.t9.2.3)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.3632 on 925 degrees of freedom
-## Multiple R-squared:  0.2634, Adjusted R-squared:  0.2563 
+## Multiple R-squared:  0.2634,	Adjusted R-squared:  0.2563 
 ## F-statistic: 36.76 on 9 and 925 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
 <div id="example-9.4" class="section level3">
@@ -238,7 +238,7 @@ summary(lm.9.4.1)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.3231 on 43 degrees of freedom
-## Multiple R-squared:  0.05712,    Adjusted R-squared:  0.01326 
+## Multiple R-squared:  0.05712,	Adjusted R-squared:  0.01326 
 ## F-statistic: 1.302 on 2 and 43 DF,  p-value: 0.2824</code></pre>
 <pre class="r"><code>lm.9.4.2 &lt;- lm(lcrmrte ~ unem + llawexpc + lcrmrt_1, data = crime2, subset = (d87==1))
 summary(lm.9.4.2)</code></pre>
@@ -261,7 +261,7 @@ summary(lm.9.4.2)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.1905 on 42 degrees of freedom
-## Multiple R-squared:  0.6798, Adjusted R-squared:  0.657 
+## Multiple R-squared:  0.6798,	Adjusted R-squared:  0.657 
 ## F-statistic: 29.73 on 3 and 42 DF,  p-value: 1.799e-10</code></pre>
 </div>
 <div id="example-9.8" class="section level3">
@@ -287,11 +287,11 @@ summary(lm.9.8.1)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 1.862 on 29 degrees of freedom
-## Multiple R-squared:  0.07612,    Adjusted R-squared:  0.0124 
+## Multiple R-squared:  0.07612,	Adjusted R-squared:  0.0124 
 ## F-statistic: 1.195 on 2 and 29 DF,  p-value: 0.3173</code></pre>
 <pre class="r"><code># See the outliers
 with(rdchem, plot(sales, rdintens, pch = 16))</code></pre>
-<p><img src="/reproduction/wooldridge/wooldridge09_files/figure-html/unnamed-chunk-13-1.png" width="480" style="display: block; margin: auto;" /></p>
+<p><img src="/reproduction/wooldridge/wooldridge09_files/figure-html/unnamed-chunk-13-1.png" alt="" width="480" style="display: block; margin: auto;" /></p>
 <pre class="r"><code># Test without the biggest firm
 lm.9.8.2 &lt;- lm(rdintens ~ sales + profmarg, data = rdchem, subset = (sales &lt; 30000))
 summary(lm.9.8.2)</code></pre>
@@ -313,7 +313,7 @@ summary(lm.9.8.2)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 1.792 on 28 degrees of freedom
-## Multiple R-squared:  0.1728, Adjusted R-squared:  0.1137 
+## Multiple R-squared:  0.1728,	Adjusted R-squared:  0.1137 
 ## F-statistic: 2.925 on 2 and 28 DF,  p-value: 0.07022</code></pre>
 <p>Hmmm, slightly different result than in the book</p>
 <pre class="r"><code># Dummy for the biggest firm
@@ -338,7 +338,7 @@ summary(lm.9.8.3)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 1.792 on 28 degrees of freedom
-## Multiple R-squared:  0.1737, Adjusted R-squared:  0.08513 
+## Multiple R-squared:  0.1737,	Adjusted R-squared:  0.08513 
 ## F-statistic: 1.962 on 3 and 28 DF,  p-value: 0.1427</code></pre>
 <pre class="r"><code># Dummy for highest rdintens
 hi.rdint &lt;- as.numeric(rdchem$rdintens == max(rdchem$rdintens))
@@ -362,7 +362,7 @@ summary(lm.9.8.4)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 1.436 on 28 degrees of freedom
-## Multiple R-squared:  0.4693, Adjusted R-squared:  0.4125 
+## Multiple R-squared:  0.4693,	Adjusted R-squared:  0.4125 
 ## F-statistic: 8.255 on 3 and 28 DF,  p-value: 0.0004321</code></pre>
 <pre class="r"><code>lm.9.8.5 &lt;- lm(rdintens ~ sales + profmarg, data = rdchem, subset = (rdintens  &lt; max(rdintens)))
 summary(lm.9.8.5)</code></pre>
@@ -384,7 +384,7 @@ summary(lm.9.8.5)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 1.436 on 28 degrees of freedom
-## Multiple R-squared:  0.1716, Adjusted R-squared:  0.1125 
+## Multiple R-squared:  0.1716,	Adjusted R-squared:  0.1125 
 ## F-statistic:   2.9 on 2 and 28 DF,  p-value: 0.07165</code></pre>
 <pre class="r"><code># Without first and tenth firm
 lm.9.8.6 &lt;- lm(rdintens ~ sales + profmarg, 
@@ -409,7 +409,7 @@ summary(lm.9.8.6)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 1.369 on 27 degrees of freedom
-## Multiple R-squared:  0.2711, Adjusted R-squared:  0.2171 
+## Multiple R-squared:  0.2711,	Adjusted R-squared:  0.2171 
 ## F-statistic: 5.021 on 2 and 27 DF,  p-value: 0.014</code></pre>
 <p>Hmm, slighty different results</p>
 <pre class="r"><code>lm.9.8.7 &lt;- lm(rdintens ~ sales + profmarg + big + hi.rdint, data = rdchem)
@@ -433,7 +433,7 @@ summary(lm.9.8.7)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 1.369 on 27 degrees of freedom
-## Multiple R-squared:  0.535,  Adjusted R-squared:  0.4661 
+## Multiple R-squared:  0.535,	Adjusted R-squared:  0.4661 
 ## F-statistic: 7.766 on 4 and 27 DF,  p-value: 0.0002664</code></pre>
 </div>
 <div id="example-9.9" class="section level3">
@@ -459,7 +459,7 @@ summary(lm.9.9.1)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.5136 on 29 degrees of freedom
-## Multiple R-squared:  0.918,  Adjusted R-squared:  0.9123 
+## Multiple R-squared:  0.918,	Adjusted R-squared:  0.9123 
 ## F-statistic: 162.2 on 2 and 29 DF,  p-value: &lt; 2.2e-16</code></pre>
 <pre class="r"><code># Without the largest firm
 lm.9.9.2 &lt;- lm(lrd ~ lsales + profmarg, data = rdchem, subset = (lsales  &lt; max(lsales)))
@@ -482,7 +482,7 @@ summary(lm.9.9.2)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.5225 on 28 degrees of freedom
-## Multiple R-squared:  0.9037, Adjusted R-squared:  0.8968 
+## Multiple R-squared:  0.9037,	Adjusted R-squared:  0.8968 
 ## F-statistic: 131.4 on 2 and 28 DF,  p-value: 5.877e-15</code></pre>
 </div>
 <div id="example-9.10" class="section level3">
@@ -510,7 +510,7 @@ summary(lm.9.10.1)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 2.058 on 47 degrees of freedom
-## Multiple R-squared:  0.1391, Adjusted R-squared:  0.08413 
+## Multiple R-squared:  0.1391,	Adjusted R-squared:  0.08413 
 ## F-statistic: 2.531 on 3 and 47 DF,  p-value: 0.06841</code></pre>
 <pre class="r"><code>lm.9.10.2 &lt;- lm(infmort ~ lpcinc + lphysic + lpopul, data = infmrt, subset = (year==1990 &amp; DC==0))
 summary(lm.9.10.2)</code></pre>
@@ -533,6 +533,6 @@ summary(lm.9.10.2)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 1.246 on 46 degrees of freedom
-## Multiple R-squared:  0.2732, Adjusted R-squared:  0.2258 
+## Multiple R-squared:  0.2732,	Adjusted R-squared:  0.2258 
 ## F-statistic: 5.763 on 3 and 46 DF,  p-value: 0.001967</code></pre>
 </div>

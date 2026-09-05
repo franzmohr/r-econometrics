@@ -36,7 +36,7 @@ summary(lm.1)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 20.06 on 1385 degrees of freedom
-## Multiple R-squared:  0.0298, Adjusted R-squared:  0.0284 
+## Multiple R-squared:  0.0298,	Adjusted R-squared:  0.0284 
 ## F-statistic: 21.27 on 2 and 1385 DF,  p-value: 7.942e-10</code></pre>
 <pre class="r"><code>summary(lm.2)</code></pre>
 <pre><code>## 
@@ -56,7 +56,7 @@ summary(lm.1)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 1.254 on 1385 degrees of freedom
-## Multiple R-squared:  0.0298, Adjusted R-squared:  0.0284 
+## Multiple R-squared:  0.0298,	Adjusted R-squared:  0.0284 
 ## F-statistic: 21.27 on 2 and 1385 DF,  p-value: 7.942e-10</code></pre>
 <pre class="r"><code>summary(lm.3)</code></pre>
 <pre><code>## 
@@ -76,7 +76,7 @@ summary(lm.1)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 20.06 on 1385 degrees of freedom
-## Multiple R-squared:  0.0298, Adjusted R-squared:  0.0284 
+## Multiple R-squared:  0.0298,	Adjusted R-squared:  0.0284 
 ## F-statistic: 21.27 on 2 and 1385 DF,  p-value: 7.942e-10</code></pre>
 <p><strong>Beta coefficients (Example 6.1)</strong></p>
 <p>To estimate beta coefficients I use the <em>QuantPsyc</em> package. Its <code>lm.beta</code> function is neat, however, it does not provide standard errors of the coefficients. Thus, I use the <code>Make.Z()</code> function to obtain z-values for the whole sample, turn it into a data frame and estimate the model as usual.</p>
@@ -110,7 +110,7 @@ summary(lm.1)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 5586 on 500 degrees of freedom
-## Multiple R-squared:  0.6357, Adjusted R-squared:  0.632 
+## Multiple R-squared:  0.6357,	Adjusted R-squared:  0.632 
 ## F-statistic: 174.5 on 5 and 500 DF,  p-value: &lt; 2.2e-16</code></pre>
 <pre class="r"><code>summary(lm.2)</code></pre>
 <pre><code>## 
@@ -123,7 +123,7 @@ summary(lm.1)</code></pre>
 ## 
 ## Coefficients:
 ##               Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)  4.744e-16  2.697e-02   0.000        1    
+## (Intercept)  5.679e-16  2.697e-02   0.000        1    
 ## nox         -3.404e-01  4.454e-02  -7.643 1.09e-13 ***
 ## crime       -1.433e-01  3.072e-02  -4.665 3.97e-06 ***
 ## rooms        5.139e-01  3.003e-02  17.112  &lt; 2e-16 ***
@@ -133,7 +133,7 @@ summary(lm.1)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.6066 on 500 degrees of freedom
-## Multiple R-squared:  0.6357, Adjusted R-squared:  0.632 
+## Multiple R-squared:  0.6357,	Adjusted R-squared:  0.632 
 ## F-statistic: 174.5 on 5 and 500 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p><strong>Joint interpretation of different transformations of an exogenous variable</strong></p>
 <p>If you use simple and squared values of an exogenous variable in your regression, you have to interpret them jointly. In this example I estimate the model, save the summary and calculate the value of the exogenous variable at which the joint effect is highest by extracting the coefficients into the solution of the first derivation of the model formula.</p>
@@ -175,11 +175,11 @@ summary(lm.1)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.2592 on 500 degrees of freedom
-## Multiple R-squared:  0.6028, Adjusted R-squared:  0.5988 
+## Multiple R-squared:  0.6028,	Adjusted R-squared:  0.5988 
 ## F-statistic: 151.8 on 5 and 500 DF,  p-value: &lt; 2.2e-16</code></pre>
 <pre class="r"><code># Figure 6.2
 curve(lm.1$coefficients[1] + lm.1$coefficients[4] * x + lm.1$coefficients[5] * x^2, xlim = c(3, 9), ylab = &quot;Effect&quot;)</code></pre>
-<p><img src="/reproduction/wooldridge/wooldridge06_files/figure-html/unnamed-chunk-5-1.png" width="384" /></p>
+<p><img src="/reproduction/wooldridge/wooldridge06_files/figure-html/unnamed-chunk-5-1.png" alt="" width="384" /></p>
 <p><strong>Example 6.3</strong></p>
 <p>This example looks at interaction terms. I use the <code>with</code> function just to spare the <code>attend$</code>-part before each of the variables. I calculate squared values and the interaction term, estimate both models, print the summary - note that you have to use the <code>print</code> command since R will not return this line of code otherwise - and calculate an F-test via <code>anova</code>. The last line gives thee marginal effect of the attendance rate on the outcome variable.</p>
 <p>The problem with this coefficient is that there is no standard error for it. This is achieved by demeaning the second variable of the interaction term and estimating the model again.</p>
@@ -210,7 +210,7 @@ summary(lm.1)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.8729 on 673 degrees of freedom
-## Multiple R-squared:  0.2287, Adjusted R-squared:  0.2218 
+## Multiple R-squared:  0.2287,	Adjusted R-squared:  0.2218 
 ## F-statistic: 33.25 on 6 and 673 DF,  p-value: &lt; 2.2e-16</code></pre>
 <pre class="r"><code>anova(lm.1, lm.2)</code></pre>
 <pre><code>## Analysis of Variance Table
@@ -252,7 +252,7 @@ summary(lm.1)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.8729 on 673 degrees of freedom
-## Multiple R-squared:  0.2287, Adjusted R-squared:  0.2218 
+## Multiple R-squared:  0.2287,	Adjusted R-squared:  0.2218 
 ## F-statistic: 33.25 on 6 and 673 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p><strong>Equations 6.23 and 6.24</strong></p>
 <p>See how the estimates and R-squared differ between the two models.</p>
@@ -275,7 +275,7 @@ summary(lm.1)</code></pre>
 ## lsales        0.3017     0.2155     1.4    0.172
 ## 
 ## Residual standard error: 1.845 on 30 degrees of freedom
-## Multiple R-squared:  0.06133,    Adjusted R-squared:  0.03004 
+## Multiple R-squared:  0.06133,	Adjusted R-squared:  0.03004 
 ## F-statistic:  1.96 on 1 and 30 DF,  p-value: 0.1718</code></pre>
 <pre class="r"><code>summary(lm.2)</code></pre>
 <pre><code>## 
@@ -295,7 +295,7 @@ summary(lm.1)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 1.788 on 29 degrees of freedom
-## Multiple R-squared:  0.1484, Adjusted R-squared:  0.08969 
+## Multiple R-squared:  0.1484,	Adjusted R-squared:  0.08969 
 ## F-statistic: 2.527 on 2 and 29 DF,  p-value: 0.09733</code></pre>
 <p><strong>Example 6.4</strong></p>
 <p>See how the estimates and R-squared differ between the following models.</p>
@@ -321,7 +321,7 @@ summary(lm.1)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 1359 on 206 degrees of freedom
-## Multiple R-squared:  0.02917,    Adjusted R-squared:  0.01975 
+## Multiple R-squared:  0.02917,	Adjusted R-squared:  0.01975 
 ## F-statistic: 3.095 on 2 and 206 DF,  p-value: 0.04739</code></pre>
 <pre class="r"><code>summary(lm.2)</code></pre>
 <pre><code>## 
@@ -341,7 +341,7 @@ summary(lm.1)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.4822 on 206 degrees of freedom
-## Multiple R-squared:  0.282,  Adjusted R-squared:  0.275 
+## Multiple R-squared:  0.282,	Adjusted R-squared:  0.275 
 ## F-statistic: 40.45 on 2 and 206 DF,  p-value: 1.519e-15</code></pre>
 <pre class="r"><code>summary(lm.1)$adj.r.squared</code></pre>
 <pre><code>## [1] 0.01974617</code></pre>
@@ -372,7 +372,7 @@ summary(lm.1)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.5599 on 4132 degrees of freedom
-## Multiple R-squared:  0.2781, Adjusted R-squared:  0.2774 
+## Multiple R-squared:  0.2781,	Adjusted R-squared:  0.2774 
 ## F-statistic:   398 on 4 and 4132 DF,  p-value: &lt; 2.2e-16</code></pre>
 <pre class="r"><code>summary(lm.1)$sigma</code></pre>
 <pre><code>## [1] 0.5598638</code></pre>
@@ -407,7 +407,7 @@ s.2</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.5599 on 4132 degrees of freedom
-## Multiple R-squared:  0.2781, Adjusted R-squared:  0.2774 
+## Multiple R-squared:  0.2781,	Adjusted R-squared:  0.2774 
 ## F-statistic:   398 on 4 and 4132 DF,  p-value: &lt; 2.2e-16</code></pre>
 <pre class="r"><code>ci.low &lt;- s.2$coefficients[1, 1] - 1.96 * s.2$coefficients[1, 2] # Create confidence intervals
 ci.high &lt;- s.2$coefficients[1, 1] + 1.96 * s.2$coefficients[1, 2]
@@ -455,7 +455,7 @@ summary(lm.1)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.5048 on 173 degrees of freedom
-## Multiple R-squared:  0.3182, Adjusted R-squared:  0.3063 
+## Multiple R-squared:  0.3182,	Adjusted R-squared:  0.3063 
 ## F-statistic: 26.91 on 3 and 173 DF,  p-value: 2.474e-14</code></pre>
 <pre class="r"><code>a.1 &lt;- sum(exp(lm.1$residuals)) / 177
 
@@ -476,7 +476,7 @@ summary(lm.3 &lt;- lm(salary ~ m - 1, data = ceosal2))</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 511.9 on 176 degrees of freedom
-## Multiple R-squared:  0.7616, Adjusted R-squared:  0.7603 
+## Multiple R-squared:  0.7616,	Adjusted R-squared:  0.7603 
 ## F-statistic: 562.4 on 1 and 176 DF,  p-value: &lt; 2.2e-16</code></pre>
 <pre class="r"><code>a.2 &lt;- summary(lm.3 &lt;- lm(salary ~ m - 1, data = ceosal2))$coefficient[1]
 
