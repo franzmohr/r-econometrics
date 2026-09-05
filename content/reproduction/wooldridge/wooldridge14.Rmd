@@ -1,0 +1,117 @@
+---
+title: "Chapter 14: Advanced Panel Data Methods"
+author: "Franz X. Mohr"
+date: "2018-02-06"
+---
+
+```{r}
+library(wooldridge)
+```
+
+In order to estimate panel data models, I use the `plm` function from the `plm` package. The intuition behind its structure is similar to the ordinary linear model, except that it allows you to specify the panel's group and time variables and the effects model.
+
+### Example 14.1
+
+Similar to the `lm` function, you can specify your model's equation and the sample. Since you want to use panel data methods for you estimation, you also have to specify which variables in your sample contain the information used to distinguish different groups and which variable contains the time measurement. In our example this is done with `index = c("fcode", "year")`. Note, that the order of the variables is important. The group variable always has to be at the first and the time variable at the second position.
+
+The specification `model = "within"` indicates that the effects occur within a group. This is the fixed effects estimator. And the `effect = "individual"` specifies that we are only interested in effects of the group variable and that there are no time specific effects. (See `?plm` for further information on this.)
+
+```{r, message = FALSE}
+data("jtrain")
+
+# install.packages("plm")
+library(plm)
+
+summary(plm(lscrap ~ d88 + d89 + grant + grant_1,
+            data = jtrain,
+            index= c("fcode", "year"),
+            model = "within",
+            effect = "individual"
+            ))
+```
+
+
+### Example 14.2
+
+The basic structure of `plm` remains the same in this example, except that interaction terms are added.
+Additionally, a specific F-test `pFtest(estimatedmodel1, estimatedmodel2)` is available to test for joint significance of those terms.
+
+```{r}
+data("wagepan")
+
+plm.1 <- plm(lwage ~ married + union +
+               d81 + d82 + d83 +d84 + d85 + d86 + d87 +
+               I(d81*educ) + I(d82*educ) + I(d83*educ) + I(d84*educ) + I(d85*educ) +
+               I(d86*educ) + I(d87*educ),
+             data=wagepan,
+             model="within",
+             effect="individual",
+             index=c("nr", "year"))
+
+summary(plm.1)
+```
+
+```{r}
+plm.2 <- plm(lwage ~ married + union +
+               d81 + d82 + d83 +d84 + d85 + d86 + d87,
+             data = wagepan,
+             model = "within",
+             effect = "individual",
+             index = c("nr", "year"))
+
+pFtest(plm.1,plm.2)
+```
+
+### Example 14.3
+
+See example 14.1.
+
+```{r}
+summary(plm(lscrap ~ d88 + d89 + grant + grant_1 + lsales + lemploy,
+            data = jtrain,
+            model = "within",
+            effect = "individual",
+            index = c("fcode", "year")))
+```
+
+### Example 14.4
+
+This example compares the estimated coefficients of an OLS, random effects and fixed effects model with each other.
+The random effects model is estimated by setting `model`= "random"`. Note that you do not need to specify the effect option.
+
+OLS
+```{r}
+# OLS
+lm.1 <- lm(lwage ~ educ + black + hisp + exper + expersq + married + union +
+             d81 + d82 + d83 + d84 + d85 + d86 + d87,
+           data =  wagepan)
+```
+
+Random effects
+```{r}
+plm.re <- plm(lwage ~ educ + black + hisp + exper + expersq + married + union +
+                d81 + d82 + d83 + d84 + d85 + d86 + d87,
+              data = wagepan,
+              model = "random",
+              index = c("nr", "year"))
+```
+
+Fixed effects
+```{r}
+plm.fe <- plm(lwage ~ expersq + married + union +
+                d81 + d82 + d83 + d84 + d85 + d86 + d87,
+              data = wagepan,
+              effect = "individual",
+              model = "within",
+              index = c("nr", "year"))
+```
+
+Table of results (rounded to 3 digits)
+```{r}
+results <- round(
+  data.frame("Pooled OLS" = lm.1$coefficients[2:8],
+             "Random Effects" = plm.re$coeff[2:8],
+             "Fixed Effects" = c(NA, NA, NA, NA, plm.re$coeff[2:4])
+             ),3)
+results
+```

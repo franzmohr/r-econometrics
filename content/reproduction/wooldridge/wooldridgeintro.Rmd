@@ -1,0 +1,43 @@
+---
+title: "Wooldridge (2013): Introductory Econometrics"
+author: "Franz X. Mohr"
+date: "2018-10-04"
+---
+
+This section is based on Wooldridge, J.M. (2013). Introductory econometrics: A modern approach (5<sup>th</sup>ed.). The following links contain examples in the main text of the book and use R to estimate the models. Alternatively, <a href="http://urfie.net/" target="_blank">Heiss, F. (2016) Using R for Introductory Econometrics</a> is a standalone textbook, which covers the same topics as Wooldridge (2013) and provides an introduction to R as well.
+
+The data sets are from the *wooldridge* package, which is a collection of all data sets used in the Wooldridge textbook. Similar to my page, the package also has a <a href="https://cran.r-project.org/web/packages/wooldridge/vignettes/Introductory-Econometrics-Examples.html" target="_blank">vignette</a> which contains a comprehensive collection of the Wooldridge textbook examples.
+
+*Note, that I do not provide solutions to the computer exercises at the end of the chapters in Wooldridge (2013). Just in case you wondered...*
+
+[Chapter 2: Simple OLS](/reproduction/wooldridge/wooldridge02)
+
+[Chapter 3: Multiple Regression Analysis](/reproduction/wooldridge/wooldridge03)
+
+[Chapter 4: Statistical Inference](/reproduction/wooldridge/wooldridge04)
+
+[Chapter 5: OLS Asymptotics](/reproduction/wooldridge/wooldridge05)
+
+[Chapter 6: Further Issues](/reproduction/wooldridge/wooldridge06)
+
+[Chapter 7: Multiple Regression Analysis with Qualitative Information](/reproduction/wooldridge/wooldridge07)
+
+[Chapter 8: Heteroskedasticity](/reproduction/wooldridge/wooldridge08)
+
+[Chapter 9: More on Specification and Data Issues](/reproduction/wooldridge/wooldridge09)
+
+[Chapter 10: Basic Regression Analysis with Time Series](/reproduction/wooldridge/wooldridge10)
+
+[Chapter 11: Further Issues in Using OLS with Time Series](/reproduction/wooldridge/wooldridge11)
+
+[Chapter 12: Serial Correlation and Heteroskedasticity in Time Series Regression](/reproduction/wooldridge/wooldridge12)
+
+[Chapter 13: Simple Panel Data Methods](/reproduction/wooldridge/wooldridge13)
+
+[Chapter 14: Advanced Panel Data Methods](/reproduction/wooldridge/wooldridge14)
+
+[Chapter 15: Instrumental Variables Estimation and Two Stage Least Squares](/reproduction/wooldridge/wooldridge15)
+
+[Chapter 16: Simultaneous Equations Models](/reproduction/wooldridge/wooldridge16)
+
+[Chapter 17: Limited Dependent Variable Models and Sample Selection Corrections](/reproduction/wooldridge/wooldridge17)

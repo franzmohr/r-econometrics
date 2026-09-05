@@ -1,0 +1,50 @@
+---
+title: "Preparing Your Workplace for an Analysis"
+author: "Franz X. Mohr"
+date: "2019-10-06"
+lastmod: "2025-01-11"
+tags:
+  - rstudio
+  - r
+description: "A short introduction on how to set up your RStudio workplace before you start with an analysis."
+---
+
+## Create a working directory
+
+Usually, people want to keep the folder structure on their computers tidy, so that they and their co-workers understand, which documents and data were used for a particular project -- even if that project was finished months ago. This should also be the case when you work with R. Therefore, I recommend to create a new folder for every new project, which becomes the so-called working directory. There you put all the files, which are necessary for a project. For example, for this introduction I created the folder *r_intro* in my file explorer and I recommend to do the same on your computer now.
+
+## Obtain the original data
+
+The data should be downloaded from the website and saved in the working directory now.
+
+## Create a new R script
+
+You can either use the script you have already open from the `1+2` example above or click on the button with the plus sign on the top left of the editor window and then choose *R Script* to create a new script. Eventually, you should save that script in your working directory by clicking on the blue save button or on *File* -- *Save As...*. It is recommended that the file has a telling name. For this intro the name *my_first_r_experience* will do. After clicking on *Save* the script saved in the .R format.
+
+## Set the working directory in R
+
+Before we start our analysis, we should set the path to the working directory in R. The reason for this is a bit technical. Let's suppose that we want to use R to access a certain file on our computer. There is no way, that R would automatically know in which folder this file is located, if we only specified its name. Therefore, we would not only have to provide the filename, but also the path to it. This can become cumbersome if we want to access many files with R. But given that we have put all the necessary data for our project in the folder *r_intro*, we only have to enter the path once by setting the working directory. Basically, it tells R to access this directory by default, whenever it has to use a file on the hard drive.[^wd] The working directory of R can be set with the `setwd` function:
+
+```{r, eval = FALSE}
+setwd("C:/path/to/your/working/directory/r_intro")
+```
+
+Recall that a function in R has a name and at least one argument. In the previous line `setwd` is the name of the function and the path to the working directory is the argument. Note that the path to the working directory has to be in quotation marks `"path/to/your/working/directory"` and the folders have to be separated by slashes `/` and *not backslashes* `\` as they would be inserted when you directly copy a path from the Windows explorer into R.
+
+## Load the packages you need
+
+Having installed all the necessary packages does not mean, that we can use them without any further action. Before we use the functions of a particular package, we have to load the package whenever R is started.[^loadpackage] This is commonly done with the `library(packagename)` function.[^library]
+
+```{r}
+library(foreign)
+```
+
+These are the basic steps which I believe are useful before starting with the actual coding. However, there are also other ways to set up your workplace. For example, RStudio offers the functionality of so-called *projects* which, among other things, set the working directory automatically for you so that you do not have to think about that. I can only recommend to work with them. A short introduction to working with RStudio-projects can be found on <a href="https://support.rstudio.com/hc/en-us/articles/200526207-Using-Projects" target="_blank">RStudio's website</a>.
+
+Anyway, once your workplace is set up you can proceed with the next step, [importing data into R](/rbasics/help_and_data_import_etc).
+
+[^library]: There is also a function called `require` which, basically, does the same as `library`. However, it also gives out the value `TRUE` if the package was loaded successfully and `FALSE` if not. This can be useful when you want your script to check, whether a certain package is installed on a machine. For example, if a co-worker uses the script and misses a certain package, `require` can be used to indicate this.
+
+[^loadpackage]: Note that you have to install a package only once, whereas you have to load a package every time you start R.
+
+[^wd]: However, you can also import data from different folders than your working directory, if you provide the full path to a file. This can be useful if you have a common data base, which should not be copied too often in order to save memory or to ensure that you always access the most recent data.

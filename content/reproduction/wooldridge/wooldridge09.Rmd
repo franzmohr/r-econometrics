@@ -1,0 +1,174 @@
+---
+title: "Chapter 9: More on Specification and Data Issues"
+author: "Franz X. Mohr"
+date: "2018-02-04"
+---
+
+```{r}
+library(wooldridge)
+```
+
+### Example 9.1
+
+```{r}
+data("crime1")
+
+lm.9.1.1 <- lm(narr86 ~ pcnv + avgsen + tottime + ptime86 + 
+                 qemp86 + inc86 + black + hispan, data = crime1)
+summary(lm.9.1.1)
+# Seems to be an error in the book.
+# Although all coefficients and their standard errors are equal
+# the intercept term is 0.569 instead of 0.596.
+```
+
+```{r}
+lm.9.1.2 <- lm(narr86 ~ pcnv + avgsen + tottime + ptime86 + 
+                 qemp86 + inc86 + black + hispan + pcnvsq + 
+                 pt86sq + inc86sq, data = crime1)
+summary(lm.9.1.2)
+```
+
+```{r}
+anova(lm.9.1.1, lm.9.1.2)
+```
+
+### Example 9.2
+
+```{r}
+data("hprice1")
+
+lm.9.2.1 <- lm(price ~ lotsize + sqrft + bdrms, data = hprice1)
+fit2.1 <- lm.9.2.1$fitted.values^2
+fit3.1 <- lm.9.2.1$fitted.values^3
+lm.9.2.1.reset <- lm(price ~ lotsize + sqrft + bdrms + fit2.1 + fit3.1, data = hprice1)
+anova(lm.9.2.1, lm.9.2.1.reset)
+```
+
+```{r}
+lm.9.2.2 <- lm(lprice ~ llotsize + lsqrft + bdrms, data = hprice1)
+fit2.2 <- lm.9.2.2$fitted.values^2
+fit3.2 <- lm.9.2.2$fitted.values^3
+lm.9.2.2.reset <- lm(lprice ~ llotsize + lsqrft + bdrms + fit2.2 + fit3.2, data = hprice1)
+anova(lm.9.2.2, lm.9.2.2.reset)
+```
+
+### Table 9.2
+
+```{r}
+data("wage2")
+
+lm.t9.2.1 <- lm(lwage ~ educ + exper + tenure + married + south + urban + 
+                  black, data = wage2)
+summary(lm.t9.2.1)
+```
+
+```{r}
+lm.t9.2.2 <- lm(lwage ~ educ + exper + tenure + married + south + urban + 
+                  black + IQ, data=wage2)
+summary(lm.t9.2.2)
+```
+
+```{r}
+lm.t9.2.3 <- lm(lwage ~ educ + exper + tenure + married + south + urban + 
+                black + IQ + IQ*educ, data = wage2)
+summary(lm.t9.2.3)
+```
+
+### Example 9.4
+
+```{r}
+data("crime2")
+
+lm.9.4.1 <- lm(lcrmrte ~ unem + llawexpc, data = crime2, subset = (d87==1))
+summary(lm.9.4.1)
+```
+
+```{r}
+lm.9.4.2 <- lm(lcrmrte ~ unem + llawexpc + lcrmrt_1, data = crime2, subset = (d87==1))
+summary(lm.9.4.2)
+```
+
+### Example 9.8
+
+```{r}
+data("rdchem")
+
+lm.9.8.1 <- lm(rdintens ~ sales + profmarg, data = rdchem)
+summary(lm.9.8.1)
+```
+
+```{r, fig.align="center", fig.height=4, fig.width=5}
+# See the outliers
+with(rdchem, plot(sales, rdintens, pch = 16))
+```
+
+```{r}
+# Test without the biggest firm
+lm.9.8.2 <- lm(rdintens ~ sales + profmarg, data = rdchem, subset = (sales < 30000))
+summary(lm.9.8.2)
+```
+
+Hmmm, slightly different result than in the book
+
+```{r}
+# Dummy for the biggest firm
+big <- as.numeric(rdchem$sales == max(rdchem$sales))
+lm.9.8.3 <- lm(rdintens ~ sales + profmarg + big, data = rdchem)
+summary(lm.9.8.3)
+```
+
+```{r}
+# Dummy for highest rdintens
+hi.rdint <- as.numeric(rdchem$rdintens == max(rdchem$rdintens))
+lm.9.8.4 <- lm(rdintens ~ sales + profmarg + hi.rdint, data = rdchem)
+summary(lm.9.8.4)
+```
+
+```{r}
+lm.9.8.5 <- lm(rdintens ~ sales + profmarg, data = rdchem, subset = (rdintens  < max(rdintens)))
+summary(lm.9.8.5)
+```
+
+```{r}
+# Without first and tenth firm
+lm.9.8.6 <- lm(rdintens ~ sales + profmarg, 
+               data = rdchem,
+               subset = (sales < max(sales) & rdintens < max(rdintens)))
+summary(lm.9.8.6)
+```
+
+Hmm, slighty different results
+
+```{r}
+lm.9.8.7 <- lm(rdintens ~ sales + profmarg + big + hi.rdint, data = rdchem)
+summary(lm.9.8.7)
+```
+
+### Example 9.9
+
+```{r}
+data("rdchem")
+
+lm.9.9.1 <- lm(lrd ~ lsales + profmarg, data = rdchem)
+summary(lm.9.9.1)
+```
+
+```{r}
+# Without the largest firm
+lm.9.9.2 <- lm(lrd ~ lsales + profmarg, data = rdchem, subset = (lsales  < max(lsales)))
+summary(lm.9.9.2)
+```
+
+### Example 9.10
+
+```{r}
+data("infmrt")
+
+lm.9.10.1 <- lm(infmort ~ lpcinc + lphysic + lpopul, data = infmrt, subset = (year==1990))
+summary(lm.9.10.1)
+```
+
+```{r}
+lm.9.10.2 <- lm(infmort ~ lpcinc + lphysic + lpopul, data = infmrt, subset = (year==1990 & DC==0))
+summary(lm.9.10.2)
+```

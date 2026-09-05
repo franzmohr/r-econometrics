@@ -1,0 +1,100 @@
+---
+title: "Assessing the Importance of Trade for a Country"
+author: "Franz X. Mohr"
+date: '2019-05-19'
+slug: "assessing-the-importance-of-trade-for-a-country"
+tags:
+  - trade
+  - gvc
+  - r
+---
+
+
+## Introduction
+
+## Application
+
+### Data
+
+Download
+
+```{r download, include = FALSE}
+download.file("http://www.wiod.org/protected3/data16/wiot_ROW/wiot_r_Nov16.zip", destfile = "~/data/wiod/wiot_data.zip")
+```
+```{r download, eval = FALSE}
+download.file("http://www.wiod.org/protected3/data16/wiot_ROW/wiot_r_Nov16.zip", destfile = "wiot_data.zip")
+```
+
+Unzip the file
+
+```{r unzip, include = FALSE}
+unzip("~/data/wiod/wiot_data.zip", exdir = "~/data/wiod")
+```
+```{r unzip, eval = FALSE}
+unzip("wiot_data.zip")
+```
+
+Read in the file
+
+```{r read}
+data <- c()
+for (i in 2000:2014) {
+  file_name <- paste("~/data/wiod/WIOT", i, "_October16_ROW.RData", sep = "")
+  load(file_name)
+  data <- rbind(data, wiot)
+}
+rm(wiot)
+```
+
+```{r, message = FALSE}
+country <- "AUT"
+
+library(dplyr)
+library(tidyr)
+
+ind_index <- data %>%
+  select(IndustryCode, RNr) %>%
+  distinct()
+
+data <- data %>%
+  filter(Country == country) %>%
+  gather(key = "user", value = "value", -(IndustryCode:Year)) %>%
+  select(Year,IndustryCode, Country, user, value) %>%
+  rename(year = Year,
+         add_ind = IndustryCode,
+         add_ctr = Country) %>%
+  mutate(user_ind = as.numeric(substring(user, 4, 5)),
+         user_ctr = substring(user, 1, 3)) %>%
+  filter(user_ind %in% c(1:61)) %>%
+  left_join(ind_index, by = c("user_ind" = "RNr")) %>%
+  mutate(user_ind = ifelse(!is.na(IndustryCode), substring(IndustryCode, 1, 1), user_ind),
+         add_ind = substring(add_ind, 1, 1)) %>%
+  group_by(year, add_ind, add_ctr, user_ind, user_ctr) %>%
+  summarise(value = sum(value)) %>%
+  ungroup() 
+```
+
+```{r}
+temp_index <- ind_index %>%
+  mutate(ind = substring(IndustryCode, 1, 1))
+temp_index <- unique(temp_index$ind)
+
+temp <- data %>%
+  mutate(var = case_when(user_ctr == country & user_ind %in% temp_index ~ "interm_domestic",
+                         user_ctr != country & user_ind %in% temp_index ~ "interm_foreign",
+                         user_ctr == country & !user_ind %in% temp_index ~ "final_domestic",
+                         user_ctr != country & !user_ind %in% temp_index ~ "final_foreign",
+                         TRUE ~ "0_Fail :)")) %>%
+  group_by(year, var) %>%
+  summarise(value = sum(value))
+```
+
+
+```{r, message = FALSE, fig.width=6, fig.height=3.5}
+library(ggplot2)
+
+ggplot(temp, aes(x = year, y = value, fill = var)) +
+  geom_col()
+```
+
+

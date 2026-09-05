@@ -1,0 +1,475 @@
+---
+title: "Chapter 20: Multivariate Time Series Methods"
+author: "Franz X. Mohr"
+date: "2019-12-09"
+---
+
+This page reproduces the models presented in Chapter 20 in Chan et al. (2019). Each example follows the structure laid out in figure 12.4 in the book.
+
+Load required packages
+
+```{r, message = FALSE}
+library(bvartools)
+library(dplyr)
+library(ggplot2)
+library(spam)
+library(tidyr)
+```
+
+
+## Exercise 20.1: The vector autoregressive model with independent normal-Wishart
+
+### Prepare data
+
+US macro data until 2007Q4
+
+```{r data, fig.width=5, fig.height=4.5, message=FALSE}
+# Specify URL
+url <- "https://web.ics.purdue.edu/~jltobias/second_edition/Chapter20/code_for_exercise_1/US_macrodata.csv"
+# Load data
+us_macro_2007 <- read.csv(url, col.names = c("date", "Dp", "u", "r"))
+# Omit NA values
+us_macro_2007 <- na.omit(us_macro_2007)
+# Transform into time-series object
+us_macro_2007 <- ts(us_macro_2007[, -1], start = c(1959, 2), frequency = 4)
+
+# Generate data matrices for estimation
+temp <- gen_var(us_macro_2007, p = 2, deterministic = "const",
+                iterations = 5000, burnin = 1000)
+
+# Reset random number generator for reproducibility 
+set.seed(8472376)
+```
+
+### Set priors
+
+```{r}
+object <- add_priors(temp,
+                     coef = list(v_i = 1, v_i_det = 1 / 10),
+                     sigma = list(df = "k + 3", scale = 1))
+```
+
+
+### Estimate
+
+In this example only the initial values of the variance-covariance matrix have to be set. They are based on the OLS estimator.
+
+```{r, message = FALSE, warning = FALSE, results='hold'}
+ex_20_1 <- draw_posterior(object)
+ex_20_1 <- thin(ex_20_1) # Thin the output
+```
+
+Obtain impuse response functions as in figure 20.1
+
+```{r irf, fig.width=6.5, fig.height=3.3, message=FALSE}
+# Calculate impulse responses
+Dp <- irf(ex_20_1, impulse = "r", response = "Dp", n.ahead = 20, type = "oir", keep_draws = TRUE)
+u <- irf(ex_20_1, impulse = "r", response = "u", n.ahead = 20, type = "oir", keep_draws = TRUE)
+r <- irf(ex_20_1, impulse = "r", response = "r", n.ahead = 20, type = "oir", keep_draws = TRUE)
+
+# Obtain means
+Dp <- colMeans(Dp)
+u <- colMeans(u)
+r <- colMeans(r)
+
+# Prepare for plotting
+temp <- cbind(Dp, u, r) %>%
+  as.data.frame() %>%
+  mutate(time = 1:n() - 1) %>%
+  pivot_longer(cols = c("Dp", "u", "r")) %>%
+  mutate(name = factor(name, levels = c("Dp", "u", "r"),
+                       labels = c("Inflation", "Unemployment", "Interest rate")))
+
+# Plot
+ggplot(temp, aes(x = time, y = value)) +
+  geom_line() +
+  facet_wrap(~ name, scales = "free")
+```
+
+Although qualitativly equal, the values of the IRF differ, since `bvartools::irf` does not allow to set the size of a shock yet.
+
+## Exercixe 20.2: Vector autoregression with Minnesota prior
+
+### Prepare data
+
+We use the same data set as in Exercise 20.1. although with lag $p=1$.
+
+```{r}
+# Generate data matrices for estimation
+temp <- gen_var(us_macro_2007, p = 1, deterministic = "const")
+y <- temp$data$Y
+x <- temp$data$Z
+
+# Generate further variables
+k <- NROW(y) # Number of endogenous variables
+tt <- ncol(y) # Number of observations
+z <- kronecker(t(x), diag(1, k)) # SUR form
+m <- ncol(z) # Number of estimated coefficients
+```
+
+### Set prior hyperparameters
+
+Since function `bvartools::minnesota_prior` uses a slightly different formula to calculate the prior covariance matrix, the prior hyperparameters need to be adapted to be consistent with the prior hyperparameters used in Chan et al. (2019). See `?minnesota_prior` for the formula.
+
+```{r}
+temp <- minnesota_prior(temp, kappa0 = .5, kappa1 = .5, kappa3 = 200)
+
+# Priors of coefficients
+mu_prior <- temp$mu # Prior mean
+v_i_prior <- temp$v_i # Prior variance
+sigma_i <- temp$sigma_i # OLS estimate of the inverse error covariance matrix
+```
+  
+### Posterior results
+  
+Since the Minnesota prior allows for an analytical solution, there is no need to use the Gibbs sampler.
+  
+```{r}
+# Posterior variance 
+v_post <- solve(v_i_prior + t(z) %*% kronecker(diag(1, tt), sigma_i) %*% z)
+
+# Posterior mean
+a_post <- v_post %*% (v_i_prior %*% mu_prior + t(z) %*% kronecker(diag(1, tt), sigma_i) %*% matrix(y))
+```
+  
+The posterior means are:
+  
+```{r}
+# Obtain rounded values in matrix form  
+a_mean <- round(t(matrix(a_post, k)), 3)
+
+# Name rows and columns
+dimnames(a_mean) <- list(dimnames(x)[[1]], dimnames(y)[[1]])
+
+# Look at result
+a_mean
+```
+
+And the posterior standard deviations are:
+
+```{r}
+# Obtain rounded values of in matrix form
+sd_mean <- round(t(matrix(sqrt(diag(v_post)), k)), 3)
+
+# Name rows and columns
+dimnames(sd_mean) <- list(dimnames(x)[[1]], dimnames(y)[[1]])
+
+# Look at result
+sd_mean
+```
+
+The results are pratically identical to the values presented in the book. The lower standard deviation of the interest rate coefficient in the interest rate equation should be a typo.
+
+## Exercise 20.5: Stochastic search variable selection in VARs
+
+### Prepare data
+
+We use the same data set as in Exercise 20.2.
+
+```{r}
+# Generate data matrices for estimation
+temp <- gen_var(us_macro_2007, p = 1, deterministic = "const",
+                iterations = 20000, burnin = 2000)
+```
+
+### Priors
+
+```{r}
+object <- add_priors(temp,
+                     sigma = list(shape = 0.01, scale = 100),
+                     ssvs = list(inprior = .5, tau = c(.01, 100), errors = TRUE))
+```
+
+### Obtain posteriors
+
+The `bvartools` package's own posterior simulation function `bvaralg` includes functionality to draw posterior draws as described in the Chan et al. (2019). In this regard, note that the second edition of the book contains some errors in section 20.5, which were corrected for the implementation. The MATLAB code of the book is correct as well.
+
+The following adjustments were made to the hyperparameters used to obtain draws of the variances $\psi_{ii}^2$.
+
+* The hyperparameter $\overline{a}_i = \underline{a}_i + \frac{T}{2}$.
+* The hyperparameter $ \overline{b}_j = \underline{b}_j + \frac{1}{2} \left\{ s_{jj} - s^{\prime}_j \left[ S_{j - 1} + \left( \underline{D}^{\eta}_j \right)^{-1} \right]^{-1} s_j \right\} $
+
+Beside that it should be noted that the hyperparameter $\overline{b}_i$ is a *rate* parameter.
+
+```{r, message=FALSE, warning=FALSE, results='hold'}
+ssvs_result <- draw_posterior(object)
+```
+
+### Results
+
+```{r}
+summary(ssvs_result)
+```
+
+The results are very similar to the results in the book. Differences might result from different random number generation, which could also lead to slightly different inclusion probabilities.
+
+
+
+
+## Exercise 20.6: Time varying parameter VAR
+
+### Data: US macro data until 2007Q4
+
+```{r, echo=FALSE}
+rm(list = ls())
+```
+
+```{r, message=FALSE}
+# Specify URL
+url <- "https://web.ics.purdue.edu/~jltobias/second_edition/Chapter20/code_for_exercise_5/US_macrodata.csv"
+# Load data
+us_macro_2007 <- read.csv(url, col.names = c("date", "Dp", "u", "r"))
+# Omit NA values
+us_macro_2007 <- na.omit(us_macro_2007)
+# Transform into time-series object
+us_macro_2007 <- ts(us_macro_2007[, -1], start = c(1959, 2), frequency = 4)
+
+# Genenerate data matrices
+temp <- gen_var(us_macro_2007, p = 2, deterministic = "const")
+y <- temp$Y
+x <- temp$Z
+
+k <- nrow(y) # Number of endogenous variables
+tt <- ncol(y) # Number of obs
+m <- nrow(x) # Number of regressors
+n <- m * k # Number of estimated coefficients
+```
+
+### Estimation
+
+Priors
+
+```{r}
+# Initial conditions
+a0_mu_prior <- matrix(0, n)
+b0_v_i_prior <- diag(1, n)
+diag(b0_v_i_prior)[n - k + 1:k] <- 1 / 10 # Prior for determinsitic terms
+
+# Priors for measurement equation errors
+sigma_df_prior <- k + 3
+sigma_df_post <- tt + sigma_df_prior
+sigma_scale_prior <- diag(1, k)
+
+# Priors for state equation errors
+q_shape_prior <- 3
+q_shape_post <- q_shape_prior + tt / 2
+q_rate_prior <- rep(.01^2, n)
+q_rate_prior[n - k + 1:k] <- .1^2 # Determinsitic
+```
+
+Initial values
+
+```{r}
+y_vec <- matrix(y)
+
+z <- matrix(0, k * tt, n * tt)
+for (i in 1:tt) {
+  z[(i - 1) * k + 1:k, (i - 1) * n + 1:n] <- kronecker(t(x[, i]), diag(1, k))
+}
+z <- as.spam(z)
+
+beta0 <- tcrossprod(y, x) %*% solve(tcrossprod(x))
+sigma_temp <- tcrossprod(y - beta0 %*% x) / tt
+sigma_i_temp <- solve(sigma_temp)
+sigma_i <- kronecker(diag(1, tt), sigma_i_temp)
+sigma_i <- as.spam(sigma_i)
+
+beta0 <- matrix(beta0)
+
+q_i <- kronecker(diag(1, tt), diag(100, n))
+q_i <- as.spam(q_i)
+
+h <- diag(1, m * k * tt)
+diag(h[-(1:(m * k)), 1:(m * k * (tt - 1))]) <- -1
+h <- as.spam(h)
+```
+
+Gibbs sampler
+
+```{r}
+iterations <- 21000
+burnin <- 1000
+
+# Data containers for draws
+draws_beta <- NULL
+for (i in 1:tt) {
+  draws_beta[[i]] <- matrix(NA, n, iterations - burnin)
+}
+draws_sigma <- matrix(NA, k * k, iterations - burnin)
+
+# Start Gibbs sampler
+for (draw in 1:iterations) {
+  # Draw parameters
+  HQiH <- crossprod(h, q_i) %*% h
+  XSi <- crossprod(z, sigma_i)
+  K_beta <- HQiH + XSi %*% z
+  mu_beta <- matrix(solve(K_beta, HQiH %*% kronecker(matrix(1, tt), beta0) + XSi %*% y_vec))
+  beta <- mu_beta + solve.spam(chol(K_beta), rnorm(n * tt))
+  
+  # Measurement eq. variance-covariance matrix
+  u <- matrix(y_vec - z %*% beta, k)
+  sigma_i_temp <- rWishart(n, sigma_df_post, solve(sigma_scale_prior + tcrossprod(u)))[,, 1]
+  sigma_i <- as.spam(kronecker(diag(1, tt), sigma_i_temp))
+  
+  # State eq. error variances
+  beta <- matrix(beta, n)
+  v <- apply(beta - cbind(beta0, beta[, -tt]), 1, function(x) {sum(x^2)})
+  q_post <- cbind(q_shape_post, q_rate_prior + v / 2)
+  q_i_temp <- apply(q_post, 1, function(x) {rgamma(1, shape = x[1], rate = x[2])})
+  diag(q_i) <- rep(q_i_temp, tt)
+  
+  # Initial condition
+  K_beta0 <- b0_v_i_prior + q_i[1:n, 1:n]
+  mu_beta0 <- solve(K_beta0, b0_v_i_prior %*% a0_mu_prior + q_i[1:n, 1:n] %*% beta[, 1])
+  beta0 <- mu_beta0 + solve(chol(K_beta0), rnorm(n))
+  
+  # Save draws
+  if (draw > burnin) {
+    pos_draw <- draw - burnin
+    
+    for (i in 1:tt) {
+      draws_beta[[i]][, pos_draw] <- as.matrix(beta[, i])
+    }
+    
+    draws_sigma[, pos_draw] <- solve(sigma_i_temp)
+  }
+}
+```
+
+### Impulse responses
+
+Create `bvar` obejcts for further analysis
+
+```{r}
+# For 1975Q1
+tt_1975 <- which(time(us_macro_2007) == 1975) - 2
+bvar_1975 <- bvar(y = y, x = x,
+                   A = draws_beta[[tt_1975]][1:(n - k),],
+                   C = draws_beta[[tt_1975]][n - k + 1:k, ],
+                   Sigma = draws_sigma)
+
+# For 2005Q1
+tt_2005 <- which(time(us_macro_2007) == 2005) - 2
+bvar_2005 <- bvar(y = y, x = x,
+                   A = draws_beta[[tt_2005]][1:(n - k),],
+                   C = draws_beta[[tt_2005]][n - k + 1:k, ],
+                   Sigma = draws_sigma)
+```
+
+Obtain impulse responses for inflation
+
+```{r Dp, fig.width=4, fig.height=3.5}
+irf_1975 <- irf(bvar_1975, impulse = "r", response = "Dp",
+                n.ahead = 20, type = "oir", keep_draws = TRUE)
+
+irf_2005 <- irf(bvar_2005, impulse = "r", response = "Dp",
+                n.ahead = 20, type = "oir", keep_draws = TRUE)
+
+# Difference between the IRF
+diff_irf_Dp <- irf_2005 - irf_1975
+diff_irf_Dp <- t(apply(diff_irf_Dp, 2, quantile, probs = c(.05, .5, .95)))
+diff_irf_Dp <- diff_irf_Dp %>%
+  as.data.frame() %>%
+  mutate(var = "Inflation",
+         time = 1:n() - 1)
+
+# Mean IRF
+irf_1975 <- colMeans(irf_1975)
+irf_2005 <- colMeans(irf_2005)
+
+irf_Dp <- cbind(irf_1975, irf_2005) %>%
+  as.data.frame() %>%
+  mutate(var = "Inflation",
+         time = 1:n() - 1)
+```
+
+Obtain impulse responses for unemployment
+
+```{r u, fig.width=4, fig.height=3.5}
+irf_1975 <- irf(bvar_1975, impulse = "r", response = "u",
+                n.ahead = 20, type = "feir", keep_draws = TRUE)
+
+irf_2005 <- irf(bvar_2005, impulse = "r", response = "u",
+                n.ahead = 20, type = "feir", keep_draws = TRUE)
+
+# Difference between the IRF
+diff_irf_u <- irf_2005 - irf_1975
+diff_irf_u <- t(apply(diff_irf_u, 2, quantile, probs = c(.05, .5, .95)))
+diff_irf_u <- diff_irf_u %>%
+  as.data.frame() %>%
+  mutate(var = "Unemployment",
+         time = 1:n() - 1)
+
+# Mean IRF
+irf_1975 <- colMeans(irf_1975)
+irf_2005 <- colMeans(irf_2005)
+
+irf_u <- cbind(irf_1975, irf_2005) %>%
+  as.data.frame() %>%
+  mutate(var = "Unemployment",
+         time = 1:n() - 1)
+```
+
+Obtain impulse responses for interest rate
+
+```{r r, fig.width=4, fig.height=3.5}
+irf_1975 <- irf(bvar_1975, impulse = "r", response = "r",
+                n.ahead = 20, type = "feir", keep_draws = TRUE)
+
+irf_2005 <- irf(bvar_2005, impulse = "r", response = "r",
+                n.ahead = 20, type = "feir", keep_draws = TRUE)
+
+# Difference between the IRF
+diff_irf_r <- irf_2005 - irf_1975
+diff_irf_r <- t(apply(diff_irf_r, 2, quantile, probs = c(.05, .5, .95)))
+diff_irf_r <- diff_irf_r %>%
+  as.data.frame() %>%
+  mutate(var = "Interest rate",
+         time = 1:n() - 1)
+
+# Mean IRF
+irf_1975 <- colMeans(irf_1975)
+irf_2005 <- colMeans(irf_2005)
+
+irf_r <- cbind(irf_1975, irf_2005) %>%
+  as.data.frame() %>%
+  mutate(var = "Interest rate",
+         time = 1:n() - 1)
+```
+
+Figure 20.2: Mean IRF
+
+```{r, message=FALSE, fig.width=6, fig.height=3.5}
+temp <- bind_rows(irf_Dp, irf_u, irf_r) %>%
+  # Bring it into long form
+  pivot_longer(cols = starts_with("irf_"),
+               names_to = "Period") %>%
+  # For better labelling in the plot
+  mutate(var = factor(var, levels = c("Inflation", "Unemployment", "Interest rate")),
+         Period = factor(Period, levels = c("irf_1975", "irf_2005"),
+                         labels = c("1975", "2005")))
+
+# Plot
+ggplot(temp, aes(x = time, y = value, colour = Period)) +
+  facet_wrap(~ var, scales = "free") +
+  geom_line() +
+  theme(legend.position = "bottom", legend.title = element_blank())
+```
+
+Figure 20.3: Plot differences between IRF
+
+```{r, fig.width=6, fig.height=3.5}
+temp <- bind_rows(diff_irf_Dp, diff_irf_u, diff_irf_r)
+names(temp) <- c("ymin", "y", "ymax", "var", "time")
+
+temp <- temp %>%
+  mutate(var = factor(var, levels = c("Inflation", "Unemployment", "Interest rate")))
+
+# Plot
+ggplot(temp, aes(x = time)) +
+  geom_ribbon(aes(ymin = ymin, ymax = ymax, fill = "a"), alpha = .3, show.legend = FALSE) +
+  geom_line(aes(y = y, colour = "a"), show.legend = FALSE) +
+  facet_wrap(~ var, scales = "free")
+```
+
+*Work in progress*

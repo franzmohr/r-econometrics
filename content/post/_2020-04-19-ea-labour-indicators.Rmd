@@ -1,0 +1,149 @@
+---
+title: "Producing a labour market dashboard using Eurostat data"
+author: "Franz X. Mohr"
+date: '2020-04-19'
+tags:
+  - euroarea
+  - labour
+  - eurostat
+---
+
+<!--more-->
+
+Yeah, I know. It's pretty obvious which countries contribute most to euro area GDP growth: the larger economies. But let's do this exercise anyways. We will use the `eurostat` package to obtain data from Eurostat and calculate a euro area member state's contribution to overall euro area GDP growth.
+
+```{r, message=FALSE, warning = FALSE}
+library(dplyr)
+library(eurostat)
+library(ggplot2)
+library(zoo)
+```
+
+### Data
+
+The `eurostat` package comes with a list of euro area countries. This is very useful when you only want to download data for euro area countries.
+
+```{r}
+ctr <- "AT"
+```
+
+
+### Sectoral breakdown of employment
+
+
+```{r, message = FALSE}
+emp <- get_eurostat(id = "namq_10_a10_e", cache = FALSE,
+                    stringsAsFactors = FALSE)
+
+valueadded <- get_eurostat(id = "namq_10_a10", cache = FALSE,
+                           stringsAsFactors = FALSE)
+```
+
+
+```{r, fig.height=3.5,  fig.show = "hold", out.width = "50%"}
+temp <- emp %>%
+  filter(na_item == "EMP_DC",
+         nace_r2 != "TOTAL",
+         unit %in% c("PC_TOT_PER", "PC_TOT_HW", "PC_TOT_JOB"),
+         geo == ctr) %>%
+  group_by(na_item) %>%
+  filter(time == max(time)) %>%
+  ungroup()
+
+temp_order <- temp %>%
+  group_by(nace_r2) %>%
+  summarise(value = sum(values)) %>%
+  ungroup() %>%
+  arrange(desc(value))
+temp_order <- temp_order$nace_r2
+
+temp <- temp %>%
+  mutate(nace_r2 = factor(nace_r2, levels = temp_order))
+
+ggplot(temp, aes(x = nace_r2, y = values, fill = unit)) +
+  geom_col(position = "dodge")
+
+
+temp <- valueadded %>%
+  filter(geo == ctr,
+         s_adj == "SCA",
+         nace_r2 != "TOTAL",
+         na_item == "B1G",
+         unit == "PC_TOT",
+         time %in% as.Date(c("2017-10-01", "2018-10-01", "2019-10-01"))) %>%
+  mutate(time = as.yearqtr(time),
+         time = as.character(time))
+
+temp_order <- temp %>%
+  group_by(nace_r2) %>%
+  summarise(value = sum(values)) %>%
+  ungroup() %>%
+  arrange(desc(value))
+temp_order <- temp_order$nace_r2
+
+temp <- temp %>%
+  mutate(nace_r2 = factor(nace_r2, levels = temp_order))
+
+ggplot(temp, aes(x = nace_r2, y = values, fill = time)) +
+  geom_col(position = "dodge")
+```
+
+## Unemployment
+
+```{r}
+unemp <- get_eurostat(id = "une_rt_m",
+                      filters = list(s_adj = c("NSA", "SA"),
+                                     geo = ctr),
+                      stringsAsFactors = FALSE) %>%
+  filter(!is.na(values)) # Drop NAs
+```
+
+### Unemployment by age group
+
+```{r, fig.height=3.5,  fig.show = "hold", out.width = "50%"}
+temp <- unemp %>%
+  filter(s_adj == "NSA",
+         sex == "T",
+         age %in% c("Y25-74", "Y_LT25"),
+         unit == "THS_PER",
+         time >= "2019-01-01")
+
+ggplot(temp, aes(x = time, y = values, fill = age)) +
+  geom_col()
+
+temp <- unemp %>%
+  filter(s_adj == "NSA",
+         sex == "T",
+         unit == "PC_ACT",
+         time >= "2019-01-01")
+
+ggplot(temp, aes(x = time, y = values, colour = age)) +
+  geom_line()
+
+```
+
+### Unemployment by sex
+
+```{r, fig.height=3.5,  fig.show = "hold", out.width = "50%"}
+temp <- unemp %>%
+  filter(s_adj == "NSA",
+         sex != "T",
+         age == "TOTAL",
+         unit == "THS_PER",
+         time >= "2019-01-01")
+
+ggplot(temp, aes(x = time, y = values, fill = sex)) +
+  geom_col(position = "dodge")
+
+temp <- unemp %>%
+  filter(s_adj == "NSA",
+         sex != "T",
+         age == "TOTAL",
+         unit == "PC_ACT",
+         time >= "2019-01-01")
+
+ggplot(temp, aes(x = time, y = values, colour = sex)) +
+  geom_line()
+
+```
+

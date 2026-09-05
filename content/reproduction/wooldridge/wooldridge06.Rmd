@@ -1,0 +1,232 @@
+---
+title: "Chapter 6: Further Issues"
+author: "Franz X. Mohr"
+date: "2018-02-04"
+---
+
+Chapter 6 in Wooldridge (2013) deals with some more issues that might have an impact on your estimates. Among these are a change in the scale of your variables, so-called beta-factors and the interpretation of variables that appear together with their squared values, i.e. interaction terms.
+
+Before you start, set your working directory, load the `foreign` library and download the data we are going to use in this chapter.
+
+```{r, message = FALSE}
+library(QuantPsyc)
+library(wooldridge)
+```
+
+**The impact of scales on the estimated coefficients**
+
+Table 6.1
+```{r}
+data("bwght")
+
+lm.1 <- lm(bwght ~ cigs + faminc, data = bwght)
+lm.2 <- lm(bwghtlbs ~ cigs + faminc, data = bwght)
+lm.3 <- lm(bwght ~ packs + faminc, data = bwght)
+
+summary(lm.1)
+summary(lm.2)
+summary(lm.3)
+```
+
+**Beta coefficients (Example 6.1)**
+
+To estimate beta coefficients I use the *QuantPsyc* package. Its `lm.beta` function is neat, however, it does not provide standard errors of the coefficients. Thus, I use the `Make.Z()` function to obtain z-values for the whole sample, turn it into a data frame and estimate the model as usual.
+
+```{r}
+data("hprice2")
+
+lm.1 <- lm(price ~ nox + crime + rooms + dist + stratio, data = hprice2)
+
+lm.beta(lm.1) # Beta coefficients with no standard errors.
+
+hprice2.2 <- as.data.frame(Make.Z(hprice2)) # Generate z-values
+lm.2 <- lm(price ~ nox + crime + rooms + dist + stratio, data = hprice2.2)
+summary(lm.1)
+summary(lm.2)
+```
+
+**Joint interpretation of different transformations of an exogenous variable**
+
+If you use simple and squared values of an exogenous variable in your regression, you have to interpret them jointly. In this example I estimate the model, save the summary and calculate the value of the exogenous variable at which the joint effect is highest by extracting the coefficients into the solution of the first derivation of the model formula.
+
+```{r}
+# Equation 6.12
+data("wage1")
+
+lm.1 <- lm(wage ~ exper + expersq, data = wage1)
+s.1 <- summary(lm.1)
+
+abs(s.1$coefficient[2, 1] / (2 * s.1$coefficient[3, 1]))
+```
+
+**Example 6.2**
+
+This example is similar to the previous. Again, one exogenous variable is squared and used as an additional estimator to take account of a possible change in the parameter with an increase in the size of the variable. The `curve` function uses the estimated parameters to simulate such a relationship. The effect on the endogenous variable first decreases at lower values of x, i.e. the number of rooms, and starts to increase with higher values.
+
+```{r, fig.height=3, fig.width=4}
+data("hprice2")
+
+ldist <- log(hprice2$dist)
+rooms.sq <- hprice2$rooms^2
+lm.1 <- lm(lprice ~ lnox + ldist + rooms + rooms.sq + stratio, data = hprice2)
+
+summary(lm.1)
+
+# Figure 6.2
+curve(lm.1$coefficients[1] + lm.1$coefficients[4] * x + lm.1$coefficients[5] * x^2, xlim = c(3, 9), ylab = "Effect")
+```
+
+**Example 6.3**
+
+This example looks at interaction terms. I use the <code>with</code> function just to spare the <code>attend$</code>-part before each of the variables. I calculate squared values and the interaction term, estimate both models, print the summary - note that you have to use the <code>print</code> command since R will not return this line of code otherwise - and calculate an F-test via <code>anova</code>. The last line gives thee marginal effect of the attendance rate on the outcome variable.
+
+The problem with this coefficient is that there is no standard error for it. This is achieved by demeaning the second variable of the interaction term and estimating the model again.
+
+```{r}
+data("attend")
+
+lm.1 <- lm(stndfnl ~ atndrte + priGPA + ACT + I(priGPA^2) + I(ACT^2) + I(priGPA*atndrte), data = attend)
+lm.2 <- lm(stndfnl ~ priGPA + ACT + I(priGPA^2) + I(ACT^2), data = attend)
+summary(lm.1)
+anova(lm.1, lm.2)
+lm.1$coefficients[2] + mean(attend$priGPA) * lm.1$coefficient[7]
+```
+Typo in the text
+
+```{r}
+priGPA.m.atndrte <- (attend$priGPA - mean(attend$priGPA)) * attend$atndrte
+lm.1 <- lm(stndfnl ~ atndrte + priGPA + ACT + I(priGPA^2) + I(ACT^2) + priGPA.m.atndrte, data = attend)
+summary(lm.1)
+```
+
+**Equations 6.23 and 6.24**
+
+See how the estimates and R-squared differ between the two models.
+
+```{r}
+data("rdchem")
+
+lm.1 <- lm(rdintens ~ lsales, data = rdchem)
+lm.2 <- lm(rdintens ~ sales + salessq, data = rdchem)
+summary(lm.1)
+summary(lm.2)
+```
+
+**Example 6.4**
+
+See how the estimates and R-squared differ between the following models.
+
+```{r}
+data("ceosal1")
+
+lm.1 <- lm(salary ~ sales + roe, data = ceosal1)
+lm.2 <- lm(lsalary ~ lsales + roe, data = ceosal1)
+summary(lm.1)
+summary(lm.2)
+summary(lm.1)$adj.r.squared
+summary(lm.2)$adj.r.squared
+```
+
+**Example 6.5**
+
+Compare the usual estimation of a model with a regression, where interesting values - like means - are subtracted from each variable before the estimation.
+
+```{r}
+data("gpa2")
+
+lm.1 <- lm(colgpa ~ sat + hsperc + hsize + hsizesq, data = gpa2)
+summary(lm.1)
+summary(lm.1)$sigma
+
+lm.1$coefficients
+lm.1$coefficients[1] + lm.1$coefficients[2] * 1200 + lm.1$coefficients[3] * 30 + 
+  lm.1$coefficients[4] * 5 + lm.1$coefficients[5] * 5^2
+
+lm.2 <- lm(colgpa ~ I(sat - 1200) + I(hsperc - 30) + I(hsize - 5) + I(hsizesq - 25), data = gpa2) # Estimate the model
+
+s.2 <- summary(lm.2)
+s.2
+
+ci.low <- s.2$coefficients[1, 1] - 1.96 * s.2$coefficients[1, 2] # Create confidence intervals
+ci.high <- s.2$coefficients[1, 1] + 1.96 * s.2$coefficients[1, 2]
+c(ci.low, ci.high)
+```
+
+**Example 6.6**
+
+```{r}
+data("gpa2")
+
+lm.2 <- lm(colgpa ~ I(sat - 1200) + I(hsperc - 30) + I(hsize - 5) + I(hsizesq - 25), data = gpa2)
+s.2 <- summary(lm.2)
+
+se <- sqrt(s.2$coefficients[1, 2]^2 + s.2$sigma^2)
+se
+
+ci.low <- s.2$coefficients[1, 1] - 1.96 * se
+ci.high <- s.2$coefficients[1, 1] + 1.96 * se
+c(ci.low, ci.high)
+```
+
+**Example from page 203**
+
+```{r}
+data("hprice1")
+
+lm.1 <- lm(price ~ lotsize + sqrft + bdrms, data = hprice1)
+min(lm.1$residuals)
+```
+
+**Example 6.7**
+
+```{r}
+data("ceosal2")
+
+lm.1 <- lm(lsalary ~ lsales + lmktval + ceoten, data = ceosal2)
+summary(lm.1)
+
+a.1 <- sum(exp(lm.1$residuals)) / 177
+
+m <- exp(lm.1$fitted.values)
+summary(lm.3 <- lm(salary ~ m - 1, data = ceosal2))
+a.2 <- summary(lm.3 <- lm(salary ~ m - 1, data = ceosal2))$coefficient[1]
+
+lm.1$coefficients[1] + lm.1$coefficients[2] * log(5000) + lm.1$coefficients[3] * log(10000) + lm.1$coefficients[4] * 10
+
+exp(lm.1$coefficients[1] + lm.1$coefficients[2] * log(5000) + lm.1$coefficients[3] * log(10000) + lm.1$coefficients[4] * 10)
+
+a.1 * exp(lm.1$coefficients[1] + lm.1$coefficients[2] * log(5000) + lm.1$coefficients[3] * log(10000) + lm.1$coefficients[4] * 10)
+
+a.2 * exp(lm.1$coefficients[1] + lm.1$coefficients[2] * log(5000) + lm.1$coefficients[3] * log(10000) + lm.1$coefficients[4] * 10)
+```
+
+**Example 6.8**
+
+```{r}
+data("ceosal2")
+
+lm.1 <- lm(lsalary ~ lsales + lmktval + ceoten, data = ceosal2)
+m <- exp(lm.1$fitted.values)
+cor(ceosal2$salary, m)^2
+
+lm.2 <- lm(salary ~ sales + mktval + ceoten, data = ceosal2)
+summary(lm.2)$r.squared
+
+ceosal2.2 <- ceosal2
+ceosal2.2$lsales <- ceosal2.2$lsales - log(5000)
+ceosal2.2$lmktval <- ceosal2.2$lmktval - log(10000)
+ceosal2.2$ceoten <- ceosal2.2$ceoten - 10
+
+lm.3 <- lm(lsalary ~ lsales + lmktval + ceoten, data = ceosal2.2)
+s.3 <- summary(lm.3)
+
+s.3$sigma
+s.3$coefficients[1, 2]
+
+se <- sqrt(s.3$coefficients[1, 2]^2 + s.3$sigma^2)
+se
+
+ci.low <- exp(-1.96 * se) * exp(s.3$coefficients[1, 1])
+ci.high <- exp(1.96 * se) * exp(s.3$coefficients[1, 1])
+c(ci.low, ci.high)
+```

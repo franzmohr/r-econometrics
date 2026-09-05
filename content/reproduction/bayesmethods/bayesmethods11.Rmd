@@ -1,0 +1,269 @@
+---
+title: "Chapter 11: Monte Carlo Integration"
+author: "Franz X. Mohr"
+date: "2019-12-25"
+---
+
+## Exercise 11.2: Drawing frmm standard distributions
+
+```{r, fig.width=7, fig.height=4.5, message=FALSE}
+# Sample size
+n1 <- 10L
+n2 <- 100L
+n3 <- 100000L
+# We use integers as indicated by the "L" at the end of the number.
+# This only makes the results look nicer
+
+# Reset random number generator for reproducibilty
+set.seed(123456)
+```
+
+### Uniform
+
+The standard specification of R's random number generator (RNG) `runif` is `min = 0` and `max = 1`, which is exactly what we need. So we only have to specify the number of draws.
+
+```{r, fig.width=7, fig.height=4.5, message=FALSE}
+unif1 <- runif(n1)
+unif2 <- runif(n2)
+unif3 <- runif(n3)
+
+result <- data.frame(size = c(n1, n2, n3),
+                     mean = c(mean(unif1), mean(unif2), mean(unif3)),
+                     sd = c(sd(unif1), sd(unif2), sd(unif3)))
+
+result
+```
+
+### Standard normal
+
+The standard specification of R's RNG for the normal distribution `rnorm` is `mean = 0` and `sd = 1`, which is by definition a *standard normal* distribution. So we only have to specify the number of draws.
+
+```{r, fig.width=7, fig.height=4.5, message=FALSE}
+norm1 <- rnorm(n1)
+norm2 <- rnorm(n2)
+norm3 <- rnorm(n3)
+
+result <- data.frame(size = c(n1, n2, n3),
+                     mean = c(mean(norm1), mean(norm2), mean(norm3)),
+                     sd = c(sd(norm1), sd(norm2), sd(norm3)))
+
+result
+```
+
+### Student t(3)
+
+```{r, fig.width=7, fig.height=4.5, message=FALSE}
+t1 <- rt(n1, df = 3)
+t2 <- rt(n2, df = 3)
+t3 <- rt(n3, df = 3)
+
+result <- data.frame(size = c(n1, n2, n3),
+                     mean = c(mean(t1), mean(t2), mean(t3)),
+                     sd = c(sd(t1), sd(t2), sd(t3)))
+
+result
+```
+
+### Beta(3,2)
+
+```{r, fig.width=7, fig.height=4.5, message=FALSE}
+beta1 <- rbeta(n1, shape1 = 3, shape2 = 2)
+beta2 <- rbeta(n2, shape1 = 3, shape2 = 2)
+beta3 <- rbeta(n3, shape1 = 3, shape2 = 2)
+
+result <- data.frame(size = c(n1, n2, n3),
+                     mean = c(mean(beta1), mean(beta2), mean(beta3)),
+                     sd = c(sd(beta1), sd(beta2), sd(beta3)))
+
+result
+```
+
+### Exponential(5)
+
+To show the equivalence of the exponential(5) distribution and the G(1, 5) distribution, we reset the RNG before we draw from the respective distribution.
+
+Also note that $rexp$ requires a slightly different input than the mean as described in the textbook. Rather, we have to specify the rate of the distribution, which is defined as `1 / mean`.
+
+```{r, fig.width=7, fig.height=4.5, message=FALSE}
+set.seed(987654) # Reset RNG
+
+exp1 <- rexp(n1, rate = 1 / 5)
+exp2 <- rexp(n2, rate = 1 / 5)
+exp3 <- rexp(n3, rate = 1 / 5)
+
+result <- data.frame(size = c(n1, n2, n3),
+                     mean = c(mean(exp1), mean(exp2), mean(exp3)),
+                     sd = c(sd(exp1), sd(exp2), sd(exp3)))
+
+result
+```
+
+### Gamma(1, 5)
+
+```{r, fig.width=7, fig.height=4.5, message=FALSE}
+set.seed(987654) # Reset RNG
+
+gamma_exp1 <- rgamma(n1, shape = 1, scale = 5)
+gamma_exp2 <- rgamma(n2, shape = 1, scale = 5)
+gamma_exp3 <- rgamma(n3, shape = 1, scale = 5)
+
+result <- data.frame(size = c(n1, n2, n3),
+                     mean = c(mean(gamma_exp1), mean(gamma_exp2), mean(gamma_exp3)),
+                     sd = c(sd(gamma_exp1), sd(gamma_exp2), sd(gamma_exp3)))
+
+result
+```
+
+Although numerically not the same, it can be shown that the two approaches are equivalent by using one million draws and plotting their histograms:
+
+```{r, fig.width=6, fig.height=3.5, message=FALSE}
+library(ggplot2)
+
+# Exponential distribution
+set.seed(987654) # Reset RNG
+exp4 <- data.frame(var = "Exponential(5)", value = rexp(10^6, rate = 1 / 5))
+
+# Gamma distribution
+set.seed(987654) # Reset RNG
+gamma_exp4 <- data.frame(var = "Gamma(1, 5)", value = rgamma(10^6, shape = 1, scale = 5))
+
+temp <- rbind(exp4, gamma_exp4)
+
+ggplot(temp, aes(x = value, fill = var)) +
+  geom_histogram(position = "dodge")
+```
+
+Note that you could also specify the $rate$ argument in $rgamma$ to obtain the same result. In this case `rate` is defined as `1 / scale`.
+
+```{r, fig.width=7, fig.height=4.5, message=FALSE}
+set.seed(987654) # Reset RNG
+
+gamma_exp1 <- rgamma(n1, shape = 1, rate = 1 / 5)
+gamma_exp2 <- rgamma(n2, shape = 1, rate = 1 / 5)
+gamma_exp3 <- rgamma(n3, shape = 1, rate = 1 / 5)
+
+result <- data.frame(size = c(n1, n2, n3),
+                     mean = c(mean(gamma_exp1), mean(gamma_exp2), mean(gamma_exp3)),
+                     sd = c(sd(gamma_exp1), sd(gamma_exp2), sd(gamma_exp3)))
+
+result
+```
+
+The `rate` argument can be very handy if you want to draw from a inverse gamma distribution, which is often the case in Gibbs sampling.
+
+### Chi-squared(2)
+
+Again, to show the equivalence of the $\chi^{2}(5)$ distribution and the $G(1, 5)$ distribution, we reset the RNG before we draw from the respective distribution.
+
+```{r, fig.width=7, fig.height=4.5, message=FALSE}
+set.seed(987654) # Reset RNG
+
+chisq1 <- rchisq(n1, 3)
+chisq2 <- rchisq(n2, 3)
+chisq3 <- rchisq(n3, 3)
+
+result <- data.frame(size = c(n1, n2, n3),
+                     mean = c(mean(chisq1), mean(chisq2), mean(chisq3)),
+                     sd = c(sd(chisq1), sd(chisq2), sd(chisq3)))
+
+result
+```
+
+### Gamma(3/2, 2)
+
+```{r, fig.width=7, fig.height=4.5, message=FALSE}
+set.seed(987654) # Reset RNG
+
+gamma_chi1 <- rgamma(n1, shape = 3 / 2, scale = 2)
+gamma_chi2 <- rgamma(n2, shape = 3 / 2, scale = 2)
+gamma_chi3 <- rgamma(n3, shape = 3 / 2, scale = 2)
+
+result <- data.frame(size = c(n1, n2, n3),
+                     mean = c(mean(gamma_chi1), mean(gamma_chi2), mean(gamma_chi3)),
+                     sd = c(sd(gamma_chi1), sd(gamma_chi2), sd(gamma_chi3)))
+
+result
+```
+
+In this case, the output of the two approaches is exaclty the same, which results from reseting the RNG seed.
+
+## Exercise 11.3: Monte Carlo integration in a regression problem
+
+### Generate artificial data set
+
+```{r, fig.width=7, fig.height=4.5, message=FALSE}
+set.seed(987654) # Reset RNG
+
+n <- 100 # Number of observations
+
+# Specify coefficients
+beta1 <- 0
+beta2 <- 1
+h <- 1
+
+# Generate random draws of explanatory variables
+x <- runif(n)
+
+# Generate random draws of errors
+epsilon <- rnorm(n, 0, 1 / h)
+
+# Calculate dependent variable
+y <- beta1 + beta2 * x + epsilon
+y <- matrix(y) # Transform to matrix format for later
+
+# Generate data matrix of regressors
+x <- cbind(1, x)
+
+# Number of regressors
+k <- ncol(x)
+```
+
+### Calculate posterior mean and standard deviation
+
+Set priors
+
+```{r, fig.width=7, fig.height=4.5, message=FALSE}
+beta_mu_prior <- matrix(c(0, 1)) # Prior mean
+beta_v_i_prior <- diag(1, k) # Prior covariance
+
+v_prior <- 1 # Prior degrees of freedom
+s2_prior <- 1 # Prior variance
+```
+
+Obtain posteriors
+
+```{r, fig.width=7, fig.height=4.5, message=FALSE}
+# OLS results
+b_hat <- solve(crossprod(x)) %*% crossprod(x, y) # OLS estimate
+v <- n - k # Degrees of freedom
+s2 <- crossprod(y - x %*% b_hat) / v # sigma2
+sse <- v * s2 # SSE
+
+# beta posterior
+beta_v_i_post <- solve(beta_v_i_prior + crossprod(x))
+beta_mu_post <- beta_v_i_post %*% (beta_v_i_prior %*% beta_mu_prior + crossprod(x) %*% b_hat)
+
+
+v_post <- v_prior + n
+
+beta_diff <- b_hat - beta_mu_prior
+
+vs_post <- as.numeric(v_prior * s2_prior + sse + crossprod(beta_diff, crossprod(x) %*% beta_v_i_post %*% beta_v_i_prior) %*% beta_diff)
+s2_post <- vs_post / v_post
+```
+
+Posterior mean and standard deviation
+
+```{r, fig.width=7, fig.height=4.5, message=FALSE}
+beta_cov <- beta_v_i_post * vs_post / (v_post - k)
+beta_sd <- sqrt(diag(beta_cov))
+
+result <- data.frame(beta_mu = beta_mu_post,
+                     beta_sd = beta_sd)
+row.names(result) <- c("beta1", "beta2")
+
+result
+```
+
+
+*Work in progress*

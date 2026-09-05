@@ -1,0 +1,281 @@
+---
+title: "An Introduction to Bayesian VAR (BVAR) Models"
+author: "Franz X. Mohr"
+date: "2019-07-07"
+tags:
+  - r
+  - bvar
+  - var
+  - bayes
+  - bayesian-var
+  - bvartools
+  - gibbs-sampler
+description: "An introduction into Bayesian VAR (BVAR) modelling and how to estimate it in R using Gibbs sampling. The post also provides some experienced-based tips about important aspects that are usually not contained in textbooks."
+---
+
+Bayesian methods have significantly gained in popularity during the last decades as computers have become more powerful and new software has been developed. Their flexibility and other advantageous features have made these methods also more popular in econometrics. This post gives a brief introduction to Bayesian VAR (BVAR) models and provides the code to set up and estimate a basic model with the [`bvartools`](https://cran.r-project.org/package=bvartools) package.
+
+<!--more-->
+
+## BVAR models
+
+Bayesian VAR (BVAR) models have the same mathematical form as any other [VAR model](/timeseries/varintro), i.e.
+
+$$ y_t = c + \sum_{l=i}^{p} A_i y_{t-i} + \epsilon_t,$$
+where $y_t$ is a $K \times 1$ vector of endogenous variables in period $t$, $A_i$ is the cofficient matrix corresponding to the $i$th lag of $y_t$, $c$ is a constant deterministic term and $\epsilon_t$ is an error term with zero mean and variance-covariance $\Sigma$.
+
+The only difference between usual VAR models and BVAR models is the way parameter estimates are obtained and interpreted. VAR models are usually estimated by [OLS](/methods/ols), which is a simple and computationally fast estimator. By contrast, Bayesian estimators are slightly more complicated and more burdensome in terms of algebra and calculation power. The coefficients obtained by so-called *frequentist* estimators like OLS are interpreted based on the concept of the <a href="https://en.wikipedia.org/wiki/Sampling_distribution" target="_blank">sampling distribution</a>. In Bayesian inference, the coefficients are assumed to have their own distribution. A more detailed treatment of the difference between frequentist and Bayesian inference can be found in Kennedy (2008, ch. 14), which provides a short introduction to the Bayesian approach and a series of references for interested readers. Koop and Korobilis (2010) provide a very good introduction to Bayesian VAR estimators.
+
+As already mentioned, Bayesian inference can be algebraically demanding. However, Bayesian estimators for linear VAR models can be implemented in a straightforward manner. A standard implementation is a so-called **Gibbs sampler**, which belongs to the family of Markov-Chain-Monte-Carlo (MCMC) methods. A detailed treatment of this method is beyond the scope of this post, but [Wikipedia](https://en.wikipedia.org/wiki/Gibbs_sampling) might be a good start to become familiar with it. Personally, I like to think of the Gibbs sampler as throwing a bunch of random numbers at a model and see what sticks. The remainer of this text provides the code to set up and estimate a basic BVAR model with the `bvartools` package.
+
+## Model and data
+
+For this illustration the dataset E1 from Lütkepohl (2007) is used. It contains data on West German fixed investment, disposable income and consumption expenditures in billions of DM from 1960Q1 to 1982Q4. Following Lütkepohl (2007) the VAR model has two lags, i.e. $p = 2$ and only the first 73 observations are used for inference.
+
+```{r data, fig.align='center', fig.height=5, fig.width=4.5}
+library(bvartools)
+
+data("e1") # Load the data
+e1 <- diff(log(e1)) # Calculate first-log-differences
+
+# Reduce number of oberservations
+e1 <- window(e1, end = c(1978, 4))
+```
+
+Basically, it would be possible to proceed without any further transformation of the data. However, it is good practise to multiply log-differenced data by 100 so that, for example, the value 1% is indicated by 1 and not by 0.01.
+
+```{r, fig.align='center', fig.height=5, fig.width=4.5}
+e1 <- e1 * 100 # Rescale data
+
+plot(e1) # Plot the series
+```
+
+To assist with the set-up of the model the `gen_var` function produces the inputs `y` and `x` for the estimator, where `y` is a matrix of dependent variables and `x` is the matrix of regressors for the model
+
+$$y_t = A x_t + u_t,$$
+with $u_t \sim N(0, \Sigma)$. This is a more compact form of the model above, where the lags of the endogenous variables and the constant are already included in $x_t$.
+
+```{r}
+data <- gen_var(e1, p = 2, deterministic = "const")
+
+y <- t(data$data$Y)
+x <- t(data$data$Z)
+```
+
+## Estimation
+
+### Frequentist estimator
+
+We calculate frequentist VAR estimates using the standard formula $y x' (x x')^{-1}$ to obtain a benchmark for the Bayesian estimator. The parameters are obtained by OLS:
+
+```{r}
+A_freq <- tcrossprod(y, x) %*% solve(tcrossprod(x)) # Calculate estimates
+round(A_freq, 3) # Round estimates and print
+```
+
+And $\Sigma$ is calculated by
+
+```{r}
+u_freq <- y - A_freq %*% x
+u_sigma_freq <- tcrossprod(u_freq) / (ncol(y) - nrow(x))
+round(u_sigma_freq, 2)
+```
+
+These are virtually the same values as in Lütkepohl (2007, Ch. 3). The only differences stem from the re-scaling of the data above, which results in proportionally higher values for the `const` variable and does not require us to multiply the covariance matrix by $10^4$.
+
+### Bayesian estimator
+
+The following code is a Gibbs sampler for a simple VAR model with non-informative priors. First, we define some variables, which help in the set-up of the sampler:
+
+```{r}
+# Reset random number generator for reproducibility
+set.seed(1234567)
+
+iter <- 30000 # Number of iterations of the Gibbs sampler
+burnin <- 15000 # Number of burn-in draws
+store <- iter - burnin
+
+tt <- ncol(y) # Number of observations
+k <- nrow(y) # Number of endogenous variables
+m <- k * nrow(x) # Number of estimated coefficients
+```
+
+Next, we set the priors. The prior means of the coefficient vector $a = vec(A)$ are set to $0$ and the diagonal elements of the corresponding covariance matrix $V$ are set to $1$, except for coefficients corresponding to intercept terms, which are set to $10$. The prior degrees of freedom of the error term are set to $6$ and the diagonal elements of the scale matrix to $1$.
+
+*Note that the choice of the prior variances for coefficients, which correspond to intercept terms, can be motivated by the values of the analysed time series. For example, if a stationary series seems to move around the value $5$, this could be taken into account by setting the prior mean of the respective coefficients to $5$ with a small prior variance around it. If the researcher still prefers to set the mean to $0$, it should be ensured that the prior variance is large enough so that the value $5$ is captured by the prior distribution.*
+
+*Note that the choice of the prior variances of the errors can be highly influential if the scale of the errors is not taken into account appropriately. For example, if the dependent variable does exceed values between $-0.1$ and $0.1$, a prior of $1$ would be too high and could lead to useless results.*
+
+```{r}
+# Set priors
+a_mu_prior <- matrix(0, m) # Vector of prior parameter means
+a_v_i_prior <- diag(1, m) # Inverse of the prior covariance matrix
+
+u_sigma_df_prior <- 6 # Prior degrees of freedom
+u_sigma_scale_prior <- diag(1, k) # Prior covariance matrix
+u_sigma_df_post <- tt + u_sigma_df_prior # Posterior degrees of freedom
+```
+
+*Note that we could also use uninformative priors, where all elements of the inverse prior covariance matrix $V^{-1}$ are set to zero and the prior degrees of freedom and the elements of the scale matrix are set to 0 as well. Such a specification should lead to posterior draws, which mimic the results of a frequentist OLS estimator.*
+
+Then we obtain some starting values. It might be a good idea to start with the OLS estimates of the model.
+
+```{r}
+# Initial values
+u_sigma_i <- solve(u_sigma_freq)
+```
+
+Next, create object, in which the posterior draws are saved for later.
+
+```{r}
+# Data containers for posterior draws
+draws_a <- matrix(NA, m, store)
+draws_sigma <- matrix(NA, k * k, store)
+```
+
+Finally run the Gibbs sampler.
+
+```{r}
+# Start Gibbs sampler
+for (draw in 1:iter) {
+  # Draw conditional mean parameters
+  a <- post_normal(y, x, u_sigma_i, a_mu_prior, a_v_i_prior)
+
+  # Draw variance-covariance matrix
+  u <- y - matrix(a, k) %*% x # Obtain residuals
+  u_sigma_scale_post <- solve(u_sigma_scale_prior + tcrossprod(u))
+  u_sigma_i <- matrix(rWishart(1, u_sigma_df_post, u_sigma_scale_post)[,, 1], k)
+  u_sigma <- solve(u_sigma_i) # Invert Sigma_i to obtain Sigma
+
+  # Store draws
+  if (draw > burnin) {
+    draws_a[, draw - burnin] <- a
+    draws_sigma[, draw - burnin] <- u_sigma
+  }
+}
+```
+
+After the Gibbs sampler has finished, point estimates for the coefficient matrix can be obtained as, e.g., the mean of the posterior draws:
+
+```{r}
+A <- rowMeans(draws_a) # Obtain means for every row
+A <- matrix(A, k) # Transform mean vector into a matrix
+A <- round(A, 3) # Round values
+dimnames(A) <- list(dimnames(y)[[1]], dimnames(x)[[1]]) # Rename matrix dimensions
+
+A # Print
+```
+
+Point estimates for the covariance matrix can also be obtained by calculating the means of the posterior draws.
+
+```{r}
+Sigma <- rowMeans(draws_sigma) # Obtain means for every row
+Sigma <- matrix(Sigma, k) # Transform mean vector into a matrix
+Sigma <- round(Sigma, 2) # Round values
+dimnames(Sigma) <- list(dimnames(y)[[1]], dimnames(y)[[1]]) # Rename matrix dimensions
+
+Sigma # Print
+```
+
+The means of the coefficient draws are relatively close to the results of the frequentist estimatior. *However, note that the frequentist estimator suggests coefficients, which are close to $1$ for the relationship between investment and consumption. By contrast, the Bayesian estimator implies different point estimates, which might be a result of the rather close prior variance of $1$ for those parameters. As mentioned above, using a non-informative prior will lead to results that are closer to the OLS estimates.*
+
+## `bvar` objects
+
+The `bvar` function can be used to collect relevant output of the Gibbs sampler into a standardised object, which can be used by further functions such as `predict` to obtain forecasts or `irf` for [impulse respons analysis](/timeseries/irf).
+
+```{r bvar-object}
+bvar_est <- bvar(y = data$data$Y, x = data$data$Z, A = draws_a[1:18,],
+                 C = draws_a[19:21, ], Sigma = draws_sigma)
+```
+
+There is also a `summary` function, which calculates some summary statistics
+
+```{r}
+summary(bvar_est)
+```
+
+Posterior draws can be thinned with the function `thin`:
+
+```{r thin}
+bvar_est <- thin_posterior(bvar_est, thin = 15)
+```
+
+## Forecasts
+
+Forecasts with credible bands can be obtained with the function `predict`. If the model contains deterministic terms, new values can be provided in the argument `new_d`. If no values are provided, the function sets them to zero. The number of rows of `new_d` must be the same as the argument `n.ahead`.
+
+```{r forecasts, fig.width=5.5, fig.height=5.5}
+bvar_pred <- predict(bvar_est, n.ahead = 10, new_d = rep(1, 10))
+
+plot(bvar_pred)
+```
+
+## Impulse response analysis
+
+Currently, `bvartools` supports forecast error, orthogonalised, and generalised impulse response functions.
+
+### Forecast error impulse response
+
+```{r feir, fig.width=5.5, fig.height=4.5}
+FEIR <- irf(bvar_est, impulse = "income", response = "cons", n.ahead = 8)
+
+plot(FEIR, main = "Forecast Error Impulse Response", xlab = "Period", ylab = "Response")
+```
+
+### Orthogonalised impulse response
+
+```{r oir, fig.width=5.5, fig.height=4.5}
+OIR <- irf(bvar_est, impulse = "income", response = "cons", n.ahead = 8, type = "oir")
+
+plot(OIR, main = "Orthogonalised Impulse Response", xlab = "Period", ylab = "Response")
+```
+
+### Generalised impulse response
+
+```{r gir, fig.width=5.5, fig.height=4.5}
+GIR <- irf(bvar_est, impulse = "income", response = "cons", n.ahead = 8, type = "gir")
+
+plot(GIR, main = "Generalised Impulse Response", xlab = "Period", ylab = "Response")
+```
+
+## Forecast error variance decomposition
+
+Default forecast error variance decomposition (FEVD) is based on orthogonalised impulse responses (OIR).
+
+```{r fevd-oir, fig.width=5.5, fig.height=4.5}
+bvar_fevd_oir <- fevd(bvar_est, response = "cons")
+
+plot(bvar_fevd_oir, main = "OIR-based FEVD of consumption")
+```
+
+It is also possible to calculate FEVDs, which are based on generalised impulse responses (GIR). Note that these do not automatically add up to unity.
+
+```{r fevd-gir, fig.width=5.5, fig.height=4.5}
+bvar_fevd_gir <- fevd(bvar_est, response = "cons", type = "gir")
+
+plot(bvar_fevd_gir, main = "GIR-based FEVD of consumption")
+```
+
+## References
+
+<!-- Eddelbuettel, D., & Sanderson C. (2014). RcppArmadillo: Accelerating R with high-performance C++ linear algebra. *Computational Statistics and Data Analysis, 71*, 1054-1063. <https://doi.org/10.1016/j.csda.2013.02.005> -->
+
+Chan, J., Koop, G., Poirier, D. J., & Tobias, J. L. (2019). *Bayesian Econometric Methods* (2nd ed.). Cambridge: University Press.
+
+Koop, G., & Korobilis, D. (2010). Bayesian multivariate time series methods for empirical macroeconomics. *Foundations and trends in econometrics, 3*(4), 267-358. <https://dx.doi.org/10.1561/0800000013>
+
+Koop, G., Pesaran, M. H., & Potter, S.M. (1996). Impulse response analysis in nonlinear multivariate models. *Journal of Econometrics 74*(1), 119-147. <https://doi.org/10.1016/0304-4076(95)01753-4>
+
+Lütkepohl, H. (2007). *New introduction to multiple time series analysis* (2nd ed.). Berlin: Springer.
+
+Kennedy, P. (2008). *A guide to econometrics* (6th ed.) Malden, MA: Blackwell.
+
+Pesaran, H. H., & Shin, Y. (1998). Generalized impulse response analysis in linear multivariate models. *Economics Letters, 58*(1), 17-29. <https://doi.org/10.1016/S0165-1765(97)00214-0>
+
+<!-- Plummer, M., Best, N., Cowles, K., & Vines, K. (2006). CODA: Convergence Diagnosis and Output Analysis for MCMC. *R News, 6*(1), 7-11. [https://www.r-project.org/doc/Rnews/Rnews_2006-1.pdf](https://www.r-project.org/doc/Rnews/Rnews_2006-1.pdf) -->
+
+<!-- Sanderson, C., & Curtin, R. (2016). Armadillo: a template-based C++ library for linear algebra. *Journal of Open Source Software, 1*(2), 26. <https://doi.org/10.21105/joss.00026> -->
+
+<!-- [^cpp]: `RcppArmadillo` is the `Rcpp` bridge to the open source 'Armadillo' -->
+<!-- library of Sanderson and Curtin (2016). -->
+

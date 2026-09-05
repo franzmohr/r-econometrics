@@ -1,0 +1,65 @@
+---
+title: "Time Series Topics"
+author: "Franz X. Mohr"
+date: "2018-08-04"
+lastmod: "`r Sys.Date()`" 
+tags:
+  - timeseries
+  - bayesian
+  - var
+  - vec
+  - bvar
+  - bvec
+  - ssvs
+---
+
+*Work in progress (September 2023). I will try to update this page over the next few months.*
+
+This section is intended to provide an overview of the relevant issues in (macro)economic time series analysis. Again the standard disclaimer: This site does not replace a good textbook, but it should help you to get a grasp of the basic concepts more quickly than if you learned it on your own.
+
+The intended structure of this site is:
+
+**Data features**
+
+* [Stationarity and unit roots](/timeseries/stationarity)
+* Cointegration
+
+
+**Univariate models**
+
+Univariate models contain only one dependent variable.
+
+* Autoregression
+* Moving averages
+* Conditional heteroskedasticity (ARCH models)
+* Stochastic volatility
+
+**Multivariate models**
+
+Multivariate models contain multiple dependent variables and they are the workhorses of data driven macroeconomic analysis.
+
+* [Vector autoregression (VAR)](/timeseries/varintro)
+* [Structural vector autoregression (SVAR)](/timeseries/svarintro)
+* [Impulse response analysis](/timeseries/irf)
+* [Vector error correction models (VECM)](/timeseries/vecintro)
+* [Dynamic factor models (DFM)](/timeseries/dynamicfactorintro)
+* Factor augmented vector autoregressive models (FAVAR)
+
+**Bayesian inference of multivariate models**
+
+Although econometrics classes usually do not cover Bayesian methods for various reasons - mathematical complexity, historic disputes, increased computational demands etc. - students should be aware of their ubiquity outside the economic profession, where they are heavily used for example in machine learning, smartphones and even in nuclear warfare. Since these methods are also increasingly employed in economics, some Bayesian methods for time series analysis are presented in the following links.
+
+* [Bayesian vector autoregression (BVAR)](/timeseries/bvar)
+* [Bayesian vector error correction models (BVEC)](/timeseries/bvec)
+* [Structural vector autoregression (SVAR)](/timeseries/bayes-svar-intro)
+* Time varying parameter (TVP) models
+* [Stochastic search variable selection à la George et al. (2008)](/timeseries/ssvs)
+* Bayesian variable selection à la Korobilis (2013)
+
+I also wrote some [notes on Bayesian VAR modelling](/timeseries/bayesnotes), that have become important to me over the past few years.
+
+**Special topics**
+
+* [Extracting cyclical components from economic time series](/timeseries/economic-cycle-extraction)
+
+Every entry should become a link once I finish an article about it.

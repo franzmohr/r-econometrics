@@ -1,0 +1,37 @@
+---
+title: "An Introduction to Bayesian Networks"
+author: "Franz X. Mohr"
+date: "2019-07-31"
+tags:
+  - causality
+  - bayesian-network
+  - r
+---
+
+One of the most important things students learn in econometrics classes is that *correlation is not causation*. This is a central insight which needs to be carefully considered when interpreting the results of a statistical model. Since the 1980s there is a growing literature on how to incorporate causal relationships in empirical applications, which often involve Bayesian networks.[^pearl] This post provides an introduction to Bayesian networks and how they can be used in R.
+
+Bayesian networks were deveolped in the early 1980s when artificial inteligences (AI) was in its early stages.
+
+Bayesian networks are even used in every smartphone to 
+
+Bayesian models seem to be much more in line with the process of human learning, which is always a mixture of prior belief that is updated with every new experience.
+
+```{r data, message = FALSE}
+library(bnlearn)
+
+data("insurance")
+```
+
+
+```{r}
+insurance
+
+```
+
+
+
+## Literature
+
+Pearl, J. (2009). Causality. Cambridge: Cambridge University Press 2nd ed.
+
+[^pearl]: See Pearl (2009) for an introduction to the topic.

@@ -1,0 +1,125 @@
+---
+title: "Chapter 11: Further Issues in Using OLS with Time Series Data"
+author: "Franz X. Mohr"
+date: "2018-10-07"
+---
+
+```{r}
+library(wooldridge)
+```
+
+### Example 11.4
+
+For this regression the lagged values of return are already contained in the dataset. Thus, we do not have to calculated them ourselves and can simply run the regression.
+
+```{r}
+data("nyse")
+
+lm.11.4  <-  lm(return ~ return_1, data = nyse)
+summary(lm.11.4)
+```
+
+### Equation 11.17
+
+To estimate this model we have to calculate the lagged values ourselves. First, I created a vector of the return values from the nyse data set. To create the series with the first lagged returns I omitted the first value in the list of returns of the nyse data set by adding [-1]. But since this causes the length of the resulting series to decrease by one observation, we have to add an NA so that R can estimate the model. I added this NA by creating a list with c() which contains the values from the first lag list "nyse$return[-1]" and put an NA at the end. For the second list of lagged values I proceeded similarly. I omitted the first and second observation from the return list of the nyse data set and added two NAs. The estimation works as usual.
+
+```{r}
+# Create lagged values
+return <- ts(nyse$return)
+return1 <- lag(return, -1)
+return2 <- lag(return, -2)
+
+return_data <- cbind(return, return1, return2)
+
+# Estimate
+lm.e11.17  <-  lm(return ~ return1 + return2, data = return_data)
+summary(lm.e11.17)
+```
+
+### Example 11.5
+
+The estimations works as usual. The difference in the inflation rate is calculated within the lm() command.
+
+```{r}
+data("phillips")
+
+lm.11.15  <-  lm(I(inf-inf_1) ~ unem, data = phillips)
+summary(lm.11.15)
+```
+
+Natural rate of unemployment
+```{r}
+lm.11.15$coeff[1] / -lm.11.15$coeff[2]
+```
+
+### Example 11.6
+
+```{r}
+data("fertil3")
+
+cor(fertil3$gfr, fertil3$gfr_1, use = "pairwise.complete.obs")
+cor(fertil3$pe, fertil3$pe_1, use = "pairwise.complete.obs")
+```
+
+```{r}
+lm.11.16.1  <- lm(cgfr ~ cpe, data = fertil3)
+summary(lm.11.16.1)
+```
+
+```{r}
+lm.11.16.2  <-  lm(cgfr ~ cpe + cpe_1 + cpe_2, data = fertil3)
+summary(lm.11.16.2)
+```
+
+Joint significance of pe and pe_1
+```{r}
+lm.11.16.2res  <-  lm(cgfr ~ cpe_2, data = fertil3)
+summary(lm.11.16.2res)
+```
+
+```{r}
+anova(lm.11.16.2, lm.11.16.2res)
+```
+
+
+### Example 11.7
+
+```{r}
+data("earns")
+
+lm.11.17.1  <-  lm(lhrwage ~ loutphr + t, data = earns)
+summary(lm.11.17.1)
+```
+
+Detrend the variables
+```{r}
+dtr.lhrwage  <-  lm(lhrwage ~ t, data = earns)$resid
+dtr.loutphr  <-  lm(loutphr ~ t, data = earns)$resid
+summary(lm(dtr.lhrwage ~ -1 + dtr.loutphr))
+```
+
+```{r}
+cor(dtr.lhrwage, c(dtr.lhrwage[-1],NA), use = "pairwise.complete.obs")
+```
+
+```{r}
+cor(dtr.loutphr, c(dtr.loutphr[-1],NA), use = "pairwise.complete.obs")
+```
+
+The `diff` function calculates the difference between elements of a vector. By default, it assumes that the first difference between subsequent observations should be calculated.
+
+```{r}
+lm.11.17.2 <- lm(I(diff(lhrwage)) ~ I(diff(loutphr)), data = earns)
+summary(lm.11.17.2)
+```
+
+### Example 11.8
+
+```{r}
+data("fertil3")
+
+lm.11.18  <-  lm(cgfr ~ cpe + cpe_1 + cpe_2 + cgfr_1, data = fertil3)
+summary(lm.11.18)
+```
+
+A significant coefficient on `cgfr_1` suggests serial correlations in the errors

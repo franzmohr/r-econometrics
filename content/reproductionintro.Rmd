@@ -1,0 +1,17 @@
+---
+title: "Reproduction Projects"
+author: "Franz X. Mohr"
+date: "2018-10-07"
+---
+
+Chan, J. C. C., Koop, G., Poirier, D. J., & Tobias, J. L. (2019). [Bayesian econometric methods](/reproduction/bayesmethods/bayesmethodsintro).
+
+Cincera, M. (1997). [Patents, R&D, and technological spillovers at the firm level](/reproduction/1997_cincera_patents). *Journal of Applied Econometrics* 12, 265-280.
+
+Koop, G., & Korobilis, D. (2014). [A new index of financial conditions](/reproduction/2014_koop_korobilis_fci). *European Economic Review* 71, 101-116.
+
+Sheperd, B. (2016) [The gravity model of international trade: A user guide](/reproduction/2016_sheperd_gravity).
+
+Timmer, M. P., Dietzenbacher, E., Los, B., Stehrer, R., & de Vries, G. J. (2015). [An Illustrated User Guide to the World Input–Output Database: the Case of Global Automotive Production](/reproduction/2015_timmer_wiod).
+
+Wooldridge, J. M. (2013) [Introductory econometrics](/reproduction/wooldridge/wooldridgeintro).

@@ -1,0 +1,65 @@
+---
+title: "An Introduction to Network Analysis in R"
+author: "Franz X. Mohr"
+date: "2020-01-07"
+description: "An introduction to basic concepts, summary statistics and visualtions applied in network analysis using R's igraph package."
+tags:
+  - igraph
+  - networkanalysis
+---
+
+With the increasing availability of granular data on the relationships between individual entities - such as persons, countries and financial institutions - network analysis offers many possibilities to extract useful information from such data. This post provides an introduction to network analysis in R using the `igraph` package.
+
+## The `igraph` package
+
+There are some R packages with allow to analyse networks. In this post I concentrate on the `igraph` packages, which allows for a broad range of applications.
+
+## Summary statistics
+
+
+## Plotting
+
+
+## Concentration
+
+
+## Other concepts
+
+### DebtRank
+
+### DebtRank
+
+
+```{r, message = FALSE}
+library(NetworkRiskMeasures)
+
+# Loads simulated banking data
+data("sim_data")
+head(sim_data)
+```
+
+```{r}
+# seed for reproducibility
+set.seed(15)
+
+# minimum density estimation
+# verbose = F to prevent printing
+md_mat <- matrix_estimation(sim_data$assets, sim_data$liabilities, method = "md", verbose = FALSE)
+
+# rownames and colnames for the matrix
+rownames(md_mat) <- colnames(md_mat) <- sim_data$bank
+```
+
+```{r}
+# DebtRank simulation
+contdr <- contagion(exposures = md_mat, buffer = sim_data$buffer, weights = sim_data$weights, 
+                    shock = "all", method = "debtrank", verbose = FALSE)
+
+summary(contdr)
+```
+
+```{r, fig.height=3.5, fig.width=5}
+plot(contdr)
+```
+
+

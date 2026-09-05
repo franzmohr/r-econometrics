@@ -1,0 +1,57 @@
+---
+title: "Generating Random Networks in R"
+author: "Franz X. Mohr"
+date: "2020-04-05"
+description: ""
+tags:
+  - igraph
+  - networks
+  - network-analysis
+  - random-graphs
+---
+
+A cental question in network analysis is how and why networks are formed. In this regard, it is important to know if the creation of a new connection can be attributed to a certain factor, e.g. strategic behaviour, socioeconomic background etc., or if it just happend by chance. This is, where random graphs come in. They are networks, where the formation of links is driven by a completly random process.[^erdos] This post looks at some basic random graph, which can serve as benchmarks against which observed networks can be contrasted.
+
+```{r, message=FALSE}
+library(igraph) # Load igraph package
+set.seed(1234567) # Set seed for repruducibility
+
+n <- 100
+```
+
+
+## Poisson random networks
+
+*Poisson random networks* belong to the simplest class of random networks.
+
+```{r}
+# Generate random graph
+g_poisson <- sample_gnp(50, .2)
+
+# Plot
+plot(g_poisson)
+```
+
+
+
+## Scale-free graphs
+
+
+
+
+
+## References
+
+Csardi G., & Nepusz, T. (2006). The igraph software package for complex network research, *InterJournal* Complex Systems, 1695.
+
+Erdös, P., & Rényi A. (1959). On random graphs. *Publicationes Mathematicae Debrecen 6*, 290-297.
+
+Erdös, P., & Rényi A. (1960). On the evolution of random graphs. *Publication of the Mathematical Institute fo the Hungarian Academy of Sciences 5*, 17-61.
+
+Erdös, P., & Rényi A. (1961). On the strength of connectedness of a random graph. *Acta Mathamatica Academy of Sciences of Hungarica 12*, 261-267.
+
+Jackson, M. O. (2008). *Social and economic networks*. Princeton: University Press.
+
+
+
+[^erdos]: Seminal work on random graphs was done by Erdös and  Rényi (1959, 1960, 1961).

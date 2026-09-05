@@ -1,0 +1,56 @@
+---
+title: "Introduction to random forests in R"
+date: "2020-01-04"
+author: "Franz X. Mohr"
+---
+
+
+## Data
+
+```{r}
+
+library(dplyr)
+
+set.seed(12345)
+
+n <- 10000
+
+# Raw data
+data <- tibble(x1 = round(runif(n, 0, 1) * 100),
+               x2 = runif(n, 2, 10),
+               x3 = sample(0:1, n, replace = TRUE),
+               y = factor(x1 > 50 & x2 <= 4))
+```
+
+## Estimation
+
+### Obtain training sample
+
+```{r}
+n_train <- 1000
+
+pos <- sample(1:n, n_train)
+
+train <- data[pos, ]
+```
+
+### Estimate
+
+```{r, message=FALSE}
+library(randomForest)
+
+rf <- randomForest(y ~ ., data = data)
+```
+
+## Results
+
+```{r}
+MDSplot(rf, data$y)
+```
+
+## References
+
+Breiman, L. (2001), Random Forests, Machine Learning 45(1), 5-32.
+
+Breiman, L (2002), “Manual On Setting Up, Using, And Understanding Random Forests V3.1”, https://www.stat.berkeley.edu/~breiman/Using_random_forests_V3.1.pdf.
+

@@ -1,0 +1,77 @@
+---
+title: "Installing R and RStudio"
+author: "Franz X. Mohr"
+date: "2018-02-04"
+lastmod: "2025-01-11"
+tags:
+  - rstudio
+  - r
+description: "A short description on how to set up a standard analytics framework using R and RStudio."
+---
+
+For this introduction I recommend to install two software packages on your system:
+
+* *R*: The software, which does all the calculations.
+* *RStudio*: The working environment, where all the code will be developed.
+
+*Note that the instructions of this section were written for a standard installation on a private computer. If you work on a corporate machine, the installation could be different due to different IT requirements of your company.*
+
+## Installing R
+
+A proper installation of R is the prerequisite of everything that will follow. Fortunately, installing R is easy and can be done quickly by following these steps:
+
+* Go to <a href="http://www.r-project.org/" target="_blank">www.r-project.org</a>.
+* Click on *CRAN* in the download section on the left.
+* Search the list for a server that is in or at least close to your country and click on it.
+
+**Windows**
+
+* Click on *Download R for Windows*.
+* Click on *base*.
+* Click on *Download R <Version> for Windows* and download the file.
+* Execute the file and follow the installation instructions.
+
+**Mac OS X**
+
+* Click on *Download R for (Mac) OS X*.
+* Click on *R-<Version>.pkg* and download the file.
+* Install the file.
+
+**Linux**
+
+If you use Linux, I trust that you are experienced enough that you can follow the installation instructions on the website. :)
+
+## Quick check
+
+Once the installation is finished open R, enter `1+2` into the so-called *command line* and press return so that you get
+```{r}
+1+2
+```
+
+Congratulations, you just did your first calculation in R! You can close the window now...
+
+## A development environment: RStudio
+
+The simple addition of numbers was probably not the main reason why you started to learn R. Usually, people want to do much more calculations of a more complex nature, which includes multiple operations and code that goes over many lines. Your current installation of R is perfectly able to do that. The main challenge is just to write your code and bring it into R's command line. One solution to this problem could be to write several lines of code in a text document, copy and paste them into R for execution. But as you might imagine, this is a rather laborious way to proceed, especially when you are still developing your code. Therefore, I recommend to install further software, which makes it easier to work with R. This would be a so-called (integrated) development environment (IDE).
+
+An IDE[^ide] facilitates the work with a programming language. It assists in writing code, helps to find mistakes[^bugs], structures your workplace and allows for the quick execution of commands. This guide uses RStudio, which is widely accepted as a standard IDE for R projects. The software can be found at <a href="https://posit.co/products/open-source/rstudio/" target="_blank">https://posit.co</a>. Search for the (free) version that matches your operating system, download it and install it by following the installation instructions.[^rstudio]
+
+Once the installation is finished, open RStudio and take some seconds to familiarize yourself with its appearance. A first thing you might notice is that the left side looks somehow familiar to the R window from before. That is because it is precisely that window. This so-called *R console* is the place, where all the calculations are done and the results and error messages show up. This integration of the R console in RStudio can be interpreted as if RStudio is a program that is built around R and can interact with it.
+
+Next, click *File* -- *New File* (or press the button with the plus sign on the top left) and then *R Script*. A new window will appear above the console, which is called the *editor*. This is the place, where all the code is written into a script, which can be used by you and your colleagues to develop your analysis.
+
+A very useful function of RStudio is that you can execute single or multiple lines of code directly from the editor. Try it out by typing `1+2` into the script and hit return. Nothing else will happen than the text cursor jumping to the next line. This is straightforward, because the editor is nothing else than a mere text editor. In order to execute the code from the editor window you have multiple choices:
+
+* Use your mouse cursor and mark the area of the script, which you want to execute. Then click *Run* on the top right of the editor window.
+* Mark the relevant area in the script again and use the keyboard shortcut `Ctrl + Return`.
+* Put the text cursor in the same line as the command, which you want to execute and press `Ctrl + Return`. Note that this method will execute all lines around the cursor, which belong to the command.
+
+All of those three methods should lead to the same output in the console, `[1] 3`. For the time being, you can neglect the `[1]` in front of the answer.
+
+Congratulations, that's all you need for your R set-up. Now we can proceed by understanding a bit more of [R's architecture in the next step](/rbasics/rstructure).
+
+[^bugs]: Mistakes in the code are also called *bugs* and the process of cleaning your code from such bugs is referred to as *debugging*.
+
+[^ide]: See, for example, <a href="https://en.wikipedia.org/wiki/Integrated_development_environment" target="_blank">Wikipedia: Integrated development environment</a>.
+
+[^rstudio]: Note that there are also other IDEs for R -- e.g., Bio7, Eclipse or IntelliJ IDEA -- and you are free to use them. But since RStudio comes with a lot of nice additional tools, which facilitate the typical R workflow, I will stay with it until something better shows up.

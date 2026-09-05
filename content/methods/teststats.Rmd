@@ -1,0 +1,239 @@
+---
+title: "Standard Test Statistics for OLS Models in R"
+author: "Franz X. Mohr"
+date: "2019-11-25"
+description: "An overview of how to calculate standard test statistics in R, which should be applied to any econometric analysis that is based on OLS."
+tags:
+  - normality-test
+  - t-test
+  - f-test
+  - hausman-test
+---
+
+Model testing belongs to the main tasks of any econometric analysis. This post gives an overview of tests, which should be applied to OLS regressions, and illustrates how to calculate them in R. The focus of the post is rather on the calcuation of the tests. For a treatment of mathematical details, please, consult a standard textbook. This list of statistical tests is necessarily incomplete. However, if you have a strong opinion that a specific test is missing, feel free to leave a comment below.
+
+## Data and model
+
+To illustrate the calculation of test statistics in R, let's use the *wage1* dataset from the `wooldridge` package and estimate a basic <a href="https://en.wikipedia.org/wiki/Mincer_earnings_function" target="_blank">Mincer earnings function</a>. This standard specification of earnings models explains the natural log of average hourly earnings `lwage` by years of education `educ` and experience `exper`. The standard specification also includes squared values of experience `expersq` to take into account potential decreasing marginal effects.
+
+```{r data, message = FALSE}
+# Load dataset
+library(wooldridge)
+data("wage1")
+
+# Estimate a model
+model <- lm(lwage ~ educ + exper + expersq, data = wage1)
+```
+
+## Significance of variables
+
+### t test
+
+t tests are used to assess the statistical significance of single variables. In R t values for each variable in a regression model are usually calculated by the `summary` function:
+
+```{r}
+summary(model)
+```
+
+The t values for our benchmark model indicate that, except for the constant, all variables are statistically significant. You might think about dropping the intercept term at this point, but let's forget about this for the moment.
+
+### F test
+
+F tests can be used to check, whether one or multiple variables in a model are statistically significant. Basically, the test compares two models with each other, where one model is a special case of the other. This means that we compare a model with more variables - the so-called *unrestricted* model - to a model with less but otherwise the same variables, i.e. the *restriced* or nested model. If the additional predictive power of the unrestricted model is sufficiently higher, the variables are jointly significant.
+
+In our example we add the `tenure` variable and its square `tenuresq` to the model equation. This model is now the unrestricted model, which we have to estimate before we can calculate the F test.
+
+```{r unrestricted, message = FALSE}
+# Estimate unrestricted model
+model_unres <- lm(lwage ~ educ + exper + expersq + tenure + tenursq, data = wage1)
+
+summary(model_unres)
+```
+
+The t values of the new model indicate that all variabes - including the constant - are individually, statistically significant. Thus, the variable `tenure` provides additional explanatory power to the model. Since `tenure` also enters in its squared form, we are interested in the joint significance of the tenure terms. This can be checked with an F test, which can be calculated by using the `anova` function in R. We only have to provide the two estimated models as arguments:
+
+```{r f-test}
+anova(model, model_unres)
+```
+
+As you can see from the output, the tenure terms are joinly significant as indicated by the low value in column `Pr(>F)`.
+
+*Note that both the $t$ test and the $F$ test are only valid in situations, where the relation between the dependent and independent variables are linear. For non-linear cases the likelihood ratio (LR) test, the Wald (W) test, and the Lagrange multiplier (LM) test can be used.*
+
+## Normality of the errors
+
+One key assumption of many test statistics is that the errors of a model are normally distributed. If this is not the case, some of the obtained results might become questionable. There is a series of normality tests, which are also listed on <a href="https://en.wikipedia.org/wiki/Normality_test" target="_blank">Wikipedia: Normality tests</a>. A selection of these tests is presented in the following.
+
+*Note that Kennedy (2014) mentions these tests in the context of outlier detection. This is intuitive, since outliers usually lie outside of the assumed (normal) distribution.*
+
+### Tests
+
+* Eyeball test: A rather intuitive way to test for normality is to simply look at the histogram of the model residuals:
+
+```{r, fig.width=4.5, fig.height=3.5}
+hist(model$residuals, breaks = 20)
+```
+
+Since the shape of the histogram resembles the famous bell shape of a normal distribution, this looks pretty normal to me. However, there are more formal ways to test for normality, which are required by a more sophisticated audience than me...
+
+* The <a href="https://en.wikipedia.org/wiki/Shapiro%E2%80%93Wilk_test" target="_blank">Shapiro-Wilk test</a> is considered to be a very reliable test for normality. It is implemented in the `shapiro.test` function of the `stats` package:
+
+```{r shapiro, message=FALSE}
+shapiro.test(model$residuals)
+```
+
+The low p-value indicates that the null hypothesis of a normal distribution is not rejected at the 1 percent level.
+
+* The <a href="https://en.wikipedia.org/wiki/Anderson%E2%80%93Darling_test" target="_blank">Anderson–Darling test</a> is also a popular normality test. It also has the advantage that it can be applied to other distributions as well. To test for normal distributions in R, the `ad.test` function of the `nortest` package can be used:
+
+```{r anderson-darling}
+library(nortest)
+
+ad.test(model$residuals)
+```
+The low p-value also indicates that the null hypothesis of a normal distribution is not rejected at the 2.56 percent level.
+
+* The <a href="https://en.wikipedia.org/wiki/Jarque%E2%80%93Bera_test" target="_blank">Jarque-Bera test</a> tests whether the skewness and kurtosis of a model's residuals match the expected values for normal distribution. In R the function `jarque.bera.test` of the `tseries` packages and the function `jarque.test` in the `moments` package are, among others, implementations of this test:
+
+```{r jarque-bera, message=FALSE}
+library(tseries)
+
+jarque.bera.test(model$residuals)
+```
+
+Again, the low p-value of the Jarque-Bera test indicates that the skewness and kurtosis of the test are not significantly different from their expected values for normal distribution. Thus, the distribution of the model residuals seems statistically not different from a normal distribution.
+
+### Antidotes
+
+In order to deal with non-normality in the errors, you could consider the following options:
+
+* Use the log of the dependent variable for you regression.
+* For time series data use the first difference of the dependent variable, because you might have a stationarity issue.
+* Use a different estimator. For example, if your dependet varible can only have positive values, you might be better off with a generalised linear model, which assumes Gamma-distributed errors. Or for count data you might want to use a Poisson estimator etc.
+
+## Heteroskedasticity
+
+Heteroskedasticity arises when the variance of an observation's error depends on the size of the regressors. Although this does not lead to a bias of the estimated coefficients, it can still render test statistics useless, because their validity relies on the assumption of so-called *homoskedastic* errors, i.e. the assumption that the errors do not correlate with explanatory variables.
+
+### Tests
+
+* Eyeball test: One way to check for heteroskedasticity is to look at a plot, where the absolute values of the residuals - or the squared residuals - are plotted against the regressors of the model. If the size of the absolute (or squared) errors appears to vary with the size of a regressor, this migth indicate heteroskedasticity.
+
+```{r heterosk_eyeball, fig.width=5.5, fig.height=5.5}
+# Create plot input
+hetsk_data <- cbind(abs(model$residuals), model$model[, -1])
+
+# Scatterplot matrix
+plot(hetsk_data)
+```
+
+By looking at the first row of the above scatter plot we might notice that the absolute errors seem to be larger for higher values of `educ` and lower for higher values of `expersq`. This might warrant to test this more formally.
+
+* The <a href="https://en.wikipedia.org/wiki/Breusch%E2%80%93Pagan_test" target="_blank">Breusch-Pagan test</a> is implemented in the function `pbtest` both of the `AER` and `lmtest` package and tests whether the variance of a model's residuals dependents on the values of the regressors. 
+
+```{r breusch-pagan, message=FALSE}
+library(AER)
+
+bptest(model)
+```
+
+* The <a href="https://en.wikipedia.org/wiki/White_test" target="_blank">White test</a> regresses the squared residuals from the original regression model onto a set of regressors that contain the original regressors along with their squares and cross-products. Since it builds on the Breusch-Pagan test, the `bptest` can be used to perform the White test by adding the dependent variables and its squared values to the estimation formula:
+
+```{r white-test}
+bptest(model, ~ lwage + I(lwage^2), data = wage1)
+```
+
+* The <a href="https://en.wikipedia.org/wiki/Goldfeld%E2%80%93Quandt_test" target="_blank">Goldfeld-Quandt test</a> basically devides the sample into two groups with low and high values of an explanatory variable and compares the variances of two submodels. If the variances differ, this indicates heteroskedasticity. It is implemented in the function `gqtest` of the `lmtest` package:
+
+```{r goldfeld-quandt, message = FALSE}
+library(lmtest)
+
+gqtest(model)
+```
+
+*Note that this test has a series of drawbacks, which is why it is not used very often. The Breusch-Pagan and White test are used much more frequently.*
+
+### Antidotes
+
+* If the basic structure of heteroskedasticity is unknown - as is usually the case - use [heteroskedasticity robust standard errors](/methods/hcrobusterrors).
+* If the researcher feels that the structure of heteroskedasticity can be estimated, use the <a href="https://en.wikipedia.org/wiki/Generalized_least_squares#Feasible_generalized_least_squares" target="_blank">feasible GLS</a> estimator
+
+## Correlation between explanatory variables and the error term
+
+If explanatory variables are correlated with the error term, i.e. when they are *endogenous*, an OLS estimator will produce biased estimates. Even if only one variable is causing this problem, the coefficients of all other variables will be affected as well. Since economic data is frequently affected by this problem - due to, for example, measurement error in explanatory variables, autoregression with autocorrelated errors, simultaneity, omitted explanatory variables or sample selection - it is important to test for it.
+
+### Hausman test
+
+A popular method to test for correlation between explanatory variables and the error term is the *Hausman test*. It basically tests whether the results of the IV estimator are significantly different from the OLS estimator. To illustrate this, let's use the *wage2* dataset from the `wooldridge` package and, again, estimate a basic <a href="https://en.wikipedia.org/wiki/Mincer_earnings_function" target="_blank">Mincer earnings function</a> as described above. However, this time we add `IQ` as a measure of *ability*. But since it is assumed that the measure is correlated with the error term, we use an additional measure of ability, `KWW`, as an instrument for `IQ`.
+
+```{r, message = FALSE}
+library(dplyr)
+library(wooldridge)
+data("wage2")
+
+# Add squared experience "expersq"
+wage2 <- wage2 %>%
+  mutate(expersq = exper^2)
+
+# IV estimator
+iv_model <- ivreg(lwage ~ educ + exper + expersq + IQ | KWW + educ + exper + expersq,
+                  data = wage2)
+```
+
+The `summary` function of the `ivreg` object, performs the Hausman test automatically. We only have to add the argument `diagnostics = TRUE`.
+
+```{r}
+summary(iv_model, diagnostics = TRUE)
+```
+
+The (Wu-)Hausman test statistic has a very low p-value and, hence, the test rejects the null of no correcation between `IQ` and the error term in this example.
+
+### Sargan test
+
+The Sargan test checks whether an instrument is correlated with the errors, which should not be the case for good instruments. In the example above, the test statistic of the Sargan test is `NA`. This is to be expected, because we use *one* instrument for *one* endogenous regressor and the mathematical properties of the test require us to have at least one instrument more than endogenous regressor. So, if we use more instruments than endogenous regressors, the system would be identified and we would be able to obtain a test statistic. A low statistic (with rather high p-value) would indicate that the instrument is uncorrelated with the error term.
+
+*To be continued... (January 2020)*
+
+<!-- ## Autocorrelated errors -->
+
+<!-- Similar to the problem of heteroskedasticity the presence of autocorrelated errors do not lead to a bias of the estimated coefficients, but they can render test statistics useless. This problem is most relevant for time series data. -->
+
+<!-- ### Tests -->
+
+<!-- Durbin Watson test -->
+
+<!-- ### Antidotes -->
+
+<!-- * HEC estimates -->
+<!-- * Cochrane-Orcut and Prais-Winsten estimator: -->
+<!-- * Durbin's two-stage method -->
+<!-- * Hildreth-Lu Search Procedure -->
+<!-- * Maximum Likelihood: Instead of a simle OLS estimator, we could use the maximum likelihood estimator, which requires to make a bit stronger assumption about the distribution of the errors. -->
+<!-- * Bayesian estimator: That would lead too far. -->
+
+
+
+<!-- ## Multicollinearity -->
+
+<!-- ### Tests -->
+
+<!-- Inflated R-squared -->
+
+<!-- ## Outliers -->
+
+<!-- Can seriously alter your estimation results -->
+
+<!-- ### Tests -->
+
+<!-- * Box-plot -->
+<!-- * Cook outlier test -->
+
+<!-- ### Antidotes -->
+
+
+
+## Literature
+
+Kennedy, P. (2014). *A Guide to Econometrics*. Malden (Mass.): Blackwell Publishing 6th ed.
+
+Wooldridge, J.M. (2013). *Introductory econometrics: A modern approach*. (5<sup>th</sup>ed.)

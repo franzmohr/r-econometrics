@@ -1,0 +1,58 @@
+---
+title: "Microeconometric Estimators"
+author: "Franz X. Mohr"
+date: "2018-02-03"
+---
+
+### Simple OLS Regression
+
+Generate an aritificial sample with 2000 observations and the following specifications:
+$$y_i = 50 + 3 a - 4b + e_i,$$
+where $e_i \sim N(0, 30).$
+
+```{r ols}
+set.seed(1) # Reset random number generator
+N <- 2000 # Number of observations
+ols_data <- data.frame("a" = runif(N, 20, 60), # Uniformly distributed
+                       "b" = rnorm(N, 100, 20)) # Normally distributed
+y <- 50 + 3*ols_data$a - 4*ols_data$b + rnorm(N, 0, 30)
+ols_data <- cbind(y, ols_data)
+```
+
+The standard function for regression analysis in R is `lm`.
+
+```{r}
+ols <- lm(y ~ a + b, data = ols_data)
+summary(ols)
+```
+
+### Heteroskedasticity robust standard errors
+`multiwayvcov`, `lmtest` and `sandwich`
+
+### F-Test
+`anova` function
+
+### Instrumental varialbes
+`AER`
+`ivreg`
+
+### Limited dependent variables
+`glm` function
+
+#### Logit and Probit
+
+
+#### Tobit
+
+
+#### Poisson
+
+
+### Panel data estimators
+
+`plm`
+
+#### Fixed effects
+
+
+#### Random effects

@@ -1,0 +1,331 @@
+---
+title: "Reproduction: Sheperd, B. (2016). The gravity model of international trade: A user guide."
+date: "2018-01-30"
+author: "Franz X. Mohr"
+tags:
+  - gravity
+  - trade
+  - r
+---
+
+The updated paper and dataset can be downloaded from
+<a href="http://www.unescap.org/resources/gravity-model-international-trade-user-guide-updated-version" target="_blank">UNESCAP</a>.
+
+## Load libraries and read data
+```{r, eval = FALSE, message = FALSE}
+library(AER)
+library(dplyr)
+library(foreign)
+library(ggplot2)
+library(lmtest)
+library(multiwayvcov)
+library(sampleSelection)
+
+data <- read.dta("servicesdataset_2016.dta")
+```
+```{r, echo = FALSE, message = FALSE, eval = TRUE}
+library(AER)
+library(dplyr)
+library(foreign)
+library(ggplot2)
+library(lmtest)
+library(multiwayvcov)
+library(sampleSelection)
+
+data <- read.dta("_servicesdataset_2016.dta")
+```
+
+## Correlations
+
+Table 1
+```{r, tidy = TRUE}
+data <- data %>% 
+  mutate(ln_trade = log(trade),
+         ln_distance = log(dist),
+         ln_gdp_exp = log(gdp_exp),
+         ln_gdp_imp = log(gdp_imp))
+
+cor.data <- data %>% 
+  filter(sector == "SER") %>% 
+  select(ln_trade, ln_gdp_exp, ln_gdp_imp, ln_distance) %>%
+  na.omit %>% 
+  filter(ln_trade > -Inf)
+
+round(cor(cor.data), 4)
+```
+
+## Graphics
+Prepare data
+```{r, tidy = TRUE}
+data <- data %>% 
+  mutate(ln_gdp_both = log(gdp_exp*gdp_imp))
+
+plot.data <- data %>% 
+  filter(sector == "SER") %>% 
+  select(ln_gdp_both, ln_trade, ln_distance) %>% 
+  na.omit %>% filter(ln_trade > -Inf)
+```
+
+### Figure 1
+```{r, fig.width = 4, fig.height = 3}
+figure1 <- ggplot(plot.data, aes(x = ln_gdp_both, y = ln_trade)) + 
+  geom_point() +
+  geom_smooth(se = FALSE, method = "lm") +
+  scale_x_continuous(limits = c(40, 60)) +
+  scale_y_continuous(limits = c(-7, 11))
+
+figure1
+```
+
+### Figure 2
+```{r, fig.width = 4, fig.height = 3}
+figure2 <- ggplot(plot.data, aes(x = ln_distance, y = ln_trade)) + 
+  geom_point() +
+  geom_smooth(se = FALSE, method = "lm") +
+  scale_x_continuous(limits = c(2, 10)) +
+  scale_y_continuous(limits = c(-7, 11))
+
+figure2
+```
+
+## Table 2
+```{r, tidy = TRUE}
+data.table.02 <- data %>% filter(sector == "SER") %>%
+  select(ln_trade, ln_gdp_exp, ln_gdp_imp, ln_distance, contig, 
+         comlang_off, colony, comcol, dist) %>%
+  na.omit %>% filter(ln_trade != -Inf)
+
+lm.table.02 <- lm(ln_trade ~ ln_gdp_exp + ln_gdp_imp + ln_distance + 
+                    contig + comlang_off + colony + comcol,
+                  data = data.table.02)
+
+summary(lm.table.02)
+
+vcov.02 <- cluster.vcov(lm.table.02, ~ dist)
+coeftest(lm.table.02, vcov. = vcov.02)
+```
+
+If found the code for the clustered standard errors [here](https://rforpublichealth.blogspot.co.at/2014/10/easy-clustered-standard-errors-in-r.html).
+
+## Table 3
+
+Not sure how to do that in R.
+
+
+## Table 4
+```{r, tidy = TRUE}
+lm.ols.ncult <- lm(ln_trade ~ ln_gdp_exp + ln_gdp_imp + ln_distance,
+                   data = data.table.02)
+
+waldtest(lm.ols.ncult, lm.table.02, vcov = vcov.02)
+```
+
+## Table 5
+```{r, tidy = TRUE}
+data.table.05 <- data %>% filter(sector == "SER") %>%
+  select(ln_trade, etcr_exp, etcr_imp, ln_gdp_exp, ln_gdp_imp, ln_distance, contig, 
+         comlang_off, colony, comcol, dist) %>%
+  na.omit %>% filter(ln_trade != -Inf)
+
+lm.table.05 <- lm(ln_trade ~ etcr_exp + etcr_imp + ln_gdp_exp + ln_gdp_imp +
+                    ln_distance + contig + comlang_off + colony + comcol,
+                  data = data.table.05)
+
+vcov.05 <- cluster.vcov(lm.table.05, ~ dist)
+coeftest(lm.table.05, vcov. = vcov.05)
+```
+
+## Table 6
+```{r, R.options = list(max.print = 50), tidy = TRUE}
+data.table.06 <- data %>% 
+  filter(sector == "SER") %>%
+  select(ln_trade, ln_distance, contig, comlang_off, colony,
+         comcol, dist, exp, imp) %>%
+  na.omit %>% 
+  filter(ln_trade != -Inf)
+
+lm.table.06 <- lm(ln_trade ~ ln_distance + contig + comlang_off +
+                    colony + comcol + exp + imp,
+                  data = data.table.06)
+
+vcov.06 <- cluster.vcov(lm.table.06, ~ dist)
+coeftest(lm.table.06, vcov. = vcov.06)
+```
+
+## Table 7
+Not sure yet
+```{r, R.options = list(max.print = 50), tidy = TRUE}
+data.table.07 <- data %>% 
+  filter(sector == "SER") %>%
+  select(ln_trade, ln_distance, contig, comlang_off, colony,
+         comcol, dist, exp, imp) %>%
+  na.omit %>% 
+  filter(ln_trade != -Inf)
+
+lm.table.07 <- lm(ln_trade ~ ln_distance + contig + comlang_off + 
+                    colony + comcol + exp + imp, 
+                  data = data.table.07)
+
+vcov.07 <- cluster.vcov(lm.table.07, ~ dist)
+coeftest(lm.table.07, vcov. = vcov.07)
+```
+
+## Table 8
+```{r, R.options = list(max.print = 50), tidy = TRUE}
+data.table.08 <- data %>% 
+  filter(sector == "SER") %>%
+  select(ln_trade, etcr_exp, etcr_imp, ln_distance, contig, 
+         comlang_off, colony, comcol, dist, exp, imp) %>%
+  mutate(etcr_both = etcr_exp*etcr_imp) %>%
+  na.omit %>% 
+  filter(ln_trade != -Inf)
+
+lm.table.08 <- lm(ln_trade ~ etcr_both + ln_distance + contig + 
+                    comlang_off + colony + comcol + exp + imp, 
+                  data = data.table.08)
+
+vcov.08 <- cluster.vcov(lm.table.08, ~ dist)
+coeftest(lm.table.08, vcov. = vcov.08)
+```
+
+## Table 9
+```{r, R.options = list(max.print = 50), tidy = TRUE}
+data.table.09 <- data %>% 
+  filter(sector == "SER") %>%
+  select(ln_trade, ln_distance, dist, exp, imp) %>%
+  na.omit %>% filter(ln_trade != -Inf)
+
+lm.table.09 <- lm(ln_trade ~ ln_distance + exp + imp,
+                  data = data.table.09)
+
+vcov.09 <- cluster.vcov(lm.table.09, ~ dist)
+coeftest(lm.table.09, vcov. = vcov.09)
+```
+
+## Table 10
+```{r, tidy = TRUE, message = FALSE}
+data.table.10 <- data %>% 
+  select(ln_trade, ln_distance, dist, exp, imp, sector, ln_gdp_exp, ln_gdp_imp)
+
+temp1 <- data.table.10 %>% 
+  group_by(exp, sector) %>% 
+  summarise(temp1 = mean(ln_distance, na.rm = TRUE))
+
+temp2 <- data.table.10 %>% 
+  group_by(imp, sector) %>% 
+  summarise(temp2 = mean(ln_distance, na.rm = TRUE))
+
+temp3 <- data.table.10 %>% 
+  group_by(sector) %>% 
+  summarise(temp3 = sum(ln_distance, na.rm = TRUE))
+
+data.table.10 <- left_join(data.table.10, temp1)
+data.table.10 <- left_join(data.table.10, temp2)
+data.table.10 <- left_join(data.table.10, temp3)
+
+data.table.10 <- data.table.10 %>% 
+  mutate(ln_distance_star = ln_distance - temp1 - temp2 + (1/218^2)*temp3)
+
+data.table.10 <- filter(data.table.10, sector == "SER") %>%
+  select(ln_trade, ln_distance_star, ln_gdp_exp, ln_gdp_imp, dist) %>%
+  na.omit %>% 
+  filter(ln_trade != -Inf)
+
+lm.table.10 <- lm(ln_trade ~ ln_distance_star + ln_gdp_exp + ln_gdp_imp,
+                  data = data.table.10)
+
+vcov.10 <- cluster.vcov(lm.table.10, ~ dist)
+coeftest(lm.table.10, vcov. = vcov.10)
+```
+
+## Table 11a
+
+```{r, tidy = TRUE}
+data.table.11 <- data %>% 
+  mutate(ln_lat_exp = log(abs(lat_exp)),
+         ln_lat_imp = log(abs(lat_imp))) %>%
+  select(ln_trade, etcr_exp, etcr_imp, ln_lat_exp, ln_lat_imp, ln_gdp_exp,
+         ln_gdp_imp, ln_distance, contig, comlang_off, colony, comcol, dist) %>% 
+  na.omit %>% 
+  filter(ln_trade != -Inf)
+
+iv.t11a <- ivreg(etcr_exp ~ ln_gdp_exp + ln_gdp_imp + ln_distance + contig +
+                   comlang_off + colony + ln_lat_exp + ln_lat_imp, 
+                 data = data.table.11)
+
+vcov.11a <- cluster.vcov(iv.t11a, ~ dist)
+coeftest(iv.t11a, vcov. = vcov.11a)
+```
+
+## Table 11b
+
+```{r}
+iv.t11b <- ivreg(etcr_imp ~ ln_gdp_exp + ln_gdp_imp + ln_distance + contig +
+                   comlang_off + colony + ln_lat_exp + ln_lat_imp, 
+                 data = data.table.11)
+
+vcov.11b <- cluster.vcov(iv.t11b, ~ dist)
+coeftest(iv.t11b, vcov. = vcov.11b)
+```
+
+## Table 11c
+
+```{r}
+iv.t11c <- ivreg(ln_trade ~ etcr_exp + etcr_imp + ln_gdp_exp + ln_gdp_imp +
+                   ln_distance + contig + comlang_off + colony | 
+                   ln_lat_exp + ln_lat_imp + ln_gdp_exp + ln_gdp_imp + 
+                   ln_distance + contig + comlang_off + colony, 
+                 data = data.table.11)
+
+vcov.11c <- cluster.vcov(iv.t11c, ~ dist)
+coeftest(iv.t11c, vcov. = vcov.11c)
+```
+The coefficients are the same, but the clustered standard errors are not. I am not sure, where this comes from.
+
+## Table 12
+
+```{r poisson, R.options = list(max.print = 50), tidy = TRUE}
+data.table.12 <- data %>% 
+  filter(sector == "SER") %>%
+  select(trade, ln_distance, contig, comlang_off, colony, 
+         comcol, exp, imp, dist) %>% 
+  na.omit
+
+est.table.12 <- glm(trade ~ ln_distance + contig + comlang_off + colony + 
+                      comcol + exp + imp, family = "quasipoisson", 
+                    data = data.table.12)
+
+vcov.12 <- cluster.vcov(est.table.12, ~ dist)
+coeftest(est.table.12, vcov. = vcov.12)
+```
+
+The coefficients are the same, but the clustered standard errors are not. I am not sure, where this comes from.
+
+# Table 13
+
+```{r, R.options = list(max.print = 50), tidy = TRUE}
+data <- mutate(data, ent_cost_both = ent_cost_exp*ent_cost_imp)
+
+data.table.13 <- data %>% 
+  filter(sector == "SER") %>%
+  select(ln_trade, ln_distance, contig, comlang_off, colony, comcol, 
+         exp, imp, ent_cost_both, dist) %>% 
+  na.omit %>%
+  mutate(select = as.numeric(ln_trade != -Inf))
+
+data.table.13[!data.table.13[,"select"], "ln_trade"] <- NA
+data.table.13[, "exp"] <- factor(data.table.13[, "exp"])
+data.table.13[, "imp"] <- factor(data.table.13[, "imp"])
+
+# Deviates from the 1st-step results in the paper
+summary(probit(select ~ ln_distance + contig + comlang_off + colony + 
+                 comcol + ent_cost_both + exp + imp, 
+               data = data.table.13))
+
+# est.table.13 <- selection(select ~ ln_distance + contig + comlang_off + colony + comcol + ent_cost_both + exp + imp, ln_trade ~ ln_distance + contig + comlang_off + colony + comcol + exp + imp, data = data.table.13)
+
+# Produces an error
+
+#vcov.13 <- cluster.vcov(est.table.13, ~ dist)
+#coeftest(est.table.13, vcov. = vcov.13)
+```

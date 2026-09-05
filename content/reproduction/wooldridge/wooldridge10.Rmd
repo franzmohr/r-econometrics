@@ -1,0 +1,149 @@
+---
+title: "Chapter 10: Basic Regression Analysis with Time Series Data"
+author: "Franz X. Mohr"
+date: "2018-10-07"
+---
+
+```{r}
+library(wooldridge)
+```
+
+### Example 10.1
+```{r}
+data("phillips")
+
+lm.10.1 <- lm(inf ~ unem, data = phillips)
+summary(lm.10.1)
+```
+
+### Example 10.2
+```{r}
+data("intdef")
+
+lm.10.2 <- lm(i3 ~ inf + def, data = intdef)
+summary(lm.10.2)
+```
+
+### Example 10.3
+```{r}
+data("prminwge")
+
+lm.10.3 <- lm(lprepop ~ lmincov + lusgnp, data = prminwge)
+summary(lm.10.3)
+```
+
+### Example 10.4
+```{r}
+data("fertil3")
+
+lm.10.4.1 <- lm(gfr ~ pe + ww2 + pill, data = fertil3)
+summary(lm.10.4.1)
+```
+
+```{r}
+lm.10.4.2 <- lm(gfr ~ pe + pe_1 + pe_2 + ww2 + pill, data = fertil3)
+summary(lm.10.4.2)
+```
+
+```{r}
+# Joint significance of pe values
+lm.10.4.2res <- lm(gfr ~ ww2 + pill, data = fertil3, subset = (is.na(pe_2) == FALSE))
+anova(lm.10.4.2, lm.10.4.2res)
+```
+
+```{r}
+# Joint significance of lagged pe values
+lm.10.4.2res2 <- lm(gfr ~ pe + ww2 + pill, data = fertil3, subset = (is.na(pe_2) == FALSE))
+anova(lm.10.4.2, lm.10.4.2res2)
+```
+
+```{r}
+# Standard error of the long run propensity
+summary(lm(gfr ~ pe + I(pe_1 - pe) + I(pe_2 - pe_1) + ww2 + pill, data = fertil3))
+```
+
+### Example 10.5
+```{r}
+data("barium")
+
+lm.10.5 <- lm(lchnimp ~ lchempi + lgas + lrtwex + befile6 + affile6 + afdec6, data = barium)
+summary(lm.10.5)
+```
+
+### Example 10.6
+```{r}
+data("fair")
+
+lm.10.6 <- lm(demvote ~ partyWH + incum + I(partyWH*gnews) + I(partyWH*inf), data = fair)
+summary(lm.10.6)
+```
+
+Slightly different results since the book uses 20 observations to 1992. But the results are the same when we drop the last observation.
+
+```{r}
+lm.10.6 <- lm(demvote ~ partyWH + incum + I(partyWH * gnews) + I(partyWH * inf), data = fair, subset = (year != 1996))
+summary(lm.10.6)
+```
+
+### Example 10.7
+```{r}
+data("hseinv")
+
+lm.10.7.1 <- lm(linvpc ~ lprice, data = hseinv)
+summary(lm.10.7.1)
+```
+
+Add a time trend
+```{r}
+lm.10.7.2 <- lm(linvpc ~ lprice + t, data = hseinv)
+summary(lm.10.7.2)
+```
+
+### Example 10.8
+```{r}
+data("fertil3")
+
+lm.10.8.1 <- lm(gfr ~ pe + ww2 + pill + t, data = fertil3)
+summary(lm.10.8.1)
+```
+
+```{r}
+lm.10.8.2 <- lm(gfr ~ pe + ww2 + pill + t + tsq, data = fertil3)
+summary(lm.10.8.2)
+```
+
+### Example 10.9
+```{r}
+data("prminwge")
+
+lm.10.9 <- lm(lprepop ~ lmincov + lusgnp + t, data = prminwge)
+summary(lm.10.9)
+```
+
+```{r}
+# Obtain results by detrending
+lprepop.detrend <- lm(lprepop ~ t, data = prminwge)$resid
+lmincov.detrend <- lm(lmincov ~ t, data = prminwge)$resid
+lusgnp.detrend <- lm(lusgnp ~ t, data = prminwge)$resid
+
+summary(lm(lprepop.detrend ~ lmincov.detrend + lusgnp.detrend - 1))
+```
+
+### Example 10.10
+```{r}
+data("hseinv")
+
+dtr.linvpc <- lm(linvpc ~ t, data = hseinv)$resid
+summary(lm(dtr.linvpc ~ lprice + t, data = hseinv))
+```
+
+### Example 10.11
+```{r}
+data("barium")
+
+lm.10.11 <- lm(lchnimp ~ lchempi + lgas + lrtwex + befile6 + affile6 + afdec6 +
+ feb + mar + apr + may + jun + jul + aug + sep + oct + nov + dec, data = barium)
+lm.10.11res <- lm(lchnimp ~ lchempi + lgas + lrtwex + befile6 + affile6 + afdec6, data = barium)
+
+anova(lm.10.11, lm.10.11res)
+```

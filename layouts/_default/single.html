@@ -25,11 +25,6 @@
                                 {{ end }}
                             {{ end }}
                         </span>
-                        {{ if or $categories $tags }} - {{ end }}
-                        <time class="li-article-date">
-                          {{$.Param "author"}}, Created: {{ .Date.Format "January 2, 2006" }}, Last update: {{ .Lastmod.Format "January 2, 2006" }}
-                         
-                        </time>
                     </header>
                     <section>
                         {{ .Content }}

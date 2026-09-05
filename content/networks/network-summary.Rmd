@@ -1,0 +1,176 @@
+---
+title: "Network Summary Statistics"
+author: "Franz X. Mohr"
+date: "2020-03-01"
+description: "An introduction to basic network summary statistics as presented in Jackson (2008) and their calculation in R."
+tags:
+  - igraph
+  - networks
+  - network-analysis
+---
+
+If a network is small, it can be easily summarised by its graph or a figure. But once a network reaches a certain size, it becomes more meaningful to use more formal summary statistics in order to describe its features. This post covers some basic network summary statistics as presented in Jackson (2008). The metrics are based on the concept of *centrality*, which describes the importance of a node in a given network of nodes.
+
+For this illustration I use the artificial data set generated in my <a href="https://www.r-econometrics.com/2020/03/01/an-introduction-to-network-analysis-in-r/" target="_blank">post on network analysis</a>.
+
+```{r, echo = FALSE, message = FALSE}
+# Set seed for reproducibility
+set.seed(12345)
+
+# Generate data
+raw <- data.frame(byer = rep(letters, 1, each = 26),
+                  sllr = rep(letters, 26),
+                  con = rnorm(26 * 26)^2) # Calculate arbitrary weights
+
+# Drop connections with oneself
+raw <- raw[raw$byer != raw$sllr,]
+
+# Only keep strong connections
+raw <- raw[abs(raw$con) > 1,]
+
+library(igraph) # Load package
+graph_df <- graph_from_data_frame(raw, directed = FALSE)
+```
+
+
+### Degree
+
+The degree of a node is the number of its connections. The `degree` function calculates this number for each node of a graph. The node with the highest number is the node with the highest number of connections.
+
+```{r}
+# Load package
+library(igraph)
+
+# Obtain degrees
+g_degree <- degree(graph_df)
+
+g_degree
+```
+
+The degree is of a node is an insteresting metric to identify the most connected nodes of a network. However, if the structure of a network is of interest, the *degree distribution* can be an informative metric. It describes the relative frequencey of nodes that have different degrees. In that way it is a histogram of degrees.
+
+```{r, fig.height=3.5, fig.width=4}
+hist(g_degree)
+```
+
+This histogram might not look very informative, which is partly due to the way the artificial network was constructed. However, as the number of nodes of a real life network increases, this distribution can become very imformative. *Note that in many cases it is beneficial to obtain the distribution of the log-degree*.
+
+Let's explore this by looking at a larger network, that can be generated with the `igraph` package. More precisely, we create a scale-free:
+
+```{r, fig.height=3.5, fig.width=4}
+# From the example of sample_degseq
+
+# Pre-specify the degrees of the nodes according to the 
+# power law
+degs <- sample(1:100, 1000, replace=TRUE, prob = (1:100)^-2)
+
+# Check if degrees sum up to an even number
+# if not, add 1 to the first node to make the sum even
+if (sum(degs) %% 2 != 0) {
+  degs[1] <- degs[1] + 1
+}
+
+# Create random graph
+g_large <- sample_degseq(degs, method = "vl")
+
+# Calculate degree
+deg_large <- degree(g_large)
+
+# Histogram of the degree
+hist(deg_large)
+```
+
+The degree distribution showes that most nodes have less than 10 connections and there are a few with more than 80. If we did not already know that the degree distribution follows a power-law, this might be a sign that we are dealing with such a network. A look at the log-degree distribution might support this suspition as well:
+
+```{r, fig.height=3.5, fig.width=4}
+hist(log(deg_large))
+```
+
+
+### Closeness
+
+*Closeness centrality* describes how close a given node is to any other node. It is usually defined as the inverse of the average of the shortest path between a node and all other nodes. Therefore, shorter paths between a node and any other node in the graph imply a higher value of the ratio.
+
+```{r}
+g_close <- closeness(graph_df)
+
+round(g_close, 2)
+```
+
+In constrast to the degree of a node, which describes the number of its direct connections, its closeness provides an idea of how well a node is indirectly connected via other nodes.
+
+### Betweenness
+
+Freeman (1977) proposes *betweenness centrality* as the number of shortest paths passing through a node. A higher value of a node impilies that other nodes are well connected through it.
+
+```{r}
+g_betw <- betweenness(graph_df)
+
+round(g_betw, 2)
+```
+
+### Eigenvector centrality
+
+*Eigenvector centrality* (Bonabeau, 1972) is based on the idea that the importance of a node is recusively related to the importance of the nodes pointing to it. For example, your popularity depends on the popularity of your friends, whose popularity depends on their friends etc. Therefore, this measure is also self-referential in the sense that a node's centrality depends on the centrality of another node, whose centrality depends the first node. A higher value of eigenvector centrality implies that a node's neighbours are more prestigious than the neighbours of other nodes. 
+
+
+```{r}
+g_eigen <- eigen_centrality(graph_df)
+
+round(g_eigen$vector, 2)
+```
+
+### Centrality measures with decay factors
+
+A further group of centrality measures uses decay factors to take into account that links with more distant neighbours should be less influential in the calculation of a node's centrality. The following mesures belong to this group:
+
+* Decay centrality is based on closeness
+* Katz prestige-2 as a special case of Bonacich centrality as implemented with `power_centrality`
+
+These are useful measures as well, however, they require the researcher to specify additional variables such as the decay factor, which can have a substantial impact on the results. While one specification might lead to results that are similar to the degree distribution, since it favours the close neighbourhood of a node, another specification could givs more weight to longer paths.
+
+## Relationships between the measures
+
+To conclude this post, let's look at the relationships between the different network measures. For this we can use scatterplot matrices.
+
+### Small network
+
+```{r, fig.height=7, fig.width=7}
+# Collect the different centrality measures in a data frame
+centr_small <- data.frame(degree = g_degree,
+                          closeness = g_close,
+                          betweenness = g_betw,
+                          eigenvalue = g_eigen$vector)
+
+# Scatterplot matrix
+pairs(centr_small)
+```
+
+For the small graph the scatterplot matrix of the different centrality measures suggest that they have a linear relationship and, hence, each measure provides more or less the same information. However, this is probably the result of the way the small network was generated in the first place.
+
+### Large network
+
+Looking at the scatterplot matrix of the centrality measures of the larger network provides a different picture:
+
+```{r, fig.height=7, fig.width=7}
+# Collect the different centrality measures in a data frame
+centr_large <- data.frame(degree = degree(g_large),
+                          closeness = closeness(g_large),
+                          betweenness = betweenness(g_large),
+                          eigenvalue = eigen_centrality(g_large)$vector)
+
+# Scatterplot matrix
+pairs(centr_large)
+```
+
+For example, although the degree and eigenvalue centrlity exhibit a quite linear relationship, the relationship between degree centrality and closeness seems to be non-linear.
+
+## References
+
+Bonabeau, E. (1972). Factoring and weighting approaches to status scores and clique identification. *Journal of Mathematical Sociology 2*, 113-120.
+
+Csardi G., & Nepusz, T. (2006). The igraph software package for complex network research, *InterJournal* Complex Systems, 1695.
+
+Freeman, L. C. (1977). A set of measures of centrality based on betweenness. *Sociometry 40*, 35-41.
+
+Jackson, M. O. (2008). *Social and economic networks*. Princeton: University Press.

@@ -1,0 +1,17 @@
+---
+title: "r-econometrics"
+author: "Franz X. Mohr"
+date: "2018-02-04"
+lastmod: "2026-09-05"
+description: "Using R for econometric analysis"
+---
+
+r-econometrics is written and maintained by [Franz X. Mohr](/about). It grew out of the
+notes taken while learning to use the free statistical software R for econometric work, and it
+is meant to give you an intuition for the structure of the program and for the statistical
+functions needed to pass an introductory or intermediate course in econometrics.
+
+It is not a replacement for a good textbook. The math behind the methods is kept short on
+purpose, so that you can get to a working example quickly and then look up the theory wherever
+your course expects you to. Everything here is free to read, and the code on every page can be
+copied straight into your own R session.

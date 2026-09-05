@@ -1,0 +1,275 @@
+---
+title: "Bayesian VARs with Stochastic Volatiliy (SV)"
+author: "Franz X. Mohr"
+date: "2023-07-07"
+tags:
+  - r
+  - bvar
+  - var
+  - sv
+  - stochastic-volatility
+  - bayes
+  - bayesian-var
+  - bvartools
+  - gibbs-sampler
+description: "An introduction to Bayesian VAR models with stochastic volatility (SV-VAR) and an application in R using the bvartools package."
+---
+
+This post gives a brief introduction to Bayesian VAR models with stochastic volatility, so-call SV-VAR models. It provides the code to set up and estimate a basic model with the [`bvartools`](https://cran.r-project.org/package=bvartools) package.
+
+<!--more-->
+
+## Model
+
+Bayesian vector autoregressive (BVAR) models with stochastic volatility have nearly the same form as common [VAR models](/timeseries/varintro) and their [Bayesian counterparts](/timeseries/bvar), i.e.,
+
+$$ y_t = c + \sum_{l=i}^{p} A_i y_{t-i} + u_t,$$
+where $y_t$ is a $K \times 1$ vector of endogenous variables in period $t$, $A_i$ is the coefficient matrix corresponding to the $i$th lag of $y_t$ and $c$ is a constant deterministic term. Also, usually, the error term $u_t$ is assumed to be normally distributed with zero mean and variance-covariance matrix $\Sigma$, i.e. $u_t \sim \Sigma$.
+
+Stochastic volatility means that the error variance of a variable is time varying. Mathematically, this means that the variance-covariance matrix is not constant and the error term becomes $u_t \sim \Sigma_t$. More precisely, note that in such a setting only the diagonal elements of $\Sigma_t$ change over time. The covariances are constant in the current example.
+
+## Model and data
+
+For this illustration the data set `us_macrodata` is used, which accompanies the textbook of Chan, Koop, Poirier and Tobias (2019). It contains quarterly time series for the US CPI inflation rate, unemployment rate, and Fed Funds rate from 1959Q2 to 2007Q4.
+
+```{r data, fig.align='center', fig.height=5, fig.width=4.5}
+library(bvartools)
+
+data("us_macrodata") # Load the data
+```
+
+Function `gen_var` can be used to obtain data matrices. Specifying `sv = TRUE` will add a flag, which indicates that SV should be used.
+
+```{r generate-model}
+data <- gen_var(us_macrodata,
+                p = 2,
+                deterministic = "const",
+                sv = TRUE,
+                iterations = 10000,
+                burnin = 2000)
+```
+
+## Priors
+
+Priors can be added using the `add_priors` method.
+
+```{r add-priors}
+model_with_priors <- add_priors(data,
+                                coef = list(v_i = 1 / 9, v_i_det = 1 / 10),
+                                sigma = list(mu = 0, v_i = .01, sigma_h = .05, shape = 3, rate = .0001))
+```
+
+## Estimation
+
+### Using the Gibbs sampler of `bvartools`
+
+Posterior draws can be obtained using `draw_posterior`.
+
+```{r, results='hide'}
+post_bvartools <- draw_posterior(model_with_priors)
+```
+
+### Programming it out
+
+
+```{r, results='hide'}
+
+set.seed(1)
+
+# Data
+y <- t(model_with_priors[["data"]][["Y"]])
+x <- t(model_with_priors[["data"]][["Z"]])
+z <- model_with_priors[["data"]][["SUR"]] # SUR form of x
+
+tt <- ncol(y) # Number of observations
+k <- nrow(y) # Number of exogenous variables
+n_tot <- ncol(z) # Number of estimated coefficients
+
+# Priors
+
+## Coefficients
+prior_a_mu <- model_with_priors[["priors"]][["coefficients"]][["mu"]]
+prior_a_vi <- model_with_priors[["priors"]][["coefficients"]][["v_i"]]
+
+## Sigma
+prior_h_init_mu <- model_with_priors[["priors"]][["sigma"]][["mu"]]
+prior_h_init_vi <- model_with_priors[["priors"]][["sigma"]][["v_i"]]
+prior_h_sigma_shape <- model_with_priors[["priors"]][["sigma"]][["shape"]]
+post_h_sigma_shape <- prior_h_sigma_shape + tt / 2
+prior_h_sigma_rate <- model_with_priors[["priors"]][["sigma"]][["rate"]]
+
+# Initial values
+h <- model_with_priors[["initial"]][["sigma"]][["h"]]
+hinit <- model_with_priors[["initial"]][["sigma"]][["sigma_h"]]
+sigma_i <- matrix(0, k * tt, k)
+for (i in 1:tt) {
+  sigma_i[(i - 1) * k + 1:k,] <- diag(exp(h[i,]))
+}
+h_sigma <- prior_h_sigma_rate
+
+# Storage objects
+iterations <- model_with_priors[["model"]][["iterations"]]
+burnin <- model_with_priors[["model"]][["iterations"]]
+draws <- iterations + burnin
+draws_a <- matrix(NA, n_tot, iterations)
+draws_sigma <- matrix(NA, k * k * tt, iterations)
+
+pb <- txtProgressBar(style = 3)
+for (draw in 1:draws) {
+  
+  # *********************************************
+  # Draw coefficients
+  # *********************************************
+  
+  a <- post_normal_sur(y, z, sigma_i, prior_a_mu, prior_a_vi)
+  
+  
+  # *********************************************
+  # Draw stochastic volatility
+  # *********************************************
+  
+  ## Obtain errors
+  u <- y - matrix(a, k) %*% x
+  
+  ## Obtain volatility states h
+  for (i in 1:k) {
+    h[, i] <- stoch_vol(u[i, ], h[, i], h_sigma[i], hinit[i]) 
+  }
+  
+  ## Update sigma_i
+  for (i in 1:tt) {
+    diag(sigma_i[(i - 1) * k + 1:k,]) <- 1 / exp(h[i, ])
+  }
+  
+  ## Draw variances of h
+  h_lag <- h * 0
+  h_lag[1, ] <- hinit
+  h_lag[-1, ] <- h[-tt,]
+  h_lag <- h - h_lag
+  post_h_sigma_scale <- 1 / (prior_h_sigma_rate + colSums(h_lag^2) / 2)
+  for (i in 1:k) {
+    h_sigma[i] <- 1 / rgamma(1, shape = post_h_sigma_shape[i], scale = post_h_sigma_scale[i])
+  }
+  
+  ## Draw initial states of h
+  h_sigma_i <- diag(1 / h_sigma[, 1])
+  post_hinit_v <- prior_h_init_vi + h_sigma_i
+  post_hinit_mu <- solve(post_hinit_v, prior_h_init_vi %*% prior_h_init_mu + h_sigma_i %*% matrix(h[1, ]))
+  hinit = post_hinit_mu + solve(chol(post_hinit_v), matrix(rnorm(k)));
+  
+  
+  # *********************************************
+  # Store post-burnin draws
+  # *********************************************
+  if (draw > burnin) {
+    pos_draw <- draw - burnin
+    draws_a[, pos_draw] <- a
+    for (i in 1:tt) {
+      draws_sigma[(i - 1) * (k^2) + 1:(k^2), pos_draw] <- solve(sigma_i[(i - 1) * k + 1:k, ])
+    }
+  }
+  
+  # Update progress bar
+  setTxtProgressBar(pb, value = draw / draws)
+}
+
+pos_a <- 1:(n_tot - 3)
+pos_c <- (n_tot - 3 + 1):n_tot
+
+# Create bvar-object
+post_own <- bvar(data = us_macrodata,
+                 y = model_with_priors[["data"]][["Y"]],
+                 A = draws_a[pos_a,],
+                 C = draws_a[pos_c,],
+                 Sigma = draws_sigma)
+```
+
+
+## Inspect coefficients
+
+### Compare summary statistics
+
+```{r}
+summary(post_bvartools)
+```
+
+```{r}
+summary(post_own)
+```
+
+### Compare plots
+
+```{r}
+plot(post_bvartools, type = "boxplot")
+```
+
+```{r}
+plot(post_own, type = "boxplot")
+```
+
+## Forecasts
+
+```{r forecasts, fig.width=5.5, fig.height=5.5}
+bvar_pred <- predict(post_bvartools, n.ahead = 10, new_d = rep(1, 10))
+
+plot(bvar_pred)
+```
+
+## Impulse response analysis
+
+Currently, `bvartools` supports forecast error, orthogonalised, and generalised impulse response functions.
+
+### Forecast error impulse response
+
+```{r feir, fig.width=5.5, fig.height=4.5}
+FEIR <- irf(post_bvartools, impulse = "r", response = "Dp", n.ahead = 8)
+
+plot(FEIR, main = "Forecast Error Impulse Response", xlab = "Period", ylab = "Response")
+```
+
+### Orthogonalised impulse response
+
+```{r oir, fig.width=5.5, fig.height=4.5}
+OIR <- irf(post_bvartools, impulse = "r", response = "Dp", n.ahead = 8, type = "oir")
+
+plot(OIR, main = "Orthogonalised Impulse Response", xlab = "Period", ylab = "Response")
+```
+
+### Generalised impulse response
+
+```{r gir, fig.width=5.5, fig.height=4.5}
+GIR <- irf(post_bvartools, impulse = "r", response = "Dp", n.ahead = 8, type = "gir")
+
+plot(GIR, main = "Generalised Impulse Response", xlab = "Period", ylab = "Response")
+```
+
+## Forecast error variance decomposition
+
+Default forecast error variance decomposition (FEVD) is based on orthogonalised impulse responses (OIR).
+
+```{r fevd-oir, fig.width=5.5, fig.height=4.5}
+bvar_fevd_oir <- fevd(post_bvartools, response = "Dp")
+
+plot(bvar_fevd_oir, main = "OIR-based FEVD of consumption")
+```
+
+It is also possible to calculate FEVDs, which are based on generalised impulse responses (GIR). Note that these do not automatically add up to unity.
+
+```{r fevd-gir, fig.width=5.5, fig.height=4.5}
+bvar_fevd_gir <- fevd(post_bvartools, response = "Dp", type = "gir")
+
+plot(bvar_fevd_gir, main = "GIR-based FEVD of consumption")
+```
+
+## References
+
+Chan, J., Koop, G., Poirier, D. J., & Tobias, J. L. (2019). *Bayesian Econometric Methods* (2nd ed.). Cambridge: University Press.
+
+Kim, S., Shephard, N., & Chib, S. (1998). Stochastic volatility. Likelihood inference and comparison with ARCH models. *Review of Economic Studies 65*(3), 361-393. <https://doi.org/10.1111/1467-937X.00050>
+
+
+<!-- Sanderson, C., & Curtin, R. (2016). Armadillo: a template-based C++ library for linear algebra. *Journal of Open Source Software, 1*(2), 26. <https://doi.org/10.21105/joss.00026> -->
+
+<!-- [^cpp]: `RcppArmadillo` is the `Rcpp` bridge to the open source 'Armadillo' -->
+<!-- library of Sanderson and Curtin (2016). -->
+

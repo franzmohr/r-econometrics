@@ -1,0 +1,174 @@
+---
+title: "Bayesian Inference of Structural Vector Autoregressions (SVAR) with the `bvartools` package"
+author: "Franz X. Mohr"
+date: "2023-09-11"
+lastmod: "`r Sys.Date()`" 
+tags:
+  - r
+  - var
+  - svar
+  - vector-autoregression
+  - bvartools
+description: "A guide on Bayesian inference of structural vector autoregressive (SVAR) in R using the bvartools package."
+---
+
+The <a href="https://cran.r-project.org/package=bvartools" target="_blank">bvartools</a> allows to perform Bayesian inference of <a href="https://www.r-econometrics.com/timeseries/varintro" target="_blank">Vector autoregressive (VAR) models</a>, including <a href="https://www.r-econometrics.com/timeseries/svarintro" target="_blank">structural VARs</a>. This post guides through the Bayesian inference of SVAR models in R using the `bvartools` package.
+
+## Data
+
+For this illustration we generate an artificial data set with three endogenous variables, which follows the data generating process
+
+$$y_t = A_1 y_{t - 1} + B \epsilon_t,$$
+
+where
+
+$$
+A_1 = \begin{bmatrix} 0.3 & 0.12 & 0.69 \\ 0 & 0.3 & 0.48 \\ 0.24 & 0.24 & 0.3 \end{bmatrix} \text{, }
+B = \begin{bmatrix} 1 & 0 & 0 \\ -0.14 & 1 & 0 \\ -0.06 & 0.39 & 1 \end{bmatrix} \text{ and } \epsilon_t \sim N(0, I_3).
+$$
+
+```{r, fig.align='center', fig.height=3.5, fig.width=5}
+# Reset random number generator for reproducibility
+set.seed(24579)
+
+tt <- 500 # Number of time series observations
+
+# Coefficient matrix
+A_1 <- matrix(c(0.3, 0, 0.24,
+                0.12, 0.3, 0.24,
+                0.69, 0.48, 0.3), 3)
+
+# Structural coefficients
+B <- diag(1, 3)
+B[lower.tri(B)] <- c(-0.14, -0.06, 0.39)
+
+# Generate series
+sd_sigma <- 1
+series <- matrix(rnorm(3, 0, sd_sigma), 3, tt + 1) # Raw series with zeros
+for (i in 2:(tt + 1)){
+  series[, i] <- A_1 %*% series[, i - 1] +  B %*% rnorm(3, 0, sd_sigma)
+}
+
+series <- ts(t(series)) # Convert to time series object
+dimnames(series)[[2]] <- c("S1", "S2", "S3") # Rename variables
+
+# Plot the series
+plot.ts(series, main = "Artificial time series")
+```
+
+## Model generation
+
+```{r, message=FALSE, warning = FALSE}
+library(bvartools)
+
+# Generate basic model
+mod <- gen_var(series,
+               p = 1,
+               deterministic = "none",
+               structural = TRUE,
+               iterations = 5000,
+               burnin = 2000)
+```
+
+## Prior specification
+
+```{r, message=FALSE, warning = FALSE}
+mod_w_prior <- add_priors(mod,
+                          coef = list(v_i = 0),
+                          sigma = list(shape = 3, rate = .0001))
+```
+
+## Draw posteriors
+
+```{r, message=FALSE, warning = FALSE, results='hide'}
+post <- draw_posterior(mod_w_prior)
+```
+
+## Evaluation
+
+### Summary statistics
+
+```{r, message=FALSE, warning = FALSE}
+summary(post)
+```
+
+Compare with actual values
+
+```{r, message=FALSE, warning = FALSE}
+solve(B) %*% A_1
+```
+
+```{r, message=FALSE, warning = FALSE}
+solve(B)
+```
+
+### Plotting posterior distributions
+
+t
+
+```{r, message=FALSE, warning = FALSE}
+plot(post, type = "boxplot")
+```
+
+### Forecasts
+
+```{r, message=FALSE, warning = FALSE}
+pred_svar <- predict(post, "S1", n.ahead = 10)
+
+plot(pred_svar)
+```
+
+
+### Impulse response functions
+
+```{r, message=FALSE, warning = FALSE}
+irf_svar <- irf(post, n.ahead = 10, impulse = "S1", response = "S3", type = "sir")
+
+plot(irf_svar)
+```
+
+### Variance decomposition
+
+```{r, message=FALSE, warning = FALSE}
+fevd_svar <- fevd(post, n.ahead = 10, response = "S3", type = "sir")
+
+plot(fevd_svar)
+```
+
+## Compare with frequentist results
+
+### Estimate basic VAR
+
+```{r, message=FALSE, warning = FALSE}
+library(vars)
+
+freq_var <- VAR(series, p = 1, type = "none")
+```
+
+### Estimate structural coefficients
+
+```{r, message=FALSE, warning = FALSE}
+# Specify A0
+a <- diag(1, 3)
+a[lower.tri(a)] <- NA
+
+freq_var_a <- SVAR(freq_var, Amat = a, max.iter = 1000)
+
+freq_var_a
+```
+
+### Impulse response function
+
+```{r, message=FALSE, warning = FALSE}
+freq_var_irf <- irf(freq_var_a, n.ahead = 10, impulse = "S1", response = "S3")
+
+plot(freq_var_irf)
+```
+
+## Literature
+
+Chan, J., Koop, G., Poirier, D. J., & Tobias, J. L. (2019). *Bayesian Econometric Methods* (2nd ed.). Cambridge: University Press.
+
+Lütkepohl, H. (2007). *New Introduction to Multiple Time Series Analyis* (2nd ed.). Berlin: Springer.
+
+Pfaff, B. (2008). VAR, SVAR and SVEC models: Implementation within R package vars. *Journal of Statistical Software, 27*(4).

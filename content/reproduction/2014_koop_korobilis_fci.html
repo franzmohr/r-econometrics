@@ -1,0 +1,194 @@
+---
+title: "Reproduction: Koop, G., & Korobilis, D. (2014). A new index of financial conditions."
+author: "Franz X. Mohr"
+date: "2026-09-05"
+tags:
+  - r
+  - fincond
+  - favar
+  - tvp-favar
+  - financial-conditions-index
+  - dynamic-factor-model
+  - kalman-filter
+  - forgetting-factors
+  - bvartools
+description: "Koop and Korobilis (2014) extract a financial conditions index from a factor augmented VAR whose loadings and coefficients are allowed to drift, and estimate it with forgetting factors instead of posterior simulation. This post reproduces the paper's index and its real-time exercise in R with the fincond package."
+---
+
+
+
+<p>A <em>financial conditions index</em> (FCI) compresses a large number of financial market series – spreads, prices, volatilities, survey measures – into a single series that is meant to say whether financial conditions are tight or loose. The obvious tool for that job is a factor model. The harder question is which series should count towards the index, and by how much, given that the answer plainly changes over time: the TED spread said something quite different about the state of the financial system in 2008 than it did in 1995.</p>
+<p>Koop and Korobilis (2014) answer it by letting the factor loadings drift. Their index comes out of a factor augmented VAR (FAVAR) in which both the loadings and the transition coefficients follow random walks, so a series can enter and leave the index as the sample proceeds. What makes the paper more than a large state space model is how it is estimated: the priors on the innovation variances are replaced by <em>forgetting factors</em>, which reduces the whole estimation to two passes of a Kalman filter and smoother. No posterior simulation is involved, and the entire index over 175 quarters and 18 financial series is obtained in a hundredth of a second.</p>
+<p>This post reproduces the two exercises the paper is built around – the index itself and its real-time counterpart – using the <a href="https://github.com/franzmohr/fincond"><code>fincond</code></a> package.</p>
+<!--more-->
+<div id="the-model" class="section level2">
+<h2>The model</h2>
+<p>Let <span class="math inline">\(y_t\)</span> be an <span class="math inline">\(n_y \times 1\)</span> vector of macroeconomic variables and <span class="math inline">\(x_t\)</span> an <span class="math inline">\(n_x \times 1\)</span> vector of financial variables, from which a single unobserved factor <span class="math inline">\(f_t\)</span> – the index – is extracted. The state vector is <span class="math inline">\(z_t = (y_t&#39;, f_t&#39;)&#39;\)</span> and the measurement equation is</p>
+<p><span class="math display">\[\begin{bmatrix} y_t \\ x_t \end{bmatrix} = \begin{bmatrix} I &amp; 0 \\ \lambda^y_t &amp; \lambda^f_t \end{bmatrix} \begin{bmatrix} y_t \\ f_t \end{bmatrix} + \begin{bmatrix} 0 \\ e_t \end{bmatrix}, \quad e_t \sim N(0, V_t),\]</span></p>
+<p>with <span class="math inline">\(V_t\)</span> diagonal. The macroeconomic block is measured without error, which is why the corresponding block of the state is simply the data and only the factor has to be inferred. The financial variables load on the factor <em>and</em> on the macro variables, so <span class="math inline">\(\lambda^y_t\)</span> removes from the index whatever is already explained by inflation, unemployment and output. That is the feature which distinguishes an FCI from a plain first principal component of financial data.</p>
+<p>The transition equation is a VAR in the state,</p>
+<p><span class="math display">\[z_t = \sum_{i=1}^{p} B_{i,t} z_{t-i} + u_t, \quad u_t \sim N(0, Q_t),\]</span></p>
+<p>and both coefficient blocks follow random walks,</p>
+<p><span class="math display">\[\lambda_t = \lambda_{t-1} + \epsilon_t, \quad \beta_t = \beta_{t-1} + \eta_t.\]</span></p>
+<p>In a fully Bayesian treatment the variances of <span class="math inline">\(\epsilon_t\)</span> and <span class="math inline">\(\eta_t\)</span> would need priors of their own, and the model would have to be simulated. Koop and Korobilis (2014) instead follow Raftery et al. (2010) and pin the drift down with <em>forgetting factors</em>: the prediction variance of the coefficients in each block is inflated by a factor <span class="math inline">\(1 / \kappa\)</span> at every step, so the amount of time variation is set by <span class="math inline">\(\kappa\)</span> rather than estimated. The two error covariances <span class="math inline">\(V_t\)</span> and <span class="math inline">\(Q_t\)</span> are handled in the same spirit, as exponentially weighted moving averages of past squared residuals. Four tuning constants in total, and what is left is a filtering problem.</p>
+<p>This is worth being explicit about, because it decides what may be read off the output. The Kalman recursions are exact Bayesian updating and the initial conditions are genuine priors, so the <em>factor</em> is a properly filtered quantity. Nothing to do with the variances is: the forgetting factors are plug-in point estimates substituted into the filter, and their uncertainty is discarded. <code>fincond</code> therefore returns one path per quantity, as <code>ts</code> objects rather than <code>coda</code> chains, and no interval computed from them is a credible interval. For a fully Bayesian dynamic factor model with priors on the innovation variances, <a href="/timeseries/dynamicfactorintro"><code>bvartools</code></a> is the appropriate tool instead.</p>
+</div>
+<div id="the-data" class="section level2">
+<h2>The data</h2>
+<p>The package ships the paper’s data as <code>koop</code>.</p>
+<pre class="r"><code>library(&quot;fincond&quot;)
+
+set.seed(1234567)
+
+data(&quot;koop&quot;)</code></pre>
+<p><code>koop$financial</code> holds the 18 financial series, quarterly from 1970 Q1 to 2013 Q3:</p>
+<pre class="r"><code>colnames(koop$financial)</code></pre>
+<pre><code>##  [1] &quot;sp500&quot;          &quot;twexmmth&quot;       &quot;oil&quot;            &quot;spread_ted&quot;    
+##  [5] &quot;spread_10_2&quot;    &quot;spread_2_3m&quot;    &quot;spread_comm&quot;    &quot;loanhpi&quot;       
+##  [9] &quot;spread_30_mort&quot; &quot;cmdebt&quot;         &quot;cci&quot;            &quot;move&quot;          
+## [13] &quot;vix&quot;            &quot;totalsl&quot;        &quot;stdscom&quot;        &quot;mich1&quot;         
+## [17] &quot;mich2&quot;          &quot;mich3&quot;</code></pre>
+<p>Several of them start well after the sample does – the VIX in 1990, the MOVE index in 1988, the loan officer survey in 1990 – and are <code>NA</code> until they do:</p>
+<pre class="r"><code>colSums(is.na(koop$financial))</code></pre>
+<pre><code>##          sp500       twexmmth            oil     spread_ted    spread_10_2 
+##              0              0             17             47             26 
+##    spread_2_3m    spread_comm        loanhpi spread_30_mort         cmdebt 
+##             26              5             25              5              0 
+##            cci           move            vix        totalsl        stdscom 
+##              0             73             66              0             82 
+##          mich1          mich2          mich3 
+##              0              0              0</code></pre>
+<p>The macroeconomic block is a list of 96 <em>real-time vintages</em> of inflation (<code>p</code>), the unemployment rate (<code>u</code>) and output (<code>y</code>). Each vintage starts in 1970 Q1 and ends one quarter later than the one before it, so <code>macro[[1]]</code> ends in 1989 Q4 and <code>macro[[96]]</code> in 2013 Q3:</p>
+<pre class="r"><code>length(koop$macro)</code></pre>
+<pre><code>## [1] 96</code></pre>
+<pre class="r"><code>colnames(koop$macro[[96]])</code></pre>
+<pre><code>## [1] &quot;p&quot; &quot;u&quot; &quot;y&quot;</code></pre>
+<pre class="r"><code>rbind(first = end(koop$macro[[1]]), last = end(koop$macro[[96]]))</code></pre>
+<pre><code>##       [,1] [,2]
+## first 1989    4
+## last  2013    3</code></pre>
+<p>The full sample index uses <code>macro[[96]]</code>. The earlier vintages are what the second exercise runs over.</p>
+</div>
+<div id="the-index" class="section level2">
+<h2>The index</h2>
+<p>The model follows the workflow of <a href="https://github.com/franzmohr/bvartools"><code>bvartools</code></a>: build the object, add priors, estimate.</p>
+<pre class="r"><code>model &lt;- create_fcimodel(y = koop$macro[[96]], x = koop$financial,
+                         p = 4, n = 1)
+model &lt;- add_priors(model)
+model &lt;- add_posterior_coefficients(model)
+
+index &lt;- fci(model, sign_on = &quot;vix&quot;)</code></pre>
+<p>The sign and scale of a factor are not identified – multiplying the factor by <span class="math inline">\(-1\)</span> and its loadings by <span class="math inline">\(-1\)</span> leaves the model unchanged – so both have to be fixed by convention rather than estimated. <code>sign_on = "vix"</code> orients the index so that its loading on the VIX is positive, which makes a high value mean stressed conditions. That is a choice and not a result, and it has to be stated, because it decides whether a rising index means tightening or loosening.</p>
+<pre class="r"><code>plot(index, main = &quot;Financial conditions index&quot;, ylab = &quot;Index&quot;, xlab = &quot;&quot;)
+abline(h = 0, lty = &quot;dashed&quot;, col = &quot;grey40&quot;)</code></pre>
+<p><img src="/reproduction/2014_koop_korobilis_fci_files/figure-html/fci-plot-1.png" alt="" width="672" /></p>
+<p>The paper’s headline claim concerns the ranking of episodes rather than any single value, so that is what to check it against. The eight highest readings:</p>
+<pre class="r"><code>as_quarter &lt;- function(x) {
+  yr &lt;- floor(x)
+  qtr &lt;- round((x - yr) * 4) + 1
+  paste0(yr, &quot; Q&quot;, qtr)
+}
+
+ord &lt;- order(-index)[1:8]
+
+data.frame(quarter = as_quarter(as.numeric(time(index)))[ord],
+           index = round(as.numeric(index)[ord], 2))</code></pre>
+<pre><code>##   quarter index
+## 1 2008 Q4  3.65
+## 2 1982 Q3  2.78
+## 3 1974 Q3  2.60
+## 4 1981 Q4  2.57
+## 5 1981 Q3  2.56
+## 6 1982 Q2  2.54
+## 7 1974 Q4  2.49
+## 8 1982 Q1  2.44</code></pre>
+<p>The index peaks in 2008 Q4, ahead of the 1982 recession, the 1974 oil crisis and the 1981 tightening – the same ordering the paper reports. The three episodes that follow the 2008 peak are all clearly separated from it, which is the point: on this measure the financial crisis is not merely another bad quarter but the worst reading of the past four decades by a wide margin.</p>
+</div>
+<div id="factor-loadings" class="section level2">
+<h2>Factor loadings</h2>
+<p>Each financial series has its own time varying exposure to the index, and it is these paths that carry the paper’s argument about a changing financial system. <code>plot(model, which = "loadings")</code> draws them, one panel per series:</p>
+<pre class="r"><code>plot(model, which = &quot;loadings&quot;)</code></pre>
+<p><img src="/reproduction/2014_koop_korobilis_fci_files/figure-html/loadings-plot-1.png" alt="" width="672" /></p>
+<p>A loading drifting towards zero is a series the index has stopped drawing on. <code>factor_loadings()</code> returns the same paths as a matrix, so the first and last periods of the sample can be compared directly. Note that these are the loadings as estimated: the sign chosen in <code>fci()</code> is applied to the index it returns and is not written back into the model, so the whole matrix here carries the estimator’s own arbitrary orientation, which happens to be the mirror image of the VIX-oriented index plotted above. Read magnitudes, not signs.</p>
+<pre class="r"><code>loadings &lt;- factor_loadings(model)
+
+round(data.frame(first = loadings[1, ],
+                 last = loadings[nrow(loadings), ]), 2)</code></pre>
+<pre><code>##                first  last
+## sp500           1.08  1.11
+## twexmmth       -0.96 -0.85
+## oil             0.21  0.39
+## spread_ted     -1.35 -2.08
+## spread_10_2     0.64  0.51
+## spread_2_3m     0.24 -0.07
+## spread_comm    -1.82 -1.69
+## loanhpi         0.78  1.33
+## spread_30_mort -1.10 -0.80
+## cmdebt          1.10  0.99
+## cci             0.53  0.55
+## move           -0.25 -1.03
+## vix            -0.93 -1.73
+## totalsl         0.63  0.15
+## stdscom        -0.72 -1.65
+## mich1           1.54  1.43
+## mich2           1.30  1.26
+## mich3           0.50  1.01</code></pre>
+<p>The TED spread and the VIX both gain a lot of weight over the sample, and the MOVE index and the senior loan officer survey likewise – the four series that most directly measure funding stress and market volatility, and the ones a reader would expect a modern FCI to lean on. The stock market’s own contribution barely moves. That reweighting is the substantive result of allowing the loadings to drift: a constant-loading factor model would have had to average these two regimes into one.</p>
+</div>
+<div id="a-real-time-index" class="section level2">
+<h2>A real-time index</h2>
+<p>Because the estimator needs no posterior simulation, it can be run recursively at essentially no cost – once per vintage, on nothing but the data that vintage contains. That recursion is the paper’s second exercise and the reason the 96 vintages are in the data set.</p>
+<p>Two things change from vintage to vintage. The macro block gets one quarter longer each time, by construction. The financial block does too, informally: since several series start partway through the sample, a series with fewer than two observations over an early vintage’s span has no information to contribute and has to be dropped from that vintage’s model rather than passed in empty.</p>
+<pre class="r"><code>n_vintages &lt;- length(koop$macro)
+realtime &lt;- data.frame(time = numeric(n_vintages), index = numeric(n_vintages))
+
+for (i in seq_len(n_vintages)) {
+  y_i &lt;- koop$macro[[i]]
+
+  # Keep only the financial series that have started by this vintage.
+  span &lt;- window(koop$financial, start = start(y_i), end = end(y_i))
+  x_i &lt;- koop$financial[, colSums(!is.na(span)) &gt;= 2, drop = FALSE]
+
+  m_i &lt;- create_fcimodel(y = y_i, x = x_i, p = 4, n = 1)
+  m_i &lt;- add_priors(m_i)
+  m_i &lt;- add_posterior_coefficients(m_i)
+
+  # sp500 spans the whole sample, unlike vix, so it fixes the sign here.
+  index_i &lt;- fci(m_i, sign_on = &quot;sp500&quot;)
+  realtime$time[i] &lt;- end(index_i)[1] + (end(index_i)[2] - 1) / 4
+  realtime$index[i] &lt;- as.numeric(index_i)[length(index_i)]
+}</code></pre>
+<p>96 models, one per vintage, in about a second in total. Each entry of <code>realtime$index</code> is a one-off reading: the value the index would have taken in that quarter, estimated with nothing later than that quarter’s data. Lining those up against the same quarters of the full sample index – built with hindsight, and re-signed on <code>sp500</code> for comparability – shows how much the revisions matter. Since <code>sp500</code> orients the index the other way round from <code>vix</code>, the figure below is the mirror image of the one above: here a <em>low</em> value means stressed conditions.</p>
+<pre class="r"><code>index_full &lt;- fci(model, sign_on = &quot;sp500&quot;)
+final &lt;- as.numeric(index_full)[match(round(realtime$time, 4),
+                                      round(as.numeric(time(index_full)), 4))]
+
+start_yr &lt;- floor(realtime$time[1])
+start_qtr &lt;- round((realtime$time[1] - start_yr) * 4) + 1
+compared &lt;- ts(cbind(realtime$index, final),
+               start = c(start_yr, start_qtr), frequency = 4)
+
+ts.plot(compared, col = c(&quot;firebrick&quot;, &quot;grey30&quot;), lwd = c(1.5, 1),
+        ylab = &quot;Index&quot;, xlab = &quot;&quot;,
+        main = &quot;Real-time vs. full-sample index&quot;)
+legend(&quot;topleft&quot;, legend = c(&quot;Real time&quot;, &quot;Full sample&quot;),
+       col = c(&quot;firebrick&quot;, &quot;grey30&quot;), lwd = c(1.5, 1), bty = &quot;n&quot;)</code></pre>
+<p><img src="/reproduction/2014_koop_korobilis_fci_files/figure-html/realtime-compare-1.png" alt="" width="672" /></p>
+<pre class="r"><code>cor(realtime$index, final)</code></pre>
+<pre><code>## [1] 0.9346385</code></pre>
+<p>A correlation above 0.93 between a reading made in real time and its own fully revised counterpart is the case for the index as a monitoring tool. Someone watching it as it was published would have seen essentially the same signal as someone looking back at it today – including through 2008, where both series reach their most extreme reading in the same quarter, 2008 Q4. That is not automatic for a factor extracted from a drifting model, and it is what makes the index usable for the purpose it was built for.</p>
+</div>
+<div id="two-deviations-from-the-published-replication-code" class="section level2">
+<h2>Two deviations from the published replication code</h2>
+<p>Reproducing the paper required departing from the code published with it in two places, both of which are documented in the package:</p>
+<ul>
+<li><strong>Lags of the state.</strong> The replication code never fills the lag blocks of the companion form of the state, so it predicts from <span class="math inline">\(B_{1,t}\)</span> alone. That is invisible at <span class="math inline">\(p = 1\)</span> and incorrect above it. <code>fincond</code> carries the blocks, which is why the results above are not bit-identical to what the published code returns at <span class="math inline">\(p = 4\)</span>.</li>
+<li><strong>Missing values.</strong> The replication code replaces missing values by the sample mean throughout, so a series that starts in 1990 contributes a constant to the index for the twenty years before it exists. <code>fincond</code> instead drops a series from the periods it is missing in, so it contributes from the date it starts and not before. A mean is still substituted for the principal components the algorithm is initialised from, which need a complete matrix and only set a starting value.</li>
+</ul>
+</div>
+<div id="references" class="section level2">
+<h2>References</h2>
+<p>Koop, G., &amp; Korobilis, D. (2014). A new index of financial conditions. <em>European Economic Review, 71</em>, 101–116. <a href="https://doi.org/10.1016/j.euroecorev.2014.07.002" class="uri">https://doi.org/10.1016/j.euroecorev.2014.07.002</a></p>
+<p>Raftery, A. E., Kárný, M., &amp; Ettler, P. (2010). Online prediction under model uncertainty via dynamic model averaging: Application to a cold rolling mill. <em>Technometrics, 52</em>(1), 52–66. <a href="https://doi.org/10.1198/TECH.2009.08104" class="uri">https://doi.org/10.1198/TECH.2009.08104</a></p>
+<p>West, M., &amp; Harrison, J. (1997). <em>Bayesian forecasting and dynamic models</em> (2nd ed.). New York: Springer.</p>
+</div>

@@ -1,0 +1,88 @@
+---
+title: "Panel data estimation in R"
+author: "Franz X. Mohr"
+date: "2018-02-03"
+---
+
+In order to estimate panel data models, I use the `plm` function from the `plm` package. The intuition behind its structure is similar to the ordinary linear model, except that it allows you to specify the panel's group and time variables and the effects model.
+
+## Introduction
+
+
+### Example 14.1
+
+Similar to the `lm` function, you can specify your model's equation and the sample. Since you want to use panel data methods for you estimation, you also have to specify which variables in your sample contain the information used to distinguish different groups and which variable contains the time measurement. In our example this is done with `index = c("fcode", "year")`. Note, that the order of the variables is important. The group variable always has to be at the first and the time variable at the second position.
+
+The specification `model = "within"` indicates that the effects occur within a group. This is the fixed effects estimator. And the `effect = "individual"` specifies that we are only interested in effects of the group variable and that there are no time specific effects. (See `?plm` for further information on this.)
+
+```{r, message = FALSE}
+# Load data
+library(wooldridge) # install.packages("wooldridge")
+data("jtrain")
+
+
+# Estimate model
+library(plm) # install.packages("plm")
+plm_1 <- plm(lscrap ~ d88 + d89 + grant + grant_1,
+             data = jtrain,
+             index= c("fcode", "year"),
+             model = "within",
+             effect = "individual")
+
+summary(plm_1)
+```
+
+
+### Fixed effects
+
+
+
+### Random effects
+
+
+
+## Test statistics
+
+
+
+
+
+For the analysis of multivariate time series with panel data, I recommend the `panelvar` package of Sigmund and Ferstl (2017).
+
+### Heteroskedasticity robust standard errors
+`multiwayvcov`, `lmtest` and `sandwich`
+
+### F-Test
+`anova` function
+
+### Instrumental varialbes
+`AER`
+`ivreg`
+
+### Limited dependent variables
+`glm` function
+
+#### Logit and Probit
+
+
+#### Tobit
+
+
+#### Poisson
+
+
+### Panel data estimators
+
+`plm`
+
+#### Fixed effects
+
+
+#### Random effects
+
+
+
+## References
+
+Sigmund, M., & Ferstl, R. (2017). <a href="https://ssrn.com/abstract=2896087" target="_blank">Panel Vector Autoregression in R with the package `panelvar`</a>.
+

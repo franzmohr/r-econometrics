@@ -1,0 +1,145 @@
+---
+title: "An Introduction to Vector Error Correction Models (VECMs)"
+author: "Franz X. Mohr"
+date: "2019-07-22"
+tags:
+  - r
+  - vec
+  - cointegration
+  - vars
+  - urca
+  - tsdyn
+description: "An introduction to the concept of vector error correction (VEC) models for cointegrated data. The focus is more on the method's application in R using the vars and urca package."
+---
+
+One of the prerequisits for the estimation of a [vector autoregressive (VAR)](/timeseries/varintro) model is that the analysed time series are stationary. However, economic theory suggests that there exist equilibrium relations between economic variables in their levels, which can render these variables stationary without taking differences. This is called *cointegration*. Since knowing the size of such relationships can improve the results of an analysis, it would be desireable to have an econometric model, which is able to capture them. So-called *vector error correction models* (VECMs) belong to this class of models. The following text presents the basic concept of VECMs and guides through the estimation of such a model in R.
+
+## Model and data
+
+Vector error correction models are very similar to [VAR models](/timeseries/varintro) and can have the following form:
+
+$$\Delta x_t = \Pi x_{t-1} + \sum_{l = 1}^{p-1} \Gamma_l \Delta x_{t-l} + C d_t + \epsilon_t,$$
+where $\Delta x$ is the first difference of the variables in vector $x$, $Pi$ is a coefficient matrix of cointegrating relationships, $\Gamma$ is a coefficient matrix of the lags of differenced variables of $x$, $d$ is a vector of deterministic terms and $C$ its corresponding coefficient matrix. $p$ is the lag order of the model in its VAR form and $\epsilon$ is an error term with zero mean and variance-covariance matrix $\Sigma$.
+
+The above equation shows that the only difference to a VAR model is the error correction term $\Pi x_{t-1}$, which captures the effect of how the growth rate of a variable in $x$ changes, if one of the variables departs from its equilibrium value. The coefficient matrix $\Pi$ can be written as the matrix product $\Pi = \alpha \beta^{\prime}$ so that the error correction term becomes $\alpha \beta^{\prime} x_{t-1}$. The cointegration matrix $\beta$ contains information on the equilibrium relationships between the variables in levels. The vector described by $\beta^{\prime} x_{t-1}$ can be interpreted as the distance of the variables form their equilibrium values. $\alpha$ is a so-called loading matrix describing the speed at which a dependent variable converges back to its equilibrium value.
+
+Note that $\Pi$ is assumed to be of reduced rank, which means that $\alpha$ is a $K \times r$ matrix and $\beta$ is a $K^{co} \times r$ matrix, where $K$ is the number of endogenous variables, $K^{co}$ is the number of variables in the cointegration term and $r$ is the rank of $\Pi$, which describes the number of cointegrating relationships that exist between the variables. Note that if $r = 0$, there is no cointegration between the variables so that $\Pi = 0$.
+
+To illustrate the estimation of VECMs in R, we use dataset E6 from Lütkepohl (2007), which contains quarterly, seasonally unadjusted time series for German long-term interest and inflation rates from 1972Q2 to 1998Q4. It comes with the `bvartools` package.
+
+```{r data, fig.height=4.5, fig.width=5}
+library(bvartools) # Load the package, which contains the data
+data("e6") # Load data
+plot(e6) # Plot data
+```
+
+## Estimation
+
+There are multiple ways to estimate VEC models. A first approach would be to use ordinary least squares, which yields accurate result, but does not allow to estimate the cointegrating relations among the variables. The estimated generalised least squares (EGLS) approach would be an alternative. However, the most popular estimator for VECMs seems to be the maximum likelihood estimator of Johansen (1995), which is implemented in R by the `ca.jo` function of the `urca` package of Pfaff (2008a). Alternatively, function `VECM` of the `tsDyn` package of Di Narzo et al. (2020) can be used as well.[^luetkepohl]
+
+But before the VEC model can be estimated, the lag order $p$, the rank of the cointegration matrix $r$ and deterministic terms have to be specified. A valid strategy to choose the lag order is to estimated the VAR in levels and choose the lag specification that minimises an Information criterion. Since the time series show strong seasonal pattern, we control for this by specifying `season = 4`, where 4 is the frequency of the data.
+
+```{r var, message=FALSE}
+library(vars) # Load package
+
+# Estimate VAR
+var_aic <- VAR(e6, type = "const", lag.max = 8, ic = "AIC", season = 4)
+
+# Lag order suggested by AIC
+var_aic$p
+```
+
+According to the AIC, a lag order of 4 can be used, which is the same value used in Lütkepohl (2007). This means the VEC model corresponding to the VAR in levels has 3 lags. Since the `ca.jo` function requires the lag order of the VAR model we set `K = 4`.[^lag]
+
+The inclusion of deterministic terms in a VECM is a delicate issue. Without going into detail a common strategy is to add a linear trend to the error correction term and a constant to the non-cointegration part of the equation. For this example we follow Lütkepohl (2007) and add a constant term and seasonal dummies to the non-cointegration part of the equation.
+
+The `ca.jo` function does not just estimate the VECM. It also calculates the test statistics for different specificaions of $r$ and the user can choose between two alternative approaches, the trace and the eigenvalue test. For this example the trace test is used, i.e. `type = "trace"`.
+
+By default, the `ca.jo` function sets `spec = "longrun"` This specification would mean that the error correction term does not refer to the first lag of the variables in levels as decribed above, but to the $p-1$th lag instead. By setting `spec = "transitory"` the first lag will be used instead. Further information on the interpretation the two alternatives can be found in the function's documentation `?ca.jo`.
+
+For further details on VEC modelling I recommend Lütkepohl (2006, Chapters 6, 7 and 8).
+
+```{r vec, message=FALSE}
+library(urca) # Load package
+
+# Estimate
+vec <- ca.jo(e6, ecdet = "none", type = "trace",
+             K = 4, spec = "transitory", season = 4)
+
+summary(vec)
+```
+
+The trace test suggests that $r=1$ and the first columns of the estimates of the cointegration relations $\beta$ and the loading matrix $\alpha$ correspond to the results of the ML estimator in Lütkepohl (2007, Ch. 7):
+
+```{r beta}
+# Beta
+round(vec@V, 2)
+```
+
+```{r alpha}
+# Alpha
+round(vec@W, 2)
+```
+
+However, the estimated coefficients of the non-cointegration part of the model correspond to the results of the EGLS estimator.
+
+```{r gamma}
+round(vec@GAMMA, 2)
+```
+
+The deterministic terms are different from the results in Lütkepohl (2006), because different reference dates are used.
+
+Using the `tsDyn` package, estimates of the coefficients can be obtained in the following way:
+
+```{r, message=FALSE, warning=FALSE}
+# Load package
+library(tsDyn)
+
+# Obtain constant and seasonal dummies
+seas <- gen_vec(data = e6, p = 4, r = 1, const = "unrestricted", seasonal = "unrestricted")
+# Lag order p is 4 since gen_vec assumes that p corresponds to VAR form
+seas <- seas$data$X[, 7:10]
+
+# Estimate
+est_tsdyn <- VECM(e6, lag = 3, r = 1, include = "none", estim = "ML", exogen = seas)
+
+# Print results
+summary(est_tsdyn)
+```
+
+
+### Impulse response analysis
+
+The impulse response function of a VECM is usually obtained from its VAR form. The function `vec2var` of the `vars` package can be used to transform the output of the `ca.jo` function into an object that can be handled by the `irf` function of the `vars` package. Note that since `ur.jo` does not set the rank $r$ of the cointegration matrix automatically, it has to be specified manually.
+
+```{r vec2var}
+# Transform VEC to VAR with r = 1
+var <- vec2var(vec, r = 1)
+```
+
+The impulse response function is then calculated in the usual manner by using the `irf` function.
+
+```{r ir, fig.height=4.5, fig.width=6}
+# Obtain IRF
+ir <- irf(var, n.ahead = 20, impulse = "R", response = "Dp",
+          ortho = FALSE, runs = 500)
+
+# Plot
+plot(ir)
+```
+
+Note that an important difference to stationary VAR models is that the impulse response of a cointegrated VAR model does not neccessarily approach zero, because the variables are not stationary.
+
+[^lag]: Not that if some variables in the model are known to be integrated, the VAR order must be at least one.
+
+[^luetkepohl]: See Lütkepohl (2006) for more details.
+
+### References
+
+Lütkepohl, H. (2006). *New introduction to multiple time series analysis* (2nd ed.). Berlin: Springer.
+
+Di Narzo, A. F., Aznarte, J. L., Stigler, M., &and Tsung-wu, H. (2020). tsDyn: Nonlinear Time Series Models with Regime Switching. R package version 10-1.2. [https://CRAN.R-project.org/package=tsDyn](https://CRAN.R-project.org/package=tsDyn)
+
+Pfaff, B. (2008a). *Analysis of Integrated and Cointegrated Time Series with R*. Second Edition. New York: Springer.
+
+Pfaff, B. (2008b). VAR, SVAR and SVEC Models: Implementation Within R Package vars. *Journal of Statistical Software 27*(4).

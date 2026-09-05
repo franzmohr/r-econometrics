@@ -1,0 +1,61 @@
+---
+title: "Chapter 5: OLS Asymptotics"
+author: "Franz X. Mohr"
+date: "2018-10-04"
+---
+
+```{r, echo = FALSE}
+library(wooldridge)
+```
+
+Make a histogram of the variable "prate".
+```{r, fig.height=3, fig.width=4}
+data("k401k")
+
+hist(k401k$prate)
+```
+
+**Example 5.2**
+
+```{r}
+data("bwght")
+
+lm.1 <- lm(lbwght ~ cigs + lfaminc, data = bwght[1:694,])
+s.1 <- summary(lm.1)
+
+lm.2 <- lm(lbwght ~ cigs + lfaminc, data = bwght)
+s.2 <- summary(lm.2)
+
+s.2$coefficients[2, 2] / s.1$coefficients[2, 2]
+
+lm.3 <- lm(cigs ~ lfaminc, data = bwght[1:694,])
+s.3 <- summary(lm.3)
+
+sigma.j <- s.3$coefficients[2, 2]
+sigma <- s.3$sigma
+r2 <- s.3$r.squared
+sigma / (sqrt(1388) * sigma.j * sqrt(1 - r2))
+```
+
+**Example 5.3**
+
+```{r}
+data("crime1")
+     
+lm.1 <- lm(narr86 ~ pcnv + ptime86 + qemp86, data = crime1)
+
+# LM test
+lm.u <- lm(lm.1$residuals ~ pcnv + ptime86 + qemp86 + avgsen + tottime, data = crime1)
+summary(lm.u)$r.squared * 2725
+```
+
+```{r}
+qchisq(.9, 2)
+1 - pchisq(4.09, 2)
+```
+
+F-Test
+```{r}
+lm.2 <- lm(narr86 ~ pcnv + ptime86 + qemp86 + avgsen + tottime, data = crime1)
+anova(lm.1, lm.2)
+```

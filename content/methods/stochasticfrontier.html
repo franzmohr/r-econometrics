@@ -1,0 +1,287 @@
+---
+title: "Stochastic Frontier Models in R"
+author: "Franz X. Mohr"
+date: "2026-09-05"
+description: "An introduction to the estimation of stochastic frontier models in R, which are used to measure the technical efficiency of firms, farms or countries."
+tags:
+  - stochastic-frontier
+  - efficiency
+  - production-function
+  - maximum-likelihood
+  - panel-data
+---
+
+
+
+<p>An <a href="/methods/ols">OLS</a> regression describes the <em>average</em> relationship between inputs and output. But in many economic questions the average is not what we are interested in. If two firms use the same amount of capital and labour, but one produces twice as much as the other, we would like to know how far each of them is away from what is technically <em>possible</em> – and not from what is <em>usual</em>. Stochastic frontier models, which were proposed independently by Aigner, Lovell and Schmidt (1977) and Meeusen and van den Broeck (1977), are designed for exactly that question. This post introduces the basic idea behind them and shows how to estimate such models in R.</p>
+<div id="the-idea-behind-a-frontier" class="section level2">
+<h2>The idea behind a frontier</h2>
+<p>Consider the following artificial sample of 300 firms, which use a single input to produce a single output. Both variables are measured in logarithms.</p>
+<pre class="r"><code># Reset random number generator for reproducibility
+set.seed(1234)
+
+# Number of firms
+N &lt;- 300
+
+# Log input
+lx &lt;- log(runif(N, 5, 100))
+
+# Symmetric noise, e.g. weather, measurement error or luck
+v &lt;- rnorm(N, 0, .15)
+
+# One-sided inefficiency term, which can only be positive
+u &lt;- abs(rnorm(N, 0, .35))
+
+# Log output
+ly &lt;- 1 + .6 * lx + v - u
+
+sim &lt;- data.frame(ly = ly, lx = lx)</code></pre>
+<p>The sample was generated from the relationship <span class="math inline">\(ly_i = 1 + 0.6 lx_i + v_i - u_i\)</span>, where <span class="math inline">\(v_i\)</span> is a standard error term, which can be positive or negative, and <span class="math inline">\(u_i\)</span> is a term that is <em>never negative</em>. The latter pushes every firm below the line, which describes the maximum attainable output. The following graph shows the sample together with the true frontier and the OLS regression line.</p>
+<pre class="r"><code>library(ggplot2)
+
+ggplot(sim, aes(x = lx, y = ly)) +
+  geom_point() +
+  geom_abline(intercept = 1, slope = .6) +
+  geom_smooth(method = &quot;lm&quot;, se = FALSE, linetype = &quot;dashed&quot;) +
+  labs(x = &quot;Log input&quot;, y = &quot;Log output&quot;,
+       title = &quot;Frontier (solid) and OLS (dashed)&quot;) +
+  theme_bw()</code></pre>
+<p><img src="/methods/stochasticfrontier_files/figure-html/sim-plot-1.png" alt="" width="432" style="display: block; margin: auto;" /></p>
+<p>The two lines are practically parallel, but the OLS line lies clearly below the frontier. This is the central point: OLS goes <em>through</em> the point cloud, while the frontier is an upper envelope <em>over</em> it. Since the inefficiency term has a positive mean, OLS does not estimate the frontier, but the frontier minus average inefficiency. Its intercept is biased downwards, although the slope – and, hence, the elasticity of output with respect to the input – is still estimated consistently.</p>
+</div>
+<div id="the-model" class="section level2">
+<h2>The model</h2>
+<p>The model behind the graph is
+<span class="math display">\[y_i = \mathbf{x}_i^\prime \beta + v_i - u_i,\]</span>
+where <span class="math inline">\(y_i\)</span> is the log of output, <span class="math inline">\(\mathbf{x}_i\)</span> contains the logs of the inputs, <span class="math inline">\(v_i \sim N(0, \sigma_v^2)\)</span> is ordinary noise and <span class="math inline">\(u_i \geq 0\)</span> measures technical inefficiency. The two error terms are assumed to be independent of each other and of the regressors. A common assumption for the one-sided term is the half-normal distribution, i.e. <span class="math inline">\(u_i \sim N^+(0, \sigma_u^2)\)</span>, which means that most firms are close to the frontier and only few are far below it.</p>
+<p>Since <span class="math inline">\(u_i\)</span> and <span class="math inline">\(v_i\)</span> cannot be observed separately, the model is estimated by maximum likelihood, usually with the parameterisation of Battese and Coelli (1992)
+<span class="math display">\[\sigma^2 = \sigma_v^2 + \sigma_u^2 \quad \text{and} \quad \gamma = \frac{\sigma_u^2}{\sigma_v^2 + \sigma_u^2},\]</span>
+where <span class="math inline">\(\gamma\)</span> lies between zero and one and indicates how important inefficiency is relative to noise.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> If <span class="math inline">\(\gamma\)</span> is close to zero, the deviations from the frontier are pure noise and there is no reason to estimate anything else than OLS.</p>
+<p>Once the model is estimated, the inefficiency of an individual firm can be predicted from its residual. The usual measure of <em>technical efficiency</em> is
+<span class="math display">\[TE_i = \exp(-u_i),\]</span>
+which is estimated by <span class="math inline">\(E[\exp(-u_i) | v_i - u_i]\)</span> as proposed by Jondrow et al. (1982) and Battese and Coelli (1988). It takes values between zero and one, where one means that the firm produces on the frontier. A value of 0.8, for example, says that the firm produces 80 percent of the output that it could produce with its inputs.</p>
+</div>
+<div id="estimation-in-r" class="section level2">
+<h2>Estimation in R</h2>
+<p>The <em>frontier</em> package of Arne Henningsen provides the function <code>sfa</code>, which is an R implementation of Tim Coelli’s FRONTIER 4.1 program. Applied to the artificial sample from above it gives</p>
+<pre class="r"><code>library(frontier) # install.packages(&quot;frontier&quot;)
+
+sim_sfa &lt;- sfa(ly ~ lx, data = sim)
+
+summary(sim_sfa)</code></pre>
+<pre><code>## Error Components Frontier (see Battese &amp; Coelli 1992)
+## Inefficiency decreases the endogenous variable (as in a production function)
+## The dependent variable is logged
+## Iterative ML estimation terminated after 6 iterations:
+## log likelihood values and parameters of two successive iterations
+## are within the tolerance limit
+## 
+## final maximum likelihood estimates
+##             Estimate Std. Error z value  Pr(&gt;|z|)    
+## (Intercept) 1.007969   0.081451 12.3752 &lt; 2.2e-16 ***
+## lx          0.596251   0.020081 29.6930 &lt; 2.2e-16 ***
+## sigmaSq     0.134925   0.018208  7.4103 1.261e-13 ***
+## gamma       0.829647   0.058451 14.1938 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## log likelihood value: -5.847546 
+## 
+## cross-sectional data
+## total number of observations = 300 
+## 
+## mean efficiency: 0.7809427</code></pre>
+<p>The estimate of the intercept is much closer to its true value of one than the OLS estimate, which is</p>
+<pre class="r"><code>coef(lm(ly ~ lx, data = sim))</code></pre>
+<pre><code>## (Intercept)          lx 
+##   0.7340934   0.5982447</code></pre>
+<p>The difference between the two intercepts corresponds to the mean of the inefficiency term. For a half-normal distribution it is <span class="math inline">\(E[u_i] = \sigma_u \sqrt{2 / \pi}\)</span> and, thus, about 0.28 in this sample. Note that separating two error terms, which are never observed individually, asks a lot of the data. In small samples the estimates of <span class="math inline">\(\gamma\)</span> and of the intercept can be quite imprecise, and it can even happen that the estimation collapses to the OLS solution.</p>
+</div>
+<div id="example-production-of-60-firms" class="section level2">
+<h2>Example: production of 60 firms</h2>
+<p>The <em>frontier</em> package contains the cross section data set, which comes with FRONTIER 4.1. It consists of 60 firms and contains an index of output as well as indices of capital and labour input.</p>
+<pre class="r"><code>data(&quot;front41Data&quot;)
+
+head(front41Data)</code></pre>
+<pre><code>##   firm output capital labour
+## 1    1 12.778   9.416 35.134
+## 2    2 24.285   4.643 77.297
+## 3    3 20.855   5.095 89.799
+## 4    4 13.213   4.935 35.698
+## 5    5 12.018   8.717 27.878
+## 6    6 15.284   1.066 92.174</code></pre>
+<p>Since all variables enter the model in logarithms, the following specification is a Cobb-Douglas production frontier, where the coefficients can be interpreted as output elasticities and their sum measures the returns to scale.</p>
+<pre class="r"><code>cobb_douglas &lt;- sfa(log(output) ~ log(capital) + log(labour),
+                    data = front41Data)
+
+summary(cobb_douglas)</code></pre>
+<pre><code>## Error Components Frontier (see Battese &amp; Coelli 1992)
+## Inefficiency decreases the endogenous variable (as in a production function)
+## The dependent variable is logged
+## Iterative ML estimation terminated after 7 iterations:
+## log likelihood values and parameters of two successive iterations
+## are within the tolerance limit
+## 
+## final maximum likelihood estimates
+##              Estimate Std. Error z value  Pr(&gt;|z|)    
+## (Intercept)  0.561619   0.202617  2.7718 0.0055742 ** 
+## log(capital) 0.281102   0.047643  5.9001 3.632e-09 ***
+## log(labour)  0.536480   0.045252 11.8555 &lt; 2.2e-16 ***
+## sigmaSq      0.217000   0.063909  3.3955 0.0006851 ***
+## gamma        0.797207   0.136424  5.8436 5.109e-09 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## log likelihood value: -17.02722 
+## 
+## cross-sectional data
+## total number of observations = 60 
+## 
+## mean efficiency: 0.7405678</code></pre>
+<div id="is-there-inefficiency-at-all" class="section level3">
+<h3>Is there inefficiency at all?</h3>
+<p>Before the efficiency estimates are interpreted, it should be checked whether the data actually support a frontier model. The null hypothesis <span class="math inline">\(\gamma = 0\)</span> means that there is no inefficiency and that OLS would be the appropriate estimator. The <code>lrtest</code> function compares the estimated frontier with the corresponding OLS model:</p>
+<pre class="r"><code>lrtest(cobb_douglas)</code></pre>
+<pre><code>## Likelihood ratio test
+## 
+## Model 1: OLS (no inefficiency)
+## Model 2: Error Components Frontier (ECF)
+##   #Df  LogLik Df  Chisq Pr(&gt;Chisq)  
+## 1   4 -18.447                       
+## 2   5 -17.027  1 2.8392    0.04599 *
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>Note that under the null hypothesis the parameter <span class="math inline">\(\gamma\)</span> lies on the boundary of the parameter space. Therefore, the test statistic does not follow a standard <span class="math inline">\(\chi^2\)</span> distribution, but a mixed <span class="math inline">\(\chi^2\)</span> distribution, which the function takes into account. A rejection of the null hypothesis means that the deviations from the frontier are systematic and not only noise. In this example the null hypothesis is rejected at the 5 percent level, but not by a wide margin. This is not unusual for a sample of 60 observations.</p>
+</div>
+<div id="technical-efficiency-scores" class="section level3">
+<h3>Technical efficiency scores</h3>
+<p>The efficiency of each firm is obtained with the <code>efficiencies</code> function:</p>
+<pre class="r"><code>eff &lt;- efficiencies(cobb_douglas)
+
+summary(as.numeric(eff))</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##  0.3513  0.6772  0.7585  0.7406  0.8428  0.9374</code></pre>
+<pre class="r"><code>ggplot(data.frame(eff = as.numeric(eff)), aes(x = eff)) +
+  geom_histogram(bins = 15) +
+  labs(x = &quot;Technical efficiency&quot;, y = &quot;Number of firms&quot;) +
+  theme_bw()</code></pre>
+<p><img src="/methods/stochasticfrontier_files/figure-html/front41-effic-1.png" alt="" width="432" style="display: block; margin: auto;" /></p>
+<p>The distribution of these estimates is what makes the approach attractive for applied work. It does not only say how efficient the average firm is, but also which firms could increase their output most without using more inputs. However, the individual estimates are predictions of an unobserved random variable and, therefore, relatively imprecise. They should be interpreted with care, especially when they are used to rank firms.</p>
+</div>
+</div>
+<div id="where-does-inefficiency-come-from" class="section level2">
+<h2>Where does inefficiency come from?</h2>
+<p>For most applications the more interesting question is not <em>how much</em> inefficiency there is, but <em>why</em>. Battese and Coelli (1995) proposed a model, in which the mean of the inefficiency term depends on a set of explanatory variables <span class="math inline">\(\mathbf{z}_i\)</span>, i.e.
+<span class="math display">\[u_i \sim N^+(\mathbf{z}_i^\prime \delta, \sigma_u^2).\]</span>
+The frontier and the inefficiency effects are estimated in a single step. This avoids the inconsistencies of the older two-step approach, where the estimated efficiencies are regressed on <span class="math inline">\(\mathbf{z}\)</span> in a second regression.</p>
+<p>The <em>frontier</em> package also contains a data set of 43 smallholder rice producers in the Philippines, which were observed between 1990 and 1997. It is the example, which is used in Coelli et al. (2005). Panel data have to be prepared with the <code>pdata.frame</code> function of the <em>plm</em> package, where the first variable identifies the farmer and the second the time period.</p>
+<pre class="r"><code>library(plm) # install.packages(&quot;plm&quot;)
+
+data(&quot;riceProdPhil&quot;)
+
+rice_panel &lt;- pdata.frame(riceProdPhil, c(&quot;FMERCODE&quot;, &quot;YEARDUM&quot;))</code></pre>
+<p>The variables of the production frontier are output <code>PROD</code> in tonnes, land <code>AREA</code> in hectares, <code>LABOR</code> in man-days and fertiliser <code>NPK</code> in kilogram. The inefficiency effects are separated from the frontier by a vertical bar <code>|</code>. In this example the years of education of the household head <code>EDYRS</code> and the share of upland fields <code>BANRAT</code> are assumed to affect inefficiency.</p>
+<pre class="r"><code>rice &lt;- sfa(log(PROD) ~ log(AREA) + log(LABOR) + log(NPK) | EDYRS + BANRAT,
+            data = rice_panel)
+
+summary(rice)</code></pre>
+<pre><code>## Efficiency Effects Frontier (see Battese &amp; Coelli 1995)
+## Inefficiency decreases the endogenous variable (as in a production function)
+## The dependent variable is logged
+## Iterative ML estimation terminated after 47 iterations:
+## log likelihood values and parameters of two successive iterations
+## are within the tolerance limit
+## 
+## final maximum likelihood estimates
+##                Estimate Std. Error z value  Pr(&gt;|z|)    
+## (Intercept)   -1.051760   0.252990 -4.1573 3.220e-05 ***
+## log(AREA)      0.379767   0.059976  6.3319 2.421e-10 ***
+## log(LABOR)     0.321029   0.061125  5.2520 1.505e-07 ***
+## log(NPK)       0.263797   0.034458  7.6555 1.926e-14 ***
+## Z_(Intercept) -2.746459   8.499206 -0.3231    0.7466    
+## Z_EDYRS       -0.028610   0.215997 -0.1325    0.8946    
+## Z_BANRAT      -3.635528   8.096598 -0.4490    0.6534    
+## sigmaSq        1.666588   3.695879  0.4509    0.6520    
+## gamma          0.978799   0.045203 21.6536 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## log likelihood value: -77.31363 
+## 
+## panel data
+## number of cross-sections = 43 
+## number of time periods = 8 
+## total number of observations = 344 
+## thus there are 0 observations not in the panel
+## 
+## mean efficiency of each year
+##         1         2         3         4         5         6         7         8 
+## 0.7619359 0.7505762 0.8311524 0.8118776 0.7641510 0.8081221 0.7049660 0.8466347 
+## 
+## mean efficiency: 0.784927</code></pre>
+<p>The coefficients of the <code>z</code> variables require some attention, because they describe the effect on <em>inefficiency</em> and not on efficiency. A negative coefficient means that the variable reduces inefficiency and, therefore, <em>increases</em> output. Both estimates are negative, which would suggest that better educated farmers and farmers with a larger share of upland fields operate closer to the frontier. However, neither of them is significantly different from zero. With 43 farmers and explanatory variables, which hardly change over time, this is a fairly common outcome. It is a useful reminder that the inefficiency effects model identifies the <span class="math inline">\(\delta\)</span> parameters from the <em>asymmetry</em> of the residuals, which is a much weaker source of information than the variation that identifies the coefficients of the frontier itself.</p>
+<p>Since the model allows the mean of the inefficiency term to differ across observations, the efficiency estimates also vary over time. The output above reports the mean efficiency for each of the eight years. The individual estimates can be added to the data in the order of the observations, which is convenient for further analysis:</p>
+<pre class="r"><code>rice_panel$efficiency &lt;- efficiencies(rice, asInData = TRUE)
+
+summary(as.numeric(rice_panel$efficiency))</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##  0.1399  0.7255  0.8311  0.7849  0.8874  0.9585</code></pre>
+</div>
+<div id="cost-frontiers" class="section level2">
+<h2>Cost frontiers</h2>
+<p>So far, inefficiency reduced output. In a cost function it works the other way round, because an inefficient firm has <em>higher</em> costs than necessary. This only requires to set the argument <code>ineffDecrease = FALSE</code>, which flips the sign of the one-sided error term.</p>
+<pre class="r"><code>rice_panel$cost &lt;- rice_panel$LABOR * rice_panel$LABORP +
+  rice_panel$NPK * rice_panel$NPKP
+
+rice_cost &lt;- sfa(log(cost) ~ log(PROD) + log(AREA) + log(LABORP) + log(NPKP),
+                 data = rice_panel, ineffDecrease = FALSE)
+
+summary(rice_cost)</code></pre>
+<pre><code>## Error Components Frontier (see Battese &amp; Coelli 1992)
+## Inefficiency increases the endogenous variable (as in a cost function)
+## The dependent variable is logged
+## Iterative ML estimation terminated after 13 iterations:
+## log likelihood values and parameters of two successive iterations
+## are within the tolerance limit
+## 
+## final maximum likelihood estimates
+##             Estimate Std. Error z value  Pr(&gt;|z|)    
+## (Intercept) 5.802370   0.187152 31.0034 &lt; 2.2e-16 ***
+## log(PROD)   0.371840   0.034212 10.8688 &lt; 2.2e-16 ***
+## log(AREA)   0.553136   0.037770 14.6447 &lt; 2.2e-16 ***
+## log(LABORP) 0.443487   0.031269 14.1829 &lt; 2.2e-16 ***
+## log(NPKP)   0.091793   0.053321  1.7215 0.0851602 .  
+## sigmaSq     0.072843   0.015707  4.6376 3.524e-06 ***
+## gamma       0.482776   0.125711  3.8404 0.0001229 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## log likelihood value: 49.36599 
+## 
+## panel data
+## number of cross-sections = 43 
+## number of time periods = 8 
+## total number of observations = 344 
+## thus there are 0 observations not in the panel
+## 
+## mean efficiency: 0.8593954</code></pre>
+</div>
+<div id="further-options" class="section level2">
+<h2>Further options</h2>
+<p>The half-normal distribution of the inefficiency term is a convenient assumption, but not the only one. The argument <code>truncNorm = TRUE</code> allows for a truncated normal distribution, which adds a parameter <span class="math inline">\(\mu\)</span> and makes the model more flexible, and <code>timeEffect = TRUE</code> allows efficiency to change over time in panel models. If more distributions are required, the <em>sfaR</em> package provides ten of them – among others the exponential, gamma, lognormal and Weibull distribution – as well as latent class and sample selection models. A non-parametric alternative to the whole approach is data envelopment analysis (DEA), which is implemented in the <em>Benchmarking</em> package. It does not require a functional form, but it also does not distinguish between inefficiency and noise.</p>
+</div>
+<div id="literature" class="section level2">
+<h2>Literature</h2>
+<p>Aigner, D., Lovell, C. A. K., &amp; Schmidt, P. (1977). Formulation and estimation of stochastic frontier production function models. <em>Journal of Econometrics, 6</em>(1), 21–37.</p>
+<p>Battese, G. E., &amp; Coelli, T. J. (1988). Prediction of firm-level technical efficiencies with a generalized frontier production function and panel data. <em>Journal of Econometrics, 38</em>(3), 387–399.</p>
+<p>Battese, G. E., &amp; Coelli, T. J. (1992). Frontier production functions, technical efficiency and panel data: With application to paddy farmers in India. <em>Journal of Productivity Analysis, 3</em>(1), 153–169.</p>
+<p>Battese, G. E., &amp; Coelli, T. J. (1995). A model for technical inefficiency effects in a stochastic frontier production function for panel data. <em>Empirical Economics, 20</em>(2), 325–332.</p>
+<p>Coelli, T. J. (1996). A guide to FRONTIER version 4.1: A computer program for stochastic frontier production and cost function estimation. CEPA Working Paper 96/08, University of New England.</p>
+<p>Coelli, T. J., Rao, D. S. P., O’Donnell, C. J., &amp; Battese, G. E. (2005). <em>An introduction to efficiency and productivity analysis</em> (2nd ed.). New York: Springer.</p>
+<p>Henningsen, A. (2020). frontier: Stochastic frontier analysis. R package version 1.1-8.</p>
+<p>Jondrow, J., Lovell, C. A. K., Materov, I. S., &amp; Schmidt, P. (1982). On the estimation of technical inefficiency in the stochastic frontier production function model. <em>Journal of Econometrics, 19</em>(2–3), 233–238.</p>
+<p>Kumbhakar, S. C., &amp; Lovell, C. A. K. (2000). <em>Stochastic frontier analysis</em>. Cambridge: Cambridge University Press.</p>
+<p>Meeusen, W., &amp; van den Broeck, J. (1977). Efficiency estimation from Cobb-Douglas production functions with composed error. <em>International Economic Review, 18</em>(2), 435–444.</p>
+</div>
+<div class="footnotes footnotes-end-of-document">
+<hr />
+<ol>
+<li id="fn1"><p>Strictly speaking, <span class="math inline">\(\gamma\)</span> is not the share of the total error variance, which is due to inefficiency, because the variance of a half-normal variable is <span class="math inline">\((1 - 2 / \pi) \sigma_u^2\)</span> and not <span class="math inline">\(\sigma_u^2\)</span>. It is a monotonic indicator, though. The closer it is to one, the more of the deviation from the frontier is systematic.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>

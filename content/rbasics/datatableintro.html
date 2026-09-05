@@ -1,0 +1,117 @@
+---
+title: "Introduction to data.table"
+author: "Franz X. Mohr"
+date: "2026-09-05"
+tags:
+  - data.table
+  - r
+description: "A short introduction to data manipulation in R using the data.table package. It presents the main elements of its syntax and illustrates their use with a simple example."
+---
+
+
+
+<p>The cleaning and transformation of data belong to the most time consuming parts of any economic analysis. Many graphical or statistical functions in R require specifically formatted data to work properly. Although the standard functions of R can be used to prepare your data for further analysis, some people find them a bit laborious for daily applications. Therefore, alternatives have been developed, which make data transformation in R easier and also faster. One of these alternatives is the <code>data.table</code> package. It is known for its very concise syntax and for its excellent performance on large data sets, which is why it is a popular choice whenever speed and memory consumption matter.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> In the following I give an introduction to the main elements of the <code>data.table</code> syntax. It covers the same operations as my <a href="/rbasics/dplyrintro">introduction to <code>dplyr</code></a>, so that both approaches can be compared directly.</p>
+<p>For this illustration we use data from the World Penn Tables, which come with the <code>pwt9</code> package. In particular, we use the 9.0 version of the data set, which can be loaded with <code>data("pwt9.0")</code>.</p>
+<pre class="r"><code>library(data.table) # Load data.table
+
+library(pwt9) # Load data
+data(&quot;pwt9.0&quot;)</code></pre>
+<div id="data.tables" class="section level2">
+<h2>data.tables</h2>
+<p>But before we start with a tour through the syntax of the package it should be mentioned that <code>data.table</code> works with its own object format, which is called <em>data.table</em>. A data.table is also a data.frame, which means that functions which expect a data.frame will continue to work with it.<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a> An existing data.frame can be turned into a data.table with <code>as.data.table</code>:</p>
+<pre class="r"><code>pwt_dt &lt;- as.data.table(pwt9.0)</code></pre>
+<p>Alternatively, <code>setDT(pwt9.0)</code> converts an object into a data.table <em>in place</em>, i.e. without making a copy of the data first. This is faster and needs less memory, but it also changes the original object. If you read data from a csv file, <code>fread</code> gives you a data.table right away, and it is usually much faster than <code>read.csv</code>.</p>
+</div>
+<div id="the-i-j-by-syntax" class="section level2">
+<h2>The i, j, by syntax</h2>
+<p>Unlike <code>dplyr</code>, the <code>data.table</code> package does not rely on a pipe operator and it does not provide a separate function for every operation. Instead, nearly everything happens inside the square brackets of a data.table, which have the general form</p>
+<pre class="r"><code>DT[i, j, by]</code></pre>
+<p>This can be read as <em>take <code>DT</code>, use the rows described by <code>i</code>, then do <code>j</code> with the columns, grouped by <code>by</code></em>. So <code>i</code> is the place where observations are selected or sorted, <code>j</code> is the place where columns are selected, calculated or created, and <code>by</code> is the place where groups are defined. Once you got used to this logic, a single operator covers most of the things you want to do with a table.</p>
+</div>
+<div id="select" class="section level2">
+<h2>select</h2>
+<p>Selecting columns happens in the <code>j</code> part of the brackets. For example, the <code>pwt9.0</code> data set contains 47 columns. But let’s assume that we only want to analyse real GDP and the population size, i.e. variables <code>rgdpna</code> and <code>pop</code>, for all countries and all years. This can be done with the following line:</p>
+<pre class="r"><code>pwt_select &lt;- pwt_dt[, .(year, country, rgdpna, pop)]</code></pre>
+<p>Note that the position of <code>i</code> in front of the first comma was left empty. This means that all rows are kept. The expression <code>.()</code> is a shorthand for <code>list()</code> and it is used throughout the package whenever multiple columns have to be addressed at once.</p>
+<p>As with <code>dplyr</code>, the column names do not have to be in quotes. If we used the standard R commands to select the same data we would have to use <code>pwt9.0[, c("year", "country", "rgdpna", "pop")]</code>.</p>
+<p>If the names of the columns are already stored in a character vector, put two dots in front of the name of that vector. They tell <code>data.table</code> that it should not look for a column with this name, but for an object outside the table:</p>
+<pre class="r"><code>cols &lt;- c(&quot;year&quot;, &quot;country&quot;, &quot;rgdpna&quot;, &quot;pop&quot;)
+pwt_select &lt;- pwt_dt[, ..cols]</code></pre>
+</div>
+<div id="rename" class="section level2">
+<h2>rename</h2>
+<p>Let’s assume we are not satisfied with the original column names and want to change them. With <code>data.table</code> this is done with <code>setnames</code>, which takes the table, the old names and the new names as arguments:</p>
+<pre class="r"><code>pwt_rename &lt;- copy(pwt_select)
+setnames(pwt_rename, old = c(&quot;country&quot;, &quot;rgdpna&quot;), new = c(&quot;ctr&quot;, &quot;gdp&quot;))</code></pre>
+<p>Two things are worth mentioning here. First, all functions of the package which start with <code>set</code> change an object <em>by reference</em>. This means that they do not return a new table, which would have to be assigned with <code>&lt;-</code>. They change the object that was handed over to them directly. Second, and precisely because of this, we made an explicit copy of <code>pwt_select</code> with the <code>copy</code> function before renaming its columns. Without that copy the columns of <code>pwt_select</code> itself would have been renamed as well. More on this in the section on modification by reference below.</p>
+<p>Note that it is not necessary to write the commands in one line. In fact, it is good practise to begin a new code line after a comma, if a command becomes too long.</p>
+</div>
+<div id="filter" class="section level2">
+<h2>filter</h2>
+<p>Observations are selected in the <code>i</code> part of the brackets, where the conditions are combined with <code>&amp;</code> for <em>and</em> and with <code>|</code> for <em>or</em>. The following code uses the data in <code>pwt_rename</code> and omits all observations, where the column <em>gdp</em> contains <code>NA</code> values, where the year is lower than 1980 and where the country name is not Austria, Germany or France.<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a> The result is saved as object <code>pwt_filter</code>.</p>
+<pre class="r"><code>pwt_filter &lt;- pwt_rename[!is.na(gdp) &amp; # Omit observations with NA values in column &quot;gdp&quot;
+                           year &gt;= 1980 &amp; # Drop observations before 1980
+                           ctr %in% c(&quot;Austria&quot;, &quot;Germany&quot;, &quot;France&quot;)] # Only use obs for AT, DE and FR</code></pre>
+<p>Since the columns of the table are known inside the brackets, they can be addressed by their names alone. This is relatively simple compared to the way you would have to do it when using the core R operators only:</p>
+<pre class="r"><code>pwt_filter &lt;- pwt_rename[!is.na(pwt_rename$gdp) &amp; pwt_rename$year &gt;= 1980 &amp; pwt_rename$ctr %in% c(&quot;Austria&quot;, &quot;Germany&quot;, &quot;France&quot;), ]</code></pre>
+<p>Also note that the comma after the conditions can be omitted in a data.table. <code>pwt_rename[year &gt;= 1980]</code> and <code>pwt_rename[year &gt;= 1980, ]</code> give the same result.</p>
+</div>
+<div id="mutate" class="section level2">
+<h2>mutate</h2>
+<p>New columns are added, and existing columns are changed, with the <code>:=</code> operator in the <code>j</code> part of the brackets. In our example we calculate the GDP per capita ratio for the three countries in the filtered data set:</p>
+<pre class="r"><code>pwt_filter[, gdp_pc := gdp / pop]</code></pre>
+<p>After executing <code>View(pwt_filter)</code> we see that the table contains a new column called <em>gdp_pc</em>, which contains the GDP per capita for each country and year since 1980. Note that there is no assignment with <code>&lt;-</code> in this line. <code>:=</code> adds the column to the existing table directly, which is why this operation is very fast even for large data sets.</p>
+<p>Multiple columns can be added in a single step by using the functional form of the operator:</p>
+<pre class="r"><code>pwt_filter[, `:=`(log_gdp = log(gdp),
+                  log_pop = log(pop))]</code></pre>
+<p>A column is deleted again by assigning <code>NULL</code> to it, i.e. <code>pwt_filter[, log_pop := NULL]</code>. And if the <code>i</code> part is used together with <code>:=</code>, only those rows are changed which fulfil the condition. <code>pwt_filter[ctr == "Germany", gdp_pc := NA]</code>, for example, would only overwrite the values of the German observations and leave the rest of the column untouched.</p>
+</div>
+<div id="modification-by-reference" class="section level2">
+<h2>Modification by reference</h2>
+<p>The fact that <code>:=</code> and the <code>set</code> functions change a table without making a copy of it is the main difference to <code>dplyr</code> and it is the most common source of confusion for people who start to work with the package. Since no copy is made, the following two lines do <em>not</em> create an independent second table. <code>pwt_second</code> is only another name for the same data and adding a column to it would also add that column to <code>pwt_filter</code>:</p>
+<pre class="r"><code>pwt_second &lt;- pwt_filter
+pwt_second[, gdp_bn := gdp / 1000]</code></pre>
+<p>If you really want an independent copy of a table, use the <code>copy</code> function, as we already did in the section on <code>setnames</code>:</p>
+<pre class="r"><code>pwt_copy &lt;- copy(pwt_filter)</code></pre>
+<p>This behaviour might look inconvenient at first, but it is the reason for the very good performance of the package: R does not have to duplicate a data set in memory every time a single column is changed.</p>
+</div>
+<div id="by" class="section level2">
+<h2>by</h2>
+<p>The third part of the brackets is the counterpart of the <code>group_by</code> function in <code>dplyr</code>. It tells R to execute the expression in <code>j</code> for each distinct value in the specified columns separately. Since the grouping is part of the same command, there is also no need for something like the <code>ungroup</code> function of <code>dplyr</code>. This should become more clear when we look more closely at the following operation…</p>
+</div>
+<div id="aggregation" class="section level2">
+<h2>Aggregation</h2>
+<p>Sometimes it might be useful to calculate aggregate values over a group of observations. This is done by combining the <code>j</code> and the <code>by</code> part of the brackets. The following code tells R that it should calculate aggregate GDP and population for each year separately, which gives the respective values for the region of Austria, France and Germany.</p>
+<pre class="r"><code>data_aggregate &lt;- pwt_filter[, .(gdp = sum(gdp),
+                                 pop = sum(pop)),
+                             by = year]</code></pre>
+<p>Groups can also be defined over multiple columns by using <code>by = .(ctr, year)</code>. And if the result should be sorted by the grouping variables right away, use <code>keyby</code> instead of <code>by</code>.</p>
+<p>A special shortcut is <code>.N</code>, which contains the number of observations in a group. So the number of available observations per country is obtained with</p>
+<pre class="r"><code>obs_per_country &lt;- pwt_filter[, .N, by = ctr]</code></pre>
+</div>
+<div id="sorting-and-keys" class="section level2">
+<h2>Sorting and keys</h2>
+<p>Since <code>i</code> is also the place where the order of the rows is determined, sorting is done with <code>setorder</code>, where a minus in front of a column name results in descending order:</p>
+<pre class="r"><code>setorder(pwt_filter, ctr, -year)</code></pre>
+<p>Closely related is the concept of a <em>key</em>. Setting a key with <code>setkey(pwt_filter, ctr, year)</code> sorts the table by these columns and marks them as the columns by which the observations are identified. This makes subsetting and joining tables considerably faster, which is especially valuable for large data sets.</p>
+</div>
+<div id="chaining" class="section level2">
+<h2>Chaining</h2>
+<p>Finally, the square brackets of a data.table can be appended to each other. This so-called <em>chaining</em> is the equivalent of the pipe in <code>dplyr</code> and it allows us to write the whole example above as a single statement:</p>
+<pre class="r"><code>data_chain &lt;- pwt_dt[!is.na(rgdpna) &amp; year &gt;= 1980 &amp;
+                       country %in% c(&quot;Austria&quot;, &quot;Germany&quot;, &quot;France&quot;),
+                     .(gdp = sum(rgdpna), pop = sum(pop)),
+                     by = year][, gdp_pc := gdp / pop]</code></pre>
+<p>Note that a command which ends with <code>:=</code> does not print its result. If you want to see the table immediately, append an empty pair of brackets, i.e. <code>[]</code>, at the end of the chain.</p>
+<p>Beside the operations presented above there are two further functions you should know when you work with <code>data.table</code>. They are called <code>melt</code> and <code>dcast</code> and they transform a table from wide to long format and back. In contrast to <code>dplyr</code>, they come with the package itself, so that no further package has to be loaded.</p>
+<p>Working with the <code>data.table</code> package requires some practise. This is especially true, when somebody just started to work with it and the meaning of the three parts of the square brackets is not yet in the back of the head. However, you have now already learned the basic syntax of the package and there is a lot of additional material out there, which assists in becoming more familiar with it. The package comes with a series of very good vignettes, which can be listed with <code>vignette(package = "data.table")</code>. In addition, I find so-called <em>cheatsheets</em> especially useful.<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a> Other sources might be blog articles, online training courses or stackoverflow.com for a particular problem.</p>
+</div>
+<div class="footnotes footnotes-end-of-document">
+<hr />
+<ol>
+<li id="fn1"><p>More information can be found on the <a href="https://rdatatable.gitlab.io/data.table/" target="_blank">package’s website</a>. The other quite popular approach to data manipulation in R is the <code>dplyr</code> package, which is introduced <a href="/rbasics/dplyrintro">here</a>.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p><code>class(pwt_dt)</code> returns <code>"data.table"</code> and <code>"data.frame"</code>, which means that a data.table inherits the behaviour of a data.frame.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+<li id="fn3"><p>For completeness possible signs for value comparison are <code>==</code>, <code>&lt;</code>, <code>&lt;=</code>, <code>&gt;</code>, <code>&gt;=</code> and <code>!=</code> for checking if the value on the left side of the sign is equal, lower, lower or equal, larger, larger or equal and different, respectively, from the value on the right side. The operator <code>%in%</code> can be used to determine, whether the object to its left is in a vector to its right.<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
+<li id="fn4"><p>Cheatsheets are compact summaries for the use of packages. They can be found on the Posit website: <a href="https://posit.co/resources/cheatsheets/">https://posit.co/resources/cheatsheets/</a>.<a href="#fnref4" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>

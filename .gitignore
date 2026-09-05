@@ -3,7 +3,6 @@ public/
 .Rhistory
 .RData
 .Ruserdata
-*.Rmd
 *.dta
 *.Rproj
 index.Rmd
@@ -12,3 +11,4 @@ index.Rmd
 *.mc
 *.rda
 .claude/
+.hugo_build.lock

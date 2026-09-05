@@ -1,0 +1,15 @@
+---
+title: "Econometric Methods"
+author: "Franz X. Mohr"
+date: "2018-10-08"
+---
+
+This section is intended to get you through your undergraduate (and maybe graduate) studies in econometrics. It is based on examples from Wooldridge, J.M. (2013). Introductory econometrics: A modern approach (5<sup>th</sup>ed.). I have also reproduced the examples of the main text, which you can find in the [reproduction section of the site](/reproduction/wooldridge/wooldridgeintro). Alternatively, [Heiss, F. (2016) Using R for Introductory Econometrics](http://urfie.net/) is a standalone textbook, which covers the same topics as Wooldridge (2013) and provides an introduction to R as well.
+
+* [Ordinary least squares (OLS)](/methods/ols)
+* [Hypothesis testing](/methods/teststats)
+* [Heteroskedasticity robust standard errors](/methods/hcrobusterrors)
+* [Stochastic frontier models](/methods/stochasticfrontier)
+* Instrumental variables
+* Limited dependent variables
+* Panel data estimators

@@ -1,0 +1,57 @@
+---
+title: "Chapter 17: Univariate Time Series Models"
+author: "Franz X. Mohr"
+date: "2019-11-30"
+---
+
+## Data
+
+US macro data until 2007Q4
+
+```{r data, fig.width=5, fig.height=4.5, message=FALSE}
+library(bvartools)
+
+# Specify URL
+url <- "https://web.ics.purdue.edu/~jltobias/second_edition/Chapter17/code_for_exercise_1/realgdp.out"
+# Load data
+gdp <- read.delim(url, header = FALSE, skip = 1, sep = "", col.names = c("date", "gdp"))
+# Format date
+gdp <- ts(log(gdp[, "gdp"]), start = 1947, frequency = 4)
+# Plot
+plot(gdp, main = "")
+```
+
+## Exercise 17.1
+
+Prepare the data
+
+```{r}
+library(bvartools)
+
+temp <- gen_var(gdp, p = 3, deterministic = "const")
+y <- temp$Y
+x <- temp$Z
+
+tt <- ncol(y)
+m <- nrow(x)
+
+q <- solve(tcrossprod(x))
+beta <- tcrossprod(y, x) %*% q
+v <- tt - m
+s2 <- tcrossprod(y - beta %*% x) / v
+
+vsq <- v / (v - 2) * as.numeric(s2) * q
+
+iterations <- 10000
+
+draws_beta <- matrix(NA, m, iterations)
+
+for (draw in 1:iterations) {
+  draws_beta[, draw] <- beta + mvtnorm::rmvt(1, sigma = vsq, df = v)
+}
+
+result <- coda::mcmc(t(draws_beta))
+summary(result)
+```
+
+*Work in progress*

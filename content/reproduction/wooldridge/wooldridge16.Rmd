@@ -1,0 +1,80 @@
+---
+title: "Chapter 16: Simultaneous Equations Models"
+author: "Franz X. Mohr"
+date: "2018-10-07"
+---
+
+```{r, message = FALSE}
+library(AER)
+library(wooldridge)
+```
+
+### Example 16.5
+```{r}
+data("mroz")
+
+s.iv.1 <- summary(iv.1 <- ivreg(hours ~ lwage + educ + age + kidslt6 + nwifeinc |
+                                  educ + age + kidslt6 + nwifeinc + exper + expersq,
+                                data = mroz))
+s.iv.1
+```
+
+```{r}
+lm.1 <- lm(lwage ~ educ + age + kidslt6 + nwifeinc + exper + expersq,
+           data = mroz[mroz$inlf==1,])
+
+lm.2 <- lm(hours ~ lwage + educ + age + kidslt6 + nwifeinc + lm.1$residuals,
+           data = mroz[mroz$inlf==1,])
+
+summary(lm.2)
+```
+
+### Example 16.6
+```{r}
+data("openness")
+
+s.lm.1 <- summary(lm.1 <- lm(open ~ lpcinc + lland, data = openness))
+s.lm.1
+```
+
+```{r}
+s.iv.1 <- summary(iv.1 <- ivreg(inf ~ open +lpcinc |
+                                  lpcinc + lland,
+                                data = openness))
+s.iv.1
+```
+
+### Example 16.7
+```{r}
+data("consump")
+
+s.iv.1 <- summary(iv.1 <- ivreg(gc ~ gy + r3 |
+                                  gc_1 + gy_1 +r3_1,
+                                data = consump))
+s.iv.1
+```
+
+### Example 16.8
+```{r}
+data("prison")
+
+s.lm.1 <- summary(lm.1 <- lm(gcriv ~ y81 + y82 + y83 + y84 + y85 + y86 + y87 + y88 +
+                               y89 + y90 + y91 + y92 + y93 + gpris + gpolpc + gincpc +
+                               cunem + cblack + cmetro + cag0_14 + cag15_17 + cag18_24 +
+                               cag25_34,
+                             data = prison))
+s.lm.1
+```
+
+```{r}
+s.iv.1 <- summary(iv.1 <- ivreg(gcriv ~ y81 + y82 + y83 + y84 + y85 + y86 + y87 + y88 +
+                                  y89 + y90 + y91 + y92 + y93 + gpris + gpolpc + gincpc +
+                                  cunem + cblack + cmetro + cag0_14 + cag15_17 + cag18_24 +
+                                  cag25_34 |
+                                  y81 + y82 + y83 + y84 + y85 + y86 + y87 + y88 +
+                                  y89 + y90 + y91 + y92 + y93 + gpolpc + gincpc +
+                                  cunem + cblack + cmetro + cag0_14 + cag15_17 + cag18_24 +
+                                  cag25_34 + final1 + final2,
+                                data = prison))
+s.iv.1
+```

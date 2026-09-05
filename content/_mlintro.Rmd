@@ -1,0 +1,14 @@
+---
+title: "Machine Learning"
+author: "Franz X. Mohr"
+date: "2020-02-03"
+---
+
+With the increasing availability of computational capabilities and granular data, machine learning has become more important.
+
+## Classification
+
+* [Neural networks](/ml/neuralnetwork)
+* [Random forests](/ml/randomforest)
+* [Support vector machines (SVM)](/ml/svm)
+  

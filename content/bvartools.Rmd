@@ -1,0 +1,10 @@
+---
+title: "bvartools"
+author: "Franz X. Mohr"
+date: "2024-08-30"
+description: "A series of introductions on how to use the R package 'bvartools'."
+---
+
+This section should help you to
+
+* [estimate simple Bayesian VAR models](/timeseries/bvar).

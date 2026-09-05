@@ -1,0 +1,14 @@
+---
+title: "An Introduction to Global Vector Autoregression (GVAR)"
+author: "Franz X. Mohr"
+date: "2018-08-20"
+categories:
+  - R
+  - VAR
+tags:
+  - R
+  - VAR
+  - vector-autoregression
+---
+
+Hello you!

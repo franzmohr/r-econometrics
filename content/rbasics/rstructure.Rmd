@@ -1,0 +1,44 @@
+---
+title: "The Structure of R"
+author: "Franz X. Mohr"
+date: "2018-07-20"
+lastmod: "2025-01-11"
+---
+
+R -- just like many other standard programming languages like C, C++, Python etc. -- can be comprehended as a language that provides the basis for a system of code chunks, which have been developed by many people across the globe, who wanted to share their work. Within the R community these chunks of R code are called *packages*. And each of those packages usually consist of at least one *function*.[^terminology] This structure is presented in the following graph. Beside a schematic description of a package and its functions in the upper part of the graph it also contains some real world examples using the packages `ggplot2` and `dplyr`.
+
+![Figure 1: Packages and functions in R.](/package_structure.png)
+
+**Functions**
+
+Functions are what makes R work. So it is necessary to understand what inputs they require from the user in order to work properly. Usually, a function has a *name* and can contain further *arguments*, which are additional options the function should consider when it is executed. In R, the syntax of a function is as follows:
+
+`name_of_the_function(argument 1, argument 2, ...)`.[^function]
+
+Basically, a function requires the right arguments as inputs to produce some sort of output. In this introduction functions will usually require data and additional arguments, which determine the operations that should be applied to the data, e.g., `name_of_function(data = your_data, argument1 = 1, argument2 = "something", argument2 = "somethingelse")`. This rather abstract depiction should become clearer when we start with the examples.
+
+**Packages**
+
+A package can be comprehended as a collection of functions. Usually, a package serves a distinct purpose. For example, there are packages which are designed to generate nice graphics like the `ggplot2` package. There are packages, which implement certain statistical methods such as `igraph` or `sna` that were developed for network analysis. And the packages `foreign` and `haven` can be used to load data files, which were originally stored in the file format of a different statistics software such as SAS, SPSS or Stata.
+
+The basic installation of R comes with a relatively small amount of pre-installed packages. Therefore, most packages must be installed by the user manually, before they can be used. This is a relatively simple process in RStudio. If you wanted to install, for example, the `dplyr` package, you would just have to do the following:
+
+* Click on the tap *Packages* of the bottom right window
+* Click *Install*
+* Make sure that the field *Install from* says *Repository (CRAN)*[^cran]
+* Enter *dplyr* into the field *Packages*
+* Check the box *Install dependencies*
+* Sometimes -- for example when using a corporate computer -- it can be necessary to check whether the path in *Install to library* is the right one. At my current job, I am not even allowed to install R packages for security reasons. But this should be of less concern when working on a private computer.
+* Click *Install*
+
+The progress of the installation is shown in the console. During the installation of those packages, you will probably notice that some additional packages are installed, which you did not explicitly specify. This is because packages can depend on functions of other packages and, hence, they have to be installed as well. By checking the box *Install dependencies* R takes care of that and installs all the required packages automatically.
+
+During the installation process R might also occasionally state that the *Source* package is newer than the *Binary* version and ask `Do you want to install from sources the package which needs compilation?`. This decision should not be of great importance for this guide. However, I recommend to answer this question buy typing `n` into the console, press `Return` and install the *Binary* version. Unless you really need the most recent functionality of a package, this should suffice.
+
+Congratulations! This is all non-statistical knowledge you need to use R for standard statistical applications. Now let's [prepare you working environment in RStudio](/rbasics/beforestart).
+
+[^cran]: CRAN is a server structure, where approved R packages are stored and can be downloaded for free. Beside *Bioconductor* it is the most imporatant source of R packages.
+
+[^function]: Note that this form resembles the mathematical way to write a function such as $F(a, b)$.
+
+[^terminology]: R specialists may forgive me the slightly sloppy terminology. However, I have found it informative and just right for beginners with no previous knowledge of the topic.

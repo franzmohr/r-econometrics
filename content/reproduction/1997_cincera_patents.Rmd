@@ -1,0 +1,188 @@
+---
+title: "Reproduction: Cincera, M. (1997). Patents, R&D, and technological spillovers at the firm level."
+date: "2018-05-08"
+author: "Franz X. Mohr"
+---
+
+## Get the data
+
+The data set can be downloaded from the <a href="http://qed.econ.queensu.ca/jae/1997-v12.3/cincera/" target="_blank">Journal of Applied Econometrics Data Archive</a>.
+
+```{r, echo = FALSE, message = FALSE, include = TRUE}
+download.file("http://qed.econ.queensu.ca/jae/1997-v12.3/cincera/mc-data.zip", destfile = "_1997_cincera_data.zip")
+data <- read.delim("_data.mc", header = FALSE)
+```
+```{r, echo = TRUE, message = FALSE, eval = FALSE}
+download.file("http://qed.econ.queensu.ca/jae/1997-v12.3/cincera/mc-data.zip", destfile = "1997_cincera_data.zip")
+unzip("1997_cincera_data.zip")
+
+data <- read.delim("data.mc", header = FALSE)
+```
+
+```{r}
+names(data) <- c("fi", "s", "g",
+                 "p83", "p84", "p85", "p86", "p87", "p88", "p89", "p90", "p91",
+                 "lr83", "lr84", "lr85", "lr86", "lr87", "lr88", "lr89", "lr90", "lr91",
+                 "ls83", "ls84", "ls85", "ls86", "ls87", "ls88", "ls89", "ls90", "ls91")
+
+p <- matrix(as.matrix(data[, c("p83", "p84", "p85", "p86", "p87", "p88", "p89", "p90", "p91")]))
+k <- matrix(as.matrix(data[, c("lr83", "lr84", "lr85", "lr86", "lr87", "lr88", "lr89", "lr90", "lr91")]))
+spill <- matrix(as.matrix(data[, c("ls83", "ls84", "ls85", "ls86", "ls87", "ls88", "ls89", "ls90", "ls91")]))
+
+# Firm IDs
+fi <- rep(1:181, 9)
+
+# Years
+year <- c()
+for (i in 1983:1991){
+  year <- append(year, rep(i, 181))
+}
+ 
+# Geographic dummies
+g <- rep(data$g, 9)
+
+g.1 <- as.numeric(g == 1)
+g.2 <- as.numeric(g == 2)
+g.3 <- as.numeric(g == 3)
+g.4 <- as.numeric(g == 4)
+ 
+# Technological dummies
+s <- rep(data$s, 9)
+ 
+s.1 <- as.numeric(s == 1)
+s.2 <- as.numeric(s == 2)
+s.3 <- as.numeric(s == 3)
+s.4 <- as.numeric(s == 4)
+s.5 <- as.numeric(s == 5)
+s.6 <- as.numeric(s == 6)
+s.7 <- as.numeric(s == 7)
+s.8 <- as.numeric(s == 8)
+s.9 <- as.numeric(s == 9)
+s.10 <- as.numeric(s == 10)
+s.11 <- as.numeric(s == 11)
+s.12 <- as.numeric(s == 12)
+s.13 <- as.numeric(s == 13)
+s.14 <- as.numeric(s == 14)
+s.15 <- as.numeric(s == 15)
+ 
+# Lags of R&D Spending
+k.1 <- as.vector(c(rep(NA, 181), k[1:(length(k) - 181)]))
+k.2 <- as.vector(c(rep(NA, 2 * 181), k[1:(length(k) - 2 * 181)]))
+k.3 <- as.vector(c(rep(NA, 3 * 181), k[1:(length(k) - 3 * 181)]))
+k.4 <- as.vector(c(rep(NA, 4 * 181), k[1:(length(k) - 4 * 181)]))
+ 
+# Lags of spillovers
+spill.1 <- as.vector(c(rep(NA, 181), spill[1:(length(spill) - 181)]))
+spill.2 <- as.vector(c(rep(NA, 2 * 181), spill[1:(length(spill) - 2 * 181)]))
+spill.3 <- as.vector(c(rep(NA, 3 * 181), spill[1:(length(spill) - 3 * 181)]))
+spill.4 <- as.vector(c(rep(NA, 4 * 181), spill[1:(length(spill) - 4 * 181)]))
+ 
+# Generate the finale data frame
+data <- data.frame(year, fi, p, k, k.1, k.2, k.3, k.4, spill, spill.1, spill.2, spill.3, spill.4,
+                   g.1, g.2, g.3, g.4, s.1, s.2, s.3, s.4, s.5, s.6, s.7, s.8, s.9, s.10,
+                   s.11, s.12, s.13, s.14, s.15)
+ 
+# Give labels to the variables
+attributes(data)$var.labels <-c('Year','FirmID','# of patents','R&D spending','Lag R&D 1',
+                               'Lag R&D 2','Lag R&D 3','Lag R&D 4','Spillover','Lag spillover 1',
+                               'Lag spillover 2','Lag spillover 3','Lag spillover 4',
+                               'Geographic dummy 1','Geographic dummy 2','Geographic dummy 3',
+                               'Geographic dummy 4','Sector dummy 1','Sector dummy 2',
+                               'Sector dummy 3','Sector dummy 4','Sector dummy 5',
+                               'Sector dummy 6','Sector dummy 7','Sector dummy 8',
+                               'Sector dummy 9','Sector dummy 10','Sector dummy 11',
+                               'Sector dummy 12','Sector dummy 13','Sector dummy 14',
+                               'Sector dummy 15')
+```
+
+If you want, you can save the modified data on your disk:
+```{r, eval = FALSE}
+save(data, file = "1997_cincera_patents.rda")
+write.csv(data, file = "1997_cincera_patents.csv", row.names = FALSE)
+```
+
+## Tables
+
+*Summary statistics*
+
+```{r}
+table.1a <- data.frame(Mean = NA, Standard.error = NA, Minimum.value = NA, Maximum.value = NA)
+ 
+table.1a[1, 1]<-round(mean(data$p), 2)
+table.1a[1, 2]<-round(sqrt(var(data$p)), 2)
+table.1a[1, 3]<-round(min(data$p), 2)
+table.1a[1, 4]<-round(max(data$p), 2)
+table.1a[2, 1]<-round(mean(data$k), 2)
+table.1a[2, 2]<-round(sqrt(var(data$k)), 2)
+table.1a[2, 3]<-round(min(data$k), 2)
+table.1a[2, 4]<-round(max(data$k), 2)
+table.1a[3, 1]<-round(mean(data$spill), 2)
+table.1a[3, 2]<-round(sqrt(var(data$spill)), 2)
+table.1a[3, 3]<-round(min(data$spill), 2)
+table.1a[3, 4]<-round(max(data$spill), 2)
+
+table.1a
+```
+
+*Correlations*
+
+```{r}
+table.1b <- data.frame(P = NA, k = NA, k.1 = NA, k.2 = NA, k.3 = NA)
+ 
+table.1b[1,1] <- round(cor(data$k, data$p), 2)
+table.1b[2,1] <- round(cor(data$k.1, data$p, "complete.obs"), 2)
+table.1b[3,1] <- round(cor(data$k.2, data$p, "complete.obs"), 2)
+table.1b[4,1] <- round(cor(data$k.3, data$p, "complete.obs"), 2)
+table.1b[5,1] <- round(cor(data$k.4, data$p, "complete.obs"), 2)
+ 
+# The "complete.obs" option tells R that despite there are missing values it should procide
+# with the evaluation. Ultimately, it will only use observations that are complete, i.e.
+# where both columns of an observation contain values.
+ 
+table.1b[2,2] <- round(cor(data$k.1, data$k, "complete.obs"), 2)
+table.1b[3,2] <- round(cor(data$k.2, data$k, "complete.obs"), 2)
+table.1b[4,2] <- round(cor(data$k.3, data$k, "complete.obs"), 2)
+table.1b[5,2] <- round(cor(data$k.4, data$k, "complete.obs"), 2)
+ 
+table.1b[3,3] <- round(cor(data$k.2, data$k.1, "complete.obs"), 2)
+table.1b[4,3] <- round(cor(data$k.3, data$k.1, "complete.obs"), 2)
+table.1b[5,3] <- round(cor(data$k.4, data$k.1, "complete.obs"), 2)
+ 
+table.1b[4,4] <- round(cor(data$k.3, data$k.2, "complete.obs"), 2)
+table.1b[5,4] <- round(cor(data$k.4, data$k.2, "complete.obs"), 2)
+ 
+table.1b[5,5] <- round(cor(data$k.4, data$k.3, "complete.obs"), 2)
+
+table.1b
+```
+
+## Panel estimates
+
+
+### Poisson
+
+Cincera (1997) estimates a simple Poisson model for panel data as a benchmark. In R this can be done with the `pglm` package for general linear models for panel data.
+
+```{r, message = FALSE}
+library(pglm)
+
+# Table 2
+# (3) Conditional Poisson
+poisson <- pglm(p ~ k + k.1 + k.2 + k.3 + k.4 +
+                  spill + spill.1 + spill.2 + spill.3 + spill.4,
+                data = data,
+                model = "within",
+                effect = "individual",
+                family = poisson())
+
+summary(poisson)
+```
+
+
+## Annex
+
+### A2
+```{r}
+colSums(data[data$year == 1983, c("s.1", "s.2", "s.3", "s.4", "s.5", "s.6", "s.7", "s.8", "s.9", "s.10", "s.11", "s.12", "s.13", "s.14", "s.15")])
+```
+

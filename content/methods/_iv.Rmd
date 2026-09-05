@@ -1,0 +1,86 @@
+---
+title: "Instrumental variables in R"
+author: "Franz X. Mohr"
+date: "2018-12-25"
+tags:
+  - instrumental-variables
+  - iv
+  - sargan-test
+---
+
+When explanatory variables are correlated with the error term, an OLS estimator will produce biased estimates of the coefficients. In such cases the instrumental variables (IV) estimator can be used to mitigate this problem.
+
+## Data
+
+To illustrate the use of instrumental variables in R, let's use the *wage2* dataset from the `wooldridge` package and estimate a basic <a href="https://en.wikipedia.org/wiki/Mincer_earnings_function" target="_blank">Mincer earnings function</a>. This standard specification of earnings models explains the natural log of average hourly earnings `lwage` by years of education `educ` and experience `exper`. The standard specification also includes the squared values of experience `expersq` to take into account potential decreasing marginal effects.
+
+## Correlation between explanatory variables and the error term
+
+If explanatory variables are correlated with the error term, i.e. when they are *endogenous*, an OLS estimator will produce biased estimates. Even if only one variable is causing this problem, the coefficients of all other variables will be affected as well. Since economic data is frequently affected by this problem - due to, for example, measurement error in explanatory variables, autoregression with autocorrelated errors, simultaneity, omitted explanatory variables or sample selection - it is important to test for it.
+
+### Hausman test
+
+A popular method to test for correlation between explanatory variables and the error term is the *Hausman test*. It basically tests whether the results of the IV estimator are significantly different from the OLS estimator. To illustrate this, let's use the *wage2* dataset from the `wooldridge` package and, again, estimate a basic <a href="https://en.wikipedia.org/wiki/Mincer_earnings_function" target="_blank">Mincer earnings function</a> as described above. However, this time we add `IQ` as a measure of *ability*. But since it is assumed that the measure is correlated with the error term, we use an additional measure of ability, `KWW`, as an instrument for `IQ`.
+
+```{r, message = FALSE}
+library(dplyr)
+library(wooldridge)
+data("wage2")
+
+# Add squared experience "expersq"
+wage2 <- wage2 %>%
+  mutate(expersq = exper^2)
+
+# IV estimator
+iv_model <- ivreg(lwage ~ educ + exper + expersq + IQ | KWW + educ + exper + expersq,
+                  data = wage2)
+```
+
+The `summary` function of the `ivreg` object, performs the Hausman test automatically. We only have to add the argument `diagnostics = TRUE`.
+
+```{r}
+summary(iv_model, diagnostics = TRUE)
+```
+
+The (Wu-)Hausman test statistic has a very low p-value and, hence, the test rejects the null of no correcation between `IQ` and the error term in this example.
+
+### Sargan test
+
+The Sargan test checks whether an instrument is correlated with the errors, which should not be the case for good instruments. In the example above, the test statistic of the Sargan test is `NA`. This is to be expected, because we use *one* instrument for *one* endogenous regressor and the mathematical properties of the test require us to have at least one instrument more than endogenous regressor. So, if we use more instruments than endogenous regressors, the system would be identified and we would be able to obtain a test statistic. A low statistic (with rather high p-value) would indicate that the instrument is uncorrelated with the error term.
+
+```{r data, message = FALSE}
+# Load dataset
+library(wooldridge)
+data("wage2")
+
+# Add expersq
+library(dplyr)
+wage2 <- wage2 %>%
+  mutate(expersq = exper^2)
+
+# Estimate a model
+ols_model <- lm(lwage ~ educ + exper + expersq + IQ, data = wage2)
+summary(ols_model)
+```
+
+## Estimation
+
+This is example 15.6 in Wooldridge (2013)
+
+```{r}
+iv_model <- ivreg(lwage ~ educ + exper + expersq + IQ | KWW + educ + exper + expersq,
+                  data = wage2)
+
+summary(iv_model)
+```
+
+## Testing
+
+Sargan test
+
+
+## Literature
+
+Kennedy, P. (2014). A Guide to Econometrics. Malden (Mass.): Blackwell Publishing 6<sup>th</sup> ed.
+
+Wooldridge, J.M. (2013). Introductory econometrics: A modern approach. (5<sup>th</sup>ed.)

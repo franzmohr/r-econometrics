@@ -1,0 +1,119 @@
+---
+title: "Introduction to dplyr"
+author: "Franz X. Mohr"
+date: "2019-10-07"
+lastmod: "2025-01-11"
+tags:
+  - dplyr
+  - r
+description: "A short introduction to data manipulation in R using the dplyr package. It presents the main function of the package and illustrates their use with a simple example."
+---
+
+The cleaning and transformation of data belong to the most time consuming parts of any economic analysis. Many graphical or statistical functions in R require specifically formatted data to work properly. Although the standard functions of R can be used to prepare your data for further analysis, some people find them a bit laborious for daily applications. Therefore, alternatives have been developed, which make data transformation in R easier and also faster. One of these alternatives is the `dplyr` package of the <a href="https://www.tidyverse.org/" target="_blank">tidyverse</a>. It has gained great popularity among R users and being familiar with its syntax can be considered a standard skill in R.[^packages] In the following I give an introduction to some main functions of `dplyr`, which I also use extensively at work.
+
+For this illustration we use data from the World Penn Tables, which come with the `pwt9` package. In particular, we use the 9.0 version of the data set, which can be loaded with `data("pwt9.0")`.
+
+```{r data, message = FALSE}
+library(dplyr) # Load dplyr
+
+library(pwt9) # Load data
+data("pwt9.0")
+```
+
+## tibbles
+
+But before we start with a tour through the main function of `dplyr` it should be mentioned that the package works with its own object format, which is called *tibble*.[^tibble] Tibbles are practically data.frames, but with some nice additional features. For some further information take a look at the documentation: `?tibble::tibble`. You will notice the differences between tibbles and data.frame when you work more with `dplyr`. For now, there is not much more use must know to use them.
+
+## pipes
+
+`dplyr` also utilises a very handy tool called *pipe*, which comes with the `magrittr` package. Pipes are indicated by the operator `%>%` and they forward the output of the part to its left as input for the part to its right. What this means will become clearer immediately.[^pipes]
+
+## select
+
+The `select` function can be used to select the columns of a table. For example, the `pwt9.0` data set contains 47 columns. But let's assume that we only want to analyse real GDP and the population size, i.e. variables `rgdpna` and `pop`, for all countries and all years. This can be done with the following lines:
+
+```{r}
+pwt_select <- pwt9.0 %>% select(year, country, rgdpna, pop)
+```
+
+Let's start with object `pwt9.0`. This is the data set that was originally loaded. The pipe to its right tells R that it should be used as input for the function to its right, i.e. `select`. The select function recognises the data coming from the pipe and selects the columns called *year*, *country*, *rgdpna* and *pop*. All other columns are dropped.
+
+There are two things to mention at this point. First, note that the column names in the `select` function do not have to be in quotes. If we used the standard R commands to select the same data we would have to use `pwt9.0[, c("year", "country", "rgdpna", "pop")]`.
+
+Second, to understand better how pipes work, it should be mentioned that it would also be possible to write the command differently and omit the pipe. This would result in `pwt_data <- select(pwt9.0, year, country, rgdpna, pop)`. This would yield the exact same result as above. The only differnece is that we included the data object in the `select` function. But since the function was designed to work with pipes, it recognices that the data comes via a pipe so that the data argument of `select` does not have to be specified.
+
+## rename
+
+Let's assume we are not satisfied with the names of the original column names and want to change them. With `dplyr` this can be done with the command `rename`, where the new name of the column is followed by the equality sign and the old name of the column. The following example illustrates this:
+
+```{r}
+pwt_rename <- pwt_select %>%
+  rename(ctr = country,
+         gdp = rgdpna)
+```
+
+Starting with the object `pwt_select` we forward its content to the `rename` function and define `ctr` as the new column name for `country` and `gdp` as the new column name instead of `rgdpna`. And the output of this operation is saved as object `pwt_rename`. Again, it would also be possbile to write `rename(pwt_select, ctr = country, value = rgdpna)`, but since we use pipes, we can forget about the data argument.
+
+Note that it is not necessary to write the commands in one line. In fact, it is good practise to begin a new code line after a pipe. For a comprehensive style guide for the tidyverse see the <a href="https://style.tidyverse.org/" target="_blank">online book by Hadley Wickham</a>.
+
+## filter
+
+`dplyr` also provides a filter function, where the conditions of the filter can be added consecutively and separated with a column. Eeach condition can be regarded as an *and* operator. *Or* conditions must be specified in the same line. The following code used the data in `pwt_rename` and omits all observations, where the column *gdp* contains `NA` value, the year is lower than 1980 and where the country name is not Austria, Germany or France.[^logcomp] The result is save as object `pwt_filter`.
+
+```{r}
+pwt_filter <- pwt_rename %>%
+  filter(!is.na(gdp), # Omit observation with NA values in column "value"
+         year >= 1980, # Drow observations before 1980
+         ctr %in% c("Austria", "Germany", "France")) # Only use obs for AT, DE and FR
+```
+
+This is relatively simple compared to the way you would have to do it when using the core R operators only:
+
+```{r, eval = FALSE}
+pwt_filter <- pwt_rename[!is.na(pwt_rename$value) & pwt_rename$year >= 1980 & pwt_rename$ctr %in% c("Austria", "Germany", "France"),]
+```
+
+## mutate
+
+The `mutate` function can be use to change the content of an existing column in the data set or to generate a new column. In our example we calculate the GDP per capita ratio for the three countries in the filtered data set:
+
+```{r}
+pwt_mutate <- pwt_filter %>%
+  mutate(gdp_pc = gdp / pop)
+```
+
+After executing `View(pwt_mutate)` we see that the data.frame contains a new column called *gdp_pc*. Which contains the GDP per capita for each country and year since 1980. Again, thanks to the logic of the `dyplr` package we do not have to use quote to specify the varible names, which makes programming more convenient and faster.
+
+## group_by
+
+One of the most tricky functions in the `dplyr` package is `group_by`. Basically, it tells R to execute the following commands for each distinct value in the specified columns separately. This should become more clear when we look more closely at the following function...
+
+## summarise
+
+Sometimes it might be useful to calculate aggregate values over a group of observations. This can be done with the `summarise` function in combination with the `group_by` function. The following code uses the `group_by` function to tell R that it should apply the `summarise` function to each year separately and calculate aggregate GDP and population for the region of Austria, France and Germany.
+
+```{r}
+data_summarise <- pwt_filter %>% 
+  group_by(year) %>%
+  summarise(gdp = sum(gdp),
+            pop = sum(pop)) %>%
+  ungroup()
+```
+
+Note that it is good practise to add the `ungroup` function after code lines which run in the context of a `group_by`. Although not really necessary, this can improve the performance of your code substantially.
+
+Beside the functions presented above there are two further functions you should know when you work with `dplyr`. They are called `spread` and `gather` and come with the `tidyr` package.
+
+
+Working with the `dplyr` packages requires some practise. This is especially true, when somebody just started to work with it. However, you have now already learned the basic functions and  syntax of the package and there is a lot of additional material out there, which assists in becoming more familiar with the functions of `dplyr`. And once somebody is quite familiar with the syntax of the package, I find so-called *cheatsheets* as they are provided on the RStudio website especially useful.[^cheatsheets] Other sources might be blog articles, online training courses or stockoverflow.com for a particular problem.
+
+
+[^cheatsheets]: Cheatsheets are compact summaries for the use of packages. They can be found on the RStudio website: [https://www.rstudio.com/resources/cheatsheets/](https://www.rstudio.com/resources/cheatsheets/).
+
+[^logcomp]: For completeness possible signs for vale comparison are `==`, `<`, `<=`, `>`, `>=` and `!=` for checking if the value on the left side of the sign is equal, lower, lower or equal, larger, larger or equal and different, respectively, from the value on the right side. The operator `%in%` can be used to determine, whether the object to its left is in a vector to its right.
+
+[^packages]: More information can be found on the <a href="https://dplyr.tidyverse.org/" target="_blank">dplyr's website</a>. Another quite popular and even a bit faster package would be `data.table`.
+
+[^pipes]: For further information on pipes see [http://r-posts.com/pipes-in-r-tutorial-for-beginners/](http://r-posts.com/pipes-in-r-tutorial-for-beginners/).
+
+[^tibble]: To be precise this object class actually comes with the `tibble` package, but `dplyr` utilises it.

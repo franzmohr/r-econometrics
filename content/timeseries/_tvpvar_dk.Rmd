@@ -1,0 +1,315 @@
+---
+title: "An Introduction to Time Varying Vector Autoregressive Models (TVP-VAR)"
+author: "Franz X. Mohr"
+date: "2019-08-08"
+tags:
+  - r
+  - tvp
+  - tvp-var
+  - var
+  - vector-autoregression
+---
+
+Time-varying parameter (TVP) methods have become increasingly attractive in the realm of finance and macroeconomics. This seems straightforward, since macroeconomic relations are likely to evolve as a result of technological progress and changes in behavioural patterns. In empirical work changes in economic relations are frequently analysed with so-called *state space models*. These models employ Kalman filtering and smoothing algorithms to obtain estimates of parameters, which are assumed to change over time. This page provides a brief hands-on introduction to the concept and estimation of Bayesian VAR models with time varying parameters (TVP-VAR) in R.
+
+### Model and data
+
+Each state space model consists of a *measurement equation* and a state equation. For the TVP_VAR model conisdered here, the measurement equation in SUR form is
+$$y_t = Z_t b_t + u_t,$$
+where $y_t$ is the vector of endogenous variables in period t, $b_t$ is the $k \times 1$ vector of parameter coefficients and the error term $u_t \sim N(0, H)$ with $H$ as the constant variance-covariance matrix. $Z_t$ is a transformation of the vector of regressors. Specifically, $Z_t = {x_t^\prime} \otimes I_n$ with $x_t$ as a column vector of the regressors.
+
+The *state equation* describes the evolution of the parameter values. It can have many forms, but in the present model we assume the standard form
+$$b_{t+1} = b_t + v_t$$
+with $v_t \sim N(0, Q)$ and $Q$ as a constant variance-covariance matrix.[^state_eq]
+
+After setting up the model, the remaining challange is to estimate it. For this illustration the dataset E1 from Lütkepohl (2007) is used. It contains data on West German fixed investment, disposable income and consumption expenditures in billions of DM from 1960Q1 to 1982Q4. Following Lütkepohl (2007, ch. 18) only consumption enters the model as endogenous variable and income as an exogenous variable. Both variables enter the TVP model in first log-differences and with two lags. Furthermore, a constant term is added so that the vector of regressors is
+$(cons_{t - 1}, cons_{t -2}, income_{t}, income_{t-1}, income_{t-2}, 1)$. My `bvartools` package contains the dataset and helps to obtain the required data matrices.
+
+```{r data, fig.width=5, fig.height=4.5, message=FALSE}
+# Specify URL
+url <- "https://web.ics.purdue.edu/~jltobias/second_edition/Chapter20/code_for_exercise_1/US_macrodata.csv"
+# Load data
+data <- read.csv(url, col.names = c("date", "Dp", "u", "r"))
+# Omit NA values
+data <- na.omit(data)
+# Transform into time-series object
+data <- ts(data[, -1], start = c(1959, 2), frequency = 4)
+# Plot
+plot(data, main = "")
+```
+
+```{r}
+library(bvartools)
+
+# Lag order
+p <- 2
+
+# Generate input data
+model_data <- gen_var(data, p = p, deterministic = "const")
+
+y <- model_data$Y # Extract data matrix of endogenous variables
+x <- model_data$Z # Extract data matrix of regressors
+
+tt <- NCOL(y) # Number of periods
+k <- NROW(y) # Number of endogenous variables
+m <- NROW(x) # Number of regressors
+n_coef <- k * m # Total amount of estimated coefficients
+```
+
+### Prior specification
+
+Similar to the estimation of a [Bayesian model with constant parameters](/timeseries/bvar) we have to specify some priors. For the coefficient states I use a normal prior with zero mean and variance 5 for each coefficient, i.e. $V = 5 I_n$, where the subscript $n$ denotes the total amount of estimated parameters (not including the number of periods for which estimates should be obtained). For the variance-covariance matrix of the measurement equation I use a fairly uninformative inverted Wishart distribution with one degree of freesome and a variance of 0.000001 as prior. The choice of the prior variance of the state equation is quite influential. For this example, I use values close to the ML estimates presented in Lütkepohl (2007) for the variance and one degree of freedom.
+
+```{r prior}
+# Priors for measurement equation
+mu_prior <- matrix(0, n_coef)
+v_i_prior <- diag(1, n_coef)
+diag(v_i_prior)[n_coef - k + 1:k] <- 1 / 10 # Prior for determinsitic terms
+
+sigma_df_prior <- k + 3
+sigma_df_post <- tt + sigma_df_prior
+sigma_scale_prior <- diag(1, k)
+
+# Priors for state equation
+q_df_prior <- 3
+q_df_post <- q_df_prior + tt / 2
+q_scale_prior <- rep(.01^2, n_coef)
+q_scale_prior[n_coef - k + 1:k] <- .1^2 # Determinsitic
+```
+
+### Bayesian inference
+
+For the estimation of the model we use a Gibbs sampler which consists of the following blocks:
+
+* Draw initialisation values for the DK algorithm
+* Draw parameter coefficient values using the DK algorithm and the drawn initial values
+* Draw the covariance matrix of the state equation from an inverse Wishart distribution
+* Draw the covariance matrix of the measurement equation from an inverse Wishart distribution
+
+**Initialisation of the DK algorithm**: A central challenge in estimating TVP models is the initialisation of the Kalman filter. It requires a vector of initial coefficient values $a_0$ from which the filter begins to run. Durbin & Koopman (2001) present methods how this can be done. The approach taken in this post follows Koop & Korobilis (2010). It starts by assuming that the values of $ b_t$ are deviations from the initial vector $b_0$. This leads to $y_t = Z_t b_0 + Z_t b_t$ so that $y^*_t = Z_t b_0$ with $y^*_t = y_t - Z_t b_t$ can be easily estimated. In this post I use an independent normal distribution to draw samples of the initial vector. For an introduction to multivariate Bayesian econometrics see Koop & Korobilis (2010), who I owe much of my understanding of the methods presented here.
+
+**Drawing parameter coefficient values**: The filter and smoothing algorithm used in this post was originally proposed by Durbin & Koopman (2002) (DK), which is computationally more efficient than previously developed algorithms like Frühwirth-Schnatter (1994), Carter & Kohn (1994) or De Jong & Shephard (1995). Before running the DK algorithm $y_t$ has to be transformed to $\hat{y}_t = y_t - Z_t a_0$ and $\hat{y}_t$ is used as the dependent variable in the DK algorithm, where $a_0$ is set to zero. $P_0$ can be an arbitrary symmetric covariance matrix. In this example $P_0 = I_{k}$. The code for the DK algorithm can be obtained from my GitHub repository.
+
+**Drawing the covariance matrix of the state equation**: Since the covariance matrix of the state parameters $Q$ is not known, it has to be estimated. In this example I use an independent Wishart distribution with $t + k + 2$ degrees of freedom and a prior variance $0.0001 I_{k}$, which allows for relatively few variation of the state parameters.
+
+**Drawing the covariance matrix of the measurement equation**: Like the covariance matrix of the state equation I use an independent Wishart distribution with $ t + 2 $ degrees of freedom and a prior variance $ 0.0001 I_{n}$ to draw samples of the measurement covariance matrix.
+
+### Initial values
+
+Before the Gibbs sampler can be started, some initial values and additional objects for temporary 
+
+```{r initial values}
+Z <- matrix(0, k * tt, n_coef * tt)
+for (i in 1:tt) {
+  Z[(i - 1) * k + 1:k, (i - 1) * n_coef + 1:n_coef] <- kronecker(t(x[, i]), diag(1, k))
+}
+
+b0 <- tcrossprod(y, x) %*% solve(tcrossprod(x))
+epsilon <- y - b0 %*% x
+sigma <- tcrossprod(epsilon) / tt
+sigma_i <- solve(sigma)
+sigma_i <- kronecker(diag(1, tt), sigma_i)
+H <- diag(1, tt * n_coef)
+diag(H[(n_coef + 1):(tt * n_coef), 1:((tt - 1) * n_coef)]) <- -1
+
+b0 <- matrix(b0)
+q_i <- kronecker(diag(1, tt), diag(1 / 100, n_coef))
+```
+
+```{r further}
+iter <- 50 # Number of iterations
+burnin <- 1 # Number of burn-in draws
+
+# Containers for coefficient draws
+draws_b <- array(NA, dim = c(n_coef, tt, iter - burnin))
+draws_sigma <- matrix(NA, k * k, iter - burnin)
+```
+
+### Gibbs sampler
+
+```{r gibbs}
+# Initialise progress bar
+pb <- txtProgressBar(style = 3)
+if (iter > 100) {
+  update <- seq(to = iter, by = floor(iter / 100), length.out = 100)  
+} else {
+  update <- 1:iter
+}
+
+for (draw in 1:iter) {
+  # Draw states
+  HQiH <- crossprod(H, q_i) %*% H
+  v <- HQiH + crossprod(Z, sigma_i) %*% Z
+  v_i <- solve(v)
+  mu <- v_i %*% (HQiH %*% kronecker(matrix(1, tt), b0) + crossprod(Z, sigma_i) %*% matrix(y))
+  b <- mu + solve(t(chol(v_i))) %*% rnorm(tt * n_coef)
+  
+  # Draw error
+  epsilon <- matrix(matrix(y) - Z %*% b, k)
+  sigma_scale_post <- sigma_scale_prior + tcrossprod(epsilon)
+  sigma_i_temp <- matrix(rWishart(1, sigma_df_post, solve(sigma_scale_post))[,, 1], k)
+  sigma_i <- kronecker(diag(1, tt), sigma_i_temp)
+  sigma <- solve(sigma_i)
+  
+  # Draw hyperparameters
+  b <- cbind(b0, matrix(b, n_coef))
+  u <- b[, -1] - b[, -(tt + 1)]
+  u_sq_sum <- apply(u^2, 1, sum)
+  q_i_temp <- diag(0, n_coef)
+  for (i in 1:n_coef) {
+    q_i_temp[i, i] <- rgamma(1, shape = q_df_post, rate = q_scale_prior[i] + u_sq_sum[i] / 2)
+  }
+  q_i <- kronecker(diag(1, tt), q_i_temp)
+  
+  # Draw initial state
+  v <- v_i_prior + q_i_temp
+  v_i <- solve(v)
+  mu <- v_i %*% (v_i_prior %*% mu_prior + q_i_temp %*% matrix(b[, 2]))
+  b0 <- mu + solve(t(chol(v_i))) %*% rnorm(n_coef)
+  
+  # Save draw for later
+  if (draw > burnin) {
+    pos_draw <- draw - burnin
+    draws_b[,, pos_draw] <- b[, -1]
+    draws_sigma[, pos_draw] <- sigma_i_temp
+    if (draw %in% update) {
+      if (pos_draw >= 3) {
+        par(mfcol = c(2, 1))
+        temp <- t(apply(draws_b[1,,1:pos_draw], 1, quantile, probs = c(.025, .5, .975)))
+        plot.ts(temp, plot.type = "single")
+        temp <- t(apply(draws_b[19,,1:pos_draw], 1, quantile, probs = c(.025, .5, .975)))
+        plot.ts(temp, plot.type = "single")
+        par(mfcol = c(1, 1))
+      }
+    }
+  }
+  # setTxtProgressBar(pb, draw / iter) # Update progress bar
+}
+```
+
+### Plot coefficients
+
+```{r plot const, fig.width=5, fig.height=4.5}
+coef_data <- t(apply(draws_b[n_coef - k + 1, , ], 1, quantile, probs = c(.025, .5, .975)))
+
+plot.ts(coef_data, plot.type = "single", ylab = "", lty = c(2, 1, 2))
+```
+
+```{r plot lag2, fig.width=5, fig.height=4.5}
+coef_data <- t(apply(draws_b[9, , ], 1, quantile, probs = c(.05, .5, .95)))
+
+plot.ts(coef_data, plot.type = "single", ylab = "", lty = c(2, 1, 2))
+```
+
+The posterior medians (straight line) and their respective 95% highest posterior density intervals (dotted) of the parameter estimates of the estimated TVP-VAR model with one lag and a constant are presented in figure 1. As a reference the OLS estimate of the respective parameter is added as a green horizontal line.
+
+There are many possibilities how to extend this model which are not presented here. For further reading you might be interested in Primiceri (2005) who adds stochastic volatility to the TVP-VAR specification of this post. The paper belongs to the central contributions in the field of TVP. Fabian Krüger wrote a fast and easy to use package based on Primiceri's model and its corrigendum 2015.
+
+[^state_eq]: Note that we could add a coefficient matrix to $b_t$ and use a timy varying covariance matrix so that the equation becomes $b_{t + 1} = T_t b_t + v_t$ with $v_t ~ N(0, Q_t)$, but here we assume that $T$ is constant diagonal matrix with 1 on its diagonal and $Q$ is constant as well.
+
+### Impulse response
+
+```{r bvar objects}
+tt_1975 <- which(time(data) == 1975) - p
+bvar_1975 <- bvar(y = y, x = x,
+                   A = draws_b[1:(n_coef - k), tt_1975,],
+                   C = draws_b[n_coef - k + 1:k, tt_1975, ],
+                   Sigma = draws_sigma)
+
+tt_2005 <- which(time(data) == 2005) - p
+bvar_2005 <- bvar(y = y, x = x,
+                   A = draws_b[1:(n_coef - k), tt_2005,],
+                   C = draws_b[n_coef - k + 1:k, tt_2005, ],
+                   Sigma = draws_sigma)
+```
+
+
+```{r Dp, fig.width=5, fig.height=4.5}
+irf_1975 <- irf(bvar_1975, impulse = "r", response = "Dp",
+                n.ahead = 20, type = "feir", keep_draws = TRUE)
+
+irf_2005 <- irf(bvar_2005, impulse = "r", response = "Dp",
+                n.ahead = 20, type = "feir", keep_draws = TRUE)
+
+diff_irf <- irf_2005 - irf_1975
+diff_irf <- t(apply(diff_irf, 2, quantile, probs = c(.05, .5, .95)))
+diff_irf <- ts(diff_irf, start = 0)
+
+irf_1975 <- colMeans(irf_1975)
+irf_2005 <- colMeans(irf_2005)
+
+irf_Dp <- ts(cbind(irf_1975, irf_2005), start = 0)
+plot(irf_Dp, plot.type = "single", col = c("blue", "red")); abline(h = 0)
+```
+
+```{r diff Dp, fig.width=5, fig.height=4.5}
+plot(diff_irf, plot.type = "single"); abline(h = 0)
+```
+
+
+
+```{r u, fig.width=5, fig.height=4.5}
+irf_1975 <- irf(bvar_1975, impulse = "r", response = "u",
+                n.ahead = 20, type = "feir", keep_draws = TRUE)
+
+irf_2005 <- irf(bvar_2005, impulse = "r", response = "u",
+                n.ahead = 20, type = "feir", keep_draws = TRUE)
+
+diff_irf <- irf_2005 - irf_1975
+diff_irf <- t(apply(diff_irf, 2, quantile, probs = c(.05, .5, .95)))
+diff_irf <- ts(diff_irf, start = 0)
+
+irf_1975 <- colMeans(irf_1975)
+irf_2005 <- colMeans(irf_2005)
+
+irf_u <- ts(cbind(irf_1975, irf_2005), start = 0)
+plot.ts(irf_u, plot.type = "single", col = c("blue", "red")); abline(h = 0)
+```
+
+```{r diff u, fig.width=5, fig.height=4.5}
+plot(diff_irf, plot.type = "single"); abline(h = 0)
+```
+
+```{r r, fig.width=5, fig.height=4.5}
+irf_1975 <- irf(bvar_1975, impulse = "r", response = "r",
+                n.ahead = 20, type = "feir", keep_draws = TRUE)
+
+irf_2005 <- irf(bvar_2005, impulse = "r", response = "r",
+                n.ahead = 20, type = "feir", keep_draws = TRUE)
+
+diff_irf <- irf_2005 - irf_1975
+diff_irf <- t(apply(diff_irf, 2, quantile, probs = c(.05, .5, .95)))
+diff_irf <- ts(diff_irf, start = 0)
+
+irf_1975 <- colMeans(irf_1975)
+irf_2005 <- colMeans(irf_2005)
+
+irf_r <- ts(cbind(irf_1975, irf_2005), start = 0)
+plot(irf_r, plot.type = "single", col = c("blue", "red")); abline(h = 0)
+```
+
+```{r diff r, fig.width=5, fig.height=4.5}
+plot(diff_irf, plot.type = "single"); abline(h = 0)
+```
+
+
+### References
+
+Carter, C. K., & Kohn, R.. (1994). On Gibbs Sampling for State Space Models. *Biometrika, 81*, 541--553.
+
+De Jong, P., & Shephard, N.. (1995). The Simulation Smoother for Time Series Models. *Biometrika, 82*, 339--350.
+
+Del Negro, M., & Primiceri, G. E. (2015). Time Varying Structural Vector Autoregressions and Monetary Policy: A 
+Corrigendum. *Review Of Economic Studies, 82*(4), 1342--1345. (Working paper version)
+
+Durbin, J., & Koopman, S. J.. (2001). Time Series Analysis by State Space Models. Oxford.
+
+Durbin, J., & Koopman, S. J.. (2002). A Simple and Efficient Simulation Smoother for State Space Time Series Analysis. *Biometrika, 89*(3), 603–-615.
+
+Frühwirth-Schnatter, S.. (1994). Data Augmentation and Dynamic Linear Models. *Journal of Time Series Analysis, 15*, 183--202.
+
+Koop, G., & Korobilis, D.. (2010). Bayesian Multivariate Time Series Methods for Empirical Macroeconomics, *Foundations and Trends in Econometrics, 3*, 267--358.
+
+Mohr, F.X. (2019). bvartools: Functions for Bayesian inference of vector autoregressive models. R package version 0.0.3.
+
+Primiceri, G. E.. (2005). Time Varying Structural Vector Autoregressions and Monetary Policy. *The Review of Economic Studies, 72*(3), 821–-852.

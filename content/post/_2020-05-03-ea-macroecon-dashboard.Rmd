@@ -1,0 +1,132 @@
+---
+title: "Macroeconmic Dashboards for European Member States"
+author: "Franz X. Mohr"
+date: '2020-05-03'
+description: "Contains code for the generate of a macroeconomc dashboard for a European member state based one Eurostat data."
+tag:
+  - macroeconomics
+  - dashboard
+---
+
+<!--more-->
+
+In public institutions it seems quite common that the management receives so-called *dashboards*, which contain a series of indicators and serve as background information.
+
+```{r, message=FALSE, warning = FALSE}
+library(dplyr)
+library(eurostat)
+library(ggplot2)
+library(tidyr)
+library(zoo)
+```
+
+### Data
+
+The `eurostat` package comes with a list of euro area countries. This is very useful when you only want to download data for euro area countries.
+
+### Gross domestic product
+
+```{r}
+raw <- get_eurostat(id = "namq_10_gdp", filters = list(geo = "AT",
+                                                       na_item = c("B1GQ", "P3_S13", "P31_S14_S15", "P5G", "P6", "P7"),
+                                                       unit = c("CP_MNAC", "CLV15_MEUR"),
+                                                       s_adj = c("SCA")))
+temp <- raw %>%
+  filter(!is.na(values)) %>%
+  select(time, unit, na_item, values) %>%
+  arrange(time, unit, na_item) %>%
+  group_by(unit, na_item) %>%
+  mutate(values = values / 1000,
+         growth = values / lag(values, 4) - 1) %>%
+  ungroup() %>%
+  mutate(date = as.yearqtr(time, "%Y-Q%q"))
+
+# Nominal
+nominal <- temp %>%
+  filter(date >= "2015 Q1") %>%
+  filter(unit == "CP_MNAC") %>%
+  select(date, na_item, values) %>%
+  pivot_wider(names_from = "na_item", values_from = "values") %>%
+  mutate(PX = B1GQ - (P3_S13 + P31_S14_S15 + P5G + P6 - P7))
+
+nominal_col <- nominal %>%
+  select(-B1GQ) %>%
+  pivot_longer(cols = -c("date")) %>%
+  mutate(value = ifelse(name == "P7", -value, value))
+
+nominal_line <- nominal %>%
+  select(date, B1GQ)
+
+g_temp <- ggplot(nominal_col, aes(x = date)) +
+  geom_col(aes(y = value, fill = name)) +
+  geom_line(data = nominal_line, aes(y = B1GQ)) +
+  labs(title = "Nominelles BIP",
+       subtitle = "Mrd EUR")
+
+g_temp
+```
+
+```{r}
+table <- nominal %>%
+  select(-PX) %>%
+  tail(5)
+
+table
+```
+
+
+### Real GDP growth
+
+```{r, message = FALSE}
+real <- temp %>%
+  filter(unit == "CLV15_MEUR") %>%
+  select(date, na_item, values) %>%
+  pivot_wider(names_from = "na_item", values_from = "values") %>%
+  mutate(PNX = P6 - P7) %>%
+  select(-P6, -P7) %>%
+  mutate(PX = B1GQ - (P3_S13 + P31_S14_S15 + P5G + PNX),
+         P3_S13 = P3_S13 - lag(P3_S13, 4),
+         P31_S14_S15 = P31_S14_S15 - lag(P31_S14_S15, 4),
+         P5G = P5G - lag(P5G, 4),
+         PNX = PNX - lag(PNX, 4),
+         PX = PX - lag(PX, 4),
+         P3_S13 = P3_S13 / lag(B1GQ, 4),
+         P31_S14_S15 = P31_S14_S15 / lag(B1GQ, 4),
+         P5G = P5G / lag(B1GQ, 4),
+         PNX = PNX / lag(B1GQ, 4),
+         PX = PX / lag(B1GQ, 4)) %>%
+  select(-B1GQ) %>%
+  pivot_longer(cols = -c("date")) %>%
+  filter(date >= "2015 Q1") %>%
+  filter(!is.na(value))
+
+real_agg <- temp %>%
+  filter(unit == "CLV15_MEUR",
+         na_item == "B1GQ") %>%
+  mutate(values = values / lag(values, 4) - 1) %>%
+  filter(date >= "2015 Q1") %>%
+  filter(!is.na(values)) %>%
+  rename(value = values)
+
+ggplot(real, aes(x = date, y = value)) +
+  geom_col(aes(fill = name)) +
+  geom_line(data = real_agg)
+```
+
+## Consumption
+
+
+## Investment
+
+
+## Government
+
+
+## Trade
+
+### Exports
+
+
+### Imports
+
+

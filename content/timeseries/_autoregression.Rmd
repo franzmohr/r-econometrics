@@ -1,0 +1,23 @@
+---
+title: "Introduction to Autoregression in R"
+author: "Franz X. Mohr"
+date: "2019-07-31"
+tags:
+  - r
+  - time-series
+  - autoregression
+---
+
+One branch of econometrics deals with the analysis of time series data.
+
+An excellent source of information is [Hyndman and Athanasopoulos (2018)](https://otexts.com/fpp2/).
+
+A standard AR(1) model has the form
+
+$$y_t = \alpha_1 y_{t - 1} + u_t,$$
+
+where $y_t$ is the value of variable $y$ in period $t$, $\alpha_1$ is the coefficient describing the relationship between the current value of $y$ and its own lag, and $u_t$ is a normally distributed error term with zero mean and variance $\sigma^2$.
+
+### References
+
+Hyndman, R. J., & Athanasopoulos G. (2018). *Forecasting: Principles and Practice*. Heathmont: OTexts. <https://otexts.com/fpp2/>

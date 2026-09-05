@@ -1,0 +1,15 @@
+---
+title: "Network Analysis in R"
+author: "Franz X. Mohr"
+date: "2020-03-01"
+tags:
+  - igraph
+  - networks
+  - network-analysis
+---
+
+With the increasing availability of granular data on the relationships between individual entities - such as persons (social media), countries (international trade) and financial institutions (supervisory reporting) - network analysis offers many possibilities to extract useful information from such data. This section provides brief introductions to the analysis of network data in R.
+
+* [Basics of the igraph package](/networks/igraph)
+* [Summary statistics with the igraph](/networks/network-summary)
+* [Network visualisation with ggraph](/networks/network-visual)

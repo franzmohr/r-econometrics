@@ -1,0 +1,107 @@
+---
+title: "An Introduction to Factor-Augmented Vector Autoregression (FAVAR)"
+author: "Franz X. Mohr"
+date: "2021-03-30"
+lastmod: "`r Sys.Date()`" 
+description: "The post provides a short introduction to the concept of factor-augmented vector autoregressive (FAVAR) models and how they can be estimated in R."
+categories:
+  - r
+  - var
+tags:
+  - r
+  - var
+  - favar
+  - vector-autoregression
+---
+
+## Introduction
+
+As we saw in the <a href="https://www.r-econometrics.com/timeseries/varintro" target="_blank">post on vector autoregressive (VAR) models</a> traditional VAR models suffer from a so-called *curse of dimensionality*. This means that adding further variables to the model increases the amount of estimated coefficients by a disproportionally larger amount, which poses a problem for the estimaton of models when the number of available observations is limited. However, the inclusion of many additional variables in a VAR model would be desirable, since policy makers usually have much more information at their disposal for decision making than the limited amount of variables, which traditionally enter VAR models.
+
+*Factor-augemented VAR (FAVAR) models* can be used to address this issue. They include the explanatory power of a data set with many observable time series by summarising them to a much smaller set of so-called factors. The factors are obtained by searching for common drivers of the observed variables. For example, GDP growth as well as growth in industrial production or private consumption can be regarded as measures of economic activity, which show very similar behaviour over time:
+
+```{r,message=FALSE, fig.width=5, fig.height=3.5}
+# Load packages
+library(alfred)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+
+# Set start and end dates
+startdt <- "1980-01-01"
+enddt <- "2020-10-01"
+
+# Download data from FRED
+gdp <- get_fred_series(series_id = "GDPC1", series_name = "gdp",
+                       observation_start = startdt, observation_end = enddt)
+iip <- get_fred_series(series_id = "IPB50001SQ", series_name = "iip",
+                       observation_start = startdt, observation_end = enddt)
+cons <- get_fred_series(series_id = "PCECC96", series_name = "cons",
+                       observation_start = startdt, observation_end = enddt)
+
+# Produce data frame for ggplot graph
+temp <- gdp %>%
+  left_join(iip) %>% # Join downloaded series
+  left_join(cons) %>%
+  # Long format
+  pivot_longer(cols = -c("date")) %>%
+  # Obtain log-growth rates
+  arrange(date) %>% # Arrange data just to be sure
+  group_by(name) %>%
+  mutate(value = log(value),
+         value = value - lag(value, 4)) %>%
+  ungroup() %>%
+  filter(!is.na(value)) %>% # Get rid of NAs
+  # Reformat legend titles
+  mutate(name = factor(name, levels = c("gdp", "iip", "cons"),
+                       labels = c("GDP", "Industrial production", "Private consumption")))
+
+# Plot
+ggplot(temp, aes(x = date, y = value, colour = name)) +
+  geom_hline(yintercept = 0) +
+  geom_line() +
+  scale_x_date(expand = c(.01, 0)) +
+  scale_y_continuous(labels = scales::percent_format()) +
+  theme_bw() +
+  theme(legend.position = "bottom",
+        legend.title = element_blank()) +
+  labs(title = "Example: Measures of economic activity",
+       x = NULL, y = "Log-growth rate (y-o-y)",
+       caption = "Source: Board of Governors of the Federal Reserve System (US),\nU.S. Bureau of Economic Analysis.")
+```
+
+Although each of the indicators measures a different economic phenomenon, they seem to follow a common pattern. This pattern can be understood as an underlying process, which drives the observed indicators. In the case of the example above we could state that the underlying process represents the abstract concept of *economic activity*.
+
+Following the description in the influential paper by Bernanke et al. (2005) a FAVAR model can be described by two equations. First, the *transition equation*[^statespace] describes the dynamic relationships between observed economic variables and unobserved factors:
+
+[^statespace]: Note that the terms measurement and transition equation refer to the close relationshipo of the FAVAR approach to state space models.
+
+$$ \begin{bmatrix} y_{t} \\ f_{t} \end{bmatrix} = c + A_{1} \begin{bmatrix} y_{t-1} \\ f_{t-1} \end{bmatrix}  + \dots + A_p \begin{bmatrix} y_{t-p} \\ f_{t-p} \end{bmatrix}  + u_t,$$
+
+where $y_t$ is a $K \times 1$ vector of observable economic variables and $f_t$ is a $N \times 1$ vector of unobserved factors. Matrices $A_1, \dots, A_p$ are corresponding coefficient matrices and $c$ is a vector of intercepts. $u_t$ is $N(0, \Sigma_u)$, where $\Sigma_u$ is assumed to be diagonal. The transition equation resembles a traditional VAR model, which is augmented by an unobserved factor $f_t$. Hence the name factor-augmented vector autoregression.
+
+Second, the *measurement equation* describes the relationship between a set of observed variables and the factors in the transition equation. It is necessary for the calculation of the unobserved factors in $f_t$ and can be written as:
+
+$$ x_t = \lambda^{y} y_t + \lambda^{f} f_t + \epsilon_t,$$
+
+where $x_t$ is a (large) $M \times 1$ vector of observable variables used to obtain the factors in vector $f_t$ and $\lambda^{f}$ is the corresponding matrix of *factor loadings*. Vector $y_t$ and its corresponding coefficient matrix $\lambda^{y}$ are also included in the measurement equation to account for any direct relationships between $x_t$ and $y_t$ so that the factors in $f_t$ only contain information that is not already included in $y_t$. The error term $\epsilon_t$ is $iid$ $N(0, \Sigma_{\epsilon})$, where $\Sigma_{\epsilon}$ is usually assumed to be diagonal. Furthermore, $\lambda^{f}$ is assumed to be a lower triangular matrix with ones on the diagonal. This assumption is mathematically necessary to ensure that the factors in $f_t$ can be estimated.
+
+An extension of the model presented in Bernanke et al. (2005) can be found in Koop and Korobilis (2014).
+
+## Application
+
+<a href=https://doi.org/10.1162/0033553053327452" target="_blank">doi:10.1162/0033553053327452</a>
+  
+http://jbduarte.com/blog/time%20series/r/favar/2020/04/24/FAVAR-Replication.html
+
+## References
+
+Bernanke, B.S, Boivin, J., & Eliasz, P. (2005). Measuring the effects of monetary policy. A factor-augemented vector autoregressive (FAVAR) approach. *The Quarterly Journal of Economics 120*(1), 387-422. <a href=https://doi.org/10.1162/0033553053327452" target="_blank">doi:10.1162/0033553053327452</a>
+
+Chan, J., Koop, G., Poirier, D. J., & Tobias, J. L. (2019). *Bayesian Econometric Methods* (2nd ed.). Cambridge: University Press.
+
+Koop, G., & Korobilis, D. (2014). A new index of finanicial conditions. *European Economic Review 71*, 101-116. <a href=https://doi.org/10.1016/j.euroecorev.2014.07.002" target="_blank">doi:10.1016/j.euroecorev.2014.07.002</a>
+
+Lütkepohl, H. (2007). *New introduction to multiple time series analysis* (2nd ed.). Berlin: Springer.
+
+Stock, J. H., & Watson, M. W. (2002). Macroeconomic forecasting using indexes diffusion. *Journal of Business & Economic Statistics 20*(2), 147-162. <a href=https://doi.org/10.1198/073500102317351921" target="_blank">doi:10.1198/073500102317351921</a>

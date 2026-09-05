@@ -1,0 +1,35 @@
+---
+title: "Who Drives Europe's Value Chain?"
+author: "Franz X. Mohr"
+date: '2018-05-11'
+---
+
+# Introduction
+International trade has been a 
+
+The purpose of this post is to illuminate, which countries and regions are the major trade partners of the EU.
+
+
+# Data
+
+```{r, message = FALSE, include = FALSE}
+library(dplyr)
+library(tidyr)
+
+load("~/Dropbox/r-econometrics/r-econometrics/content/post/_WIOT2014_October16_ROW.RData")
+```
+```{r, message = FALSE, eval = FALSE}
+library(dplyr)
+
+load("WIOT2014_October16_ROW.RData")
+```
+
+# Countries
+
+```{r}
+temp <- wiot %>%
+  gather(key = "country_id", value = "value", -(IndustryCode:Year))
+```
+
+# Sectors
+

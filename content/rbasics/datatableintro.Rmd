@@ -1,0 +1,184 @@
+---
+title: "Introduction to data.table"
+author: "Franz X. Mohr"
+date: "2026-09-05"
+tags:
+  - data.table
+  - r
+description: "A short introduction to data manipulation in R using the data.table package. It presents the main elements of its syntax and illustrates their use with a simple example."
+---
+
+The cleaning and transformation of data belong to the most time consuming parts of any economic analysis. Many graphical or statistical functions in R require specifically formatted data to work properly. Although the standard functions of R can be used to prepare your data for further analysis, some people find them a bit laborious for daily applications. Therefore, alternatives have been developed, which make data transformation in R easier and also faster. One of these alternatives is the `data.table` package. It is known for its very concise syntax and for its excellent performance on large data sets, which is why it is a popular choice whenever speed and memory consumption matter.[^packages] In the following I give an introduction to the main elements of the `data.table` syntax. It covers the same operations as my [introduction to `dplyr`](/rbasics/dplyrintro), so that both approaches can be compared directly.
+
+For this illustration we use data from the World Penn Tables, which come with the `pwt9` package. In particular, we use the 9.0 version of the data set, which can be loaded with `data("pwt9.0")`.
+
+```{r data, message = FALSE}
+library(data.table) # Load data.table
+
+library(pwt9) # Load data
+data("pwt9.0")
+```
+
+## data.tables
+
+But before we start with a tour through the syntax of the package it should be mentioned that `data.table` works with its own object format, which is called *data.table*. A data.table is also a data.frame, which means that functions which expect a data.frame will continue to work with it.[^dtclass] An existing data.frame can be turned into a data.table with `as.data.table`:
+
+```{r}
+pwt_dt <- as.data.table(pwt9.0)
+```
+
+Alternatively, `setDT(pwt9.0)` converts an object into a data.table *in place*, i.e. without making a copy of the data first. This is faster and needs less memory, but it also changes the original object. If you read data from a csv file, `fread` gives you a data.table right away, and it is usually much faster than `read.csv`.
+
+## The i, j, by syntax
+
+Unlike `dplyr`, the `data.table` package does not rely on a pipe operator and it does not provide a separate function for every operation. Instead, nearly everything happens inside the square brackets of a data.table, which have the general form
+
+```{r, eval = FALSE}
+DT[i, j, by]
+```
+
+This can be read as *take `DT`, use the rows described by `i`, then do `j` with the columns, grouped by `by`*. So `i` is the place where observations are selected or sorted, `j` is the place where columns are selected, calculated or created, and `by` is the place where groups are defined. Once you got used to this logic, a single operator covers most of the things you want to do with a table.
+
+## select
+
+Selecting columns happens in the `j` part of the brackets. For example, the `pwt9.0` data set contains 47 columns. But let's assume that we only want to analyse real GDP and the population size, i.e. variables `rgdpna` and `pop`, for all countries and all years. This can be done with the following line:
+
+```{r}
+pwt_select <- pwt_dt[, .(year, country, rgdpna, pop)]
+```
+
+Note that the position of `i` in front of the first comma was left empty. This means that all rows are kept. The expression `.()` is a shorthand for `list()` and it is used throughout the package whenever multiple columns have to be addressed at once.
+
+As with `dplyr`, the column names do not have to be in quotes. If we used the standard R commands to select the same data we would have to use `pwt9.0[, c("year", "country", "rgdpna", "pop")]`.
+
+If the names of the columns are already stored in a character vector, put two dots in front of the name of that vector. They tell `data.table` that it should not look for a column with this name, but for an object outside the table:
+
+```{r, eval = FALSE}
+cols <- c("year", "country", "rgdpna", "pop")
+pwt_select <- pwt_dt[, ..cols]
+```
+
+## rename
+
+Let's assume we are not satisfied with the original column names and want to change them. With `data.table` this is done with `setnames`, which takes the table, the old names and the new names as arguments:
+
+```{r}
+pwt_rename <- copy(pwt_select)
+setnames(pwt_rename, old = c("country", "rgdpna"), new = c("ctr", "gdp"))
+```
+
+Two things are worth mentioning here. First, all functions of the package which start with `set` change an object *by reference*. This means that they do not return a new table, which would have to be assigned with `<-`. They change the object that was handed over to them directly. Second, and precisely because of this, we made an explicit copy of `pwt_select` with the `copy` function before renaming its columns. Without that copy the columns of `pwt_select` itself would have been renamed as well. More on this in the section on modification by reference below.
+
+Note that it is not necessary to write the commands in one line. In fact, it is good practise to begin a new code line after a comma, if a command becomes too long.
+
+## filter
+
+Observations are selected in the `i` part of the brackets, where the conditions are combined with `&` for *and* and with `|` for *or*. The following code uses the data in `pwt_rename` and omits all observations, where the column *gdp* contains `NA` values, where the year is lower than 1980 and where the country name is not Austria, Germany or France.[^logcomp] The result is saved as object `pwt_filter`.
+
+```{r}
+pwt_filter <- pwt_rename[!is.na(gdp) & # Omit observations with NA values in column "gdp"
+                           year >= 1980 & # Drop observations before 1980
+                           ctr %in% c("Austria", "Germany", "France")] # Only use obs for AT, DE and FR
+```
+
+Since the columns of the table are known inside the brackets, they can be addressed by their names alone. This is relatively simple compared to the way you would have to do it when using the core R operators only:
+
+```{r, eval = FALSE}
+pwt_filter <- pwt_rename[!is.na(pwt_rename$gdp) & pwt_rename$year >= 1980 & pwt_rename$ctr %in% c("Austria", "Germany", "France"), ]
+```
+
+Also note that the comma after the conditions can be omitted in a data.table. `pwt_rename[year >= 1980]` and `pwt_rename[year >= 1980, ]` give the same result.
+
+## mutate
+
+New columns are added, and existing columns are changed, with the `:=` operator in the `j` part of the brackets. In our example we calculate the GDP per capita ratio for the three countries in the filtered data set:
+
+```{r}
+pwt_filter[, gdp_pc := gdp / pop]
+```
+
+After executing `View(pwt_filter)` we see that the table contains a new column called *gdp_pc*, which contains the GDP per capita for each country and year since 1980. Note that there is no assignment with `<-` in this line. `:=` adds the column to the existing table directly, which is why this operation is very fast even for large data sets.
+
+Multiple columns can be added in a single step by using the functional form of the operator:
+
+```{r}
+pwt_filter[, `:=`(log_gdp = log(gdp),
+                  log_pop = log(pop))]
+```
+
+A column is deleted again by assigning `NULL` to it, i.e. `pwt_filter[, log_pop := NULL]`. And if the `i` part is used together with `:=`, only those rows are changed which fulfil the condition. `pwt_filter[ctr == "Germany", gdp_pc := NA]`, for example, would only overwrite the values of the German observations and leave the rest of the column untouched.
+
+## Modification by reference
+
+The fact that `:=` and the `set` functions change a table without making a copy of it is the main difference to `dplyr` and it is the most common source of confusion for people who start to work with the package. Since no copy is made, the following two lines do *not* create an independent second table. `pwt_second` is only another name for the same data and adding a column to it would also add that column to `pwt_filter`:
+
+```{r, eval = FALSE}
+pwt_second <- pwt_filter
+pwt_second[, gdp_bn := gdp / 1000]
+```
+
+If you really want an independent copy of a table, use the `copy` function, as we already did in the section on `setnames`:
+
+```{r}
+pwt_copy <- copy(pwt_filter)
+```
+
+This behaviour might look inconvenient at first, but it is the reason for the very good performance of the package: R does not have to duplicate a data set in memory every time a single column is changed.
+
+## by
+
+The third part of the brackets is the counterpart of the `group_by` function in `dplyr`. It tells R to execute the expression in `j` for each distinct value in the specified columns separately. Since the grouping is part of the same command, there is also no need for something like the `ungroup` function of `dplyr`. This should become more clear when we look more closely at the following operation...
+
+## Aggregation
+
+Sometimes it might be useful to calculate aggregate values over a group of observations. This is done by combining the `j` and the `by` part of the brackets. The following code tells R that it should calculate aggregate GDP and population for each year separately, which gives the respective values for the region of Austria, France and Germany.
+
+```{r}
+data_aggregate <- pwt_filter[, .(gdp = sum(gdp),
+                                 pop = sum(pop)),
+                             by = year]
+```
+
+Groups can also be defined over multiple columns by using `by = .(ctr, year)`. And if the result should be sorted by the grouping variables right away, use `keyby` instead of `by`.
+
+A special shortcut is `.N`, which contains the number of observations in a group. So the number of available observations per country is obtained with
+
+```{r}
+obs_per_country <- pwt_filter[, .N, by = ctr]
+```
+
+## Sorting and keys
+
+Since `i` is also the place where the order of the rows is determined, sorting is done with `setorder`, where a minus in front of a column name results in descending order:
+
+```{r}
+setorder(pwt_filter, ctr, -year)
+```
+
+Closely related is the concept of a *key*. Setting a key with `setkey(pwt_filter, ctr, year)` sorts the table by these columns and marks them as the columns by which the observations are identified. This makes subsetting and joining tables considerably faster, which is especially valuable for large data sets.
+
+## Chaining
+
+Finally, the square brackets of a data.table can be appended to each other. This so-called *chaining* is the equivalent of the pipe in `dplyr` and it allows us to write the whole example above as a single statement:
+
+```{r}
+data_chain <- pwt_dt[!is.na(rgdpna) & year >= 1980 &
+                       country %in% c("Austria", "Germany", "France"),
+                     .(gdp = sum(rgdpna), pop = sum(pop)),
+                     by = year][, gdp_pc := gdp / pop]
+```
+
+Note that a command which ends with `:=` does not print its result. If you want to see the table immediately, append an empty pair of brackets, i.e. `[]`, at the end of the chain.
+
+Beside the operations presented above there are two further functions you should know when you work with `data.table`. They are called `melt` and `dcast` and they transform a table from wide to long format and back. In contrast to `dplyr`, they come with the package itself, so that no further package has to be loaded.
+
+Working with the `data.table` package requires some practise. This is especially true, when somebody just started to work with it and the meaning of the three parts of the square brackets is not yet in the back of the head. However, you have now already learned the basic syntax of the package and there is a lot of additional material out there, which assists in becoming more familiar with it. The package comes with a series of very good vignettes, which can be listed with `vignette(package = "data.table")`. In addition, I find so-called *cheatsheets* especially useful.[^cheatsheets] Other sources might be blog articles, online training courses or stackoverflow.com for a particular problem.
+
+
+[^cheatsheets]: Cheatsheets are compact summaries for the use of packages. They can be found on the Posit website: [https://posit.co/resources/cheatsheets/](https://posit.co/resources/cheatsheets/).
+
+[^dtclass]: `class(pwt_dt)` returns `"data.table"` and `"data.frame"`, which means that a data.table inherits the behaviour of a data.frame.
+
+[^logcomp]: For completeness possible signs for value comparison are `==`, `<`, `<=`, `>`, `>=` and `!=` for checking if the value on the left side of the sign is equal, lower, lower or equal, larger, larger or equal and different, respectively, from the value on the right side. The operator `%in%` can be used to determine, whether the object to its left is in a vector to its right.
+
+[^packages]: More information can be found on the <a href="https://rdatatable.gitlab.io/data.table/" target="_blank">package's website</a>. The other quite popular approach to data manipulation in R is the `dplyr` package, which is introduced [here](/rbasics/dplyrintro).

@@ -1,0 +1,211 @@
+---
+title: "Chapter 17: Limited Dependent Variable Models and Sample Selection Corrections"
+author: "Franz X. Mohr"
+date: "2018-10-07"
+---
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+library(AER)
+library(sampleSelection)
+library(survival)
+library(wooldridge)
+```
+
+### Example 17.1
+
+First, look at the linear model.
+```{r}
+data("mroz")
+
+lm.17.1 <- lm(inlf ~ nwifeinc + educ + exper + expersq + age +
+                kidslt6 + kidsge6, data = mroz)
+summary(lm.17.1)
+```
+
+To calculated the percentage share of correct predictions I create dummy variables, which equal unity when the fitted values are above or equal to 0.5 and zero else. Next, I create a vector of dummies that are unity when both the fitted prediction and the observation of the dependent variable are unity. If they have different values, i.e. (1,0) or (0,1), the dummy is zero. The mean of this latter vector gives the percentage share of correctly predicted observations.
+
+```{r}
+lm.fitted <- as.numeric(lm.17.1$fitted.values >= .5)
+corr.pred.lm <- as.numeric(lm.fitted == mroz$inlf)
+
+mean(corr.pred.lm)
+```
+
+To estimate the Logit model, we cannot use the `lm` function. Instead, we have to use the `glm` command. Specify the estimation model, the dataset and the family of the estimation procedure, which in our case is *logit*. Estimate the model, save it and use the `summary` command to get an overview of the results.
+
+```{r}
+logit.17.1 <- glm(inlf ~ nwifeinc + educ + exper + expersq + age +
+                    kidslt6 + kidsge6,
+                  data = mroz,
+                  family = binomial(link = "logit"))
+summary(logit.17.1)
+```
+
+The share of correctly predicted observations is retrieved in the same way as it was done with the linear model.
+
+```{r}
+logit.fitted <- as.numeric(logit.17.1$fitted.values >= .5)
+corr.pred.logit <- as.numeric(logit.fitted==mroz$inlf)
+
+mean(corr.pred.logit)
+```
+
+To get the log-likelihood, there is simple command, which just needs the estimated model output.
+
+```{r}
+logLik(logit.17.1)
+```
+
+Probit estimation works in the same way as Logit, except that you have to specify a different estimation procedure in the family argument.
+
+```{r}
+probit.17.1 <- glm(inlf ~ nwifeinc + educ + exper + expersq + age +
+                     kidslt6 + kidsge6,
+                   data = mroz,
+                   family = binomial(link = "probit"))
+summary(probit.17.1)
+```
+
+```{r}
+probit.fitted <- as.numeric(probit.17.1$fitted.values >= .5)
+corr.pred.probit <- as.numeric(probit.fitted==mroz$inlf)
+
+mean(corr.pred.probit)
+```
+
+Log-likelihood
+```{r}
+logLik(probit.17.1)
+```
+
+### Example 17.2
+
+```{r}
+data("mroz")
+
+lm.17.2 <- lm.1 <- lm(hours ~ nwifeinc + educ + exper + expersq + age +
+                        kidslt6 + kidsge6,
+                      data = mroz)
+summary(lm.17.2)
+```
+
+For some reason, my results for sigma are slightly different from the results in Wooldridge (2013).
+```{r}
+sd(lm.17.2$residuals)
+```
+
+To estimate a Tobit model, we have to load the `AER` package. The rest is similar to linear regression methods. Just enter the formula and the data set and you will get your estimates.
+
+```{r}
+tobit.17.2 <- tobit(hours ~ nwifeinc + educ + exper + expersq + age +
+                      kidslt6 + kidsge6,
+                    data = mroz)
+summary(tobit.17.2)
+```
+
+To obtain an R-squared value, calculate fitted values by inserting the (scaled 1122) linear predictors that are contained in the estimation results into equation 17.25 and calculate the square of the correlation between those fitted values and the real observations.
+
+```{r}
+fitted <- pnorm(tobit.17.2$linear.predictors / 1122) * tobit.17.2$linear.predictors +
+  1122 * dnorm(tobit.17.2$linear.predictors / 1122)
+
+cor(mroz$hours,fitted)^2
+```
+
+To get the **average partial effect** calculate the mean of the vector, which contains the values of the cumulative normal distribution function depending on the scaled linear predictors of the estimation:
+
+```{r}
+ape <- mean(pnorm(tobit.17.2$linear.predictors / 1122))
+ape * 80.65
+```
+
+For the **partial effect at the average** we generate a vector with unity as the first value and the means of all the independent variables in the model. Then, multiply this vector with the coefficients of the model to get linear predictions, scale them and calculate the value of the cumulative normal distribution function.
+
+```{r}
+# PEA
+means <- c(1, mean(mroz$nwifeinc), mean(mroz$educ), mean(mroz$exper), mean(mroz$exper)^2,
+           mean(mroz$age), mean(mroz$kidslt6), mean(mroz$kidsge6))
+pea <- pnorm(tobit.17.2$coefficients %*% means / 1122)
+pea * 80.65
+```
+
+### Example 17.3
+
+Estimate the linear model
+```{r}
+data("crime1")
+
+lm.17.3 <- lm(narr86 ~ pcnv + avgsen + tottime + ptime86 + 
+                qemp86 + inc86 + black + hispan + born60,
+              data = crime1)
+summary(lm.17.3)
+```
+
+Again, the standard error deviates from the book.
+```{r}
+sd(lm.17.3$residuals)
+```
+
+To estimate the Poisson model we use the `glm` function and specify the formula, dataset and the family of the estimation procedure, i.e. Poisson. After the estimation we get the summary of the results and the log-likelihood. The R-squared of the estimation is the squared correlation of the Poisson model's fitted values and the real observations. 
+
+```{r}
+poisson.17.3 <- glm(narr86 ~ pcnv + avgsen + tottime + ptime86 + 
+                      qemp86 + inc86 + black + hispan + born60,
+                    data = crime1,
+                    family = poisson)
+summary(poisson.17.3)
+```
+
+Log-likelihood
+```{r}
+logLik(poisson.17.3)
+```
+
+```{r}
+cor(poisson.17.3$fitted.values, crime1$narr86)^2
+```
+
+The standard errors can be scaled either manually by multiplying the variance of the coefficient (squared standard error) by the scale factor and taking the square root or by specifying the dispersion factor in the `summary` command.
+
+```{r}
+(0.014750^2 * 1.232)^0.5
+
+summary(poisson.17.3, dispersion = 1.232)
+```
+
+### Example 17.4
+
+For censored regression models we have to use the `survival` package. The command `Surv` prepares the dependent variable to be used in `survreg`. It takes the variable "ldurat" as the interval. The argument `event` tells `Surv` whether a command is censored or not. I had to revert the variable *cens*, which is why I generated a further vector of dummies. The last option in `Surv` tells if the data are censored to the left or to the right.
+
+The independent variables and the data set are specified in the usual way. The distribution usually used is the Gaussian (referred to as "normal") distribution.
+
+```{r}
+data("recid")
+
+surv.17.4 <- survreg(Surv(ldurat, event = as.numeric(cens!=1), type = "right") ~ 
+                       workprg + priors + tserved + felon + alcohol + drugs +
+                       black + married + educ + age,
+                     dist = "gaussian",
+                     data = recid)
+summary(surv.17.4)
+```
+
+### Example 17.5
+
+Estimate the OLS model
+```{r}
+data("mroz")
+
+lm.17.5 <- lm(lwage ~ educ + exper + expersq, data = mroz)
+summary(lm.17.5)
+```
+
+To estimate the Heckit model we have to install the `sampleSelection` package. It contains a neat function called `heckit`, where we specify the formula for the model describing the causes of sample selection (first line) and the formula for the model of interest. Next, we specify the method used for estimation (two steps) and the sample.
+
+```{r}
+heckit.17.5 <- heckit(inlf ~ educ + exper + expersq + nwifeinc + age + kidslt6 + kidsge6,
+                      lwage ~ educ + exper + expersq,
+                      method = "2step",
+                      data = mroz)
+summary(heckit.17.5)
+```
