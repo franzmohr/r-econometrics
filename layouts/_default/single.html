@@ -1,15 +1,8 @@
- <!-- {{ template "_internal/google_analytics.html" . }} -->
 {{ partial "head.html" . }}
 {{ partial "header.html" . }}
 
-{{ $baseurl := .Site.BaseURL }}
 {{ $categories := .Params.categories }}
 {{ $tags := .Params.tags }}
-
-  <meta
-     name="description"
-     content="{{ if .Params.description }}{{ .Params.description }}{{ end }}"
-   />
 
     <div class="container">
         <div class="row">
@@ -20,15 +13,15 @@
                         <span class="li-article-taxonomies">
                             {{ with $categories }}
                                 Posted in
-                                {{ range $categories }}
-                                    <a href="{{ $baseurl }}/categories/{{ . | urlize }}">{{ . }}</a>
+                                {{ range . }}
+                                    <a href="{{ printf "categories/%s" (. | urlize) | relURL }}">{{ . }}</a>
                                 {{ end }}
                             {{ end }}
 
                             {{ with $tags }}
                                 with tags
-                                {{ range $tags }}
-                                    <a href="{{ $baseurl }}/tags/{{ . | urlize }}">{{ . }}</a>
+                                {{ range . }}
+                                    <a href="{{ printf "tags/%s" (. | urlize) | relURL }}">{{ . }}</a>
                                 {{ end }}
                             {{ end }}
                         </span>
@@ -42,10 +35,10 @@
                         {{ .Content }}
                     </section>
                 </article>
+                {{ partial "coffee.html" . }}
                 {{ partial "comment.html" . }}
             </div>
         </div>
-        {{ partial "author.html" .}}
     </div>
 {{ partial "footer.html" . }}
 {{ partial "tail.html" . }}
