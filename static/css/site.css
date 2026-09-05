@@ -1,0 +1,75 @@
+/**
+ * Site-wide overrides for r-econometrics.
+ *
+ * Loaded on every page, after the liquorice theme stylesheet, so the vendored
+ * theme in themes/liquorice stays untouched and upgradeable. Rules here are
+ * scoped with the `.li-body` class that the theme puts on <body>, which raises
+ * their specificity just enough to beat the theme's own grid declarations.
+ */
+
+/** Fluid grid below the tablet breakpoint ***********************************/
+/*
+ * The Skeleton grid liquorice is built on predates responsive design: below
+ * 768px it pins the container to a fixed 300px (420px in landscape), which
+ * leaves wide dead margins on any modern phone. Make it fill the viewport
+ * instead, minus a gutter, and let the columns stack at full width.
+ */
+@media only screen and (max-width: 767px) {
+    .li-body .container {
+        width: auto;
+        padding-left: 20px;
+        padding-right: 20px;
+        box-sizing: border-box;
+    }
+
+    .li-body .container .column,
+    .li-body .container .columns,
+    .li-body .container .one.column,
+    .li-body .container .one.columns,
+    .li-body .container .two.columns,
+    .li-body .container .three.columns,
+    .li-body .container .four.columns,
+    .li-body .container .five.columns,
+    .li-body .container .six.columns,
+    .li-body .container .seven.columns,
+    .li-body .container .eight.columns,
+    .li-body .container .nine.columns,
+    .li-body .container .ten.columns,
+    .li-body .container .eleven.columns,
+    .li-body .container .twelve.columns,
+    .li-body .container .thirteen.columns,
+    .li-body .container .fourteen.columns,
+    .li-body .container .fifteen.columns,
+    .li-body .container .sixteen.columns,
+    .li-body .container .one-third.column,
+    .li-body .container .two-thirds.column {
+        width: auto;
+        float: none;
+        display: block;
+        margin-left: 0;
+        margin-right: 0;
+    }
+}
+
+/** Keep wide content from scrolling the whole page **************************/
+/*
+ * With a fluid container, anything wider than the viewport would otherwise
+ * push the page sideways. Knitted R output is the usual culprit: console
+ * listings run to several hundred characters, and regression output is laid
+ * out in tables.
+ */
+.li-body pre {
+    overflow-x: auto;
+}
+
+.li-body .li-article table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+@media only screen and (max-width: 767px) {
+    .li-body pre {
+        padding: 16px;
+    }
+}

@@ -1,0 +1,390 @@
+/**
+ * Home page styles for r-econometrics.
+ *
+ * Loaded only on the landing page (see layouts/partials/head.html). It sits on
+ * top of the liquorice theme stylesheet and reuses its grid container, so the
+ * page keeps the same measure as the rest of the site.
+ */
+
+.li-home {
+    --li-ink: #202020;
+    --li-body: #484644;
+    --li-muted: #77736f;
+    --li-rule: #e3e0dc;
+    --li-tint: #f7f6f4;
+    --li-accent: #276dc3;      /* the blue of the R logo */
+    --li-accent-dark: #1c5296;
+}
+
+.li-home h1,
+.li-home h2,
+.li-home h3 {
+    color: var(--li-ink);
+    margin: 0;
+}
+
+.li-home p {
+    color: var(--li-body);
+}
+
+.li-home a {
+    color: var(--li-accent);
+    font-weight: normal;
+}
+
+.li-home a:hover,
+.li-home a:active {
+    color: var(--li-accent-dark);
+}
+
+/** Sections ****************************************************************/
+.li-section {
+    padding: 56px 0;
+}
+
+.li-band {
+    background-color: var(--li-tint);
+    border-top: 1px solid var(--li-rule);
+    border-bottom: 1px solid var(--li-rule);
+    padding: 56px 0;
+}
+
+.li-section-title {
+    font-size: 1.6em;
+    font-weight: 300;
+    letter-spacing: -0.01em;
+    margin-bottom: 28px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--li-rule);
+}
+
+.li-section-more {
+    float: right;
+    font-size: 0.55em;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    line-height: 2.6;
+}
+
+/** Hero ********************************************************************/
+.li-hero {
+    padding: 72px 0 64px 0;
+}
+
+.li-eyebrow {
+    color: var(--li-accent);
+    font-size: 0.75em;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin: 0 0 14px 0;
+}
+
+.li-hero-title {
+    font-size: 3em;
+    font-weight: 300;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    max-width: 15em;
+}
+
+.li-hero-lead {
+    font-size: 1.2em;
+    line-height: 1.6;
+    max-width: 34em;
+    margin: 20px 0 0 0;
+}
+
+.li-hero-actions {
+    margin: 28px 0 0 0;
+}
+
+.li-hero-meta {
+    color: var(--li-muted);
+    font-size: 0.85em;
+    margin: 20px 0 0 0;
+}
+
+/** Buttons *****************************************************************/
+.li-btn,
+.li-home a.li-btn {
+    display: inline-block;
+    margin: 0 10px 10px 0;
+    padding: 12px 22px;
+    border: 1px solid var(--li-ink);
+    border-radius: 3px;
+    color: var(--li-ink);
+    font-size: 0.95em;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.li-btn:hover,
+.li-home a.li-btn:hover {
+    background-color: var(--li-tint);
+    color: var(--li-ink);
+}
+
+.li-btn-primary,
+.li-home a.li-btn-primary {
+    background-color: var(--li-accent);
+    border-color: var(--li-accent);
+    color: #fff;
+}
+
+.li-btn-primary:hover,
+.li-home a.li-btn-primary:hover {
+    background-color: var(--li-accent-dark);
+    border-color: var(--li-accent-dark);
+    color: #fff;
+}
+
+.li-link-arrow,
+.li-home a.li-link-arrow {
+    font-size: 0.9em;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.li-link-arrow::after {
+    content: " \2192";
+}
+
+/** Getting-started steps ***************************************************/
+.li-steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 28px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    counter-reset: none;
+}
+
+.li-step {
+    list-style: none;
+    margin: 0;
+}
+
+.li-step-num {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    margin-bottom: 12px;
+    border-radius: 50%;
+    background-color: var(--li-ink);
+    color: #fff;
+    font-size: 0.85em;
+    font-weight: 600;
+    line-height: 30px;
+    text-align: center;
+}
+
+.li-step-title {
+    font-size: 1.15em;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.li-home .li-step-title a {
+    color: var(--li-ink);
+    text-decoration: none;
+}
+
+.li-home .li-step-title a:hover {
+    color: var(--li-accent);
+}
+
+.li-step-text {
+    font-size: 0.95em;
+    line-height: 1.6;
+    margin: 0 0 10px 0;
+}
+
+/** Topic cards *************************************************************/
+.li-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.li-home a.li-card {
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+    border: 1px solid var(--li-rule);
+    border-radius: 4px;
+    background-color: #fff;
+    color: var(--li-body);
+    text-decoration: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.li-home a.li-card:hover {
+    border-color: var(--li-accent);
+    box-shadow: 0 6px 18px rgba(32, 32, 32, 0.08);
+    transform: translateY(-2px);
+}
+
+.li-card-tag {
+    color: var(--li-muted);
+    font-size: 0.7em;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.li-card-title {
+    font-size: 1.25em;
+    font-weight: 600;
+    margin: 10px 0 0 0;
+}
+
+.li-card-blurb {
+    flex: 1 1 auto;
+    font-size: 0.93em;
+    line-height: 1.6;
+    margin: 10px 0 18px 0;
+}
+
+.li-card-foot {
+    color: var(--li-muted);
+    font-size: 0.82em;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.li-card-arrow {
+    color: var(--li-accent);
+    float: right;
+    font-weight: 600;
+    transition: transform 0.15s ease;
+}
+
+/** Callout *****************************************************************/
+.li-callout {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 28px;
+    padding: 28px 32px;
+    border: 1px solid var(--li-rule);
+    border-left: 4px solid var(--li-accent);
+    border-radius: 4px;
+    background-color: var(--li-tint);
+}
+
+.li-callout-title {
+    font-size: 1.2em;
+    font-weight: 600;
+}
+
+.li-callout-text {
+    font-size: 0.95em;
+    line-height: 1.6;
+    margin: 8px 0 0 0;
+    max-width: 44em;
+}
+
+.li-callout .li-btn {
+    flex: none;
+    margin: 0;
+}
+
+/** Blog teasers ************************************************************/
+.li-posts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 28px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.li-post {
+    list-style: none;
+    margin: 0;
+}
+
+.li-post-date {
+    color: var(--li-muted);
+    font-size: 0.8em;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.li-post-title {
+    font-size: 1.1em;
+    font-weight: 600;
+    margin: 8px 0;
+}
+
+.li-home .li-post-title a {
+    color: var(--li-ink);
+    text-decoration: none;
+}
+
+.li-home .li-post-title a:hover {
+    color: var(--li-accent);
+}
+
+.li-post-text {
+    font-size: 0.93em;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/** About *******************************************************************/
+.li-prose {
+    font-size: 1em;
+    line-height: 1.7;
+    max-width: 42em;
+}
+
+.li-prose p {
+    margin-top: 0;
+}
+
+/** Mobile ******************************************************************/
+@media only screen and (max-width: 767px) {
+    .li-hero {
+        padding: 40px 0 32px 0;
+    }
+
+    .li-hero-title {
+        font-size: 2em;
+    }
+
+    .li-hero-lead {
+        font-size: 1.05em;
+    }
+
+    .li-section,
+    .li-band {
+        padding: 36px 0;
+    }
+
+    .li-section-more {
+        float: none;
+        display: block;
+        line-height: 1.6;
+        margin-top: 8px;
+    }
+
+    .li-callout {
+        display: block;
+    }
+
+    .li-callout .li-btn {
+        margin-top: 20px;
+    }
+
+    .li-btn,
+    .li-home a.li-btn {
+        display: block;
+        margin-right: 0;
+        text-align: center;
+    }
+}

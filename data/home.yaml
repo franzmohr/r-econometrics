@@ -1,0 +1,74 @@
+# Content of the home page. Edit here instead of touching layouts/index.html.
+
+hero:
+  headline: "Learn econometrics by actually doing it in R"
+  lead: >-
+    A free, hands-on companion to your econometrics course. Every topic comes with
+    runnable R code, real data and plots you can reproduce line by line. The focus is
+    less on the math behind the methods and more on getting them to work.
+  primary:
+    text: "Start with the basics"
+    url: "/rbasicsintro"
+  secondary:
+    text: "Browse all topics"
+    url: "#topics"
+
+# The three-step path for first-time visitors.
+start:
+  - step: "1"
+    title: "Set up R and RStudio"
+    text: "Install both, learn what the four panes are for and how to keep a workspace tidy."
+    url: "/rbasics/installation"
+    cta: "Install R"
+  - step: "2"
+    title: "Get data into shape"
+    text: "Import data sets, reshape them with dplyr and plot what you find with ggplot2."
+    url: "/rbasics/dplyrintro"
+    cta: "Wrangle data"
+  - step: "3"
+    title: "Run your first regression"
+    text: "Estimate an OLS model, read the summary output and test whether it holds up."
+    url: "/methods/ols"
+    cta: "Estimate OLS"
+
+# Topic cards. `section` is the Hugo content section used to count articles.
+topics:
+  - name: "R(eal) Basics"
+    url: "/rbasicsintro"
+    section: "rbasics"
+    tag: "Beginner"
+    blurb: "Installation, the structure of the program, importing data, dplyr and ggplot2 — everything you need before the econometrics starts."
+  - name: "Econometric Methods"
+    url: "/methodsintro"
+    section: "methods"
+    tag: "Core"
+    blurb: "OLS, hypothesis testing and heteroskedasticity-robust standard errors, worked through with examples from Wooldridge's textbook."
+  - name: "Time Series Topics"
+    url: "/timeseriesintro"
+    section: "timeseries"
+    tag: "Advanced"
+    blurb: "Stationarity and unit roots, VAR and VEC models, and a long series on Bayesian estimation of macroeconomic time series models."
+  - name: "bvartools"
+    url: "/bvartools"
+    section: ""
+    tag: "R package"
+    blurb: "Guides to the author's own R package for the Bayesian estimation of vector autoregressive models, from a simple BVAR upwards."
+  - name: "Network Analysis"
+    url: "/networksintro"
+    section: "networks"
+    tag: "Applied"
+    blurb: "Turn relational data into graphs with igraph, compute the usual summary statistics and visualise the result with ggraph."
+  - name: "Reproduction Projects"
+    url: "/reproductionintro"
+    section: "reproduction"
+    tag: "Papers"
+    blurb: "Published papers and textbook chapters re-estimated in R, from Cincera (1997) to the Bayesian Econometric Methods exercises."
+
+# Highlighted download shown below the topic grid.
+callout:
+  title: "Introduction to R — the short version"
+  text: >-
+    An under-30-page introduction that walks through one realistic workflow and the
+    packages dplyr, ggplot2 and openxlsx. Free PDF, no sign-up.
+  url: "/2019-mohr-introduction-r.pdf"
+  cta: "Download the PDF"

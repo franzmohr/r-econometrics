@@ -1,22 +1,138 @@
 {{ partial "head.html" . }}
 {{ partial "header.html" . }}
 
-    <div class="container">
-        <div class="row">
-            <div class="sixteen columns">
-                <article class="li-article">
-                    <header class="li-article-header">
-                        <h1 class="li-article-title">{{ .Title }}</h1>
-                        <time class="li-article-date">
-                          {{ $.Param "author" }}, Created: {{ .Date.Format "January 2, 2006" }}, Last update: {{ .Lastmod.Format "January 2, 2006" }}
-                        </time>
-                    </header>
-                    <section>
-                        {{ .Content }}
-                    </section>
-                </article>
+{{ $home := .Site.Data.home }}
+{{/* Number of published articles across the topic sections, for the hero strapline. */}}
+{{ $articles := 0 }}
+{{ range $home.topics }}
+    {{ with .section }}
+        {{ $articles = add $articles (len (where site.RegularPages "Section" .)) }}
+    {{ end }}
+{{ end }}
+
+<main class="li-home">
+
+    <section class="li-hero">
+        <div class="container">
+            <div class="row">
+                <div class="sixteen columns">
+                    <p class="li-eyebrow">R for econometrics</p>
+                    <h1 class="li-hero-title">{{ $home.hero.headline }}</h1>
+                    <p class="li-hero-lead">{{ $home.hero.lead }}</p>
+                    <p class="li-hero-actions">
+                        <a class="li-btn li-btn-primary" href="{{ $home.hero.primary.url }}">{{ $home.hero.primary.text }}</a>
+                        <a class="li-btn" href="{{ $home.hero.secondary.url }}">{{ $home.hero.secondary.text }}</a>
+                    </p>
+                    <p class="li-hero-meta">{{ $articles }} articles &middot; free and without registration &middot; every example runs on your own machine</p>
+                </div>
             </div>
         </div>
-    </div>
+    </section>
+
+    <section class="li-band">
+        <div class="container">
+            <div class="row">
+                <div class="sixteen columns">
+                    <h2 class="li-section-title">New here? Three steps to your first regression</h2>
+                    <ol class="li-steps">
+                        {{ range $home.start }}
+                            <li class="li-step">
+                                <span class="li-step-num">{{ .step }}</span>
+                                <h3 class="li-step-title"><a href="{{ .url }}">{{ .title }}</a></h3>
+                                <p class="li-step-text">{{ .text }}</p>
+                                <a class="li-link-arrow" href="{{ .url }}">{{ .cta }}</a>
+                            </li>
+                        {{ end }}
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="topics" class="li-section">
+        <div class="container">
+            <div class="row">
+                <div class="sixteen columns">
+                    <h2 class="li-section-title">Topics</h2>
+                    <div class="li-cards">
+                        {{ range $home.topics }}
+                            {{ $count := 0 }}
+                            {{ with .section }}{{ $count = len (where site.RegularPages "Section" .) }}{{ end }}
+                            <a class="li-card" href="{{ .url }}">
+                                <span class="li-card-tag">{{ .tag }}</span>
+                                <h3 class="li-card-title">{{ .name }}</h3>
+                                <p class="li-card-blurb">{{ .blurb }}</p>
+                                <span class="li-card-foot">
+                                    {{ if $count }}{{ $count }} article{{ if ne $count 1 }}s{{ end }}{{ else }}Guides{{ end }}
+                                    <span class="li-card-arrow" aria-hidden="true">&rarr;</span>
+                                </span>
+                            </a>
+                        {{ end }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="li-section">
+        <div class="container">
+            <div class="row">
+                <div class="sixteen columns">
+                    <div class="li-callout">
+                        <div class="li-callout-body">
+                            <h3 class="li-callout-title">{{ $home.callout.title }}</h3>
+                            <p class="li-callout-text">{{ $home.callout.text }}</p>
+                        </div>
+                        <a class="li-btn li-btn-primary" href="{{ $home.callout.url }}" target="_blank" rel="noopener">{{ $home.callout.cta }}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {{ $posts := first 3 (where site.RegularPages "Section" "post") }}
+    {{ with $posts }}
+    <section class="li-band">
+        <div class="container">
+            <div class="row">
+                <div class="sixteen columns">
+                    <h2 class="li-section-title">
+                        From the blog
+                        <a class="li-section-more" href="/post">All posts &rarr;</a>
+                    </h2>
+                    <ul class="li-posts">
+                        {{ range . }}
+                            <li class="li-post">
+                                <time class="li-post-date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "January 2, 2006" }}</time>
+                                <h3 class="li-post-title"><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
+                                <p class="li-post-text">{{ with .Params.description }}{{ . }}{{ else }}{{ .Summary | plainify | truncate 160 }}{{ end }}</p>
+                            </li>
+                        {{ end }}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+    {{ end }}
+
+    <section class="li-section li-about">
+        <div class="container">
+            <div class="row">
+                <div class="sixteen columns">
+                    <h2 class="li-section-title">About this site</h2>
+                    <div class="li-prose">
+                        {{ .Content }}
+                    </div>
+                    <p class="li-hero-actions">
+                        <a class="li-btn" href="/about">About and disclaimer</a>
+                        <a class="li-btn" href="/links">Further resources</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</main>
+
 {{ partial "footer.html" . }}
 {{ partial "tail.html" . }}
