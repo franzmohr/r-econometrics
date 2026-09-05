@@ -320,7 +320,7 @@ summary(lm.e8.18u)$r.squared * 88</code></pre>
 </div>
 <div id="example-8.5" class="section level3">
 <h3>Example 8.5</h3>
-<p>To obtain the test statistic of the the White test, estimate the model, obtain its squared residuals, fitted values and squared fitted values and regress the first on the latter ones. Then, get the R-Squared and multiply it by the number of used observations to get the LM-statistic and the p-value.</p>
+<p>To obtain the test statistic of the White test, estimate the model, obtain its squared residuals, fitted values and squared fitted values and regress the first on the latter ones. Then, get the R-Squared and multiply it by the number of used observations to get the LM-statistic and the p-value.</p>
 <pre class="r"><code>data(&quot;hprice1&quot;)
 
 lm.e8.18 &lt;- lm(lprice ~ llotsize + lsqrft + bdrms, data = hprice1)

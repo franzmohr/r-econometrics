@@ -6,7 +6,7 @@ date: "2018-10-04"
 
 
 
-<p>In R the function for basic linear regression models is <code>lm</code>, which is short for <em>linear model</em>. Its first argument is a formula of the regression model, which has the form <code>y ~ a</code>. The tilde between <em>y</em> and <em>a</em> indicates that <em>y</em> is the dependent variable and <em>a</em> is the explanatory variable. It is also possible to add a further explanatory variable - for example <em>b</em> - to the regression by adding a plus sign followed by the the name of the additional variable to the formula. In our example this would result in <code>y ~ a + b</code>. But since this chapter only covers models with a single explanatory variable, we postpone this issue to the next chapter.</p>
+<p>In R the function for basic linear regression models is <code>lm</code>, which is short for <em>linear model</em>. Its first argument is a formula of the regression model, which has the form <code>y ~ a</code>. The tilde between <em>y</em> and <em>a</em> indicates that <em>y</em> is the dependent variable and <em>a</em> is the explanatory variable. It is also possible to add a further explanatory variable - for example <em>b</em> - to the regression by adding a plus sign followed by the name of the additional variable to the formula. In our example this would result in <code>y ~ a + b</code>. But since this chapter only covers models with a single explanatory variable, we postpone this issue to the next chapter.</p>
 <p>Beside the formula, the <code>lm</code> function also requires you to specify the data used for the estimation. This can be done in multiple ways, but it is quite common practise to specify a data frame as the <em>data</em> argument, e.g. <code>data = my_data_frame</code>, which contains the variables that are mentioned in the model formula.</p>
 <p>With this knowledge we can already estimate a simple model. In the textbook this is a regression of the variable <em>salary</em> on the variable <em>roe</em>, where both variables are contained in the <em>ceosal1</em> data set. We can access this data set by loading the <em>wooldridge</em> data package with <code>library(wooldridge</code> and then load the sample with <code>data(&quot;ceosal1&quot;)</code>:</p>
 <pre class="r"><code>library(wooldridge) # Load the data package
@@ -139,7 +139,7 @@ summary(lm_1)</code></pre>
                    salaryhat = NA,
                    uhat = NA)</code></pre>
 <p><code>data.frame</code> is the function which generates the frame. <em>roe</em> is the label of the column which is defined as the value of <em>ceosal1$salary</em> at the positions 1 to 15, i.e. <code>[1:15]</code>. The structure is the same for the following part with <em>salary</em>. <em>salaryhat</em> and <em>uhat</em> are not defined and <code>NA</code> (<strong>n</strong>ot <strong>a</strong>vailable) is used to indicate that. <code>NA</code> is in general the indicator of missing values in R.</p>
-<p>As a next step we paste the fitted values and the residuals from the regression into the data frame. Therefore, we seperately paste the first 15 fitted values (<code>lm_1$fitted.values[1:15]</code>) from the regression into the column <em>salaryhat</em> (<code>df_1$salaryhat</code>). The same method applies to the resudials. Finally, display the table with <em>df_1</em></p>
+<p>As a next step we paste the fitted values and the residuals from the regression into the data frame. Therefore, we separately paste the first 15 fitted values (<code>lm_1$fitted.values[1:15]</code>) from the regression into the column <em>salaryhat</em> (<code>df_1$salaryhat</code>). The same method applies to the resudials. Finally, display the table with <em>df_1</em></p>
 <pre class="r"><code>df_1$salaryhat &lt;- lm_1$fitted.values[1:15]
 df_1$uhat &lt;- lm_1$resid[1:15]
 df_1</code></pre>
@@ -185,7 +185,7 @@ lm_1$coefficients[2]</code></pre>
 <p><strong>Example 2.9</strong></p>
 <p>Repeat the script from example 2.5 and check the multiple R-squared. It states 0.8561, just like in the book.</p>
 <p><strong>Example 2.10 (taking logs)</strong></p>
-<p>The example uses logged values as dependend variable. How do we get them? Just type</p>
+<p>The example uses logged values as dependent variable. How do we get them? Just type</p>
 <pre class="r"><code>data(&quot;wage1&quot;)
 
 lwage &lt;- log(wage1$wage)</code></pre>

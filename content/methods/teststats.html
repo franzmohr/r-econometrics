@@ -181,7 +181,7 @@ bptest(model)</code></pre>
 ## data:  model
 ## BP = 19.84, df = 3, p-value = 0.0001832</code></pre>
 <ul>
-<li>The <a href="https://en.wikipedia.org/wiki/White_test" target="_blank">White test</a> regresses the squared residuals from the original regression model onto a set of regressors that contain the original regressors along with their squares and cross-products. Since it builds on the Breusch-Pagan test, the <code>bptest</code> can be used to perform the White test by adding the dependend variables and its squared values to the estimation formula:</li>
+<li>The <a href="https://en.wikipedia.org/wiki/White_test" target="_blank">White test</a> regresses the squared residuals from the original regression model onto a set of regressors that contain the original regressors along with their squares and cross-products. Since it builds on the Breusch-Pagan test, the <code>bptest</code> can be used to perform the White test by adding the dependent variables and its squared values to the estimation formula:</li>
 </ul>
 <pre class="r"><code>bptest(model, ~ lwage + I(lwage^2), data = wage1)</code></pre>
 <pre><code>## 

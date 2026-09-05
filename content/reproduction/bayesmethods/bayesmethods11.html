@@ -212,7 +212,7 @@ x &lt;- runif(n)
 # Generate random draws of errors
 epsilon &lt;- rnorm(n, 0, 1 / h)
 
-# Calculate depended variable
+# Calculate dependent variable
 y &lt;- beta1 + beta2 * x + epsilon
 y &lt;- matrix(y) # Transform to matrix format for later
 
