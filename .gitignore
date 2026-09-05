@@ -11,3 +11,4 @@ index.Rmd
 *.zip
 *.mc
 *.rda
+.claude/
