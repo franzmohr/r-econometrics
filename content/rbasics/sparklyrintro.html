@@ -1,0 +1,111 @@
+---
+title: "Introduction to sparklyr"
+author: "Franz X. Mohr"
+date: "2026-09-05"
+tags:
+  - sparklyr
+  - spark
+  - r
+description: "A short introduction to data manipulation in R using the sparklyr package. It presents the connection to Apache Spark and illustrates the use of the main dplyr verbs on a Spark table with a simple example."
+---
+
+
+
+<p>The cleaning and transformation of data belong to the most time consuming parts of any economic analysis. As long as a data set fits into the memory of your computer, packages like <code>dplyr</code> or <code>data.table</code> are all you need to get this job done. But once it does not, R alone reaches its limits, because it holds all its objects in memory. This is where <a href="https://spark.apache.org/" target="_blank">Apache Spark</a> comes into play. Spark is a computing engine, which distributes both the data and the calculations over the machines of a cluster – or over the cores of a single computer. The <code>sparklyr</code> package is the interface between R and Spark.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> Its most attractive feature for R users is that it translates the well-known verbs of <code>dplyr</code> into Spark SQL. This means that you can keep writing the code you already know and let it run on data which would never fit into your RAM. In the following I use the same example as in my introductions to <a href="/rbasics/dplyrintro"><code>dplyr</code></a> and <a href="/rbasics/datatableintro"><code>data.table</code></a>, so that the three approaches can be compared directly.</p>
+<p>For this illustration we use data from the World Penn Tables, which come with the <code>pwt9</code> package. In particular, we use the 9.0 version of the data set, which can be loaded with <code>data("pwt9.0")</code>. Note that this data set is small enough to be analysed with ordinary R functions. It is only used here because it keeps the example comparable to the other two introductions.</p>
+<pre class="r"><code>library(sparklyr)
+library(dplyr) # sparklyr works with the verbs of dplyr
+
+library(pwt9) # Load data
+data(&quot;pwt9.0&quot;)</code></pre>
+<div id="installing-and-connecting-to-spark" class="section level2">
+<h2>Installing and connecting to Spark</h2>
+<p>Before Spark can be used, it has to be available on your machine. A local version can be installed directly from R with the following command, which downloads Spark into a folder in your home directory. This has to be done only once.<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></p>
+<pre class="r"><code>spark_install()</code></pre>
+<p>Every session then begins with a connection to a cluster, which is established with <code>spark_connect</code>. Its <code>master</code> argument describes where that cluster is. For a real cluster this would be its address. The value <code>"local"</code> means that Spark runs on your own computer and treats its cores as if they were the nodes of a cluster. This is the usual way to develop and test code before it is sent to a productive environment.</p>
+<pre class="r"><code>sc &lt;- spark_connect(master = &quot;local&quot;)</code></pre>
+<p>The resulting object <code>sc</code> is the connection to Spark. It is the first argument of practically every function of the package, which is why it should always be assigned to an object.</p>
+</div>
+<div id="spark-data-frames" class="section level2">
+<h2>Spark data frames</h2>
+<p><code>sparklyr</code> does not work with data.frames or tibbles, but with tables which live in Spark. A local data.frame is copied into the cluster with <code>copy_to</code>, where the <code>name</code> argument gives the name under which the table is registered in Spark:</p>
+<pre class="r"><code>pwt_spark &lt;- copy_to(sc, pwt9.0, name = &quot;pwt&quot;, overwrite = TRUE)</code></pre>
+<p>The object <code>pwt_spark</code> prints like a tibble, but it does not contain any data. It is only a reference to the table in Spark.<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a> The tables which are currently available in the cluster are listed with <code>src_tbls(sc)</code> and an existing table can be referred to again with <code>tbl(sc, "pwt")</code>.</p>
+<p>In practice, data are rarely copied from R into Spark, because a data set which requires Spark is usually far too large to be loaded into R in the first place. Instead, the data are read into the cluster directly with functions like <code>spark_read_csv(sc, name = "pwt", path = "pwt.csv")</code> or <code>spark_read_parquet</code>.</p>
+</div>
+<div id="pipes" class="section level2">
+<h2>pipes</h2>
+<p>Like <code>dplyr</code>, <code>sparklyr</code> is used together with the <em>pipe</em> operator <code>%&gt;%</code>, which forwards the output of the part to its left as input for the part to its right. If you are not familiar with it, take a look at the section on pipes in the <a href="/rbasics/dplyrintro">introduction to <code>dplyr</code></a>.</p>
+</div>
+<div id="select" class="section level2">
+<h2>select</h2>
+<p>The <code>select</code> function can be used to select the columns of a table. For example, the <code>pwt9.0</code> data set contains 47 columns. But let’s assume that we only want to analyse real GDP and the population size, i.e. variables <code>rgdpna</code> and <code>pop</code>, for all countries and all years. This can be done with the following line:</p>
+<pre class="r"><code>pwt_select &lt;- pwt_spark %&gt;% select(year, country, rgdpna, pop)</code></pre>
+<p>This is exactly the line from the introduction to <code>dplyr</code>, with the only difference that the data do not come from a tibble, but from a table in Spark. And this is the main point of the package: the verbs stay the same, no matter how large the data behind them are.</p>
+<p>However, there is one thing which does not work any more. Since a Spark table is not a data.frame, it cannot be subset with the standard R operators. <code>pwt_spark[, c("year", "country", "rgdpna", "pop")]</code> results in an error, whereas the same command would work on the original data.frame.</p>
+</div>
+<div id="rename" class="section level2">
+<h2>rename</h2>
+<p>Let’s assume we are not satisfied with the original column names and want to change them. As in <code>dplyr</code>, this is done with <code>rename</code>, where the new name of the column is followed by the equality sign and the old name of the column:</p>
+<pre class="r"><code>pwt_rename &lt;- pwt_select %&gt;%
+  rename(ctr = country,
+         gdp = rgdpna)</code></pre>
+<p>Note that it is not necessary to write the commands in one line. In fact, it is good practise to begin a new code line after a pipe.</p>
+</div>
+<div id="filter" class="section level2">
+<h2>filter</h2>
+<p>Observations are selected with the <code>filter</code> function, where the conditions can be added consecutively and separated with a comma. Each condition can be regarded as an <em>and</em> operator. <em>Or</em> conditions must be specified in the same line. The following code uses the data in <code>pwt_rename</code> and omits all observations, where the column <em>gdp</em> contains <code>NA</code> values, where the year is lower than 1980 and where the country name is not Austria, Germany or France.<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a></p>
+<pre class="r"><code>pwt_filter &lt;- pwt_rename %&gt;%
+  filter(!is.na(gdp), # Omit observations with NA values in column &quot;gdp&quot;
+         year &gt;= 1980, # Drop observations before 1980
+         ctr %in% c(&quot;Austria&quot;, &quot;Germany&quot;, &quot;France&quot;)) # Only use obs for AT, DE and FR</code></pre>
+<p>Behind the scenes these conditions are not evaluated by R, but translated into the <code>WHERE</code> clause of a SQL query, which is then executed by Spark. This also implies a limitation you should be aware of: only those R functions can be used, for which <code>sparklyr</code> knows a Spark counterpart. Basic arithmetic, the usual mathematical and string functions and the aggregation functions are covered, but a function from an arbitrary R package is not. If a function cannot be translated, you will get an error.</p>
+</div>
+<div id="mutate" class="section level2">
+<h2>mutate</h2>
+<p>The <code>mutate</code> function can be used to change the content of an existing column or to generate a new one. In our example we calculate the GDP per capita ratio for the three countries in the filtered data set:</p>
+<pre class="r"><code>pwt_mutate &lt;- pwt_filter %&gt;%
+  mutate(gdp_pc = gdp / pop)</code></pre>
+</div>
+<div id="group_by" class="section level2">
+<h2>group_by</h2>
+<p>As in <code>dplyr</code>, the <code>group_by</code> function tells Spark to execute the following commands for each distinct value in the specified columns separately. This should become more clear when we look more closely at the following function…</p>
+</div>
+<div id="summarise" class="section level2">
+<h2>summarise</h2>
+<p>Sometimes it might be useful to calculate aggregate values over a group of observations. This can be done with the <code>summarise</code> function in combination with the <code>group_by</code> function. The following code calculates aggregate GDP and population for each year, i.e. for the region of Austria, France and Germany.</p>
+<pre class="r"><code>data_summarise &lt;- pwt_filter %&gt;%
+  group_by(year) %&gt;%
+  summarise(gdp = sum(gdp),
+            pop = sum(pop)) %&gt;%
+  ungroup()</code></pre>
+<p>This is the kind of operation which benefits most from Spark. Each node of the cluster can aggregate the part of the data it holds and only the comparatively small partial results have to be combined afterwards.</p>
+</div>
+<div id="laziness-and-collect" class="section level2">
+<h2>Laziness and collect</h2>
+<p>Up to this point not a single number has been calculated. <code>sparklyr</code> is <em>lazy</em>: it collects the verbs, translates them into one SQL query and only sends that query to Spark when the result is actually needed. This is a substantial advantage, because it allows Spark to optimise all the steps together instead of executing them one after another. The query which was built up in the meantime can be inspected with</p>
+<pre class="r"><code>data_summarise %&gt;% show_query()</code></pre>
+<p>The result of a query is brought from the cluster into the R session with <code>collect</code>, which returns an ordinary tibble that can be used like any other object in R:</p>
+<pre class="r"><code>data_local &lt;- data_summarise %&gt;% collect()</code></pre>
+<p>Since <code>collect</code> loads its result into the memory of your computer, it should only be used for results which are small enough to fit in there. But this is exactly the way Spark is usually applied: the expensive filtering and aggregation happens in the cluster and only the small final result is pulled back into R, where it is plotted with <code>ggplot2</code> or written into a report.</p>
+<p>If an intermediate result is needed repeatedly, <code>compute</code> stores it as a table in Spark, so that the steps up to that point do not have to be calculated again:</p>
+<pre class="r"><code>pwt_cached &lt;- pwt_filter %&gt;% compute(&quot;pwt_filtered&quot;)</code></pre>
+</div>
+<div id="disconnecting" class="section level2">
+<h2>Disconnecting</h2>
+<p>At the end of a session the connection should be closed, which frees the resources of the cluster:</p>
+<pre class="r"><code>spark_disconnect(sc)</code></pre>
+<p>After that, objects like <code>pwt_spark</code> become useless, because the tables they refer to do not exist any more. So everything you want to keep has to be collected before, or written to disk from within Spark with functions like <code>spark_write_csv</code> or <code>spark_write_parquet</code>.</p>
+<p>Beside the verbs presented above there are two further families of functions you should know when you work with <code>sparklyr</code>. The functions which begin with <code>sdf_</code> operate on Spark data frames directly and cover things for which there is no <code>dplyr</code> verb, for example <code>sdf_nrow</code> or <code>sdf_describe</code>. The functions which begin with <code>ml_</code> give access to the machine learning library of Spark, so that a model like <code>ml_linear_regression</code> can be estimated on data which never enter the memory of R.</p>
+<p>Finally, a word of caution. Spark comes with a considerable overhead. Starting a session, distributing the data and translating the queries all take time, which is why an analysis of a moderately sized data set will almost always be faster with <code>dplyr</code> or <code>data.table</code> on a single machine. Spark becomes the better choice when the data do not fit into memory any more – and if you have reached that point, the fact that you can keep using the verbs of <code>dplyr</code> is worth a lot. There is also plenty of additional material out there, which assists in becoming more familiar with the package. The <a href="https://spark.posit.co/" target="_blank">website of the package</a> contains a large collection of examples and, as usual, I find so-called <em>cheatsheets</em> especially useful.<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a></p>
+</div>
+<div class="footnotes footnotes-end-of-document">
+<hr />
+<ol>
+<li id="fn1"><p>More information can be found on the <a href="https://spark.posit.co/" target="_blank">package’s website</a>. If your data fit into the memory of your computer, the <code>dplyr</code> and the <code>data.table</code> packages are the more convenient choices. They are introduced <a href="/rbasics/dplyrintro">here</a> and <a href="/rbasics/datatableintro">here</a>.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>Spark runs on the Java virtual machine. Therefore, a Java Development Kit must be installed and the environment variable <code>JAVA_HOME</code> must point to it. The versions which can be installed are listed by <code>spark_available_versions()</code>. Note that not every version of Spark works with every release of Java.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+<li id="fn3"><p>Note that Spark does not know the factor format of R. Factor columns like <em>country</em> become character columns when they are copied into the cluster.<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
+<li id="fn4"><p>For completeness possible signs for value comparison are <code>==</code>, <code>&lt;</code>, <code>&lt;=</code>, <code>&gt;</code>, <code>&gt;=</code> and <code>!=</code> for checking if the value on the left side of the sign is equal, lower, lower or equal, larger, larger or equal and different, respectively, from the value on the right side. The operator <code>%in%</code> can be used to determine, whether the object to its left is in a vector to its right.<a href="#fnref4" class="footnote-back">↩︎</a></p></li>
+<li id="fn5"><p>Cheatsheets are compact summaries for the use of packages. They can be found on the Posit website: <a href="https://posit.co/resources/cheatsheets/">https://posit.co/resources/cheatsheets/</a>.<a href="#fnref5" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
