@@ -85,6 +85,17 @@ data(&quot;pwt9.0&quot;)</code></pre>
 <h2>Laziness and collect</h2>
 <p>Up to this point not a single number has been calculated. <code>sparklyr</code> is <em>lazy</em>: it collects the verbs, translates them into one SQL query and only sends that query to Spark when the result is actually needed. This is a substantial advantage, because it allows Spark to optimise all the steps together instead of executing them one after another. The query which was built up in the meantime can be inspected with</p>
 <pre class="r"><code>data_summarise %&gt;% show_query()</code></pre>
+<pre><code>## &lt;SQL&gt;
+## SELECT `year`, SUM(`gdp`) AS `gdp`, SUM(`pop`) AS `pop`
+## FROM (
+##   SELECT `year`, `country` AS `ctr`, `rgdpna` AS `gdp`, `pop`
+##   FROM `pwt`
+##   WHERE
+##     (NOT((`rgdpna` IS NULL))) AND
+##     (`year` &gt;= 1980.0) AND
+##     (`country` IN (&#39;Austria&#39;, &#39;Germany&#39;, &#39;France&#39;))
+## ) AS `q01`
+## GROUP BY `year`</code></pre>
 <p>The result of a query is brought from the cluster into the R session with <code>collect</code>, which returns an ordinary tibble that can be used like any other object in R:</p>
 <pre class="r"><code>data_local &lt;- data_summarise %&gt;% collect()</code></pre>
 <p>Since <code>collect</code> loads its result into the memory of your computer, it should only be used for results which are small enough to fit in there. But this is exactly the way Spark is usually applied: the expensive filtering and aggregation happens in the cluster and only the small final result is pulled back into R, where it is plotted with <code>ggplot2</code> or written into a report.</p>

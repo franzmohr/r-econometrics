@@ -13,6 +13,10 @@ The cleaning and transformation of data belong to the most time consuming parts 
 
 For this illustration we use data from the World Penn Tables, which come with the `pwt9` package. In particular, we use the 9.0 version of the data set, which can be loaded with `data("pwt9.0")`. Note that this data set is small enough to be analysed with ordinary R functions. It is only used here because it keeps the example comparable to the other two introductions.
 
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+```
+
 ```{r data, message = FALSE}
 library(sparklyr)
 library(dplyr) # sparklyr works with the verbs of dplyr
@@ -31,7 +35,7 @@ spark_install()
 
 Every session then begins with a connection to a cluster, which is established with `spark_connect`. Its `master` argument describes where that cluster is. For a real cluster this would be its address. The value `"local"` means that Spark runs on your own computer and treats its cores as if they were the nodes of a cluster. This is the usual way to develop and test code before it is sent to a productive environment.
 
-```{r, eval = FALSE}
+```{r}
 sc <- spark_connect(master = "local")
 ```
 
@@ -41,7 +45,7 @@ The resulting object `sc` is the connection to Spark. It is the first argument o
 
 `sparklyr` does not work with data.frames or tibbles, but with tables which live in Spark. A local data.frame is copied into the cluster with `copy_to`, where the `name` argument gives the name under which the table is registered in Spark:
 
-```{r, eval = FALSE}
+```{r}
 pwt_spark <- copy_to(sc, pwt9.0, name = "pwt", overwrite = TRUE)
 ```
 
@@ -57,7 +61,7 @@ Like `dplyr`, `sparklyr` is used together with the *pipe* operator `%>%`, which 
 
 The `select` function can be used to select the columns of a table. For example, the `pwt9.0` data set contains 47 columns. But let's assume that we only want to analyse real GDP and the population size, i.e. variables `rgdpna` and `pop`, for all countries and all years. This can be done with the following line:
 
-```{r, eval = FALSE}
+```{r}
 pwt_select <- pwt_spark %>% select(year, country, rgdpna, pop)
 ```
 
@@ -69,7 +73,7 @@ However, there is one thing which does not work any more. Since a Spark table is
 
 Let's assume we are not satisfied with the original column names and want to change them. As in `dplyr`, this is done with `rename`, where the new name of the column is followed by the equality sign and the old name of the column:
 
-```{r, eval = FALSE}
+```{r}
 pwt_rename <- pwt_select %>%
   rename(ctr = country,
          gdp = rgdpna)
@@ -81,7 +85,7 @@ Note that it is not necessary to write the commands in one line. In fact, it is 
 
 Observations are selected with the `filter` function, where the conditions can be added consecutively and separated with a comma. Each condition can be regarded as an *and* operator. *Or* conditions must be specified in the same line. The following code uses the data in `pwt_rename` and omits all observations, where the column *gdp* contains `NA` values, where the year is lower than 1980 and where the country name is not Austria, Germany or France.[^logcomp]
 
-```{r, eval = FALSE}
+```{r}
 pwt_filter <- pwt_rename %>%
   filter(!is.na(gdp), # Omit observations with NA values in column "gdp"
          year >= 1980, # Drop observations before 1980
@@ -94,7 +98,7 @@ Behind the scenes these conditions are not evaluated by R, but translated into t
 
 The `mutate` function can be used to change the content of an existing column or to generate a new one. In our example we calculate the GDP per capita ratio for the three countries in the filtered data set:
 
-```{r, eval = FALSE}
+```{r}
 pwt_mutate <- pwt_filter %>%
   mutate(gdp_pc = gdp / pop)
 ```
@@ -107,7 +111,7 @@ As in `dplyr`, the `group_by` function tells Spark to execute the following comm
 
 Sometimes it might be useful to calculate aggregate values over a group of observations. This can be done with the `summarise` function in combination with the `group_by` function. The following code calculates aggregate GDP and population for each year, i.e. for the region of Austria, France and Germany.
 
-```{r, eval = FALSE}
+```{r}
 data_summarise <- pwt_filter %>%
   group_by(year) %>%
   summarise(gdp = sum(gdp),
@@ -121,13 +125,13 @@ This is the kind of operation which benefits most from Spark. Each node of the c
 
 Up to this point not a single number has been calculated. `sparklyr` is *lazy*: it collects the verbs, translates them into one SQL query and only sends that query to Spark when the result is actually needed. This is a substantial advantage, because it allows Spark to optimise all the steps together instead of executing them one after another. The query which was built up in the meantime can be inspected with
 
-```{r, eval = FALSE}
+```{r}
 data_summarise %>% show_query()
 ```
 
 The result of a query is brought from the cluster into the R session with `collect`, which returns an ordinary tibble that can be used like any other object in R:
 
-```{r, eval = FALSE}
+```{r}
 data_local <- data_summarise %>% collect()
 ```
 
@@ -135,7 +139,7 @@ Since `collect` loads its result into the memory of your computer, it should onl
 
 If an intermediate result is needed repeatedly, `compute` stores it as a table in Spark, so that the steps up to that point do not have to be calculated again:
 
-```{r, eval = FALSE}
+```{r}
 pwt_cached <- pwt_filter %>% compute("pwt_filtered")
 ```
 
@@ -143,7 +147,7 @@ pwt_cached <- pwt_filter %>% compute("pwt_filtered")
 
 At the end of a session the connection should be closed, which frees the resources of the cluster:
 
-```{r, eval = FALSE}
+```{r}
 spark_disconnect(sc)
 ```
 

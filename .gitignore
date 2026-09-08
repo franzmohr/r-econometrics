@@ -12,3 +12,6 @@ index.Rmd
 *.rda
 .claude/
 .hugo_build.lock
+derby.log
+metastore_db/
+spark-warehouse/
