@@ -10,6 +10,8 @@ Cincera, M. (1997). [Patents, R&D, and technological spillovers at the firm leve
 
 Koop, G., & Korobilis, D. (2014). [A new index of financial conditions](/reproduction/2014_koop_korobilis_fci). *European Economic Review* 71, 101-116.
 
+Koop, G., León-González, R., & Strachan, R. W. (2011). [Bayesian inference in a time varying cointegration model](/reproduction/2011_koop_leongonzalez_strachan_tvcoint). *Journal of Econometrics* 165, 210-220.
+
 Sheperd, B. (2016) [The gravity model of international trade: A user guide](/reproduction/2016_sheperd_gravity).
 
 Timmer, M. P., Dietzenbacher, E., Los, B., Stehrer, R., & de Vries, G. J. (2015). [An Illustrated User Guide to the World Input–Output Database: the Case of Global Automotive Production](/reproduction/2015_timmer_wiod).

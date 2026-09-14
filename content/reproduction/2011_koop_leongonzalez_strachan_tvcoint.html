@@ -1,0 +1,381 @@
+---
+title: "Reproduction: Koop, G., León-González, R., & Strachan, R. W. (2011). Bayesian inference in a time varying cointegration model."
+author: "Franz X. Mohr"
+date: "2026-09-14"
+tags:
+  - r
+  - bvartools
+  - cointegration
+  - vecm
+  - tvp-vecm
+  - time-varying-cointegration
+  - stochastic-volatility
+  - fisher-effect
+description: "Koop, León-González and Strachan (2011) let the cointegration space of a VECM drift over time and use the model to ask whether the Fisher effect holds in UK data. This post reproduces the paper's time varying cointegrating coefficient and its comparison of model variants by predictive likelihood in R with bvartools."
+---
+
+
+
+<p>The Fisher hypothesis says that nominal interest rates move one for one with expected inflation, so that the real interest rate is stationary. In a vector error correction model (VECM) of a short-term interest rate <span class="math inline">\(r_t\)</span> and inflation <span class="math inline">\(\pi_t\)</span> it implies a single cointegrating relationship with the vector <span class="math inline">\((1, -1)&#39;\)</span>. Tests of it on long samples give mixed results, and one reason may be that the relationship is not the same throughout: a hypothesis that holds in some decades and fails in others is rejected by a model that insists on one answer for all of them.</p>
+<p>Koop, León-González and Strachan (2011) develop a VECM whose cointegration space is allowed to change over time, and use it on exactly this question. The difficulty they solve is not computational but conceptual. The natural extension of a time varying parameter VAR – letting the cointegrating vectors follow a random walk – does not work, because only the space spanned by the vectors is identified, and a random walk on a normalised vector says nothing sensible about how that space moves. Their state equation instead implies that the space in one period is centred on the space of the period before, and that its marginal prior is uniform in every period.</p>
+<p>This post reproduces the two results of the application with <a href="https://github.com/franzmohr/bvartools"><code>bvartools</code></a>: the path of the cointegrating coefficient in the paper’s preferred model (Fig. 1) and the log predictive likelihoods of the model variants (Tables 1 and 2).</p>
+<!--more-->
+<div id="the-model" class="section level2">
+<h2>The model</h2>
+<p>For an <span class="math inline">\(n \times 1\)</span> vector <span class="math inline">\(y_t\)</span> the measurement equation is</p>
+<p><span class="math display">\[\Delta y_t = \alpha_t \beta_t^{\prime} y_{t-1} + \sum_{h=1}^{l} \Gamma_{h,t} \Delta y_{t-h} + \Phi_t d_t + \varepsilon_t, \quad \varepsilon_t \sim N(0, \Omega_t),\]</span></p>
+<p>where <span class="math inline">\(\alpha_t\)</span> and <span class="math inline">\(\beta_t\)</span> are <span class="math inline">\(n \times r\)</span> and <span class="math inline">\(\beta_t\)</span> is semi-orthogonal, <span class="math inline">\(\beta_t^{\prime} \beta_t = I_r\)</span>, so that it identifies the space <span class="math inline">\(\mathfrak{p}_t = sp(\beta_t)\)</span> without restricting it. Write <span class="math inline">\(\beta_t^* = \beta_t \kappa_t\)</span> for an unrestricted matrix of cointegrating vectors, with <span class="math inline">\(\kappa_t = (\beta_t^{*\prime} \beta_t^*)^{1/2}\)</span>, and <span class="math inline">\(b_t^* = vec(\beta_t^*)\)</span>. The state equation of the cointegration space is</p>
+<p><span class="math display">\[b_t^* = \rho b_{t-1}^* + \eta_t, \quad \eta_t \sim N(0, I_{nr}), \quad b_1^* \sim N\left(0, I_{nr} \frac{1}{1 - \rho^2}\right),\]</span></p>
+<p>with <span class="math inline">\(|\rho| &lt; 1\)</span>. The paper proves that under this equation the density of <span class="math inline">\(\mathfrak{p}_t\)</span> given <span class="math inline">\(\mathfrak{p}_{t-1}\)</span> has its mode, and in Villani’s (2006) sense its mean, at <span class="math inline">\(\mathfrak{p}_{t-1}\)</span>, and that <span class="math inline">\(\rho\)</span> controls how concentrated it is around that location. A <span class="math inline">\(\rho\)</span> close to one means small changes from one period to the next, and the paper’s prior restricts it to <span class="math inline">\([0.999, 1)\)</span>.</p>
+<p>The remaining coefficients <span class="math inline">\(A_t = (\alpha_t^*, \Gamma_{1,t}, \ldots, \Gamma_{l,t}, \Phi_t)\)</span>, with <span class="math inline">\(\alpha_t^* = \alpha_t \kappa_t^{-1}\)</span> so that <span class="math inline">\(\alpha_t^* \beta_t^{*\prime} = \alpha_t \beta_t^{\prime}\)</span>, follow a random walk, and <span class="math inline">\(\Omega_t\)</span> is the stochastic volatility specification of Primiceri (2005): <span class="math inline">\(\Lambda_t \Omega_t \Lambda_t^{\prime} = \Sigma_t \Sigma_t^{\prime}\)</span> with <span class="math inline">\(\Lambda_t\)</span> unit lower triangular and <span class="math inline">\(\Sigma_t\)</span> diagonal, and random walks for the free elements of <span class="math inline">\(\Lambda_t\)</span> and the log standard deviations in <span class="math inline">\(\Sigma_t\)</span>.</p>
+<p>The application is bivariate, <span class="math inline">\(y_t = (r_t, \pi_t)^{\prime}\)</span>, with one lag of differences and an intercept. Its models differ in which of the three blocks moves: <span class="math inline">\((d_\Omega, d_\beta, d_a)\)</span> is one for a block that is time varying and zero for one that is constant, and the rank <span class="math inline">\(r\)</span> is zero, one or two. Under the Fisher hypothesis <span class="math inline">\(r = 1\)</span>, and normalising the cointegrating vector as <span class="math inline">\((1, B_t)^{\prime}\)</span> gives <span class="math inline">\(B_t = -1\)</span>.</p>
+</div>
+<div id="the-data" class="section level2">
+<h2>The data</h2>
+<p>The paper uses quarterly UK data from the IMF’s International Financial Statistics: the Treasury bill rate and CPI inflation, annualised by multiplying the quarterly log difference by 400. They are included in <code>bvartools</code> as columns <code>rs</code> and <code>Dp</code> of data set <code>uk_macrodata</code>.</p>
+<pre class="r"><code>library(&quot;bvartools&quot;)
+
+data(&quot;uk_macrodata&quot;)
+uk &lt;- uk_macrodata[, c(&quot;rs&quot;, &quot;Dp&quot;)]
+colnames(uk) &lt;- c(&quot;r&quot;, &quot;pi&quot;)
+
+plot(uk, main = &quot;UK Treasury bill rate and inflation&quot;)</code></pre>
+<p><img src="/reproduction/2011_koop_leongonzalez_strachan_tvcoint_files/figure-html/data-1.png" alt="" width="672" /></p>
+<p>With one lag of differences the estimation sample runs from 1957 Q4 to 2009 Q3, 208 observations.</p>
+</div>
+<div id="priors" class="section level2">
+<h2>Priors</h2>
+<p>Appendix A of the paper gives the priors. <code>bvartools</code> puts independent priors on the diagonal of the covariance matrices of the state equations where the paper uses Wishart priors on their inverses, so each of them is translated into gamma priors with the same degrees of freedom and scale: a diagonal element of a <span class="math inline">\(W(\nu, S^{-1})\)</span> matrix is gamma distributed with shape <span class="math inline">\(\nu / 2\)</span> and rate <span class="math inline">\(S_{ii} / 2\)</span>.</p>
+<table>
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Paper</th>
+<th><code>bvartools</code></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(\rho\)</span></td>
+<td><span class="math inline">\(U[0.999, 1)\)</span></td>
+<td><code>coint = list(rho = 0.9995, rho_min = 0.999, rho_max = 1)</code></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(a_0\)</span></td>
+<td><span class="math inline">\(N(0, 2V)\)</span>, <span class="math inline">\(V = I\)</span> except <span class="math inline">\(1 - \rho^2\)</span> for <span class="math inline">\(\alpha^*\)</span></td>
+<td><code>coef$v_i = 1 / 2</code>, loadings <span class="math inline">\(1 / (2 (1 - \rho^2))\)</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(Q^{-1}\)</span></td>
+<td><span class="math inline">\(W(\dim(a) + 2, 0.0001 I)\)</span></td>
+<td>shape <span class="math inline">\((\dim(a) + 2) / 2\)</span>, rate <span class="math inline">\(0.0001 / 2\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\lambda_0\)</span>, <span class="math inline">\(C^{-1}\)</span></td>
+<td><span class="math inline">\(N(0, 2)\)</span>, <span class="math inline">\(W(3, 0.0001)\)</span></td>
+<td>precision <span class="math inline">\(1/2\)</span>, shape <span class="math inline">\(3/2\)</span>, rate <span class="math inline">\(0.0001 / 2\)</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(h_0\)</span>, <span class="math inline">\(W^{-1}\)</span></td>
+<td><span class="math inline">\(N(0, 2 I)\)</span>, <span class="math inline">\(W(n + 2, 0.0001 I)\)</span></td>
+<td><code>sigma$v_i = 1 / 8</code>, <code>sigma$shape = 2</code>, <code>sigma$rate = 4 \times 0.0001 / 2</code></td>
+</tr>
+</tbody>
+</table>
+<p>The last row needs a word. The paper’s <span class="math inline">\(h_t\)</span> is the log of a standard deviation, while <code>bvartools</code> models the log of a variance, which is twice that. Its prior variance and the variance of its state equation are therefore four times as large.</p>
+</div>
+<div id="a-time-varying-cointegration-space" class="section level2">
+<h2>A time varying cointegration space</h2>
+<p>A VEC model with <code>tvp = TRUE</code> lets every coefficient follow a random walk, and with <code>error = "sv+covar"</code> it is the model <span class="math inline">\((d_\Omega, d_\beta, d_a) = (1, 1, 1)\)</span>. <code>add_priors</code> takes most of the priors of the table directly, and the prior of the loadings and the shape of the prior of the covariance coefficient are set afterwards.</p>
+<p>The paper’s preferred model, <span class="math inline">\((1, 1, 0)\)</span>, keeps <span class="math inline">\(A\)</span> constant while the cointegration space moves. <code>bvartools</code> has no switch for that, but it does not need one: a gamma prior on the precision of the state equation of <span class="math inline">\(A\)</span> with shape <span class="math inline">\(10^6\)</span> and rate <span class="math inline">\(10^{-6}\)</span> puts its variance at <span class="math inline">\(10^{-12}\)</span>, and the path of <span class="math inline">\(A\)</span> is then constant to seven digits. That this gives a constant coefficient rather than a chain that stops moving depends on how the state before the sample is drawn. <code>bvartools</code> integrates it out of the prior of the first period, so the level of the path is left to the data.</p>
+<p>One function sets up both models:</p>
+<pre class="r"><code>rho0 &lt;- 0.9995
+
+tvp_vec &lt;- function(data, d_omega, d_a, r = 1, iterations = 36000, burnin = 1000) {
+  sv &lt;- d_omega == 1
+  model &lt;- create_bvecmodel(data, p = 2, r = r, const = &quot;unrestricted&quot;, tvp = TRUE,
+                            error = if (sv) &quot;sv+covar&quot; else &quot;wishart&quot;,
+                            iterations = iterations, burnin = burnin)
+  sigma &lt;- if (sv) {
+    list(mu = 0, v_i = 1 / 8, shape = 2, rate = 4 * 0.0001 / 2,
+         state_variance = 0.001, offset = 1e-8)
+  } else {
+    list(df = &quot;k + 1&quot;, scale = 1)
+  }
+  model &lt;- add_priors(model,
+                      coef = list(v_i = 1 / 2, v_i_det = 1 / 2, shape = 1, rate = 1),
+                      coint = list(rho = rho0, rho_min = 0.999, rho_max = 1),
+                      sigma = sigma)
+
+  k &lt;- ncol(data)
+  n_a &lt;- nrow(model$priors$a$shape)
+  diag(model$priors$a$v_inv)[1:(k * r)] &lt;- 1 / (2 * (1 - rho0^2))
+  if (d_a == 1) {
+    model$priors$a$shape[] &lt;- (n_a + 2) / 2
+    model$priors$a$rate[] &lt;- 0.0001 / 2
+  } else {
+    model$priors$a$shape[] &lt;- 1e6
+    model$priors$a$rate[] &lt;- 1e-6
+  }
+  if (sv) {
+    model$priors$psi$shape[] &lt;- 3 / 2
+    model$priors$psi$rate[] &lt;- 0.0001 / 2
+  }
+  model
+}</code></pre>
+<p>The paper runs its sampler for 1,000 burn-in draws and keeps the next 36,000. So does this post, which takes well under a minute per model.</p>
+<pre class="r"><code>set.seed(20110816)
+model_110 &lt;- add_posterior_coefficients(add_initial_values(tvp_vec(uk, d_omega = 1, d_a = 0)))
+
+set.seed(20110816)
+model_111 &lt;- add_posterior_coefficients(add_initial_values(tvp_vec(uk, d_omega = 1, d_a = 1)))</code></pre>
+</div>
+<div id="the-cointegrating-coefficient" class="section level2">
+<h2>The cointegrating coefficient</h2>
+<p>The draws of <span class="math inline">\(b_t^*\)</span> are in <code>posterior$beta$coeffs</code>, one pair of columns per period, and the normalised coefficient <span class="math inline">\(B_t = \beta_{2,t}^* / \beta_{1,t}^*\)</span> is their ratio. It does not depend on the scale of <span class="math inline">\(b_t^*\)</span>, which is not identified.</p>
+<pre class="r"><code>b_ratio &lt;- function(model, probs = c(.05, .5, .95)) {
+  beta &lt;- model$posterior$beta$coeffs
+  odd &lt;- seq(1, ncol(beta), by = 2)
+  b &lt;- beta[, odd + 1] / beta[, odd]
+  ts(t(apply(b, 2, quantile, probs = probs)),
+     start = start(model$data$train$y), frequency = 4)
+}
+
+b_110 &lt;- b_ratio(model_110)
+b_111 &lt;- b_ratio(model_111)</code></pre>
+<p>Fig. 1 of the paper plots the posterior median of <span class="math inline">\(B_t\)</span> and its 90% credible interval for the preferred model:</p>
+<pre class="r"><code>ts.plot(b_110, lty = c(2, 1, 2), ylim = c(-7, 0), xlab = &quot;&quot;, ylab = expression(B[t]),
+        main = &quot;Model (1, 1, 0), r = 1&quot;)
+abline(h = -1)</code></pre>
+<p><img src="/reproduction/2011_koop_leongonzalez_strachan_tvcoint_files/figure-html/fig1-1.png" alt="" width="672" /></p>
+<pre class="r"><code>inside &lt;- mean(b_110[, 1] &lt;= -1 &amp; b_110[, 3] &gt;= -1)
+below &lt;- mean(b_110[, 3] &lt; -1)</code></pre>
+<p>The path has the shape of the published one. The interval is wide at the start of the sample and lies below <span class="math inline">\(-1\)</span>, closes in on <span class="math inline">\(-1\)</span> in the 1970s, drops to around <span class="math inline">\(-2\)</span> in the 1980s and 1990s, and drifts back towards <span class="math inline">\(-1\)</span> at the end of the sample. The paper reports that the interval contains <span class="math inline">\(-1\)</span> in 34% of the periods and lies entirely below it in 60%. Here the shares are 46% and 47%: the interval is somewhat narrower and higher than in the paper, but the conclusion is the same. The Fisher hypothesis holds in some periods, most clearly in the 1970s, and not in others.</p>
+<p>The model in which <span class="math inline">\(A\)</span> drifts as well gives nearly the same path:</p>
+<pre class="r"><code>ts.plot(b_111, b_110, lty = c(2, 1, 2), col = rep(c(&quot;grey60&quot;, &quot;black&quot;), each = 3),
+        ylim = c(-7, 0), xlab = &quot;&quot;, ylab = expression(B[t]),
+        main = &quot;Models (1, 1, 1) and (1, 1, 0), r = 1&quot;)
+abline(h = -1)
+legend(&quot;bottomleft&quot;, legend = c(&quot;(1, 1, 1)&quot;, &quot;(1, 1, 0)&quot;),
+       col = c(&quot;grey60&quot;, &quot;black&quot;), lty = 1, bty = &quot;n&quot;)</code></pre>
+<p><img src="/reproduction/2011_koop_leongonzalez_strachan_tvcoint_files/figure-html/fig1-111-1.png" alt="" width="672" /></p>
+</div>
+<div id="predictive-likelihoods" class="section level2">
+<h2>Predictive likelihoods</h2>
+<p>Tables 1 and 2 of the paper compare the models by the log predictive likelihood of the last 100 observations,</p>
+<p><span class="math display">\[\sum_{t = T - 99}^{T} \ln p(\Delta y_t | y_{t-1}, \ldots, y_1).\]</span></p>
+<p>Each term requires the model to be estimated on the data up to <span class="math inline">\(t - 1\)</span>. The states are then carried one period forward with their state equations, and the density of the realised <span class="math inline">\(\Delta y_t\)</span> is averaged over 7,000 draws. That is 100 estimations per model and 1,600 in all, which is too slow to run while this page is built, so the code is shown and its results are loaded afterwards. For a VEC model estimated on the data up to <span class="math inline">\(t - 1\)</span>, one term is</p>
+<pre class="r"><code>last_period &lt;- function(draws, size) {
+  if (ncol(draws) == size) draws else draws[, ncol(draws) - size + 1:size, drop = FALSE]
+}
+
+# model: a VEC model estimated on the data up to t - 1
+# obs:   the same model created on the data up to t, whose last rows hold
+#        the realised Delta y_t and the regressors of period t
+lpd_bvec &lt;- function(model, obs, tvp_beta, tvp_a) {
+  k &lt;- model$model$k
+  r &lt;- model$model$rank
+  n_obs &lt;- nrow(obs$data$train$y)
+  y &lt;- as.numeric(obs$data$train$y[n_obs, ])
+  w &lt;- as.numeric(obs$data$train$w[n_obs, ])
+  x &lt;- as.numeric(obs$data$train$x[n_obs, ])
+  post &lt;- model$posterior
+
+  a &lt;- last_period(post$a$coeffs, k * (r + length(x)))
+  if (tvp_a) {
+    a &lt;- a + matrix(rnorm(length(a)), nrow(a)) * sqrt(post$a$sigma)
+  }
+  beta &lt;- last_period(post$beta$coeffs, length(w) * r)
+  if (tvp_beta) {
+    beta &lt;- as.numeric(post$beta$rho) * beta + matrix(rnorm(length(beta)), nrow(beta))
+  }
+  prec &lt;- last_period(post$u_sigma_inv$coeffs, k * k)
+
+  ld &lt;- sapply(seq_len(nrow(a)), function(i) {
+    mu &lt;- matrix(a[i, 1:(k * r)], k) %*% crossprod(matrix(beta[i, ], length(w)), w) +
+      matrix(a[i, -(1:(k * r))], k) %*% x
+    p &lt;- matrix(prec[i, ], k)
+    -k / 2 * log(2 * pi) + 0.5 * as.numeric(determinant(p)$modulus) -
+      0.5 * as.numeric(crossprod(y - mu, p %*% (y - mu)))
+  })
+  max(ld) + log(mean(exp(ld - max(ld))))
+}</code></pre>
+<p>The models with a constant cointegration space are estimated with <code>tvp = FALSE</code> and a uniform prior on the space, <code>coint = list(v_i = 0, p_tau_i = 1)</code>, and the models with <span class="math inline">\(r = 0\)</span> as VARs in differences with <code>create_bvarmodel</code>.</p>
+<p>The results of all models are in a small file next to this page:</p>
+<pre class="r"><code>lpl &lt;- read.csv(&quot;_2011_kls_predlik.csv&quot;)
+lpl$label &lt;- paste0(&quot;r = &quot;, lpl$r, &quot;, &quot;, lpl$model)
+
+constant &lt;- lpl[lpl$label %in% c(&quot;r = 1, (0,0,0)&quot;, &quot;r = 0, (0,0)&quot;), ]
+constant[, c(&quot;label&quot;, &quot;paper&quot;, &quot;lpl100&quot;, &quot;lpl110&quot;)]</code></pre>
+<pre><code>##             label  paper lpl100 lpl110
+## 8  r = 1, (0,0,0) -437.1 -392.9 -437.9
+## 17   r = 0, (0,0) -442.5 -398.5 -442.5</code></pre>
+<p>Summed over the last 100 observations, the log predictive likelihoods of the two models with constant parameters are 44 higher than in the paper. Such models have nothing that could differ between two implementations beyond their priors, which 200 observations make irrelevant, and a gap that large means that the two sums are not over the same observations. Summed over the last 110, they agree with the published values to within 0.8. The paper’s sums therefore appear to run over 110 observations rather than the 100 its footnote states, and the comparison below uses 110.</p>
+<pre class="r"><code>fmt &lt;- function(x, se) ifelse(is.na(x), &quot;not estimated&quot;, sprintf(&quot;%.1f (%.2f)&quot;, x, se))
+knitr::kable(data.frame(lpl$r, lpl$model,
+                        fmt(lpl$paper, lpl$paper_nse),
+                        fmt(lpl$lpl110, lpl$lpl110_nse)),
+             col.names = c(&quot;$r$&quot;, &quot;Model&quot;, &quot;Paper&quot;, &quot;bvartools&quot;),
+             align = &quot;clrr&quot;)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="center"><span class="math inline">\(r\)</span></th>
+<th align="left">Model</th>
+<th align="right">Paper</th>
+<th align="right">bvartools</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">1</td>
+<td align="left">(1,1,1)</td>
+<td align="right">-397.6 (0.66)</td>
+<td align="right">-400.1 (0.62)</td>
+</tr>
+<tr class="even">
+<td align="center">1</td>
+<td align="left">(1,1,0)</td>
+<td align="right">-381.6 (0.61)</td>
+<td align="right">-383.6 (1.11)</td>
+</tr>
+<tr class="odd">
+<td align="center">1</td>
+<td align="left">(0,0,1)</td>
+<td align="right">-427.5 (0.14)</td>
+<td align="right">not estimated</td>
+</tr>
+<tr class="even">
+<td align="center">1</td>
+<td align="left">(0,1,1)</td>
+<td align="right">-424.9 (0.12)</td>
+<td align="right">-425.7 (0.13)</td>
+</tr>
+<tr class="odd">
+<td align="center">1</td>
+<td align="left">(1,0,0)</td>
+<td align="right">-390.1 (0.86)</td>
+<td align="right">-396.0 (1.20)</td>
+</tr>
+<tr class="even">
+<td align="center">1</td>
+<td align="left">(1,0,1)</td>
+<td align="right">-392.2 (0.72)</td>
+<td align="right">not estimated</td>
+</tr>
+<tr class="odd">
+<td align="center">1</td>
+<td align="left">(0,1,0)</td>
+<td align="right">-421.4 (0.08)</td>
+<td align="right">-420.6 (0.11)</td>
+</tr>
+<tr class="even">
+<td align="center">1</td>
+<td align="left">(0,0,0)</td>
+<td align="right">-437.1 (0.05)</td>
+<td align="right">-437.9 (0.04)</td>
+</tr>
+<tr class="odd">
+<td align="center">2</td>
+<td align="left">(1,1,1)</td>
+<td align="right">-423.8 (0.93)</td>
+<td align="right">-418.9 (56.39)</td>
+</tr>
+<tr class="even">
+<td align="center">2</td>
+<td align="left">(1,1,0)</td>
+<td align="right">-384.1 (0.58)</td>
+<td align="right">-385.9 (1.45)</td>
+</tr>
+<tr class="odd">
+<td align="center">2</td>
+<td align="left">(0,0,1)</td>
+<td align="right">-431.0 (0.97)</td>
+<td align="right">not estimated</td>
+</tr>
+<tr class="even">
+<td align="center">2</td>
+<td align="left">(0,1,1)</td>
+<td align="right">-434.1 (1.10)</td>
+<td align="right">-423.2 (0.54)</td>
+</tr>
+<tr class="odd">
+<td align="center">2</td>
+<td align="left">(1,0,0)</td>
+<td align="right">-386.5 (1.11)</td>
+<td align="right">-395.8 (1.03)</td>
+</tr>
+<tr class="even">
+<td align="center">2</td>
+<td align="left">(1,0,1)</td>
+<td align="right">-412.8 (1.21)</td>
+<td align="right">not estimated</td>
+</tr>
+<tr class="odd">
+<td align="center">2</td>
+<td align="left">(0,1,0)</td>
+<td align="right">-423.3 (0.12)</td>
+<td align="right">-421.9 (0.23)</td>
+</tr>
+<tr class="even">
+<td align="center">2</td>
+<td align="left">(0,0,0)</td>
+<td align="right">-436.9 (0.05)</td>
+<td align="right">-437.6 (0.04)</td>
+</tr>
+<tr class="odd">
+<td align="center">0</td>
+<td align="left">(0,0)</td>
+<td align="right">-442.5 (0.04)</td>
+<td align="right">-442.5 (0.03)</td>
+</tr>
+<tr class="even">
+<td align="center">0</td>
+<td align="left">(0,1)</td>
+<td align="right">-443.2 (0.05)</td>
+<td align="right">-442.7 (0.03)</td>
+</tr>
+<tr class="odd">
+<td align="center">0</td>
+<td align="left">(1,0)</td>
+<td align="right">-398.0 (0.62)</td>
+<td align="right">-407.9 (0.82)</td>
+</tr>
+<tr class="even">
+<td align="center">0</td>
+<td align="left">(1,1)</td>
+<td align="right">-403.2 (0.59)</td>
+<td align="right">-408.4 (0.86)</td>
+</tr>
+</tbody>
+</table>
+<p>The models are <span class="math inline">\((d_\Omega, d_\beta, d_a)\)</span> for <span class="math inline">\(r &gt; 0\)</span> and <span class="math inline">\((d_\Omega, d_\Pi)\)</span> for the VARs in differences, <span class="math inline">\(r = 0\)</span>. Numerical standard errors are in brackets.</p>
+<pre class="r"><code>est &lt;- lpl[!is.na(lpl$lpl110), ]
+best &lt;- est[order(-est$lpl110), &quot;label&quot;]
+rank_cor &lt;- cor(est$paper, est$lpl110, method = &quot;spearman&quot;)</code></pre>
+<p>The levels are not identical, which is to be expected with priors that are translated rather than copied and with a different sampler, but half of the estimated models are within 1.9 of the published value. What the paper’s conclusions rest on is the ordering, and it is reproduced: the rank correlation between the two columns is 0.99. The best model is r = 1, (1,1,0), followed by r = 2, (1,1,0) – the same two as in the paper – and the seven best models come in exactly the paper’s order. All seven have stochastic volatility, which is the feature that matters most. Among them, letting the short-run coefficients drift in addition to the cointegration space lowers the predictive likelihood in both ranks, and a constant cointegration space with stochastic volatility comes in between. The VARs in differences are dominated by the best cointegrated models.</p>
+<p>The one estimate that should be read with care is that of r = 2, (1,1,1). Its numerical standard error is dominated by a single term, the one for 2008 Q4, when UK interest rates and inflation both fell sharply. An observation that far in the tail of the predictive density leaves its average to a handful of draws, and repeating that one term with different seeds moved it by as much as ten.</p>
+</div>
+<div id="deviations-from-the-paper" class="section level2">
+<h2>Deviations from the paper</h2>
+<ul>
+<li><strong>Priors on the state covariances.</strong> The paper uses Wishart priors on the inverse covariance matrices of the state equations of <span class="math inline">\(A_t\)</span>, <span class="math inline">\(\lambda_t\)</span> and <span class="math inline">\(h_t\)</span>; they are replaced by independent gamma priors on the diagonal with the same degrees of freedom and scale.</li>
+<li><strong>Constant coefficients.</strong> A block that is constant in the paper’s notation is a random walk with a state variance of <span class="math inline">\(10^{-12}\)</span> here, not a constant parameter.</li>
+<li><strong><span class="math inline">\(\rho\)</span>.</strong> <code>bvartools</code> gives the state before the sample the stationary distribution at the starting value of <span class="math inline">\(\rho\)</span>, 0.9995, and keeps it there when <span class="math inline">\(\rho\)</span> is drawn. That turns the draw of <span class="math inline">\(\rho\)</span> into an exact Gibbs step, where the paper uses a Metropolis-within-Gibbs step.</li>
+<li><strong>Constant error covariance.</strong> The paper does not state the prior of the models with a constant error covariance. Here it is inverse Wishart with <span class="math inline">\(n + 1\)</span> degrees of freedom and an identity scale matrix.</li>
+<li><strong>Predictive densities.</strong> The log volatilities and the covariance coefficient are held at their values in <span class="math inline">\(t - 1\)</span> rather than carried forward with their state equations.</li>
+<li><strong>Missing variants.</strong> The models <span class="math inline">\((1, 0, 1)\)</span> and <span class="math inline">\((0, 0, 1)\)</span> – drifting short-run coefficients with a constant cointegration space – are not estimated.</li>
+</ul>
+</div>
+<div id="references" class="section level2">
+<h2>References</h2>
+<p>Koop, G., León-González, R., &amp; Strachan, R. W. (2010). Efficient posterior simulation for cointegrated models with priors on the cointegration space. <em>Econometric Reviews, 29</em>(2), 224–242. <a href="https://doi.org/10.1080/07474930903382208" class="uri">https://doi.org/10.1080/07474930903382208</a></p>
+<p>Koop, G., León-González, R., &amp; Strachan, R. W. (2011). Bayesian inference in a time varying cointegration model. <em>Journal of Econometrics, 165</em>(2), 210–220. <a href="https://doi.org/10.1016/j.jeconom.2011.07.007" class="uri">https://doi.org/10.1016/j.jeconom.2011.07.007</a></p>
+<p>Primiceri, G. E. (2005). Time varying structural vector autoregressions and monetary policy. <em>Review of Economic Studies, 72</em>(3), 821–852. <a href="https://doi.org/10.1111/j.1467-937X.2005.00353.x" class="uri">https://doi.org/10.1111/j.1467-937X.2005.00353.x</a></p>
+<p>Villani, M. (2006). Bayesian point estimation of the cointegration space. <em>Journal of Econometrics, 127</em>(2), 645–664. <a href="https://doi.org/10.1016/j.jeconom.2005.01.002" class="uri">https://doi.org/10.1016/j.jeconom.2005.01.002</a></p>
+</div>
