@@ -1,0 +1,320 @@
+---
+title: "Reproduction: Griffin, J. E., & Steel, M. F. J. (2007). Bayesian stochastic frontier analysis using WinBUGS."
+author: "Franz X. Mohr"
+date: "2026-09-21"
+tags:
+  - r
+  - bsfa
+  - stochastic-frontier
+  - efficiency
+  - bayesian
+  - gibbs-sampler
+  - data-augmentation
+  - cost-function
+description: "Griffin and Steel (2007) show how to estimate Bayesian stochastic frontier models in WinBUGS, using the 123 US electric utilities of Christensen and Greene as their first example. This post reproduces their exponential and half-normal cost frontiers in R with the bsfa package, under the priors the paper prints."
+---
+
+
+
+<p>Griffin and Steel (2007) is a tutorial as much as a research paper. It shows how the Bayesian stochastic frontier models that van den Broeck, Koop, Osiewalski and Steel (1994) set out can be written down and estimated in WinBUGS, and its first example is the classic of the field: the costs of 123 US electric utilities in 1970, first analysed by Christensen and Greene (1976) and used by Greene (1990) and many others since. The paper prints its WinBUGS code, its priors and the posterior summaries it obtained, which makes it an unusually complete target for a reproduction.</p>
+<p>This post reproduces the exponential and half-normal cost frontiers of that example with the <a href="https://github.com/franzmohr/bsfa"><code>bsfa</code></a> package, which samples the same models by data augmentation and elicits its priors in the way the paper does.</p>
+<!--more-->
+<div id="the-model" class="section level2">
+<h2>The model</h2>
+<p>The frontier is a cost function. For firm <span class="math inline">\(i\)</span>,</p>
+<p><span class="math display">\[\ln(C_i / P_{f,i}) = \alpha + \beta_1 \ln Q_i + \beta_2 \ln(P_{l,i} / P_{f,i}) + \beta_3 \ln(P_{k,i} / P_{f,i}) + \beta_4 (\ln Q_i)^2 + u_i + v_i,\]</span></p>
+<p>where <span class="math inline">\(C\)</span> is total cost, <span class="math inline">\(Q\)</span> output, and <span class="math inline">\(P_l\)</span>, <span class="math inline">\(P_k\)</span> and <span class="math inline">\(P_f\)</span> the prices of labour, capital and fuel. Dividing cost and the other two prices by the fuel price imposes homogeneity of degree one in prices. The symmetric error is <span class="math inline">\(v_i \sim N(0, \sigma^2)\)</span> and <span class="math inline">\(u_i \geq 0\)</span> is the inefficiency term, which <em>raises</em> cost above the frontier, so that the cost efficiency of firm <span class="math inline">\(i\)</span> is <span class="math inline">\(r_i = \exp(-u_i)\)</span>.</p>
+<p>The paper’s priors are</p>
+<p><span class="math display">\[\alpha, \beta_j \sim N(0, 10^6), \qquad \sigma^{-2} \sim Ga(0.001, 0.001),\]</span></p>
+<p>and, for an exponential inefficiency term <span class="math inline">\(u_i \sim Exp(\lambda)\)</span> with mean <span class="math inline">\(1/\lambda\)</span>,</p>
+<p><span class="math display">\[\lambda \sim Exp(-\ln r^*),\]</span></p>
+<p>which is the prior of van den Broeck et al. (1994): it makes <span class="math inline">\(r^*\)</span> the prior median efficiency. For the half-normal model <span class="math inline">\(u_i \sim N^+(0, \lambda^{-1})\)</span> – note that <span class="math inline">\(\lambda\)</span> is a precision there, not a rate – the prior is <span class="math inline">\(\lambda \sim Ga(1, 1/37.5)\)</span>, which the paper describes as a prior median efficiency of about 0.875.</p>
+<p>These are the priors <code>bsfa</code> builds itself. <code>add_priors()</code> takes a normal prior on the coefficients, a gamma prior on the error precision, and elicits the prior on the inefficiency term from a prior median efficiency <code>r_star</code>; at a shape of one that is exactly <span class="math inline">\(Exp(-\ln r^*)\)</span> for the exponential model. So the reproduction needs no custom code at all, only the right arguments.</p>
+</div>
+<div id="the-data" class="section level2">
+<h2>The data</h2>
+<p>The data set ships with the <a href="https://cran.r-project.org/package=sfaR"><code>sfaR</code></a> package as <code>electricity</code>.</p>
+<pre class="r"><code>library(&quot;bsfa&quot;) # remotes::install_github(&quot;franzmohr/bsfa&quot;)
+
+data(&quot;electricity&quot;, package = &quot;sfaR&quot;)
+
+d &lt;- data.frame(lc = log(electricity$cost / electricity$fprice),
+                lq = log(electricity$output),
+                lpl = log(electricity$lprice / electricity$fprice),
+                lpk = log(electricity$cprice / electricity$fprice))
+d$q2 &lt;- d$lq^2</code></pre>
+<p>Before estimating anything it is worth making sure that these are the data the literature used. Greene (2008, Table 2.5) prints a least squares fit of the same frontier, with the square of log output multiplied by one half:</p>
+<pre class="r"><code>d$hq2 &lt;- d$q2 / 2
+round(coef(lm(lc ~ lpk + lpl + lq + hq2, data = d)), 4)</code></pre>
+<pre><code>## (Intercept)         lpk         lpl          lq         hq2 
+##     -7.2940      0.0748      0.2608      0.3909      0.0624</code></pre>
+<p>Greene reports <span class="math inline">\(-7.294\)</span>, <span class="math inline">\(0.0748\)</span>, <span class="math inline">\(0.2608\)</span>, <span class="math inline">\(0.3909\)</span> and <span class="math inline">\(0.0624\)</span>, which is what comes back to the last digit. The data and the variable definitions are the ones the frontier literature has been working with.</p>
+</div>
+<div id="the-exponential-model" class="section level2">
+<h2>The exponential model</h2>
+<p>The paper leaves the value of <span class="math inline">\(r^*\)</span> in its exponential model unstated. Its half-normal prior is built around 0.875, and 0.875 turns out to be the value that reproduces its results – in particular the posterior of <span class="math inline">\(\lambda\)</span>, which is the parameter the prior acts on most directly.</p>
+<pre class="r"><code>exp_model &lt;- create_sfmodel_exp(lc ~ lq + lpl + lpk + q2,
+                                data = d,
+                                type = &quot;cost&quot;,
+                                iterations = 20000,
+                                burnin = 5000,
+                                thin = 5)
+
+exp_model &lt;- add_priors(exp_model,
+                        coef = list(mu = 0, v_i = 1e-6),
+                        sigma = list(shape = 0.001, rate = 0.001),
+                        lambda = list(r_star = 0.875, shape = 1))
+
+exp_model &lt;- add_posterior_coefficients(add_seed(exp_model, 2007))</code></pre>
+<p>The paper ran its chain for 200,000 retained draws after 20,000 of burn-in, thinned to every fifth. Data augmentation mixes well enough here that a tenth of that suffices for a comparison, as the effective sample sizes show:</p>
+<pre class="r"><code>summary(exp_model)</code></pre>
+<pre><code>## Bayesian stochastic frontier model
+## 
+## Call:
+## create_sfmodel_exp(formula = lc ~ lq + lpl + lpk + q2, data = d, 
+##     type = &quot;cost&quot;, iterations = 20000, burnin = 5000, thin = 5)
+## 
+## Frontier:           cost
+## Inefficiency:       exponential
+## Observations:       123
+## Units:              123
+## Draws:              4000 kept of 20000 after 5000 burn-in, thinning 5
+## 
+## Posterior summary, 95% credible bands:
+##                mean      sd    2.5%  median   97.5%  ESS
+## (Intercept) -7.5698  0.3474 -8.2459 -7.5658 -6.8938 2689
+## lq           0.4306  0.0418  0.3477  0.4309  0.5137 1854
+## lpl          0.2665  0.0661  0.1356  0.2658  0.3943 3656
+## lpk          0.0420  0.0621 -0.0785  0.0419  0.1665 2461
+## q2           0.0292  0.0027  0.0237  0.0292  0.0346 2435
+## sigma_v      0.1140  0.0159  0.0849  0.1134  0.1463  653
+## lambda      12.2305  4.6380  7.1839 10.9724 24.7425  430
+## 
+## Posterior mean efficiency, per observation:
+##   mean    min median    max 
+## 0.9185 0.6598 0.9325 0.9770</code></pre>
+<p>Table 1 of the paper reports posterior means and standard deviations. Side by side, with the error variance <span class="math inline">\(\sigma^2\)</span> computed from the draws of <span class="math inline">\(\sigma_v\)</span>:</p>
+<pre class="r"><code>beta &lt;- as.matrix(exp_model$posterior$beta$coeffs)
+lambda &lt;- as.numeric(exp_model$posterior$lambda$coeffs)
+sigmasq &lt;- as.numeric(exp_model$posterior$sigma_v$coeffs)^2
+
+draws &lt;- cbind(beta, lambda = lambda, sigmasq = sigmasq)
+
+table1 &lt;- data.frame(
+  parameter = c(&quot;alpha&quot;, &quot;beta1&quot;, &quot;beta2&quot;, &quot;beta3&quot;, &quot;beta4&quot;,
+                &quot;lambda&quot;, &quot;sigmasq&quot;),
+  gs_mean = c(-7.47, 0.4252, 0.2501, 0.0473, 0.02962, 12.23, 0.01332),
+  gs_sd = c(0.3407, 0.04301, 0.06495, 0.06193, 0.002843, 5.207, 0.003836),
+  bsfa_mean = colMeans(draws),
+  bsfa_sd = apply(draws, 2, sd),
+  row.names = NULL
+)
+table1$diff_in_sd &lt;- (table1$bsfa_mean - table1$gs_mean) / table1$gs_sd
+
+knitr::kable(table1, digits = c(0, 5, 5, 5, 5, 2))</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">parameter</th>
+<th align="right">gs_mean</th>
+<th align="right">gs_sd</th>
+<th align="right">bsfa_mean</th>
+<th align="right">bsfa_sd</th>
+<th align="right">diff_in_sd</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">alpha</td>
+<td align="right">-7.47000</td>
+<td align="right">0.34070</td>
+<td align="right">-7.56984</td>
+<td align="right">0.34742</td>
+<td align="right">-0.29</td>
+</tr>
+<tr class="even">
+<td align="left">beta1</td>
+<td align="right">0.42520</td>
+<td align="right">0.04301</td>
+<td align="right">0.43064</td>
+<td align="right">0.04185</td>
+<td align="right">0.13</td>
+</tr>
+<tr class="odd">
+<td align="left">beta2</td>
+<td align="right">0.25010</td>
+<td align="right">0.06495</td>
+<td align="right">0.26648</td>
+<td align="right">0.06609</td>
+<td align="right">0.25</td>
+</tr>
+<tr class="even">
+<td align="left">beta3</td>
+<td align="right">0.04730</td>
+<td align="right">0.06193</td>
+<td align="right">0.04204</td>
+<td align="right">0.06207</td>
+<td align="right">-0.08</td>
+</tr>
+<tr class="odd">
+<td align="left">beta4</td>
+<td align="right">0.02962</td>
+<td align="right">0.00284</td>
+<td align="right">0.02920</td>
+<td align="right">0.00274</td>
+<td align="right">-0.15</td>
+</tr>
+<tr class="even">
+<td align="left">lambda</td>
+<td align="right">12.23000</td>
+<td align="right">5.20700</td>
+<td align="right">12.23053</td>
+<td align="right">4.63802</td>
+<td align="right">0.00</td>
+</tr>
+<tr class="odd">
+<td align="left">sigmasq</td>
+<td align="right">0.01332</td>
+<td align="right">0.00384</td>
+<td align="right">0.01325</td>
+<td align="right">0.00370</td>
+<td align="right">-0.02</td>
+</tr>
+</tbody>
+</table>
+<p>The posterior standard deviations agree, allowing for the long right tail of <span class="math inline">\(\lambda\)</span>, whose standard deviation is the least stable summary of any here, and so do the means of the parameters that describe the error terms. <span class="math inline">\(\lambda\)</span> is the one to look at first: its posterior is skewed, with a long right tail that the prior leaves in place, so a wrong prior would show up here before anywhere else.</p>
+<pre class="r"><code>round(quantile(lambda, c(0.025, 0.5, 0.975)), 2)</code></pre>
+<pre><code>##  2.5%   50% 97.5% 
+##  7.18 10.97 24.74</code></pre>
+<p>The paper reports a median of 10.79 and a 95 per cent interval of <span class="math inline">\((7.07, 26.75)\)</span>.</p>
+<p>The frontier coefficients agree to within a small fraction of a posterior standard deviation, with two exceptions of between a quarter and a third of one: the intercept and the coefficient on the labour price. That is more than Monte Carlo error on either side – the paper’s MCMC error on these is of the order of <span class="math inline">\(10^{-3}\)</span>, and the effective sample sizes above run into the thousands. But it is not a difference between the samplers either. Greene (2008) fits the same exponential frontier by maximum likelihood and gets 0.270 on the labour price, which with a sample of 123 and flat priors on the coefficients is where the posterior mean should be. <code>bsfa</code> gives 0.266, the paper 0.250. Something in the paper’s data or set-up differs slightly from the listing in <code>sfaR</code> – the firms are also in a different order, as the next section shows – and it moves those two coefficients a little without touching anything else.</p>
+</div>
+<div id="efficiency" class="section level2">
+<h2>Efficiency</h2>
+<p>Because the inefficiency terms are sampled as latent variables, the efficiency of every firm comes out of the sampler as a full posterior distribution rather than as a point predictor.</p>
+<pre class="r"><code>eff &lt;- efficiency(exp_model)
+summary(eff$mean)</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##  0.6598  0.9066  0.9325  0.9185  0.9503  0.9770</code></pre>
+<p>The paper also summarises the posterior of the <em>rank</em> of each firm’s efficiency (its Table 2), which is a quantity only a sampler can deliver: for every draw the firms are ranked, and the distribution of each firm’s rank is read off the draws.</p>
+<pre class="r"><code>u &lt;- as.matrix(exp_model$posterior$u$coeffs)
+
+# A high rank is a high efficiency, as in the paper.
+ranks &lt;- t(apply(-u, 1, rank))
+
+t(apply(ranks[, 1:7], 2, quantile, c(0.025, 0.5, 0.975)))</code></pre>
+<pre><code>##     2.5% 50%   97.5%
+## 1 15.975  80 121.000
+## 2  1.000   4  90.025
+## 3  1.000   2  52.025
+## 4 20.000  84 122.000
+## 5 17.000  79 121.000
+## 6  9.000  62 120.000
+## 7 13.000  73 121.000</code></pre>
+<p>The spread is as wide as the paper’s: a firm’s median rank tells little on its own when its 95 per cent interval covers most of the sample. The individual rows cannot be matched to the paper’s, though. Its first firm has a median rank of 4 and an interval of <span class="math inline">\((1, 90)\)</span>, which is the second firm here, and none of the others line up. The paper took its data from the listing in Greene (1990), whereas <code>sfaR</code> sorts the firms by output, so the same firm carries a different number in the two.</p>
+</div>
+<div id="the-half-normal-model" class="section level2">
+<h2>The half-normal model</h2>
+<p>For the half-normal model the paper’s prior on the precision <span class="math inline">\(\lambda\)</span> is a gamma of shape 1 and rate <span class="math inline">\(1/37.5\)</span>. <code>bsfa</code> places an inverse gamma prior on <span class="math inline">\(\sigma_u^2\)</span>, which is the same thing, but asks for a shape above one, so that the prior mean of <span class="math inline">\(\sigma_u^2\)</span> exists and can serve as a starting value. A shape of 1.001 and <span class="math inline">\(r^* = 0.875\)</span> reproduce the paper’s prior to three digits:</p>
+<pre class="r"><code>hn_model &lt;- create_sfmodel_hn(lc ~ lq + lpl + lpk + q2,
+                              data = d,
+                              type = &quot;cost&quot;,
+                              iterations = 20000,
+                              burnin = 5000,
+                              thin = 2)
+
+hn_model &lt;- add_priors(hn_model,
+                       coef = list(mu = 0, v_i = 1e-6),
+                       sigma = list(shape = 0.001, rate = 0.001),
+                       sigma_u = list(r_star = 0.875, shape = 1.001))
+
+c(bsfa = hn_model$priors$rate_u, paper = 1 / 37.5)</code></pre>
+<pre><code>##       bsfa      paper 
+## 0.02678327 0.02666667</code></pre>
+<pre class="r"><code>hn_model &lt;- add_posterior_coefficients(add_seed(hn_model, 2007),
+                                       keep_u = FALSE)</code></pre>
+<p>Table 4 of the paper reports posterior medians and 95 per cent intervals. The precision of the half-normal is <span class="math inline">\(1 / \sigma_u^2\)</span>:</p>
+<pre class="r"><code>beta &lt;- as.matrix(hn_model$posterior$beta$coeffs)
+precision &lt;- 1 / as.numeric(hn_model$posterior$sigma_u$coeffs)^2
+sigmasq &lt;- as.numeric(hn_model$posterior$sigma_v$coeffs)^2
+
+draws &lt;- cbind(beta, lambda = precision, sigmasq = sigmasq)
+q &lt;- t(apply(draws, 2, quantile, c(0.5, 0.025, 0.975)))
+
+fmt &lt;- function(m, l, u, digits) {
+  paste0(formatC(m, digits = digits, format = &quot;fg&quot;), &quot; (&quot;,
+         formatC(l, digits = digits, format = &quot;fg&quot;), &quot;, &quot;,
+         formatC(u, digits = digits, format = &quot;fg&quot;), &quot;)&quot;)
+}
+
+table4 &lt;- data.frame(
+  parameter = c(&quot;alpha&quot;, &quot;beta1&quot;, &quot;beta2&quot;, &quot;beta3&quot;, &quot;beta4&quot;,
+                &quot;lambda&quot;, &quot;sigmasq&quot;),
+  paper = c(&quot;-7.4 (-8.0, -6.7)&quot;, &quot;0.41 (0.33, 0.48)&quot;, &quot;0.24 (0.11, 0.37)&quot;,
+            &quot;0.06 (-0.06, 0.19)&quot;, &quot;0.031 (0.025, 0.036)&quot;,
+            &quot;44.5 (20.8, 140.6)&quot;, &quot;0.013 (0.006, 0.021)&quot;),
+  bsfa = fmt(q[, 1], q[, 2], q[, 3], digits = 3),
+  row.names = NULL
+)
+
+knitr::kable(table4)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">parameter</th>
+<th align="left">paper</th>
+<th align="left">bsfa</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">alpha</td>
+<td align="left">-7.4 (-8.0, -6.7)</td>
+<td align="left">-7.47 (-8.16, -6.82)</td>
+</tr>
+<tr class="even">
+<td align="left">beta1</td>
+<td align="left">0.41 (0.33, 0.48)</td>
+<td align="left">0.41 (0.336, 0.483)</td>
+</tr>
+<tr class="odd">
+<td align="left">beta2</td>
+<td align="left">0.24 (0.11, 0.37)</td>
+<td align="left">0.257 (0.127, 0.391)</td>
+</tr>
+<tr class="even">
+<td align="left">beta3</td>
+<td align="left">0.06 (-0.06, 0.19)</td>
+<td align="left">0.0576 (-0.0582, 0.179)</td>
+</tr>
+<tr class="odd">
+<td align="left">beta4</td>
+<td align="left">0.031 (0.025, 0.036)</td>
+<td align="left">0.0303 (0.0253, 0.0353)</td>
+</tr>
+<tr class="even">
+<td align="left">lambda</td>
+<td align="left">44.5 (20.8, 140.6)</td>
+<td align="left">47.1 (22.2, 146)</td>
+</tr>
+<tr class="odd">
+<td align="left">sigmasq</td>
+<td align="left">0.013 (0.006, 0.021)</td>
+<td align="left">0.0131 (0.00667, 0.021)</td>
+</tr>
+</tbody>
+</table>
+<p>The medians and intervals agree closely. The precision of the inefficiency term comes out a few per cent higher throughout its distribution, which is about as close as the shape of 1.001 against the paper’s 1, and a long right tail, allow.</p>
+</div>
+<div id="reproducing-it-as-a-test" class="section level2">
+<h2>Reproducing it as a test</h2>
+<p>Both models, together with the least squares check against Greene (2008), are part of the test suite of <code>bsfa</code> (in <code>tests/testthat/test-replication.R</code>), so a change to the sampler that moved these results would fail its checks. The tolerance there is half a posterior standard deviation, which leaves room for the small differences discussed above and none for a wrong full conditional.</p>
+</div>
+<div id="references" class="section level2">
+<h2>References</h2>
+<p>Christensen, L. R., &amp; Greene, W. H. (1976). Economies of scale in U.S. electric power generation. <em>Journal of Political Economy, 84</em>(4), 655–676.</p>
+<p>Greene, W. H. (1990). A gamma-distributed stochastic frontier model. <em>Journal of Econometrics, 46</em>(1–2), 141–163.</p>
+<p>Greene, W. H. (2008). The econometric approach to efficiency analysis. In H. O. Fried, C. A. K. Lovell, &amp; S. S. Schmidt (Eds.), <em>The measurement of productive efficiency and productivity growth</em>. Oxford: Oxford University Press.</p>
+<p>Griffin, J. E., &amp; Steel, M. F. J. (2007). Bayesian stochastic frontier analysis using WinBUGS. <em>Journal of Productivity Analysis, 27</em>, 163–176. <a href="https://doi.org/10.1007/s11123-007-0033-y" class="uri">https://doi.org/10.1007/s11123-007-0033-y</a></p>
+<p>van den Broeck, J., Koop, G., Osiewalski, J., &amp; Steel, M. F. J. (1994). Stochastic frontier models: A Bayesian perspective. <em>Journal of Econometrics, 61</em>(2), 273–303. <a href="https://doi.org/10.1016/0304-4076(94)90087-6" class="uri">https://doi.org/10.1016/0304-4076(94)90087-6</a></p>
+</div>

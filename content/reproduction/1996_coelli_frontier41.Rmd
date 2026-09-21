@@ -1,0 +1,121 @@
+---
+title: "Reproduction: Coelli, T. J. (1996). A guide to FRONTIER Version 4.1."
+author: "Franz X. Mohr"
+date: "2026-09-21"
+tags:
+  - r
+  - bsfa
+  - frontier
+  - stochastic-frontier
+  - efficiency
+  - production-function
+  - bayesian
+  - maximum-likelihood
+description: "Coelli's guide to FRONTIER 4.1 introduced a generation of researchers to stochastic frontier estimation, and its first example is still the standard test case. This post reproduces it by maximum likelihood with the frontier package and by Bayesian inference with bsfa, and explains where the two answers differ and why."
+---
+
+For most of the 1990s and 2000s, estimating a stochastic frontier meant running FRONTIER 4.1, Tim Coelli's Fortran program, and its guide (Coelli, 1996) was where one learnt how. The guide works through a small example: a Cobb-Douglas production frontier for 60 firms with half-normal inefficiency, estimated by maximum likelihood. Its data are distributed with the program and, today, with the R package [`frontier`](https://cran.r-project.org/package=frontier) by Coelli and Henningsen, which implements FRONTIER 4.1 in R.
+
+This post reproduces that example twice: by maximum likelihood with `frontier`, which returns the guide's printed estimates, and by Bayesian inference with [`bsfa`](https://github.com/franzmohr/bsfa). The second is the more interesting exercise, because the two approaches answer slightly different questions, and a sample of 60 is small enough for the difference to show.
+
+<!--more-->
+
+## The model
+
+For firm $i$ the frontier is
+
+$$\ln Q_i = \beta_0 + \beta_1 \ln K_i + \beta_2 \ln L_i + v_i - u_i,$$
+
+with output $Q$, capital $K$ and labour $L$, a symmetric error $v_i \sim N(0, \sigma_v^2)$ and a half-normal inefficiency term $u_i \sim N^+(0, \sigma_u^2)$, so that the technical efficiency of firm $i$ is $\exp(-u_i)$. FRONTIER does not estimate $\sigma_u^2$ and $\sigma_v^2$ directly. It uses the parameterisation of Battese and Corra (1977),
+
+$$\sigma^2 = \sigma_u^2 + \sigma_v^2, \qquad \gamma = \frac{\sigma_u^2}{\sigma^2},$$
+
+in which $\gamma$ lies between zero and one and measures how much of the composed error is inefficiency.
+
+## Maximum likelihood
+
+```{r setup, message = FALSE}
+library("frontier") # install.packages("frontier")
+library("bsfa")     # remotes::install_github("franzmohr/bsfa")
+
+data("front41Data", package = "frontier")
+head(front41Data)
+```
+
+```{r ml}
+ml <- sfa(log(output) ~ log(capital) + log(labour), data = front41Data)
+summary(ml)
+```
+
+These are the guide's estimates: $\hat\beta_0 = 0.5616$, $\hat\beta_1 = 0.2811$, $\hat\beta_2 = 0.5365$, $\hat\sigma^2 = 0.2170$ and $\hat\gamma = 0.7972$, with a log-likelihood of $-17.027$ and a mean technical efficiency of
+
+```{r ml-eff}
+mean(efficiencies(ml))
+```
+
+## Bayesian inference
+
+`bsfa` samples the same model by data augmentation: the inefficiency terms are drawn as latent variables, and the frontier and the variances are drawn given them. The coefficients get a flat prior, so that they are left to the data. The inefficiency term cannot be treated that way: its prior is elicited from a prior median efficiency, 0.75 by default, in the manner of van den Broeck, Koop, Osiewalski and Steel (1994).
+
+```{r bayes}
+model <- create_sfmodel_hn(log(output) ~ log(capital) + log(labour),
+                           data = front41Data,
+                           iterations = 20000,
+                           burnin = 5000)
+
+model <- add_priors(model, coef = list(mu = 0, v_i = 1e-6))
+
+model <- add_posterior_coefficients(add_seed(model, 1996))
+
+summary(model)
+```
+
+The frontier coefficients agree with the maximum likelihood estimates to within a small fraction of a standard error, and their posterior standard deviations are close to the guide's standard errors of 0.203, 0.048 and 0.045. That is what a flat prior on the coefficients should deliver.
+
+The variance parameters are a different matter. Translated into FRONTIER's parameterisation, draw by draw:
+
+```{r bayes-gamma}
+su2 <- as.numeric(model$posterior$sigma_u$coeffs)^2
+sv2 <- as.numeric(model$posterior$sigma_v$coeffs)^2
+
+sigma_sq <- su2 + sv2
+gamma <- su2 / sigma_sq
+
+rbind(sigma_sq = quantile(sigma_sq, c(0.025, 0.5, 0.975)),
+      gamma = quantile(gamma, c(0.025, 0.5, 0.975)))
+```
+
+$\sigma^2$ is estimated much as by maximum likelihood, but $\gamma$ is not pinned down: its 95 per cent credible interval runs over half the unit interval. The maximum likelihood standard error of 0.136 says the same, if less plainly, and it is the honest answer for a sample of 60. How the composed error splits into noise and inefficiency is identified only through the asymmetry of the residuals, and 60 residuals do not carry much of it. The posterior median lies a little below $\hat\gamma$ because the posterior is skewed towards the lower values, and a mode and a median of a skewed distribution are not the same point.
+
+## Efficiency
+
+The mean efficiency agrees closely:
+
+```{r bayes-eff}
+eff <- efficiency(model)
+mean(eff$mean)
+```
+
+What the Bayesian fit adds is the uncertainty around each firm's score. The maximum likelihood estimates of efficiency are the conditional expectations of Battese and Coelli (1988), evaluated at the point estimates; the posterior means above are the same expectation, averaged over the uncertainty in the parameters as well, and each comes with a credible interval.
+
+```{r bayes-plot, fig.height = 4, fig.width = 8}
+plot(model, type = "efficiency", units = 60)
+```
+
+Most intervals are wide. With one observation per firm there is little information about any single firm's inefficiency, and a ranking of the 60 firms by their point scores would suggest far more precision than the data contain.
+
+## Reproducing it as a test
+
+The Bayesian fit is part of the test suite of `bsfa` (in `tests/testthat/test-replication.R`): its frontier coefficients have to lie within half a standard error of the guide's estimates and its mean efficiency close to 0.7406, so a change to the sampler that moved them would fail its checks.
+
+## References
+
+Battese, G. E., & Coelli, T. J. (1988). Prediction of firm-level technical efficiencies with a generalized frontier production function and panel data. *Journal of Econometrics, 38*(3), 387--399.
+
+Battese, G. E., & Corra, G. S. (1977). Estimation of a production frontier model: With application to the pastoral zone of Eastern Australia. *Australian Journal of Agricultural Economics, 21*(3), 169--179.
+
+Coelli, T. J. (1996). *A guide to FRONTIER Version 4.1: A computer program for stochastic frontier production and cost function estimation*. CEPA Working Paper 96/07. Armidale: University of New England.
+
+Coelli, T., & Henningsen, A. (2020). frontier: Stochastic frontier analysis. R package. <https://CRAN.R-project.org/package=frontier>
+
+van den Broeck, J., Koop, G., Osiewalski, J., & Steel, M. F. J. (1994). Stochastic frontier models: A Bayesian perspective. *Journal of Econometrics, 61*(2), 273--303. <https://doi.org/10.1016/0304-4076(94)90087-6>

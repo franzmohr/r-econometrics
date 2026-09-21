@@ -1,0 +1,217 @@
+---
+title: "Reproduction: Griffin, J. E., & Steel, M. F. J. (2007). Bayesian stochastic frontier analysis using WinBUGS."
+author: "Franz X. Mohr"
+date: "2026-09-21"
+tags:
+  - r
+  - bsfa
+  - stochastic-frontier
+  - efficiency
+  - bayesian
+  - gibbs-sampler
+  - data-augmentation
+  - cost-function
+description: "Griffin and Steel (2007) show how to estimate Bayesian stochastic frontier models in WinBUGS, using the 123 US electric utilities of Christensen and Greene as their first example. This post reproduces their exponential and half-normal cost frontiers in R with the bsfa package, under the priors the paper prints."
+---
+
+Griffin and Steel (2007) is a tutorial as much as a research paper. It shows how the Bayesian stochastic frontier models that van den Broeck, Koop, Osiewalski and Steel (1994) set out can be written down and estimated in WinBUGS, and its first example is the classic of the field: the costs of 123 US electric utilities in 1970, first analysed by Christensen and Greene (1976) and used by Greene (1990) and many others since. The paper prints its WinBUGS code, its priors and the posterior summaries it obtained, which makes it an unusually complete target for a reproduction.
+
+This post reproduces the exponential and half-normal cost frontiers of that example with the [`bsfa`](https://github.com/franzmohr/bsfa) package, which samples the same models by data augmentation and elicits its priors in the way the paper does.
+
+<!--more-->
+
+## The model
+
+The frontier is a cost function. For firm $i$,
+
+$$\ln(C_i / P_{f,i}) = \alpha + \beta_1 \ln Q_i + \beta_2 \ln(P_{l,i} / P_{f,i}) + \beta_3 \ln(P_{k,i} / P_{f,i}) + \beta_4 (\ln Q_i)^2 + u_i + v_i,$$
+
+where $C$ is total cost, $Q$ output, and $P_l$, $P_k$ and $P_f$ the prices of labour, capital and fuel. Dividing cost and the other two prices by the fuel price imposes homogeneity of degree one in prices. The symmetric error is $v_i \sim N(0, \sigma^2)$ and $u_i \geq 0$ is the inefficiency term, which *raises* cost above the frontier, so that the cost efficiency of firm $i$ is $r_i = \exp(-u_i)$.
+
+The paper's priors are
+
+$$\alpha, \beta_j \sim N(0, 10^6), \qquad \sigma^{-2} \sim Ga(0.001, 0.001),$$
+
+and, for an exponential inefficiency term $u_i \sim Exp(\lambda)$ with mean $1/\lambda$,
+
+$$\lambda \sim Exp(-\ln r^*),$$
+
+which is the prior of van den Broeck et al. (1994): it makes $r^*$ the prior median efficiency. For the half-normal model $u_i \sim N^+(0, \lambda^{-1})$ -- note that $\lambda$ is a precision there, not a rate -- the prior is $\lambda \sim Ga(1, 1/37.5)$, which the paper describes as a prior median efficiency of about 0.875.
+
+These are the priors `bsfa` builds itself. `add_priors()` takes a normal prior on the coefficients, a gamma prior on the error precision, and elicits the prior on the inefficiency term from a prior median efficiency `r_star`; at a shape of one that is exactly $Exp(-\ln r^*)$ for the exponential model. So the reproduction needs no custom code at all, only the right arguments.
+
+## The data
+
+The data set ships with the [`sfaR`](https://cran.r-project.org/package=sfaR) package as `electricity`.
+
+```{r setup, message = FALSE}
+library("bsfa") # remotes::install_github("franzmohr/bsfa")
+
+data("electricity", package = "sfaR")
+
+d <- data.frame(lc = log(electricity$cost / electricity$fprice),
+                lq = log(electricity$output),
+                lpl = log(electricity$lprice / electricity$fprice),
+                lpk = log(electricity$cprice / electricity$fprice))
+d$q2 <- d$lq^2
+```
+
+Before estimating anything it is worth making sure that these are the data the literature used. Greene (2008, Table 2.5) prints a least squares fit of the same frontier, with the square of log output multiplied by one half:
+
+```{r ols}
+d$hq2 <- d$q2 / 2
+round(coef(lm(lc ~ lpk + lpl + lq + hq2, data = d)), 4)
+```
+
+Greene reports $-7.294$, $0.0748$, $0.2608$, $0.3909$ and $0.0624$, which is what comes back to the last digit. The data and the variable definitions are the ones the frontier literature has been working with.
+
+## The exponential model
+
+The paper leaves the value of $r^*$ in its exponential model unstated. Its half-normal prior is built around 0.875, and 0.875 turns out to be the value that reproduces its results -- in particular the posterior of $\lambda$, which is the parameter the prior acts on most directly.
+
+```{r exp-model}
+exp_model <- create_sfmodel_exp(lc ~ lq + lpl + lpk + q2,
+                                data = d,
+                                type = "cost",
+                                iterations = 20000,
+                                burnin = 5000,
+                                thin = 5)
+
+exp_model <- add_priors(exp_model,
+                        coef = list(mu = 0, v_i = 1e-6),
+                        sigma = list(shape = 0.001, rate = 0.001),
+                        lambda = list(r_star = 0.875, shape = 1))
+
+exp_model <- add_posterior_coefficients(add_seed(exp_model, 2007))
+```
+
+The paper ran its chain for 200,000 retained draws after 20,000 of burn-in, thinned to every fifth. Data augmentation mixes well enough here that a tenth of that suffices for a comparison, as the effective sample sizes show:
+
+```{r exp-summary}
+summary(exp_model)
+```
+
+Table 1 of the paper reports posterior means and standard deviations. Side by side, with the error variance $\sigma^2$ computed from the draws of $\sigma_v$:
+
+```{r exp-table}
+beta <- as.matrix(exp_model$posterior$beta$coeffs)
+lambda <- as.numeric(exp_model$posterior$lambda$coeffs)
+sigmasq <- as.numeric(exp_model$posterior$sigma_v$coeffs)^2
+
+draws <- cbind(beta, lambda = lambda, sigmasq = sigmasq)
+
+table1 <- data.frame(
+  parameter = c("alpha", "beta1", "beta2", "beta3", "beta4",
+                "lambda", "sigmasq"),
+  gs_mean = c(-7.47, 0.4252, 0.2501, 0.0473, 0.02962, 12.23, 0.01332),
+  gs_sd = c(0.3407, 0.04301, 0.06495, 0.06193, 0.002843, 5.207, 0.003836),
+  bsfa_mean = colMeans(draws),
+  bsfa_sd = apply(draws, 2, sd),
+  row.names = NULL
+)
+table1$diff_in_sd <- (table1$bsfa_mean - table1$gs_mean) / table1$gs_sd
+
+knitr::kable(table1, digits = c(0, 5, 5, 5, 5, 2))
+```
+
+The posterior standard deviations agree, allowing for the long right tail of $\lambda$, whose standard deviation is the least stable summary of any here, and so do the means of the parameters that describe the error terms. $\lambda$ is the one to look at first: its posterior is skewed, with a long right tail that the prior leaves in place, so a wrong prior would show up here before anywhere else.
+
+```{r exp-lambda}
+round(quantile(lambda, c(0.025, 0.5, 0.975)), 2)
+```
+
+The paper reports a median of 10.79 and a 95 per cent interval of $(7.07, 26.75)$.
+
+The frontier coefficients agree to within a small fraction of a posterior standard deviation, with two exceptions of between a quarter and a third of one: the intercept and the coefficient on the labour price. That is more than Monte Carlo error on either side -- the paper's MCMC error on these is of the order of $10^{-3}$, and the effective sample sizes above run into the thousands. But it is not a difference between the samplers either. Greene (2008) fits the same exponential frontier by maximum likelihood and gets 0.270 on the labour price, which with a sample of 123 and flat priors on the coefficients is where the posterior mean should be. `bsfa` gives `r round(table1$bsfa_mean[3], 3)`, the paper 0.250. Something in the paper's data or set-up differs slightly from the listing in `sfaR` -- the firms are also in a different order, as the next section shows -- and it moves those two coefficients a little without touching anything else.
+
+## Efficiency
+
+Because the inefficiency terms are sampled as latent variables, the efficiency of every firm comes out of the sampler as a full posterior distribution rather than as a point predictor.
+
+```{r exp-eff}
+eff <- efficiency(exp_model)
+summary(eff$mean)
+```
+
+The paper also summarises the posterior of the *rank* of each firm's efficiency (its Table 2), which is a quantity only a sampler can deliver: for every draw the firms are ranked, and the distribution of each firm's rank is read off the draws.
+
+```{r exp-ranks}
+u <- as.matrix(exp_model$posterior$u$coeffs)
+
+# A high rank is a high efficiency, as in the paper.
+ranks <- t(apply(-u, 1, rank))
+
+t(apply(ranks[, 1:7], 2, quantile, c(0.025, 0.5, 0.975)))
+```
+
+The spread is as wide as the paper's: a firm's median rank tells little on its own when its 95 per cent interval covers most of the sample. The individual rows cannot be matched to the paper's, though. Its first firm has a median rank of 4 and an interval of $(1, 90)$, which is the second firm here, and none of the others line up. The paper took its data from the listing in Greene (1990), whereas `sfaR` sorts the firms by output, so the same firm carries a different number in the two.
+
+## The half-normal model
+
+For the half-normal model the paper's prior on the precision $\lambda$ is a gamma of shape 1 and rate $1/37.5$. `bsfa` places an inverse gamma prior on $\sigma_u^2$, which is the same thing, but asks for a shape above one, so that the prior mean of $\sigma_u^2$ exists and can serve as a starting value. A shape of 1.001 and $r^* = 0.875$ reproduce the paper's prior to three digits:
+
+```{r hn-model}
+hn_model <- create_sfmodel_hn(lc ~ lq + lpl + lpk + q2,
+                              data = d,
+                              type = "cost",
+                              iterations = 20000,
+                              burnin = 5000,
+                              thin = 2)
+
+hn_model <- add_priors(hn_model,
+                       coef = list(mu = 0, v_i = 1e-6),
+                       sigma = list(shape = 0.001, rate = 0.001),
+                       sigma_u = list(r_star = 0.875, shape = 1.001))
+
+c(bsfa = hn_model$priors$rate_u, paper = 1 / 37.5)
+
+hn_model <- add_posterior_coefficients(add_seed(hn_model, 2007),
+                                       keep_u = FALSE)
+```
+
+Table 4 of the paper reports posterior medians and 95 per cent intervals. The precision of the half-normal is $1 / \sigma_u^2$:
+
+```{r hn-table}
+beta <- as.matrix(hn_model$posterior$beta$coeffs)
+precision <- 1 / as.numeric(hn_model$posterior$sigma_u$coeffs)^2
+sigmasq <- as.numeric(hn_model$posterior$sigma_v$coeffs)^2
+
+draws <- cbind(beta, lambda = precision, sigmasq = sigmasq)
+q <- t(apply(draws, 2, quantile, c(0.5, 0.025, 0.975)))
+
+fmt <- function(m, l, u, digits) {
+  paste0(formatC(m, digits = digits, format = "fg"), " (",
+         formatC(l, digits = digits, format = "fg"), ", ",
+         formatC(u, digits = digits, format = "fg"), ")")
+}
+
+table4 <- data.frame(
+  parameter = c("alpha", "beta1", "beta2", "beta3", "beta4",
+                "lambda", "sigmasq"),
+  paper = c("-7.4 (-8.0, -6.7)", "0.41 (0.33, 0.48)", "0.24 (0.11, 0.37)",
+            "0.06 (-0.06, 0.19)", "0.031 (0.025, 0.036)",
+            "44.5 (20.8, 140.6)", "0.013 (0.006, 0.021)"),
+  bsfa = fmt(q[, 1], q[, 2], q[, 3], digits = 3),
+  row.names = NULL
+)
+
+knitr::kable(table4)
+```
+
+The medians and intervals agree closely. The precision of the inefficiency term comes out a few per cent higher throughout its distribution, which is about as close as the shape of 1.001 against the paper's 1, and a long right tail, allow.
+
+## Reproducing it as a test
+
+Both models, together with the least squares check against Greene (2008), are part of the test suite of `bsfa` (in `tests/testthat/test-replication.R`), so a change to the sampler that moved these results would fail its checks. The tolerance there is half a posterior standard deviation, which leaves room for the small differences discussed above and none for a wrong full conditional.
+
+## References
+
+Christensen, L. R., & Greene, W. H. (1976). Economies of scale in U.S. electric power generation. *Journal of Political Economy, 84*(4), 655--676.
+
+Greene, W. H. (1990). A gamma-distributed stochastic frontier model. *Journal of Econometrics, 46*(1--2), 141--163.
+
+Greene, W. H. (2008). The econometric approach to efficiency analysis. In H. O. Fried, C. A. K. Lovell, & S. S. Schmidt (Eds.), *The measurement of productive efficiency and productivity growth*. Oxford: Oxford University Press.
+
+Griffin, J. E., & Steel, M. F. J. (2007). Bayesian stochastic frontier analysis using WinBUGS. *Journal of Productivity Analysis, 27*, 163--176. <https://doi.org/10.1007/s11123-007-0033-y>
+
+van den Broeck, J., Koop, G., Osiewalski, J., & Steel, M. F. J. (1994). Stochastic frontier models: A Bayesian perspective. *Journal of Econometrics, 61*(2), 273--303. <https://doi.org/10.1016/0304-4076(94)90087-6>
