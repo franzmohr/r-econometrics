@@ -306,10 +306,6 @@ knitr::kable(table4)</code></pre>
 </table>
 <p>The medians and intervals agree closely. The precision of the inefficiency term comes out a few per cent higher throughout its distribution, which is about as close as the shape of 1.001 against the paper’s 1, and a long right tail, allow.</p>
 </div>
-<div id="reproducing-it-as-a-test" class="section level2">
-<h2>Reproducing it as a test</h2>
-<p>Both models, together with the least squares check against Greene (2008), are part of the test suite of <code>bsfa</code> (in <code>tests/testthat/test-replication.R</code>), so a change to the sampler that moved these results would fail its checks. The tolerance there is half a posterior standard deviation, which leaves room for the small differences discussed above and none for a wrong full conditional.</p>
-</div>
 <div id="references" class="section level2">
 <h2>References</h2>
 <p>Christensen, L. R., &amp; Greene, W. H. (1976). Economies of scale in U.S. electric power generation. <em>Journal of Political Economy, 84</em>(4), 655–676.</p>

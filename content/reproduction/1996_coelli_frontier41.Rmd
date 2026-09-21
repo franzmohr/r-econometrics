@@ -104,10 +104,6 @@ plot(model, type = "efficiency", units = 60)
 
 Most intervals are wide. With one observation per firm there is little information about any single firm's inefficiency, and a ranking of the 60 firms by their point scores would suggest far more precision than the data contain.
 
-## Reproducing it as a test
-
-The Bayesian fit is part of the test suite of `bsfa` (in `tests/testthat/test-replication.R`): its frontier coefficients have to lie within half a standard error of the guide's estimates and its mean efficiency close to 0.7406, so a change to the sampler that moved them would fail its checks.
-
 ## References
 
 Battese, G. E., & Coelli, T. J. (1988). Prediction of firm-level technical efficiencies with a generalized frontier production function and panel data. *Journal of Econometrics, 38*(3), 387--399.

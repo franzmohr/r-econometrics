@@ -132,10 +132,6 @@ mean(eff$mean)</code></pre>
 <p><img src="/reproduction/1996_coelli_frontier41_files/figure-html/bayes-plot-1.png" alt="" width="768" /></p>
 <p>Most intervals are wide. With one observation per firm there is little information about any single firm’s inefficiency, and a ranking of the 60 firms by their point scores would suggest far more precision than the data contain.</p>
 </div>
-<div id="reproducing-it-as-a-test" class="section level2">
-<h2>Reproducing it as a test</h2>
-<p>The Bayesian fit is part of the test suite of <code>bsfa</code> (in <code>tests/testthat/test-replication.R</code>): its frontier coefficients have to lie within half a standard error of the guide’s estimates and its mean efficiency close to 0.7406, so a change to the sampler that moved them would fail its checks.</p>
-</div>
 <div id="references" class="section level2">
 <h2>References</h2>
 <p>Battese, G. E., &amp; Coelli, T. J. (1988). Prediction of firm-level technical efficiencies with a generalized frontier production function and panel data. <em>Journal of Econometrics, 38</em>(3), 387–399.</p>
