@@ -19,7 +19,7 @@ The analysis of economic time series often requires the extraction of their cycl
 
 ### Data
 
-I use quarterly data of US log real GDP from 1970Q1 to 2016Q4 for the illustration of the different methods. The time series is obtained via [Quandl](https://www.quandl.com/data/FRED/GDPC1-Real-Gross-Domestic-Product) and its respectiv R-package. The original series can be downloaded from the [FRED database](https://fred.stlouisfed.org/series/GDPC1).
+I use quarterly data of US log real GDP from 1970Q1 to 2016Q4 for the illustration of the different methods. The time series is obtained via Quandl and its respectiv R-package. The original series can be downloaded from the [FRED database](https://fred.stlouisfed.org/series/GDPC1).
 
 ```{r quandl, echo = FALSE, message=FALSE}
 Quandl::Quandl.api_key("FoPzBPA1oU3iKdRojSya")

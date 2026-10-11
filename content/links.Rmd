@@ -22,10 +22,6 @@ date: "2019-06-10"
 
 <a href="http://tryr.codeschool.com/" target="_blank">Codeschool: R-Tutorials</a>
 
-<a href="http://www.endmemo.com/program/R/index.php" target="_blank">Endmemo: R-Tutorials</a>
-
-<a href="http://en.wikibooks.org/wiki/R_Programming" target="_blank">Wikibook on R Programming</a>
-
 <a href="http://en.wikibooks.org/wiki/R_Programming" target="_blank">Wikibook on R Programming</a>
 
 
@@ -35,9 +31,7 @@ date: "2019-06-10"
 
 <a href="http://pages.stern.nyu.edu/~adamodar/New_Home_Page/datacurrent.html" target="_blank">Financial data and benchmarks</a>
 
-<a href="http://www.quandl.com/" target="_blank">Quandl: Data source</a>
-
-<a href="http://archive.ics.uci.edu/ml/datasets.html" target="_blank">UC Irvine Machine Learning Repository: Collection of interesting data</a>
+<a href="https://archive.ics.uci.edu/datasets" target="_blank">UC Irvine Machine Learning Repository: Collection of interesting data</a>
 
 
 

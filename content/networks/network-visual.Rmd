@@ -46,7 +46,7 @@ ggraph(graph_df, layout = "kk") + # Generate graph
   theme_graph() # Get rid of gray background colour, grid and axes
 ```
 
-Further introductions to `ggraph` can be found on <a href="https://www.data-imaginist.com/tags/ggraph" target="_blank">https://www.data-imaginist.com/tags/ggraph</a> and in the package's vignettes, of course.
+Further introductions to `ggraph` can be found on <a href="https://ggraph.data-imaginist.com/" target="_blank">https://ggraph.data-imaginist.com/</a> and in the package's vignettes, of course.
 
 However, the standard `plot` function can be used to get a quick impression of a network as well:
 

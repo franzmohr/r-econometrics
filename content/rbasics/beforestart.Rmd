@@ -39,7 +39,7 @@ Having installed all the necessary packages does not mean, that we can use them 
 library(foreign)
 ```
 
-These are the basic steps which I believe are useful before starting with the actual coding. However, there are also other ways to set up your workplace. For example, RStudio offers the functionality of so-called *projects* which, among other things, set the working directory automatically for you so that you do not have to think about that. I can only recommend to work with them. A short introduction to working with RStudio-projects can be found on <a href="https://support.rstudio.com/hc/en-us/articles/200526207-Using-Projects" target="_blank">RStudio's website</a>.
+These are the basic steps which I believe are useful before starting with the actual coding. However, there are also other ways to set up your workplace. For example, RStudio offers the functionality of so-called *projects* which, among other things, set the working directory automatically for you so that you do not have to think about that. I can only recommend to work with them. A short introduction to working with RStudio-projects can be found on <a href="https://docs.posit.co/ide/user/ide/guide/code/projects.html" target="_blank">RStudio's website</a>.
 
 Anyway, once your workplace is set up you can proceed with the next step, [importing data into R](/rbasics/help_and_data_import_etc).
 
