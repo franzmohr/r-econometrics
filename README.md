@@ -10,15 +10,15 @@ familiar with the language quickly.
 ## Building the site
 
 The site is a [Hugo](https://gohugo.io/) project written with
-[blogdown](https://github.com/rstudio/blogdown). The theme is included as a git
-submodule, so clone with:
+[blogdown](https://github.com/rstudio/blogdown). The
+[liquorice](https://github.com/eliasson/liquorice) theme is vendored in
+`themes/liquorice`, so a plain clone is enough:
 
 ```bash
-git clone --recurse-submodules git@github.com:franzmohr/r-econometrics.git
+git clone git@github.com:franzmohr/r-econometrics.git
 ```
 
-If the repository is already cloned, `git submodule update --init` fetches the
-theme. Then serve it locally with:
+Then serve it locally with:
 
 ```bash
 hugo server
