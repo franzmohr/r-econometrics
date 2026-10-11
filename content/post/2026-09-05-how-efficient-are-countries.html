@@ -1,0 +1,423 @@
+---
+title: "How Efficiently Do Countries Produce?"
+author: "Franz X. Mohr"
+date: '2026-09-05'
+description: "Applying a stochastic frontier model to Penn World Table data to estimate how far countries are away from the world's best practice production frontier."
+tags:
+  - stochastic-frontier
+  - efficiency
+  - pwt
+  - productivity
+  - technical-efficiency
+---
+
+
+
+<p>In an <a href="/2018/12/30/an-exercise-in-growth-accounting/">earlier post on growth accounting</a> total factor productivity was calculated as a residual: whatever part of output that cannot be explained by capital and labour is attributed to technology. The drawback of this approach is that the residual contains everything, which the model does not capture – including measurement error and bad luck. A <a href="/methods/stochasticfrontier">stochastic frontier model</a> takes a different route. It splits the residual into a symmetric noise term and a one-sided term, which measures how far a country produces below the maximum output that is attainable with its inputs. This post applies that idea to the countries in the Penn World Table.</p>
+<!--more-->
+<div id="data" class="section level2">
+<h2>Data</h2>
+<p>The <a href="https://www.rug.nl/ggdc/productivity/pwt/" target="_blank">Penn World Table</a> is available on CRAN. Version 10.01 covers 183 countries between 1950 and 2019.</p>
+<pre class="r"><code>library(dplyr)
+library(ggplot2)
+library(frontier) # install.packages(&quot;frontier&quot;)
+library(pwt10)    # install.packages(&quot;pwt10&quot;)
+
+data(&quot;pwt10.01&quot;)</code></pre>
+<p>The choice of variables deserves a moment of attention, because the Penn World Table contains several versions of output and capital, which are <em>not</em> interchangeable. Variables at current PPPs – <code>cgdpo</code> for output and <code>cn</code> for the capital stock – are constructed to compare productivity <em>levels across countries at a point in time</em>. Variables at constant prices – <code>rgdpo</code> and <code>rnna</code> – are constructed to compare <em>growth over time</em>. Since the first part of this post ranks countries in a single year, it uses the former pair. The panel model at the end, which looks at the time dimension, uses the latter.</p>
+<p>Labour is measured in efficiency units, i.e. the number of persons engaged <code>emp</code> multiplied by the index of human capital <code>hc</code>. This is the same convention that the Penn World Table itself uses when it calculates total factor productivity.</p>
+<pre class="r"><code>cs &lt;- pwt10.01 %&gt;%
+  filter(year == 2019) %&gt;%
+  transmute(country, isocode,
+            gdp = cgdpo,
+            capital = cn,
+            labour = emp * hc) %&gt;%
+  filter(complete.cases(.))
+
+nrow(cs)</code></pre>
+<pre><code>## [1] 144</code></pre>
+</div>
+<div id="a-world-production-frontier" class="section level2">
+<h2>A world production frontier</h2>
+<p>The model is a Cobb-Douglas production frontier
+<span class="math display">\[\ln Y_i = \beta_0 + \beta_1 \ln K_i + \beta_2 \ln L_i + v_i - u_i,\]</span>
+where <span class="math inline">\(Y_i\)</span> is output, <span class="math inline">\(K_i\)</span> the capital stock, <span class="math inline">\(L_i\)</span> labour in efficiency units, <span class="math inline">\(v_i\)</span> is noise and <span class="math inline">\(u_i \geq 0\)</span> is the distance to the frontier.</p>
+<pre class="r"><code>unrestricted &lt;- sfa(log(gdp) ~ log(capital) + log(labour), data = cs)
+
+summary(unrestricted)</code></pre>
+<pre><code>## Error Components Frontier (see Battese &amp; Coelli 1992)
+## Inefficiency decreases the endogenous variable (as in a production function)
+## The dependent variable is logged
+## Iterative ML estimation terminated after 9 iterations:
+## log likelihood values and parameters of two successive iterations
+## are within the tolerance limit
+## 
+## final maximum likelihood estimates
+##              Estimate Std. Error z value  Pr(&gt;|z|)    
+## (Intercept)  2.087641   0.281216  7.4236 1.140e-13 ***
+## log(capital) 0.718903   0.024954 28.8090 &lt; 2.2e-16 ***
+## log(labour)  0.274185   0.029962  9.1512 &lt; 2.2e-16 ***
+## sigmaSq      0.303166   0.049030  6.1832 6.281e-10 ***
+## gamma        0.871992   0.047996 18.1681 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## log likelihood value: -54.30155 
+## 
+## cross-sectional data
+## total number of observations = 144 
+## 
+## mean efficiency: 0.705794</code></pre>
+<p>The sum of the two elasticities measures returns to scale:</p>
+<pre class="r"><code>sum(coef(unrestricted)[2:3])</code></pre>
+<pre><code>## [1] 0.9930888</code></pre>
+<p>This is so close to one that constant returns to scale can be imposed without doing much harm. That simplifies the model to a relationship between output per efficiency unit of labour <span class="math inline">\(y = Y / L\)</span> and capital per efficiency unit of labour <span class="math inline">\(k = K / L\)</span>, which has the further advantage that the frontier can be drawn in a simple scatter plot.</p>
+<pre class="r"><code>cs &lt;- cs %&gt;%
+  mutate(y = gdp / labour,
+         k = capital / labour)
+
+frontier_model &lt;- sfa(log(y) ~ log(k), data = cs)
+
+summary(frontier_model)</code></pre>
+<pre><code>## Error Components Frontier (see Battese &amp; Coelli 1992)
+## Inefficiency decreases the endogenous variable (as in a production function)
+## The dependent variable is logged
+## Iterative ML estimation terminated after 8 iterations:
+## log likelihood values and parameters of two successive iterations
+## are within the tolerance limit
+## 
+## final maximum likelihood estimates
+##             Estimate Std. Error z value  Pr(&gt;|z|)    
+## (Intercept) 2.063596   0.274462  7.5187 5.533e-14 ***
+## log(k)      0.719421   0.024892 28.9015 &lt; 2.2e-16 ***
+## sigmaSq     0.302802   0.048837  6.2002 5.639e-10 ***
+## gamma       0.870831   0.048833 17.8330 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## log likelihood value: -54.37468 
+## 
+## cross-sectional data
+## total number of observations = 144 
+## 
+## mean efficiency: 0.7057818</code></pre>
+<p>The estimate of <span class="math inline">\(\gamma\)</span> is high, which means that most of the variation, which the production function does not explain, is attributed to inefficiency rather than to noise. Whether a frontier model is justified at all can be tested against the corresponding OLS model:</p>
+<pre class="r"><code>lrtest(frontier_model)</code></pre>
+<pre><code>## Likelihood ratio test
+## 
+## Model 1: OLS (no inefficiency)
+## Model 2: Error Components Frontier (ECF)
+##   #Df  LogLik Df  Chisq Pr(&gt;Chisq)    
+## 1   3 -66.524                         
+## 2   4 -54.375  1 24.299  4.123e-07 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>The null hypothesis of no inefficiency is clearly rejected. The following graph shows what the two estimators do with the data. The solid line is the estimated frontier, the dashed line is the OLS regression through the cloud.</p>
+<pre class="r"><code>library(ggrepel)
+
+label_these &lt;- c(&quot;USA&quot;, &quot;DEU&quot;, &quot;CHN&quot;, &quot;IND&quot;, &quot;EGY&quot;, &quot;VEN&quot;, &quot;QAT&quot;, &quot;IRL&quot;, &quot;NGA&quot;, &quot;JPN&quot;, &quot;AUT&quot;)
+
+eu &lt;- c(&quot;AUT&quot;, &quot;BEL&quot;, &quot;BGR&quot;, &quot;HRV&quot;, &quot;CYP&quot;, &quot;CZE&quot;, &quot;DNK&quot;, &quot;EST&quot;, &quot;FIN&quot;, &quot;FRA&quot;,
+        &quot;DEU&quot;, &quot;GRC&quot;, &quot;HUN&quot;, &quot;IRL&quot;, &quot;ITA&quot;, &quot;LVA&quot;, &quot;LTU&quot;, &quot;LUX&quot;, &quot;MLT&quot;, &quot;NLD&quot;,
+        &quot;POL&quot;, &quot;PRT&quot;, &quot;ROU&quot;, &quot;SVK&quot;, &quot;SVN&quot;, &quot;ESP&quot;, &quot;SWE&quot;)
+
+ggplot(cs, aes(x = log(k), y = log(y))) +
+  geom_point(aes(colour = isocode %in% eu), show.legend = FALSE) +
+  geom_abline(intercept = coef(frontier_model)[1],
+              slope = coef(frontier_model)[2]) +
+  geom_smooth(method = &quot;lm&quot;, se = FALSE, linetype = &quot;dashed&quot;) +
+  geom_text_repel(data = filter(cs, isocode %in% label_these),
+                  aes(label = isocode), size = 3) +
+  labs(x = &quot;Log capital per efficiency unit of labour&quot;,
+       y = &quot;Log output per efficiency unit of labour&quot;,
+       title = &quot;The world production frontier in 2019&quot;,
+       subtitle = &quot;Frontier (solid) and OLS (dashed)&quot;) +
+  theme_bw()</code></pre>
+<p><img src="/post/2026-09-05-how-efficient-are-countries_files/figure-html/scatter-1.png" alt="" width="624" /></p>
+</div>
+<div id="which-countries-are-close-to-the-frontier" class="section level2">
+<h2>Which countries are close to the frontier?</h2>
+<p>The distance of each country to the frontier is translated into an efficiency score between zero and one, where one means that a country produces as much as the best practice in the sample.</p>
+<pre class="r"><code>cs$efficiency &lt;- as.numeric(efficiencies(frontier_model))
+
+summary(cs$efficiency)</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+## 0.07707 0.62988 0.72677 0.70578 0.80206 0.93765</code></pre>
+<pre class="r"><code>ranking &lt;- cs %&gt;%
+  arrange(desc(efficiency)) %&gt;%
+  mutate(group = case_when(row_number() &lt;= 15 ~ &quot;15 closest to the frontier&quot;,
+                           row_number() &gt; n() - 15 ~ &quot;15 furthest away&quot;,
+                           TRUE ~ NA_character_)) %&gt;%
+  filter(!is.na(group))
+
+ggplot(ranking, aes(x = efficiency, y = reorder(isocode, efficiency))) +
+  geom_col(fill = &quot;grey40&quot;) +
+  facet_wrap(~ group, scales = &quot;free_y&quot;) +
+  labs(x = &quot;Technical efficiency&quot;, y = NULL) +
+  theme_bw()</code></pre>
+<p><img src="/post/2026-09-05-how-efficient-are-countries_files/figure-html/ranking-1.png" alt="" width="624" /></p>
+<p>Egypt, Trinidad and Tobago, Pakistan and Sudan come out on top, while Greece, Ukraine, Haiti and Venezuela are at the other end. This is not the ranking of advanced economies that one might have expected, and it is worth understanding why. The frontier is estimated with a capital elasticity of about 0.72. A country is therefore predicted to produce a lot only if it has a lot of <em>measured</em> capital. Countries that produce a decent amount of output with a small measured capital stock end up close to the frontier, and countries with a large capital stock and moderate output end up far below it. The efficiency scores are, to a large extent, a ranking by the inverse of the capital-output ratio:</p>
+<pre class="r"><code>cor(cs$efficiency, cs$capital / cs$gdp)</code></pre>
+<pre><code>## [1] -0.7230601</code></pre>
+<p>That is not a flaw in the estimator, but it is a strong reminder of what the model actually measures. Three things are worth keeping in mind.</p>
+<p>First, the model only knows about capital and labour. Natural resources are an unmeasured input, so oil and gas exporters convert a resource endowment into output that the model can only interpret as exceptional efficiency. The same applies to financial centres and entrepôt economies.</p>
+<p>Second, cross-country capital stocks are the weakest part of the data. They are constructed by accumulating past investment, which requires long and reliable investment series. Where those are missing, the capital stock is uncertain, and the efficiency score inherits that uncertainty.</p>
+<p>Third, individual scores are predictions of an unobserved random variable and should not be read as precise measurements. Venezuela is the extreme case in this sample:</p>
+<pre class="r"><code>cs %&gt;%
+  filter(isocode == &quot;VEN&quot;) %&gt;%
+  transmute(country, ky_ratio = capital / gdp, efficiency)</code></pre>
+<pre><code>##                                     country ky_ratio efficiency
+## VEN-2019 Venezuela (Bolivarian Republic of) 28.17112 0.07707343</code></pre>
+<p>An efficiency score of eight percent does not describe a technology. It describes an economy in the middle of a collapse, whose PPP conversion is not comparable to anything else in the sample.</p>
+</div>
+<div id="a-warning-about-homogeneous-samples" class="section level2">
+<h2>A warning about homogeneous samples</h2>
+<p>It is tempting to avoid these problems by restricting the sample to similar countries. That, however, tends to remove the very variation that identifies the model. Here is the same frontier for OECD members only:</p>
+<pre class="r"><code>oecd &lt;- c(&quot;AUS&quot;, &quot;AUT&quot;, &quot;BEL&quot;, &quot;CAN&quot;, &quot;CHL&quot;, &quot;COL&quot;, &quot;CRI&quot;, &quot;CZE&quot;, &quot;DNK&quot;, &quot;EST&quot;,
+          &quot;FIN&quot;, &quot;FRA&quot;, &quot;DEU&quot;, &quot;GRC&quot;, &quot;HUN&quot;, &quot;ISL&quot;, &quot;IRL&quot;, &quot;ISR&quot;, &quot;ITA&quot;, &quot;JPN&quot;,
+          &quot;KOR&quot;, &quot;LVA&quot;, &quot;LTU&quot;, &quot;LUX&quot;, &quot;MEX&quot;, &quot;NLD&quot;, &quot;NZL&quot;, &quot;NOR&quot;, &quot;POL&quot;, &quot;PRT&quot;,
+          &quot;SVK&quot;, &quot;SVN&quot;, &quot;ESP&quot;, &quot;SWE&quot;, &quot;CHE&quot;, &quot;TUR&quot;, &quot;GBR&quot;, &quot;USA&quot;)
+
+oecd_model &lt;- sfa(log(y) ~ log(k), data = filter(cs, isocode %in% oecd))</code></pre>
+<pre><code>## Warning in sfa(log(y) ~ log(k), data = filter(cs, isocode %in% oecd)): the
+## residuals of the OLS estimates are right-skewed; this might indicate that there
+## is no inefficiency or that the model is misspecified</code></pre>
+<pre><code>## Warning in sfa(log(y) ~ log(k), data = filter(cs, isocode %in% oecd)): the
+## parameter &#39;gamma&#39; is close to the boundary of the parameter space [0,1]: this
+## can cause convergence problems and can negatively affect the validity and
+## reliability of statistical tests and might be caused by model misspecification</code></pre>
+<pre class="r"><code>coef(oecd_model)[&quot;gamma&quot;]</code></pre>
+<pre><code>##        gamma 
+## 1.596242e-05</code></pre>
+<p>The estimate of <span class="math inline">\(\gamma\)</span> is practically zero and the function warns that the OLS residuals are right-skewed. Since inefficiency can only push observations <em>below</em> the frontier, the residuals of a frontier model should be left-skewed. If they are not, the data contain no evidence of a one-sided error term and the maximum likelihood estimator degenerates to OLS. This so-called <em>wrong skewness</em> problem is common in small and homogeneous samples, and it is a result in itself: within the OECD, the deviations from the common production function do not look systematic.</p>
+</div>
+<div id="has-the-world-moved-closer-to-best-practice" class="section level2">
+<h2>Has the world moved closer to best practice?</h2>
+<p>The cross section says nothing about the time dimension. For that, the model is estimated on a balanced panel of the years 1990 to 2019, this time with the constant price variables, which are the ones designed for comparisons over time. A linear trend allows the frontier itself to shift.</p>
+<pre class="r"><code>library(plm)
+
+pan &lt;- pwt10.01 %&gt;%
+  filter(year &gt;= 1990, year &lt;= 2019) %&gt;%
+  transmute(country, isocode, year,
+            y = rgdpo / (emp * hc),
+            k = rnna / (emp * hc)) %&gt;%
+  filter(complete.cases(.))
+
+# Keep countries, which are observed in every year
+balanced &lt;- pan %&gt;%
+  count(isocode) %&gt;%
+  filter(n == 30) %&gt;%
+  pull(isocode)
+
+pan &lt;- pan %&gt;%
+  filter(isocode %in% balanced) %&gt;%
+  mutate(trend = year - 1990) %&gt;%
+  droplevels()
+
+pdat &lt;- pdata.frame(pan, c(&quot;isocode&quot;, &quot;year&quot;))
+
+length(balanced)</code></pre>
+<pre><code>## [1] 144</code></pre>
+<pre class="r"><code>panel_model &lt;- sfa(log(y) ~ log(k) + trend, data = pdat)
+
+summary(panel_model)</code></pre>
+<pre><code>## Error Components Frontier (see Battese &amp; Coelli 1992)
+## Inefficiency decreases the endogenous variable (as in a production function)
+## The dependent variable is logged
+## Iterative ML estimation terminated after 18 iterations:
+## log likelihood values and parameters of two successive iterations
+## are within the tolerance limit
+## 
+## final maximum likelihood estimates
+##               Estimate Std. Error  z value  Pr(&gt;|z|)    
+## (Intercept) 4.67555284 0.19919262  23.4725 &lt; 2.2e-16 ***
+## log(k)      0.49699628 0.01661035  29.9209 &lt; 2.2e-16 ***
+## trend       0.01146714 0.00044472  25.7853 &lt; 2.2e-16 ***
+## sigmaSq     1.02332449 0.12827587   7.9775 1.493e-15 ***
+## gamma       0.94468852 0.00719180 131.3563 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## log likelihood value: -279.8751 
+## 
+## panel data
+## number of cross-sections = 144 
+## number of time periods = 30 
+## total number of observations = 4320 
+## thus there are 0 observations not in the panel
+## 
+## mean efficiency: 0.4594662</code></pre>
+<p>The coefficient of the trend is the annual rate at which the frontier shifts upwards, i.e. the rate of technical progress of the best practice technology. At about 1.1 percent per year it is of a plausible order of magnitude. Efficiency is time invariant in this specification, so each country receives a single score for the whole period. The argument <code>timeEffect = TRUE</code> relaxes that and lets the distance to the frontier change over time:</p>
+<pre class="r"><code>panel_time &lt;- sfa(log(y) ~ log(k) + trend, data = pdat, timeEffect = TRUE)
+
+summary(panel_time)</code></pre>
+<pre><code>## Error Components Frontier (see Battese &amp; Coelli 1992)
+## Inefficiency decreases the endogenous variable (as in a production function)
+## The dependent variable is logged
+## Iterative ML estimation terminated after 15 iterations:
+## log likelihood values and parameters of two successive iterations
+## are within the tolerance limit
+## 
+## final maximum likelihood estimates
+##               Estimate Std. Error z value  Pr(&gt;|z|)    
+## (Intercept)  2.8138922  0.1122851 25.0602 &lt; 2.2e-16 ***
+## log(k)       0.6910175  0.0109205 63.2773 &lt; 2.2e-16 ***
+## trend       -0.0087470  0.0010394 -8.4155 &lt; 2.2e-16 ***
+## sigmaSq      0.3912846  0.0462621  8.4580 &lt; 2.2e-16 ***
+## gamma        0.8672082  0.0160791 53.9340 &lt; 2.2e-16 ***
+## time         0.0243990  0.0010506 23.2241 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## log likelihood value: -83.27813 
+## 
+## panel data
+## number of cross-sections = 144 
+## number of time periods = 30 
+## total number of observations = 4320 
+## thus there are 0 observations not in the panel
+## 
+## mean efficiency of each year
+##      1990      1991      1992      1993      1994      1995      1996      1997 
+## 0.3993362 0.4071771 0.4150248 0.4228755 0.4307255 0.4385709 0.4464080 0.4542333 
+##      1998      1999      2000      2001      2002      2003      2004      2005 
+## 0.4620433 0.4698344 0.4776033 0.4853468 0.4930615 0.5007445 0.5083926 0.5160030 
+##      2006      2007      2008      2009      2010      2011      2012      2013 
+## 0.5235728 0.5310992 0.5385798 0.5460119 0.5533931 0.5607211 0.5679936 0.5752086 
+##      2014      2015      2016      2017      2018      2019 
+## 0.5823640 0.5894580 0.5964886 0.6034542 0.6103532 0.6171841 
+## 
+## mean efficiency: 0.5107754</code></pre>
+<p>The parameter <code>time</code> is positive, which in this parameterisation means that inefficiency declines over the sample period. Average efficiency rises from about 0.40 in 1990 to about 0.62 in 2019, so the typical country has moved closer to best practice.</p>
+<pre class="r"><code>mean_eff &lt;- data.frame(year = 1990:2019,
+                       efficiency = colMeans(efficiencies(panel_time)))
+
+ggplot(mean_eff, aes(x = year, y = efficiency)) +
+  geom_line() +
+  labs(x = NULL, y = &quot;Mean technical efficiency&quot;,
+       title = &quot;Average distance to the world frontier&quot;) +
+  theme_bw()</code></pre>
+<p><img src="/post/2026-09-05-how-efficient-are-countries_files/figure-html/panel-plot-1.png" alt="" width="576" /></p>
+<p>This result should be read together with the coefficient of the trend, which turns negative once time-varying efficiency is allowed. Both terms describe how output evolves over time – one through the position of the frontier, the other through the distance to it – and the data have a hard time telling them apart. The finding that countries are catching up is therefore not independent of the assumption that the frontier itself is shifting at a constant rate. Whenever a frontier model contains two ways of expressing the same trend, it is worth checking how much of the story depends on which of them is allowed to move.</p>
+</div>
+<div id="heterogeneity-or-inefficiency" class="section level2">
+<h2>Heterogeneity or inefficiency?</h2>
+<p>There is a deeper problem with the country ranking, and it is worth making explicit. In the panel model above, each country receives one efficiency score for the whole period. That score has to absorb <em>everything</em> persistent about a country that is not capital or labour: oil reserves, geography, climate, institutions, the structure of its industries. Calling all of that “inefficiency” is a strong claim.</p>
+<p>Greene (2005) proposed a way out, which is usually called the <em>true fixed effects</em> model. Every country gets its own intercept in the frontier, and the inefficiency term is allowed to vary from observation to observation. Persistent country characteristics then end up in the intercept, and only the deviations from a country’s own best performance are counted as inefficiency. In R this amounts to adding country dummies to the frontier and treating the sample as a pooled cross section, so that inefficiency is estimated for each observation rather than for each country.</p>
+<pre class="r"><code>tfe &lt;- sfa(log(y) ~ log(k) + trend + factor(isocode), data = pan)
+
+coef(tfe)[c(&quot;log(k)&quot;, &quot;trend&quot;, &quot;sigmaSq&quot;, &quot;gamma&quot;)]</code></pre>
+<pre><code>##      log(k)       trend     sigmaSq       gamma 
+## 0.496018871 0.009770952 0.147541552 0.971961593</code></pre>
+<p>The frontier itself hardly moves: the capital elasticity and the rate of technical progress are close to those of the previous model. What the country dummies change is the <em>position</em> of the frontier, which is no longer a single line but 144 parallel ones. Drawing all of them is not very instructive. Since they differ only by their intercept, the country intercept can instead be subtracted from output, together with the trend, which leaves a single frontier through the origin and makes the deviations comparable across countries.</p>
+<pre class="r"><code>cf &lt;- coef(tfe)
+
+# Collect the country specific intercepts. The first country in the sample
+# serves as the reference category, so its dummy is zero.
+dummies &lt;- cf[grep(&quot;^factor\\(isocode\\)&quot;, names(cf))]
+names(dummies) &lt;- sub(&quot;^factor\\(isocode\\)&quot;, &quot;&quot;, names(dummies))
+reference &lt;- setdiff(levels(pan$isocode), names(dummies))
+intercepts &lt;- c(setNames(0, reference), dummies) + cf[&quot;(Intercept)&quot;]
+
+# Net out the country intercept and technical progress
+tfe_frontier &lt;- pan %&gt;%
+  mutate(output_net = log(y) - intercepts[as.character(isocode)] - cf[&quot;trend&quot;] * trend,
+         isocode = as.character(isocode),
+         var_colour = ifelse(isocode %in% eu, isocode, &quot;Other&quot;),
+         var_colour = factor(var_colour, levels = c(eu, &quot;Other&quot;)),
+         var_alpha = ifelse(isocode %in% c(eu), 1, 0.2)) %&gt;%
+  arrange(desc(var_colour)) %&gt;%
+  filter(log(k) &gt; 9,
+         log(k) &lt; 12.5)
+
+ggplot(tfe_frontier, aes(x = log(k), y = output_net)) +
+  geom_point(aes(colour = var_colour, alpha = var_alpha), size = 0.6) +
+  geom_abline(intercept = 0, slope = cf[&quot;log(k)&quot;]) +
+  guides(alpha = &quot;none&quot;) +
+  labs(x = &quot;Log capital per efficiency unit of labour&quot;,
+       y = &quot;Log output, net of country intercept\nand technical progress&quot;,
+       title = &quot;The true fixed effects frontier, 1990 to 2019&quot;,
+       subtitle = &quot;A single frontier once the country intercepts are removed&quot;) +
+  theme_bw()</code></pre>
+<p><img src="/post/2026-09-05-how-efficient-are-countries_files/figure-html/tfe-plot-1.png" alt="" width="624" /></p>
+<p>Almost all observations lie below the line, and the vertical distance to it is what the model now calls inefficiency. Everything that permanently separates a country from the rest of the world has moved into its intercept, so a country is no longer compared to the world, but to its own best years. What changes completely, therefore, is the efficiency estimates.</p>
+<pre class="r"><code>panel_eff &lt;- data.frame(isocode = rownames(efficiencies(panel_model)),
+                        eff_panel = as.numeric(efficiencies(panel_model)))
+
+comparison &lt;- pan %&gt;%
+  mutate(eff_tfe = as.numeric(efficiencies(tfe))) %&gt;%
+  group_by(isocode = as.character(isocode), country) %&gt;%
+  summarise(eff_tfe = mean(eff_tfe), .groups = &quot;drop&quot;) %&gt;%
+  left_join(panel_eff, by = &quot;isocode&quot;)
+
+# Mean efficiency under both specifications
+c(panel = mean(comparison$eff_panel), tfe = mean(comparison$eff_tfe))</code></pre>
+<pre><code>##     panel       tfe 
+## 0.4594662 0.7831169</code></pre>
+<pre class="r"><code># How similar are the two rankings?
+cor(comparison$eff_panel, comparison$eff_tfe, method = &quot;spearman&quot;)</code></pre>
+<pre><code>## [1] 0.2318624</code></pre>
+<p>The rank correlation between the two sets of scores is low, which means that the two models tell almost different stories about the same data. The countries that led the previous ranking are a good illustration:</p>
+<pre class="r"><code>comparison %&gt;%
+  arrange(desc(eff_panel)) %&gt;%
+  select(country, eff_panel, eff_tfe) %&gt;%
+  head(8)</code></pre>
+<pre><code>## # A tibble: 8 × 3
+##   country              eff_panel eff_tfe
+##   &lt;fct&gt;                    &lt;dbl&gt;   &lt;dbl&gt;
+## 1 Kuwait                   0.990   0.695
+## 2 China, Macao SAR         0.966   0.641
+## 3 Qatar                    0.966   0.653
+## 4 Brunei Darussalam        0.926   0.752
+## 5 Saudi Arabia             0.902   0.726
+## 6 Trinidad and Tobago      0.878   0.685
+## 7 United Arab Emirates     0.855   0.720
+## 8 Taiwan                   0.838   0.798</code></pre>
+<p>Once every country is allowed its own intercept, the resource exporters lose their exceptional position, because what made them look efficient was a permanent country characteristic and not something that varies over time. The countries at the bottom of the new ranking are those whose output fluctuated most strongly relative to their own trajectory:</p>
+<pre class="r"><code>comparison %&gt;%
+  arrange(eff_tfe) %&gt;%
+  select(country, eff_tfe, eff_panel) %&gt;%
+  head(8)</code></pre>
+<pre><code>## # A tibble: 8 × 3
+##   country              eff_tfe eff_panel
+##   &lt;fct&gt;                  &lt;dbl&gt;     &lt;dbl&gt;
+## 1 Zimbabwe               0.540    0.428 
+## 2 Kyrgyzstan             0.545    0.295 
+## 3 Nigeria                0.572    0.171 
+## 4 Yemen                  0.586    0.246 
+## 5 Tajikistan             0.596    0.0899
+## 6 Angola                 0.623    0.201 
+## 7 Syrian Arab Republic   0.625    0.242 
+## 8 China, Macao SAR       0.641    0.966</code></pre>
+<p>Neither model is simply right. They answer different questions. The first asks how much output a country produces compared to the best practice observed anywhere in the world, which is the interesting question if one believes that technology is freely available and that persistent differences are the object of study. The second asks how much output a country produces compared to its own best performance, which is the interesting question if one believes that countries face genuinely different production possibilities. The low rank correlation is a measure of how much of the original ranking was persistent heterogeneity rather than inefficiency.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></p>
+</div>
+<div id="related-literature" class="section level2">
+<h2>Related literature</h2>
+<p>None of this is new territory. Stochastic frontier models have been applied to cross-country growth data since the 1990s. Koop, Osiewalski and Steel (1999, 2000) estimate Bayesian frontiers on country panels and decompose output growth into input change, technical change and efficiency change. Kumbhakar and Wang (2005) estimate a world frontier for 75 countries and conclude that productivity differences account for virtually the entire growth gap between developed and developing countries. Pires and Garcia (2012) apply the same Battese-Coelli estimator, which is used here, to an earlier vintage of the Penn World Table and compare the resulting efficiency scores with conventional productivity indices.</p>
+<p>A parallel and equally large literature builds the world frontier non-parametrically with data envelopment analysis, which imposes no functional form but also has no noise term. Färe, Grosskopf, Norris and Zhang (1994) introduced the approach for industrialised countries, Kumar and Russell (2002) decompose labour productivity growth into frontier shift, catch-up and capital deepening, Henderson and Russell (2005) add human capital, and Jerzmanowski (2007) uses it to weigh the inefficiency explanation of productivity gaps against the appropriate technology explanation.</p>
+<p>Anyone who wants to take the exercise in this post seriously should start there, and in particular with the heterogeneity problem, for which the true fixed effects model above is only the simplest of the available answers.</p>
+</div>
+<div id="conclusion" class="section level2">
+<h2>Conclusion</h2>
+<p>Stochastic frontier models add something that growth accounting cannot deliver: an explicit distinction between noise and systematic underperformance, and a benchmark that is estimated from the data rather than assumed. Applied to countries they also show the limits of the approach quite clearly. The frontier can only be as good as the list of inputs, and for economies that list is inevitably incomplete. What the last section adds to that is a warning about the estimates themselves: the country ranking turned out to depend more on the treatment of unobserved heterogeneity than on anything the frontier does. Read as a measure of “how much output does this country get out of its measured capital and labour”, the estimates are informative. Read as a ranking of national competence, they are not.</p>
+</div>
+<div id="literature" class="section level2">
+<h2>Literature</h2>
+<p>Aigner, D., Lovell, C. A. K., &amp; Schmidt, P. (1977). Formulation and estimation of stochastic frontier production function models. <em>Journal of Econometrics, 6</em>(1), 21–37.</p>
+<p>Battese, G. E., &amp; Coelli, T. J. (1992). Frontier production functions, technical efficiency and panel data: With application to paddy farmers in India. <em>Journal of Productivity Analysis, 3</em>(1), 153–169.</p>
+<p>Färe, R., Grosskopf, S., Norris, M., &amp; Zhang, Z. (1994). Productivity growth, technical progress, and efficiency change in industrialized countries. <em>American Economic Review, 84</em>(1), 66–83.</p>
+<p>Feenstra, R. C., Inklaar, R., &amp; Timmer, M. P. (2015). The next generation of the Penn World Table. <em>American Economic Review, 105</em>(10), 3150–3182.</p>
+<p>Greene, W. (2005). Reconsidering heterogeneity in panel data estimators of the stochastic frontier model. <em>Journal of Econometrics, 126</em>(2), 269–303.</p>
+<p>Henderson, D. J., &amp; Russell, R. R. (2005). Human capital and convergence: A production-frontier approach. <em>International Economic Review, 46</em>(4), 1167–1205.</p>
+<p>Henningsen, A. (2020). frontier: Stochastic frontier analysis. R package version 1.1-8.</p>
+<p>Jerzmanowski, M. (2007). Total factor productivity differences: Appropriate technology vs. efficiency. <em>European Economic Review, 51</em>(8), 2080–2110.</p>
+<p>Koop, G., Osiewalski, J., &amp; Steel, M. F. J. (1999). The components of output growth: A stochastic frontier analysis. <em>Oxford Bulletin of Economics and Statistics, 61</em>(4), 455–487.</p>
+<p>Koop, G., Osiewalski, J., &amp; Steel, M. F. J. (2000). Modeling the sources of output growth in a panel of countries. <em>Journal of Business &amp; Economic Statistics, 18</em>(3), 284–299.</p>
+<p>Kumar, S., &amp; Russell, R. R. (2002). Technological change, technological catch-up, and capital deepening: Relative contributions to growth and convergence. <em>American Economic Review, 92</em>(3), 527–548.</p>
+<p>Kumbhakar, S. C., &amp; Wang, H.-J. (2005). Estimation of growth convergence using a stochastic production frontier approach. <em>Economics Letters, 88</em>(3), 300–305.</p>
+<p>Meeusen, W., &amp; van den Broeck, J. (1977). Efficiency estimation from Cobb-Douglas production functions with composed error. <em>International Economic Review, 18</em>(2), 435–444.</p>
+<p>Pires, J. O., &amp; Garcia, F. (2012). Productivity of nations: A stochastic frontier approach to TFP decomposition. <em>Economics Research International</em>, 584869.</p>
+<p>Simar, L., &amp; Wilson, P. W. (2010). Inferences from cross-sectional, stochastic frontier models. <em>Econometric Reviews, 29</em>(1), 62–98.</p>
+</div>
+<div class="footnotes footnotes-end-of-document">
+<hr />
+<ol>
+<li id="fn1"><p>The true fixed effects model is not without problems of its own. Estimating one intercept per country together with the parameters of the error distribution creates an incidental parameters problem, which biases the variance estimates when the number of time periods is small. With 30 years per country the bias should be moderate, but in shorter panels it is a serious concern.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
