@@ -20,18 +20,18 @@ description: "This post presents methods that can be used to decompose economic 
 <p>The analysis of economic time series often requires the extraction of their cyclical components. This post presents some methods, which can be used to decompose time series into their different components. It is based on the chapter on business cycles by Stock and Watson (1999) in the Handbook of Macroeconomics, but also presents some more recent methods like Hamilton’s (2018) alternative to the HP-filter, wavelet filtering and empirical mode decomposition.</p>
 <div id="data" class="section level3">
 <h3>Data</h3>
-<p>I use quarterly data of US log real GDP from 1970Q1 to 2016Q4 for the illustration of the different methods. The time series is obtained via Quandl and its respectiv R-package. The original series can be downloaded from the <a href="https://fred.stlouisfed.org/series/GDPC1">FRED database</a>.</p>
-<pre class="r"><code># Load packages for data download and transformation
+<p>I use quarterly data of US log real GDP from 1970Q1 to 2016Q4 for the illustration of the different methods. The series is downloaded directly from the <a href="https://fred.stlouisfed.org/series/GDPC1">FRED database</a> of the Federal Reserve Bank of St. Louis, which offers each series as a CSV file that can be read without an API key. Note that FRED always returns the latest vintage of the data, so revisions of the national accounts can change the figures below slightly.</p>
+<pre class="r"><code># Load packages for data transformation
 library(dplyr)
-library(Quandl)
 library(tidyr)
 
 # Download data
-data &lt;- Quandl(&quot;FRED/GDPC1&quot;, order = &quot;asc&quot;,
-               start_date = &quot;1970-01-01&quot;, end_date = &quot;2016-10-01&quot;)  %&gt;%
-  rename(date = Date,
-         gdp = Value) %&gt;%
-  mutate(lgdp = log(gdp)) # Take logs</code></pre>
+url &lt;- &quot;https://fred.stlouisfed.org/graph/fredgraph.csv?id=GDPC1&amp;cosd=1970-01-01&amp;coed=2016-10-01&quot;
+data &lt;- read.csv(url) %&gt;%
+  rename(date = observation_date,
+         gdp = GDPC1) %&gt;%
+  mutate(date = as.Date(date),
+         lgdp = log(gdp)) # Take logs</code></pre>
 <p>To get an intuition about what it means to extract the cyclical component of a time series, look at the development of log real GDP over time in the following figure.</p>
 <pre class="r"><code>library(ggplot2)
 
@@ -39,8 +39,8 @@ ggplot(data, aes(x = date, y = lgdp)) +
   geom_line() +
   theme_classic() +
   labs(title = &quot;Log real US GDP&quot;, x = &quot;Quarter&quot;, y = &quot;&quot;,
-       caption = &quot;Source: U.S. Bureau of Economic Analysis (GDPC1).\nRetrieved via Quandl.com.&quot;)</code></pre>
-<p><img src="/timeseries/economic-cycle-extraction_files/figure-html/raw-series-1.png" width="432" /></p>
+       caption = &quot;Source: U.S. Bureau of Economic Analysis (GDPC1).\nRetrieved from FRED.&quot;)</code></pre>
+<p><img src="/timeseries/economic-cycle-extraction_files/figure-html/raw-series-1.png" alt="" width="432" /></p>
 <p>There is a clear increasing trend in the data, which appears to become gradually smaller up to the present. Additionally, the series seems to fluctuate around this trend in a more or less regular manner. There are relatively long lasting deviations from the trend, which could be considered to be cyclical fluctuations. The identification of those cyclical components is an important question in economics, because it might have serious implications for economic policy.</p>
 </div>
 <div id="deviation-from-a-linear-trend" class="section level2">
@@ -69,7 +69,7 @@ ggplot(temp, aes(x = date, y = value, colour = Variable)) +
   theme_classic() +
   labs(title = &quot;Residuals of a linear trend estimation&quot;,
        x = &quot;Quarter&quot;, y = &quot;&quot;)</code></pre>
-<p><img src="/timeseries/economic-cycle-extraction_files/figure-html/trend-1.png" width="432" /></p>
+<p><img src="/timeseries/economic-cycle-extraction_files/figure-html/trend-1.png" alt="" width="432" /></p>
 <p>This approach is relatively controversial, since it assumes that there is a constant, linear time trend. As we have seen above, this is not very likely given the steady decrease of the trend’s growth rate over time. However, it is still possible to assume a different functional form of the time trend, e.g. a quadratic term, to account for the specifities of a trend. A further disadvantage of this method is that it does only exlude the trend, but not the noise, i.e. the very small fluctuations in the series.</p>
 </div>
 <div id="hodrick-prescott-filter" class="section level2">
@@ -103,7 +103,7 @@ ggplot(temp, aes(x = date, y = value, colour = Variable)) +
   theme_classic() +
   labs(title = &quot;HP filter&quot;,
        x = &quot;Qurarter&quot;, y = &quot;&quot;)</code></pre>
-<p><img src="/timeseries/economic-cycle-extraction_files/figure-html/hodrick%20prescott-1.png" width="432" /></p>
+<p><img src="/timeseries/economic-cycle-extraction_files/figure-html/hodrick%20prescott-1.png" alt="" width="432" /></p>
 <p>Although widely used in economics, the HP filter is also heavily criticised for some features. See, for example, a good overview in a <a href="http://bruegel.org/2012/07/blogs-review-hp-filters-and-business-cycles/" target="_blank">Bruegel blog post</a> by Jérémie Cohen-Setton and Yury Yatsynovich and <a href="https://doi.org/10.1162/rest_a_00706" target="_blank">here</a> for the working paper version of a critique by James Hamilton.</p>
 </div>
 <div id="a-regression-based-alternative-to-the-hp-filter" class="section level2">
@@ -141,7 +141,7 @@ ggplot(temp, aes(x = date, y = value, colour = Variable)) +
   labs(title = &quot;Hamilton&#39;s alternative to the HP filter&quot;,
        x = &quot;Qurarter&quot;, y = &quot;&quot;, 
        caption = &quot;Source: Hamilton (2018).&quot;)</code></pre>
-<p><img src="/timeseries/economic-cycle-extraction_files/figure-html/hp%20augmented-1.png" width="432" /></p>
+<p><img src="/timeseries/economic-cycle-extraction_files/figure-html/hp%20augmented-1.png" alt="" width="432" /></p>
 </div>
 <div id="baxter-king-filter" class="section level2">
 <h2>Baxter King filter</h2>
@@ -169,7 +169,7 @@ ggplot(temp, aes(x = date, y = value, colour = Variable)) +
   theme_classic() +
   labs(title = &quot;Baxter-King filter&quot;,
        x = &quot;Qurarter&quot;, y = &quot;&quot;)</code></pre>
-<p><img src="/timeseries/economic-cycle-extraction_files/figure-html/baxter%20king-1.png" width="432" /></p>
+<p><img src="/timeseries/economic-cycle-extraction_files/figure-html/baxter%20king-1.png" alt="" width="432" /></p>
 </div>
 <div id="wavelet-filter" class="section level2">
 <h2>Wavelet filter</h2>
@@ -203,7 +203,7 @@ ggplot(temp, aes(x = date, y = value)) +
   facet_wrap( ~ imf, scales = &quot;free&quot;) +
   labs(title = &quot;Wavelets&quot;,
        x = &quot;Quarter&quot;, y = &quot;&quot;)</code></pre>
-<p><img src="/timeseries/economic-cycle-extraction_files/figure-html/wavelet-1.png" width="576" /></p>
+<p><img src="/timeseries/economic-cycle-extraction_files/figure-html/wavelet-1.png" alt="" width="576" /></p>
 <p>The function gives multiple series, which have to be cumulated with <code>cumsum</code> to translate them back into the level data. Maybe not surprisingly, the wavelet filter yields a similar result as the BK filter, since the upper bound of cycle periods is equal in both and the lower bound differs only by two - <span class="math inline">\(2^3 = 8\)</span> compared to the <span class="math inline">\(6\)</span> in the BK filter.</p>
 <pre class="r"><code>data &lt;- data %&gt;%
   mutate(wave = c(NA, cumsum(wave_gdp$D3 + wave_gdp$D4 + wave_gdp$D5)))
@@ -221,11 +221,11 @@ ggplot(temp, aes(x = date, y = value, colour = Variable)) +
   theme_classic() +
   labs(title = &quot;Wavelets&quot;,
        x = &quot;Quarter&quot;, y = &quot;&quot;)</code></pre>
-<p><img src="/timeseries/economic-cycle-extraction_files/figure-html/wavelet%20plot-1.png" width="432" /></p>
+<p><img src="/timeseries/economic-cycle-extraction_files/figure-html/wavelet%20plot-1.png" alt="" width="432" /></p>
 </div>
 <div id="empirical-mode-decomposition-emd" class="section level2">
 <h2>Empirical mode decomposition (EMD)</h2>
-<p>Kozic and Sever (2014) propose empirical mode decomposition as a further method of business cycle extraction as presented in Huang et al. (1998). An implementation of the method comes with the <code>emd</code> function in the <em>EMD</em> package. It requires a time series, which can be both stationary or non-stationary and a <code>boundary</code> condition. The basic idea of EMD is similar to wavelets. It decomposes a time series into sub-series, which are called <em>intrinsic mode functions</em> (IMF).</p>
+<p>Kozic and Sever (2014) propose empirical mode decomposition as a further method of business cycle extraction as presented in Huang et al. (1998). An implementation of the method comes with the <code>emd</code> function in the <em>EMD</em> package. It requires a time series, which can be both stationary or non-stationary and a <code>boundary</code> condition. The basic idea of EMD is similar to wavelets. It decomposes a time series into sub-series, which are called <em>intrinsic mode functions</em> (IMF).</p>
 <pre class="r"><code>library(EMD)
 
 y &lt;- na.omit(data$lgdp)
@@ -248,7 +248,7 @@ ggplot(temp, aes(x = date, y = value)) +
   facet_wrap( ~ imf) +
   labs(title = &quot;Empirical mode decomposition&quot;,
        x = &quot;Quarter&quot;, y = &quot;&quot;)</code></pre>
-<p><img src="/timeseries/economic-cycle-extraction_files/figure-html/emd-1.png" width="432" /></p>
+<p><img src="/timeseries/economic-cycle-extraction_files/figure-html/emd-1.png" alt="" width="432" /></p>
 <pre class="r"><code># Add EMD output to main data frame
 data &lt;- data %&gt;%
   mutate(emd = lgdp - emd_gdp$residue)
@@ -268,12 +268,12 @@ ggplot(temp, aes(x = date, y = value, colour = Variable)) +
   theme_classic() +
   labs(title = &quot;Empirical mode decomposition&quot;,
        x = &quot;Qurarter&quot;, y = &quot;&quot;)</code></pre>
-<p><img src="/timeseries/economic-cycle-extraction_files/figure-html/emd%20plot-1.png" width="432" /></p>
-<p>Note that the first and last elements are equal to zero. This is because we used the argument <code>boundary = &quot;none&quot;</code>. If we used a different specification, the function would eliminate this boundary effect by extending the original series.</p>
+<p><img src="/timeseries/economic-cycle-extraction_files/figure-html/emd%20plot-1.png" alt="" width="432" /></p>
+<p>Note that the first and last elements are equal to zero. This is because we used the argument <code>boundary = "none"</code>. If we used a different specification, the function would eliminate this boundary effect by extending the original series.</p>
 </div>
 <div id="grant-a.-l.-chan-j.-c.-c.-2017" class="section level2">
 <h2>Grant, A. L., &amp; Chan, J. C. C. (2017)</h2>
-<p>The followning code follows the description in Chan et al. (2019). The MATLAB code can be found on <a href="https://web.ics.purdue.edu/~jltobias/second_edition/Chapter18/chapt18.html" target="_blank">the textbook’s website</a>.</p>
+<p>The followning code follows the description in Chan et al. (2019). The MATLAB code can be found on <a href="https://web.ics.purdue.edu/~jltobias/second_edition/Chapter18/chapt18.html" target="_blank">the textbook’s website</a>.</p>
 <p>Priors</p>
 <pre class="r"><code># Rescaled data
 y &lt;- na.omit(data$lgdp) * 100
@@ -401,7 +401,7 @@ ggplot(temp, aes(x = date, y = value, colour = Variable)) +
   theme_classic() +
   labs(title = &quot;Grant &amp; Chan (2017)&quot;,
        x = &quot;Qurarter&quot;, y = &quot;&quot;)</code></pre>
-<p><img src="/timeseries/economic-cycle-extraction_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p><img src="/timeseries/economic-cycle-extraction_files/figure-html/unnamed-chunk-4-1.png" alt="" width="672" /></p>
 </div>
 <div id="references" class="section level2">
 <h2>References</h2>
@@ -412,7 +412,6 @@ ggplot(temp, aes(x = date, y = value, colour = Variable)) +
 <p>Hamilton, J. D. (2018), Why you should never use the Hodrick-Prescott filter. <em>Review of Economics and Statistics, 100</em>(5), 831-843. <a href="https://doi.org/10.1162/rest_a_00706">https://doi.org/10.1162/rest_a_00706</a></p>
 <p>Kim, D. and Oh, H.-S. (2014). EMD: Empirical Mode Decomposition and Hilbert Spectral Analysis. R package version 1.5.7.</p>
 <p>Kožić, I., &amp; Sever, I. (2014). Measuring business cycles: Empirical Mode Decomposition of economic time series. <em>Economics Letters, 123</em>(3), 287–290. <a href="https://doi.org/10.1016/j.econlet.2014.03.009">https://doi.org/10.1016/j.econlet.2014.03.009</a></p>
-<p>McTaggart, R., Daroczi, G., &amp; Leung, C. (2018). Quandl: API Wrapper for Quandl.com. R package version 2.9.1. <a href="https://CRAN.R-project.org/package=Quandl">https://CRAN.R-project.org/package=Quandl</a></p>
 <p>Shea, J. M. (2018). neverhpfilter: A Better Alternative to the Hodrick-Prescott Filter. R package version 0.2-0. <a href="https://CRAN.R-project.org/package=neverhpfilter">https://CRAN.R-project.org/package=neverhpfilter</a></p>
 <p>Stock, J. H., &amp; Watson, M. W. (1999). Business Cycle Fluctuations in US Macroeconomic Time Series. In J. B. Taylor &amp; M. Woodford (Eds.), Handbook of Macroeconomics. Handbook of Macroeconomics (pp. 3–64). Elsevier.</p>
 <p>Whitcher, B. (2015). waveslim: Basic wavelet routines for one-, two- and three-dimensional signal processing. R package version 1.7.5. <a href="https://CRAN.R-project.org/package=waveslim">https://CRAN.R-project.org/package=waveslim</a></p>

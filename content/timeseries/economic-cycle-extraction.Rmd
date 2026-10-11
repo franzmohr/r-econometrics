@@ -19,23 +19,20 @@ The analysis of economic time series often requires the extraction of their cycl
 
 ### Data
 
-I use quarterly data of US log real GDP from 1970Q1 to 2016Q4 for the illustration of the different methods. The time series is obtained via Quandl and its respectiv R-package. The original series can be downloaded from the [FRED database](https://fred.stlouisfed.org/series/GDPC1).
+I use quarterly data of US log real GDP from 1970Q1 to 2016Q4 for the illustration of the different methods. The series is downloaded directly from the [FRED database](https://fred.stlouisfed.org/series/GDPC1) of the Federal Reserve Bank of St. Louis, which offers each series as a CSV file that can be read without an API key. Note that FRED always returns the latest vintage of the data, so revisions of the national accounts can change the figures below slightly.
 
-```{r quandl, echo = FALSE, message=FALSE}
-Quandl::Quandl.api_key("FoPzBPA1oU3iKdRojSya")
-```
-```{r data, message = FALSE, fig.width=4.5, fig.height=3.5}
-# Load packages for data download and transformation
+```{r data, message = FALSE}
+# Load packages for data transformation
 library(dplyr)
-library(Quandl)
 library(tidyr)
 
 # Download data
-data <- Quandl("FRED/GDPC1", order = "asc",
-               start_date = "1970-01-01", end_date = "2016-10-01")  %>%
-  rename(date = Date,
-         gdp = Value) %>%
-  mutate(lgdp = log(gdp)) # Take logs
+url <- "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GDPC1&cosd=1970-01-01&coed=2016-10-01"
+data <- read.csv(url) %>%
+  rename(date = observation_date,
+         gdp = GDPC1) %>%
+  mutate(date = as.Date(date),
+         lgdp = log(gdp)) # Take logs
 ```
 
 To get an intuition about what it means to extract the cyclical component of a time series, look at the development of log real GDP over time in the following figure.
@@ -47,7 +44,7 @@ ggplot(data, aes(x = date, y = lgdp)) +
   geom_line() +
   theme_classic() +
   labs(title = "Log real US GDP", x = "Quarter", y = "",
-       caption = "Source: U.S. Bureau of Economic Analysis (GDPC1).\nRetrieved via Quandl.com.")
+       caption = "Source: U.S. Bureau of Economic Analysis (GDPC1).\nRetrieved from FRED.")
 ```
 
 There is a clear increasing trend in the data, which appears to become gradually smaller up to the present. Additionally, the series seems to fluctuate around this trend in a more or less regular manner. There are relatively long lasting deviations from the trend, which could be considered to be cyclical fluctuations. The identification of those cyclical components is an important question in economics, because it might have serious implications for economic policy.
@@ -464,8 +461,6 @@ Hamilton, J. D. (2018), Why you should never use the Hodrick-Prescott filter. *R
 Kim, D. and Oh, H.-S. (2014). EMD: Empirical Mode Decomposition and Hilbert Spectral Analysis. R package version 1.5.7.
 
 Kožić, I., & Sever, I. (2014). Measuring business cycles: Empirical Mode Decomposition of economic time series. *Economics Letters, 123*(3), 287–290. [https://doi.org/10.1016/j.econlet.2014.03.009](https://doi.org/10.1016/j.econlet.2014.03.009)
-
-McTaggart, R., Daroczi, G., & Leung, C. (2018). Quandl: API Wrapper for Quandl.com. R package version 2.9.1. [https://CRAN.R-project.org/package=Quandl](https://CRAN.R-project.org/package=Quandl)
 
 Shea, J. M. (2018). neverhpfilter: A Better Alternative to the Hodrick-Prescott Filter. R package version 0.2-0. [https://CRAN.R-project.org/package=neverhpfilter](https://CRAN.R-project.org/package=neverhpfilter)
 
