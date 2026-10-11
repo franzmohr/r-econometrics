@@ -10,7 +10,8 @@
                         <li>
                             <time class="li-article-date">{{ .Date.Format "January 2, 2006" }}</time>
                             <h4><a href="{{ .Permalink }}">{{ .Title }}</a></h4>
-                            {{ .Summary | safeHTML }}
+                            {{/* Footnotes are not part of the summary, so drop the references to them. */}}
+                            {{ .Summary | replaceRE `<a href="#fn\d+" class="footnote-?[Rr]ef"[^>]*><sup>\d+</sup></a>` "" | safeHTML }}
                         </li>
                     {{ end }}
                 </ul>

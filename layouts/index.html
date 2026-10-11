@@ -1,7 +1,7 @@
 {{ partial "head.html" . }}
 {{ partial "header.html" . }}
 
-{{ $home := .Site.Data.home }}
+{{ $home := hugo.Data.home }}
 {{/* Number of published articles across the topic sections, for the hero strapline. */}}
 {{ $articles := 0 }}
 {{ range $home.topics }}
