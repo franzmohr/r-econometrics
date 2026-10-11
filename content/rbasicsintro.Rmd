@@ -2,7 +2,7 @@
 title: "R(eal) Basics"
 author: "Franz X. Mohr"
 date: "2019-10-06"
-description: "A series of introductions on essential R skills for beginners. These range from the basic user interface of R and RStudio to data manipulation with the dplyr, data.table and sparklyr packages and visualisation with the ggplot2 package."
+description: "A series of introductions on essential R skills for beginners. These range from the basic user interface of R and RStudio to data manipulation with the dplyr and data.table packages and visualisation with the ggplot2 package."
 ---
 
 This section should help you to
@@ -13,7 +13,8 @@ This section should help you to
 * [import data, get help and some more important vocabulary](/rbasics/help_and_data_import_etc)
 * [manipulate data with the `dplyr` package](/rbasics/dplyrintro)
 * [manipulate data with the `data.table` package](/rbasics/datatableintro)
-* [manipulate data which does not fit into memory with the `sparklyr` package](/rbasics/sparklyrintro)
+* [set up your machine for the use of the `sparklyr` package](/rbasics/sparklyrsetup)
+* [work with large data sets in Apache Spark using the `sparklyr` package](/rbasics/sparklyrintro)
 * [create graphics with the `ggplot2` package](/rbasics/ggplotintro).
 
 Recently, I have finished the first version of a below 30 pages introduction to R. It uses an exemplary workflow to explain some basics of the language and the application of the packages `dplyr`, `ggplot2` and `openxlsx`. The script can be downloaded <a href="/2019-mohr-introduction-r.pdf" target="_blank">here</a>.

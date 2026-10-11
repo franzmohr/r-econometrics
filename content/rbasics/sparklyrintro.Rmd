@@ -27,7 +27,7 @@ data("pwt9.0")
 
 ## Installing and connecting to Spark
 
-Before Spark can be used, it has to be available on your machine. A local version can be installed directly from R with the following command, which downloads Spark into a folder in your home directory. This has to be done only once.[^java]
+Before Spark can be used, it has to be available on your machine. A local version can be installed directly from R with the following command, which downloads Spark into a folder in your home directory. This has to be done only once.[^java] The single steps of that preparation -- the installation of Java, the setting of `JAVA_HOME` and the alternative of a container -- are described in a [separate post on the set-up of `sparklyr`](/rbasics/sparklyrsetup).
 
 ```{r, eval = FALSE}
 spark_install()
@@ -162,7 +162,7 @@ Finally, a word of caution. Spark comes with a considerable overhead. Starting a
 
 [^factors]: Note that Spark does not know the factor format of R. Factor columns like *country* become character columns when they are copied into the cluster.
 
-[^java]: Spark runs on the Java virtual machine. Therefore, a Java Development Kit must be installed and the environment variable `JAVA_HOME` must point to it. The versions which can be installed are listed by `spark_available_versions()`. Note that not every version of Spark works with every release of Java.
+[^java]: Spark runs on the Java virtual machine. Therefore, a Java Development Kit must be installed and the environment variable `JAVA_HOME` must point to it. The versions which can be installed are listed by `spark_available_versions()`. Note that not every version of Spark works with every release of Java. See the [post on the set-up](/rbasics/sparklyrsetup) for details.
 
 [^logcomp]: For completeness possible signs for value comparison are `==`, `<`, `<=`, `>`, `>=` and `!=` for checking if the value on the left side of the sign is equal, lower, lower or equal, larger, larger or equal and different, respectively, from the value on the right side. The operator `%in%` can be used to determine, whether the object to its left is in a vector to its right.
 

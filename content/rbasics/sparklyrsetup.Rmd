@@ -1,0 +1,175 @@
+---
+title: "Setting up sparklyr"
+author: "Franz X. Mohr"
+date: "2026-09-08"
+tags:
+  - sparklyr
+  - spark
+  - java
+  - r
+description: "A step-by-step description on how to prepare your machine for the use of the sparklyr package. It covers the installation of a Java development kit, the setting of the JAVA_HOME variable, the installation of a local version of Apache Spark, the alternative of a container with Docker and a first test of the connection."
+---
+
+The `sparklyr` package allows you to work with data sets, which are too large for the memory of your computer, by using the well-known verbs of `dplyr` on <a href="https://spark.apache.org/" target="_blank">Apache Spark</a>.[^intro] However, before you can write a single line of such code, your machine has to be prepared for it. This is a bit more involved than the installation of an ordinary R package, because Spark is not written in R. It runs on the Java virtual machine and, therefore, needs a working Java installation as well as a copy of Spark itself. This post goes through those steps one by one.
+
+In total, four things have to be on your computer:
+
+* *R* and, ideally, *RStudio*, which are covered in a [separate post](/rbasics/installation).
+* A *Java development kit* (JDK), on which Spark runs.
+* The R package *`sparklyr`*, which is the interface between R and Spark.
+* *Apache Spark* itself, which can be installed from within R.
+
+On Windows there is a second, in my experience more comfortable route, which spares you the first two of those steps: you let a container do the work. Java and Spark are then installed inside a small, ready-made Linux environment, which runs on your machine with Docker Desktop, and you never have to touch a system variable. This is the way I got Spark running on my own Windows computer, and it is described in the [section on Docker](#an-alternative-a-container-with-docker) below. If you want to stay on your operating system, simply follow the sections in their given order.
+
+*Note that the following instructions were written for a standard installation on a private computer. If you work on a corporate machine, you might not be allowed to install software or to change environment variables. In that case your IT department is the right place to ask.*
+
+## Installing a Java development kit
+
+Spark is written in Scala and runs on the Java virtual machine. This means that a Java development kit has to be installed before anything else can be done. Note that the ordinary *Java runtime environment*, which many computers have anyway, is not sufficient. It has to be a *development kit*.
+
+The choice of the version matters, because Spark does not run on every release of Java. The 3.x versions of Spark, which are the ones you will most likely install, require Java 8, 11 or 17. Newer releases can lead to errors, which are hard to interpret, so a *long term support* version like Java 17 is the safest choice at the moment.[^javaversions]
+
+Free and open source builds of the development kit are provided, among others, by <a href="https://adoptium.net/" target="_blank">Eclipse Temurin</a>, which I use here, or by <a href="https://learn.microsoft.com/en-us/java/openjdk/download" target="_blank">Microsoft</a>. Download the installer for your operating system and the version you have chosen and follow the installation instructions. On Windows it is worth activating the option, which sets the `JAVA_HOME` variable during the installation, because it saves you the manual work of the next section. Users of Linux can also install the kit with the package manager of their distribution, for example with `sudo apt install openjdk-17-jdk` on Ubuntu.
+
+Once the installation is finished, you can check from within R, which version of Java your system uses:
+
+```{r, eval = FALSE}
+system("java -version")
+```
+
+If this results in an error or if the reported version is not the one you have just installed, the following section should solve the problem.
+
+## Setting the JAVA_HOME variable
+
+R does not search your hard drive for a Java installation. Instead, it looks at the environment variable `JAVA_HOME`, which contains the path to the development kit. You can look at its current value with
+
+```{r, eval = FALSE}
+Sys.getenv("JAVA_HOME")
+```
+
+If this returns an empty string or the path of a version you do not want to use, the variable has to be set. Note that it must point to the *root* folder of the development kit and not to the `bin` folder inside it. Typical paths are `C:/Program Files/Eclipse Adoptium/jdk-17.0.10.7-hotspot` on Windows, `/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home` on macOS and `/usr/lib/jvm/java-17-openjdk-amd64` on Linux.
+
+The most convenient way to set the variable for R is to write it into the `.Renviron` file, which R reads every time it starts. The file can be opened with
+
+```{r, eval = FALSE}
+usethis::edit_r_environ()
+```
+
+and should then contain a line of the following form, where the path has to be replaced by the one of your own installation:
+
+```
+JAVA_HOME="C:/Program Files/Eclipse Adoptium/jdk-17.0.10.7-hotspot"
+```
+
+Save the file and restart R afterwards -- in RStudio this is done with *Session* -- *Restart R* -- so that the new value becomes effective. `Sys.getenv("JAVA_HOME")` should now return the path you have entered.[^setenv]
+
+## Installing sparklyr
+
+The package itself comes from CRAN and is installed like any other R package. Since it is used together with `dplyr`, it makes sense to install both at once:
+
+```{r, eval = FALSE}
+install.packages(c("sparklyr", "dplyr"))
+```
+
+## Installing Apache Spark
+
+Spark does not come with the package, but it can be downloaded from within R. The versions, which are available for installation, are listed by
+
+```{r, eval = FALSE}
+library(sparklyr)
+
+spark_available_versions()
+```
+
+A specific version is then installed with `spark_install`, where I recommend to be explicit about the version instead of relying on the default, so that you can reproduce your set-up on another machine later:
+
+```{r, eval = FALSE}
+spark_install(version = "3.5")
+```
+
+This downloads a few hundred megabytes into a folder in your home directory and can take a while.[^installdir] It has to be done only once. Which versions are already on your machine can be checked with
+
+```{r, eval = FALSE}
+spark_installed_versions()
+```
+
+Note that this is a *local* installation, which uses the cores of your computer as if they were the nodes of a cluster. It is the usual way to develop and test code, before it is sent to a productive environment. If you want to work with an existing cluster of your organisation, this step is not necessary. In that case you only need the package and the address of the cluster, which is passed to the `master` argument of `spark_connect` below.
+
+## Testing the installation
+
+Everything is now in place, so it is time to find out whether it works. The following lines establish a connection to the local cluster, copy a small data.frame into it, run a trivial query on it and close the connection again:
+
+```{r, eval = FALSE}
+library(sparklyr)
+library(dplyr)
+
+sc <- spark_connect(master = "local") # Connect to the local cluster
+
+spark_version(sc) # Which version of Spark are we talking to?
+
+cars_spark <- copy_to(sc, mtcars, name = "cars", overwrite = TRUE)
+
+cars_spark %>%
+  group_by(cyl) %>%
+  summarise(mpg = mean(mpg)) %>%
+  collect()
+
+spark_disconnect(sc) # Always close the connection at the end of a session
+```
+
+If this returns a small tibble with the average fuel consumption per number of cylinders, your machine is ready and you can proceed with the [introduction to `sparklyr`](/rbasics/sparklyrintro). While a connection is open, `spark_web(sc)` opens the web interface of Spark in your browser, where you can watch the jobs, which are sent to the cluster. It is also a quick way to confirm that the cluster is really running.
+
+## An alternative: a container with Docker
+
+The installation described above puts Java and Spark directly on your operating system. This works, but it also means that you have to take care of the Java version, of environment variables and, on Windows, of a few peculiarities of the Hadoop libraries. Those are exactly the points, where a set-up on Windows tends to fail, which is why I recommend the following alternative to Windows users in particular: you let a container do the work. A container is a small, isolated Linux environment, in which R, Java and Spark are already installed and correctly configured. Nothing of it ends up in your own system, which also makes it the only option, if you are not allowed to install software or to change environment variables on your machine.
+
+On Windows you need <a href="https://www.docker.com/products/docker-desktop/" target="_blank">Docker Desktop</a> for this, which comes with everything that is required and can be installed like any other program. The Rocker project provides ready-made images with R and RStudio. The following command, which is entered into the PowerShell or the command prompt and not into R, downloads such an image and starts a container with RStudio in it:
+
+```
+docker run --rm -d -p 8787:8787 -e PASSWORD=r-econometrics -v ${PWD}:/home/rstudio/project rocker/tidyverse
+```
+
+The parts of that line mean the following. The `-p` option connects port 8787 of the container with port 8787 of your computer, so that RStudio can be opened in your browser at `http://localhost:8787` with the user name *rstudio* and the password you have set. The `-v` option makes the current folder of your computer available inside the container under `/home/rstudio/project`, which is how your data and scripts get in and your results get out. Without it everything you produce disappears with the container, because `--rm` deletes it as soon as it is stopped.
+
+Once RStudio runs in the browser, the remaining steps happen inside the container and are the same as above, with the pleasant difference that the Linux image already contains a suitable Java version:
+
+```{r, eval = FALSE}
+install.packages("sparklyr")
+
+library(sparklyr)
+
+spark_install(version = "3.5")
+
+sc <- spark_connect(master = "local")
+```
+
+Two things are worth knowing about this approach. First, a container only gets the share of processors and memory, which Docker Desktop grants it, and the default values are rather modest. They can be raised in the settings of Docker Desktop, and it is worth doing so before you complain about the speed of Spark. Second, everything you install inside a running container is lost when it is removed. If you want to keep your set-up, the installation steps belong into a `Dockerfile`, from which your own image is built -- but that goes beyond this introduction.
+
+Note that the container is also a convenient way to run a *separate* Spark cluster, to which R connects from the outside. Images like `bitnami/spark` start a master and one or more workers, whose address is then passed to `spark_connect(master = "spark://localhost:7077")`. This comes closest to the situation you will find in a productive environment, where the cluster is a machine somewhere else and your R session is only its client.
+
+## When something goes wrong
+
+Most problems of a fresh installation are caused by Java, and the error messages are not always helpful. The following list contains the ones I have come across most often.
+
+* *`Java is required to connect to Spark` or `JAVA_HOME does not exist`*: Either no development kit is installed or `JAVA_HOME` points to a folder, which does not contain one. Check the value with `Sys.getenv("JAVA_HOME")` and make sure that it refers to the root folder of the kit and not to its `bin` subfolder.
+* *`UnsupportedClassVersionError` or an unspecific failure while the connection is established*: This is the typical symptom of a Java version, which is too new for the installed version of Spark. Install a supported version like Java 17 and point `JAVA_HOME` to it.
+* *`Failed to connect to Spark` after a long waiting time*: The driver and the workers of a local cluster communicate over the network interface of your own computer. A firewall or a virtual private network can block this. Deactivating the VPN or allowing Java in the firewall usually helps.
+* *Errors, which mention `HADOOP_HOME` or `winutils.exe` on Windows*: Spark expects a small Hadoop helper program on Windows. `sparklyr` installs it together with Spark, but if the message shows up anyway, set `HADOOP_HOME` to the folder of your Spark installation in the same way as `JAVA_HOME` above. If you keep running into errors of this kind, do not spend your evening on them. Take the [container of the previous section](#an-alternative-a-container-with-docker) instead. It is the solution, which worked for me on Windows.
+* *`java.lang.OutOfMemoryError`*: By default the local cluster only gets a modest amount of memory. It can be increased before the connection is established:
+
+```{r, eval = FALSE}
+config <- spark_config()
+config$`sparklyr.shell.driver-memory` <- "8G"
+
+sc <- spark_connect(master = "local", config = config)
+```
+
+Finally, keep in mind that a local Spark installation is not a substitute for a cluster. It behaves like one and it is perfectly suited for the development of code, but it is still limited by the cores and the memory of your own machine. Its purpose is that you can write and test your analysis at your desk and run exactly the same code on real hardware afterwards.
+
+[^installdir]: The default location is a folder like `~/spark` on Linux and macOS and `%LOCALAPPDATA%/spark` on Windows. It can be changed with the `dir` argument of `spark_install` and the current value is returned by `spark_install_dir()`.
+
+[^intro]: An introduction to the use of the package can be found [here](/rbasics/sparklyrintro).
+
+[^javaversions]: The requirements change with every major release of Spark, which is why it is worth taking a look at the <a href="https://spark.apache.org/docs/latest/" target="_blank">documentation of Spark</a> before you install a development kit for a newer version.
+
+[^setenv]: It is also possible to set the variable only for the current session with `Sys.setenv(JAVA_HOME = "path/to/jdk")`. However, this has to be repeated every time R is restarted, which is why the entry in `.Renviron` is the better choice. If you want to set the variable for the whole system instead, this is done in the environment variables of the system properties on Windows and in a file like `.bash_profile` or `.zshrc` on macOS and Linux.
