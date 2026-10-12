@@ -17,7 +17,7 @@ description: "Hochmuth and Petz (2026) argue that persistent services inflation 
 
 <p>Euro area services inflation has come down much more slowly than goods inflation since its peak in 2023. <a href="https://www.oenb.at/en/daten-und-forschung/publikationen/publikationsreihen/policy-brief/2026/policy-brief-2026-11.html">Hochmuth and Petz (2026)</a> read this partly as a relative-price adjustment. Before the pandemic, services prices rose faster than goods prices along a stable trend, which reflects slower productivity growth in services, income-elastic demand for them and their lower tradability. The surge in goods prices in 2021 and 2022 pushed the price of services relative to goods below that trend, and part of what looks like persistent services inflation is the relative price working its way back.</p>
 <p>How fast that happens, and whether it happens through higher services inflation or lower goods inflation, is the question of the policy brief’s Annex A. It answers it with a small error correction model of services and non-energy industrial goods (NEIG) prices, and finds that half of a gap closes after about three and a half years, mostly through services. With overall goods prices instead of NEIG the gap closes within about five quarters, and mostly through goods.</p>
-<p>This post reproduces both results with <a href="https://github.com/franzmohr/bvartools"><code>bvartools</code></a>.</p>
+<p>This post reproduces both results with <a href="https://github.com/franzmohr/bvartools"><code>bvartools</code></a>, together with the brief’s two charts of the relative price of services in the euro area and the United States.</p>
 <!--more-->
 <div id="the-model" class="section level2">
 <h2>The model</h2>
@@ -82,11 +82,75 @@ for (i in colnames(hicp)) {
 }
 prices &lt;- aggregate(hicp_sa, nfrequency = 4, FUN = mean)
 colnames(prices) &lt;- c(&quot;services&quot;, &quot;neig&quot;, &quot;goods&quot;)</code></pre>
-<p>The relative price of services rose along a steady trend before the pandemic, against NEIG at more than one percent a year, and fell below it during the inflation surge:</p>
-<pre class="r"><code>rel &lt;- 100 * log(prices[, &quot;services&quot;] / prices[, c(&quot;neig&quot;, &quot;goods&quot;)])
-colnames(rel) &lt;- c(&quot;Services relative to NEIG&quot;, &quot;Services relative to goods&quot;)
-plot(rel, main = &quot;Log relative price of services (x 100)&quot;, xlab = &quot;&quot;)</code></pre>
-<p><img src="/reproduction/2026_hochmuth_petz_services_files/figure-html/relative-price-1.png" alt="" width="672" /></p>
+</div>
+<div id="the-price-of-services-relative-to-goods" class="section level2">
+<h2>The price of services relative to goods</h2>
+<p>Chart 2 of the brief shows the price of services relative to NEIG and to overall goods as a four-quarter moving average, indexed to 100 in the first quarter of 2000, together with a log-linear trend fitted over 1996 to 2019 and extrapolated from there. The moving average removes the seasonal pattern, so the chart works with quarterly averages of the unadjusted indices:</p>
+<pre class="r"><code>ma4 &lt;- function(x) stats::filter(x, rep(1 / 4, 4), sides = 1)
+index_2000 &lt;- function(x) 100 * x / window(x, start = c(2000, 1), end = c(2000, 1))[1]
+
+# A smoothed relative price and its log-linear trend, fitted up to &#39;fit_end&#39;
+relative_price &lt;- function(services, goods, fit_end = Inf) {
+  x &lt;- index_2000(ma4(services / goods))
+  t &lt;- time(x)
+  fit &lt;- lm(log(x) ~ t, subset = t &lt; fit_end)
+  trend &lt;- ts(exp(predict(fit, data.frame(t = t))), start = start(x), frequency = frequency(x))
+  list(price = x, trend = trend, growth = 100 * coef(fit)[[&quot;t&quot;]])
+}
+
+prices_nsa &lt;- aggregate(hicp, nfrequency = 4, FUN = mean)
+ea_neig &lt;- relative_price(prices_nsa[, &quot;SERV&quot;], prices_nsa[, &quot;IGD_NNRG&quot;], fit_end = 2020)
+ea_goods &lt;- relative_price(prices_nsa[, &quot;SERV&quot;], prices_nsa[, &quot;GD&quot;], fit_end = 2020)</code></pre>
+<pre class="r"><code>ts.plot(ea_neig$price, ea_neig$trend, ea_goods$price, ea_goods$trend,
+        col = rep(c(&quot;#123d7a&quot;, &quot;#d9b56b&quot;), each = 2), lty = c(1, 2, 1, 2), lwd = 2,
+        xlab = &quot;&quot;, ylab = &quot;Relative price (Q1 2000 = 100)&quot;,
+        main = &quot;Price of services relative to goods (euro area)&quot;)
+abline(h = 100)
+legend(&quot;topleft&quot;, legend = c(&quot;Services relative to NEIG&quot;, &quot;Services relative to goods&quot;),
+       col = c(&quot;#123d7a&quot;, &quot;#d9b56b&quot;), lwd = 2, bty = &quot;n&quot;)</code></pre>
+<p><img src="/reproduction/2026_hochmuth_petz_services_files/figure-html/chart2-1.png" alt="" width="672" /></p>
+<p>Before the pandemic services became 1.3% a year more expensive relative to NEIG, and 0.3% relative to overall goods. Both relative prices fell below their trends in 2021 and 2022. The one against overall goods fell much more, because the energy and food prices it includes rose most, and it has made up less of the loss since. In the second quarter of 2026 services relative to NEIG are 3.2% below the extrapolated trend, which the brief puts at 3.5%, and relative to overall goods 5% below it.</p>
+<p>The euro area series is short, so the brief turns to post-war US data to ask whether such a trend survives large shocks. Chart 3 is the price of services relative to commodities in the US consumer price index for all urban consumers (CPI-U), series <code>CUUR0000SAS</code> and <code>CUUR0000SAC</code> of the Bureau of Labor Statistics. Its public API returns at most ten years per request:</p>
+<pre class="r"><code>library(&quot;httr&quot;)
+library(&quot;jsonlite&quot;)
+
+bls &lt;- function(start, end) {
+  body &lt;- toJSON(list(seriesid = c(&quot;CUUR0000SAS&quot;, &quot;CUUR0000SAC&quot;),
+                      startyear = as.character(start), endyear = as.character(end)),
+                 auto_unbox = TRUE)
+  res &lt;- fromJSON(content(POST(&quot;https://api.bls.gov/publicAPI/v2/timeseries/data/&quot;,
+                               body = body, content_type_json()), &quot;text&quot;, encoding = &quot;UTF-8&quot;))
+  series &lt;- res$Results$series
+  do.call(rbind, lapply(seq_along(series$seriesID), function(i) {
+    d &lt;- series$data[[i]]
+    d &lt;- d[d$period != &quot;M13&quot;, ]   # M13 is the annual average
+    data.frame(series = series$seriesID[i], month = paste0(d$year, &quot;-&quot;, substr(d$period, 2, 3)),
+               value = suppressWarnings(as.numeric(d$value)))
+  }))
+}
+us &lt;- do.call(rbind, lapply(seq(1947, 2026, by = 10), function(y) bls(y, min(y + 9, 2026))))
+us &lt;- reshape(us, idvar = &quot;month&quot;, timevar = &quot;series&quot;, direction = &quot;wide&quot;)
+names(us) &lt;- sub(&quot;value.&quot;, &quot;&quot;, names(us), fixed = TRUE)
+us &lt;- us[us$month &lt;= &quot;2026-06&quot;, ]
+us &lt;- us[order(us$month), ]
+
+write.csv(us, &quot;_2026_hochmuth_petz_us_cpi.csv&quot;, row.names = FALSE)</code></pre>
+<p>Both indices are published quarterly until 1955 and monthly after that, and October 2025, when the federal government was shut down, is missing. Quarterly averages of what is there take care of both. The trend is fitted over the whole sample:</p>
+<pre class="r"><code>us &lt;- read.csv(&quot;_2026_hochmuth_petz_us_cpi.csv&quot;)
+months &lt;- format(seq(as.Date(&quot;1947-01-01&quot;), as.Date(&quot;2026-06-01&quot;), by = &quot;month&quot;), &quot;%Y-%m&quot;)
+us &lt;- ts(as.matrix(us[match(months, us$month), c(&quot;CUUR0000SAS&quot;, &quot;CUUR0000SAC&quot;)]),
+         start = c(1947, 1), frequency = 12)
+us_q &lt;- aggregate(us, nfrequency = 4, FUN = function(x) mean(x, na.rm = TRUE))
+us_q &lt;- window(us_q, start = c(1949, 4))   # the first moving average ends in 1950 Q1
+us_rel &lt;- relative_price(us_q[, &quot;CUUR0000SAS&quot;], us_q[, &quot;CUUR0000SAC&quot;])
+
+ts.plot(window(us_rel$price, start = 1950), window(us_rel$trend, start = 1950),
+        col = &quot;#123d7a&quot;, lty = c(1, 2), lwd = 2, xlab = &quot;&quot;,
+        ylab = &quot;Relative price (Q1 2000 = 100)&quot;,
+        main = &quot;Price of services relative to commodities (USA)&quot;)
+abline(h = 100)</code></pre>
+<p><img src="/reproduction/2026_hochmuth_petz_services_files/figure-html/chart3-1.png" alt="" width="672" /></p>
+<p>Over seventy years US services became 1.5% a year more expensive relative to commodities, and the relative price never strayed far from that trend: not in the commodity price shocks of the 1970s, not in the oil price swings of the 2000s and not in 2021 and 2022. The recent surge pushed it further below the trend than at any other time since 1950, by almost ten percent, and it has since returned to within three percent of it, which is what the brief expects of the euro area as well. As the brief points out, the two charts are not directly comparable, since the US series compares services with commodities rather than with goods.</p>
 </div>
 <div id="estimation" class="section level2">
 <h2>Estimation</h2>
