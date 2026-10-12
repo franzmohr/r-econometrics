@@ -9,14 +9,14 @@ tags:
 
 
 
-<pre class="r"><code>library(AER)
-library(wooldridge)</code></pre>
+<pre class="r"><code>library(&quot;AER&quot;)
+library(&quot;wooldridge&quot;)</code></pre>
 <div id="example-15.1" class="section level3">
 <h3>Example 15.1</h3>
 <pre class="r"><code>data(&quot;mroz&quot;)</code></pre>
 <p>OLS</p>
-<pre class="r"><code>s.lm.1 &lt;- summary(lm(lwage ~ educ, data = mroz))
-s.lm.1</code></pre>
+<pre class="r"><code>summary_1 &lt;- summary(lm(lwage ~ educ, data = mroz))
+summary_1</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = lwage ~ educ, data = mroz)
@@ -34,14 +34,15 @@ s.lm.1</code></pre>
 ## 
 ## Residual standard error: 0.68 on 426 degrees of freedom
 ##   (325 observations deleted due to missingness)
-## Multiple R-squared:  0.1179, Adjusted R-squared:  0.1158 
+## Multiple R-squared:  0.1179,	Adjusted R-squared:  0.1158 
 ## F-statistic: 56.93 on 1 and 426 DF,  p-value: 2.761e-13</code></pre>
 <p><em>fatheduc</em> as IV for <em>educ</em></p>
-<pre class="r"><code>s.lm.2 &lt;- summary(lm(educ ~ fatheduc, data = mroz[mroz$inlf !=0 ,]))
-s.lm.2</code></pre>
+<pre class="r"><code>summary_2 &lt;- summary(lm(educ ~ fatheduc, data = mroz[mroz[[&quot;inlf&quot;]] != 0, ]))
+summary_2</code></pre>
 <pre><code>## 
 ## Call:
-## lm(formula = educ ~ fatheduc, data = mroz[mroz$inlf != 0, ])
+## lm(formula = educ ~ fatheduc, data = mroz[mroz[[&quot;inlf&quot;]] != 0, 
+##     ])
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
@@ -55,12 +56,12 @@ s.lm.2</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 2.081 on 426 degrees of freedom
-## Multiple R-squared:  0.1726, Adjusted R-squared:  0.1706 
+## Multiple R-squared:  0.1726,	Adjusted R-squared:  0.1706 
 ## F-statistic: 88.84 on 1 and 426 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>IV estimation</p>
-<pre class="r"><code>s.iv.1 &lt;- summary(ivreg(lwage ~ educ | fatheduc,
-                        data=mroz))
-s.iv.1</code></pre>
+<pre class="r"><code>summary_iv_1 &lt;- summary(ivreg(lwage ~ educ | fatheduc,
+                              data = mroz))
+summary_iv_1</code></pre>
 <pre><code>## 
 ## Call:
 ## ivreg(formula = lwage ~ educ | fatheduc, data = mroz)
@@ -77,15 +78,15 @@ s.iv.1</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.6894 on 426 degrees of freedom
-## Multiple R-Squared: 0.09344, Adjusted R-squared: 0.09131 
+## Multiple R-Squared: 0.09344,	Adjusted R-squared: 0.09131 
 ## Wald test: 2.835 on 1 and 426 DF,  p-value: 0.09294</code></pre>
 </div>
 <div id="example-15.2" class="section level3">
 <h3>Example 15.2</h3>
 <pre class="r"><code>data(&quot;wage2&quot;)
 
-s.lm.1 &lt;- summary(lm(educ ~ sibs, data = wage2))
-s.lm.1</code></pre>
+summary_1 &lt;- summary(lm(educ ~ sibs, data = wage2))
+summary_1</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = educ ~ sibs, data = wage2)
@@ -102,10 +103,10 @@ s.lm.1</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 2.134 on 933 degrees of freedom
-## Multiple R-squared:  0.05726,    Adjusted R-squared:  0.05625 
+## Multiple R-squared:  0.05726,	Adjusted R-squared:  0.05625 
 ## F-statistic: 56.67 on 1 and 933 DF,  p-value: 1.215e-13</code></pre>
-<pre class="r"><code>s.iv.1 &lt;- summary(ivreg(lwage ~ educ | sibs, data = wage2))
-s.iv.1</code></pre>
+<pre class="r"><code>summary_iv_1 &lt;- summary(ivreg(lwage ~ educ | sibs, data = wage2))
+summary_iv_1</code></pre>
 <pre><code>## 
 ## Call:
 ## ivreg(formula = lwage ~ educ | sibs, data = wage2)
@@ -122,15 +123,15 @@ s.iv.1</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.4233 on 933 degrees of freedom
-## Multiple R-Squared: -0.009174,   Adjusted R-squared: -0.01026 
+## Multiple R-Squared: -0.009174,	Adjusted R-squared: -0.01026 
 ## Wald test: 21.59 on 1 and 933 DF,  p-value: 3.865e-06</code></pre>
 </div>
 <div id="example-15.3" class="section level3">
 <h3>Example 15.3</h3>
 <pre class="r"><code>data(&quot;bwght&quot;)
 
-s.lm.1 &lt;- summary(lm(packs ~ cigprice, data = bwght))
-s.lm.1</code></pre>
+summary_1 &lt;- summary(lm(packs ~ cigprice, data = bwght))
+summary_1</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = packs ~ cigprice, data = bwght)
@@ -145,11 +146,11 @@ s.lm.1</code></pre>
 ## cigprice    0.0002829  0.0007830   0.361    0.718
 ## 
 ## Residual standard error: 0.2987 on 1386 degrees of freedom
-## Multiple R-squared:  9.417e-05,  Adjusted R-squared:  -0.0006273 
+## Multiple R-squared:  9.417e-05,	Adjusted R-squared:  -0.0006273 
 ## F-statistic: 0.1305 on 1 and 1386 DF,  p-value: 0.7179</code></pre>
-<pre class="r"><code>s.iv.1 &lt;- summary(ivreg(lbwght ~ packs | cigprice,
-                        data = bwght))
-s.iv.1</code></pre>
+<pre class="r"><code>summary_iv_1 &lt;- summary(ivreg(lbwght ~ packs | cigprice,
+                              data = bwght))
+summary_iv_1</code></pre>
 <pre><code>## 
 ## Call:
 ## ivreg(formula = lbwght ~ packs | cigprice, data = bwght)
@@ -166,18 +167,19 @@ s.iv.1</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.9389 on 1386 degrees of freedom
-## Multiple R-Squared: -23.23,  Adjusted R-squared: -23.25 
+## Multiple R-Squared: -23.23,	Adjusted R-squared: -23.25 
 ## Wald test: 0.118 on 1 and 1386 DF,  p-value: 0.7312</code></pre>
 </div>
 <div id="example-15.4" class="section level3">
 <h3>Example 15.4</h3>
 <pre class="r"><code>data(&quot;card&quot;)
 
-s.lm.1 &lt;- summary(lm(educ ~ nearc4 + exper + expersq + black + smsa + south +
-                       smsa66 + reg662 + reg663 + reg664 + reg665 + reg666 + reg667 +
-                       reg668 + reg669,
-                     data = card))
-s.lm.1</code></pre>
+model_1 &lt;- lm(educ ~ nearc4 + exper + expersq + black + smsa + south +
+                smsa66 + reg662 + reg663 + reg664 + reg665 + reg666 +
+                reg667 + reg668 + reg669,
+              data = card)
+summary_1 &lt;- summary(model_1)
+summary_1</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = educ ~ nearc4 + exper + expersq + black + smsa + 
@@ -210,13 +212,14 @@ s.lm.1</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 1.941 on 2994 degrees of freedom
-## Multiple R-squared:  0.4771, Adjusted R-squared:  0.4745 
+## Multiple R-squared:  0.4771,	Adjusted R-squared:  0.4745 
 ## F-statistic: 182.1 on 15 and 2994 DF,  p-value: &lt; 2.2e-16</code></pre>
-<pre class="r"><code>s.lm.2 &lt;- summary(lm.2 &lt;- lm(lwage ~ educ + exper + expersq + black + smsa + south +
-                               smsa66 + reg662 + reg663 + reg664 + reg665 + reg666 + reg667 +
-                               reg668 + reg669,
-                             data = card))
-s.lm.2</code></pre>
+<pre class="r"><code>model_2 &lt;- lm(lwage ~ educ + exper + expersq + black + smsa + south +
+                smsa66 + reg662 + reg663 + reg664 + reg665 + reg666 +
+                reg667 + reg668 + reg669,
+              data = card)
+summary_2 &lt;- summary(model_2)
+summary_2</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = lwage ~ educ + exper + expersq + black + smsa + 
@@ -249,15 +252,17 @@ s.lm.2</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.3723 on 2994 degrees of freedom
-## Multiple R-squared:  0.2998, Adjusted R-squared:  0.2963 
+## Multiple R-squared:  0.2998,	Adjusted R-squared:  0.2963 
 ## F-statistic: 85.48 on 15 and 2994 DF,  p-value: &lt; 2.2e-16</code></pre>
-<pre class="r"><code>s.iv.1 &lt;- summary(ivreg(lwage ~ educ + exper + expersq + black + smsa + south +
-                          smsa66 + reg662 + reg663 + reg664 + reg665 + reg666 + reg667 +
-                          reg668 + reg669 | nearc4 + exper + expersq + black + smsa + south +
-                          smsa66 + reg662 + reg663 + reg664 + reg665 + reg666 + reg667 +
-                          reg668 + reg669,
-                        data = card))
-s.iv.1</code></pre>
+<pre class="r"><code>iv_1 &lt;- ivreg(lwage ~ educ + exper + expersq + black + smsa + south +
+                smsa66 + reg662 + reg663 + reg664 + reg665 + reg666 +
+                reg667 + reg668 + reg669 |
+                nearc4 + exper + expersq + black + smsa + south +
+                smsa66 + reg662 + reg663 + reg664 + reg665 + reg666 +
+                reg667 + reg668 + reg669,
+              data = card)
+summary_iv_1 &lt;- summary(iv_1)
+summary_iv_1</code></pre>
 <pre><code>## 
 ## Call:
 ## ivreg(formula = lwage ~ educ + exper + expersq + black + smsa + 
@@ -292,15 +297,16 @@ s.iv.1</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.3883 on 2994 degrees of freedom
-## Multiple R-Squared: 0.2382,  Adjusted R-squared: 0.2343 
+## Multiple R-Squared: 0.2382,	Adjusted R-squared: 0.2343 
 ## Wald test: 51.01 on 15 and 2994 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
 <div id="example-15.5" class="section level3">
 <h3>Example 15.5</h3>
 <pre class="r"><code>data(&quot;mroz&quot;)
 
-s.lm.1 &lt;- summary(lm.1 &lt;- lm(lwage ~ educ + exper + expersq, data = mroz))
-s.lm.1</code></pre>
+model_1 &lt;- lm(lwage ~ educ + exper + expersq, data = mroz)
+summary_1 &lt;- summary(model_1)
+summary_1</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = lwage ~ educ + exper + expersq, data = mroz)
@@ -320,13 +326,15 @@ s.lm.1</code></pre>
 ## 
 ## Residual standard error: 0.6664 on 424 degrees of freedom
 ##   (325 observations deleted due to missingness)
-## Multiple R-squared:  0.1568, Adjusted R-squared:  0.1509 
+## Multiple R-squared:  0.1568,	Adjusted R-squared:  0.1509 
 ## F-statistic: 26.29 on 3 and 424 DF,  p-value: 1.302e-15</code></pre>
-<pre class="r"><code>s.lm.2a &lt;- summary(lm.2a &lt;- lm(educ ~ exper + expersq + motheduc + fatheduc,
-                               data = mroz[mroz$inlf &gt; 0,]))
-s.lm.2b &lt;- summary(lm.2b &lt;- lm(educ ~ exper + expersq,data=mroz[mroz$inlf &gt; 0,]))
+<pre class="r"><code>model_2a &lt;- lm(educ ~ exper + expersq + motheduc + fatheduc,
+               data = mroz[mroz[[&quot;inlf&quot;]] &gt; 0, ])
+summary_2a &lt;- summary(model_2a)
+model_2b &lt;- lm(educ ~ exper + expersq, data = mroz[mroz[[&quot;inlf&quot;]] &gt; 0, ])
+summary_2b &lt;- summary(model_2b)
 
-anova(lm.2a, lm.2b)</code></pre>
+anova(model_2a, model_2b)</code></pre>
 <pre><code>## Analysis of Variance Table
 ## 
 ## Model 1: educ ~ exper + expersq + motheduc + fatheduc
@@ -336,9 +344,11 @@ anova(lm.2a, lm.2b)</code></pre>
 ## 2    425 2219.2 -2   -460.64 55.4 &lt; 2.2e-16 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<pre class="r"><code>s.iv.1 &lt;- summary(ivreg(lwage ~ educ + exper + expersq | exper +
-                          expersq + motheduc + fatheduc, data = mroz))
-s.iv.1</code></pre>
+<pre class="r"><code>iv_1 &lt;- ivreg(lwage ~ educ + exper + expersq |
+                exper + expersq + motheduc + fatheduc,
+              data = mroz)
+summary_iv_1 &lt;- summary(iv_1)
+summary_iv_1</code></pre>
 <pre><code>## 
 ## Call:
 ## ivreg(formula = lwage ~ educ + exper + expersq | exper + expersq + 
@@ -358,16 +368,18 @@ s.iv.1</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.6747 on 424 degrees of freedom
-## Multiple R-Squared: 0.1357,  Adjusted R-squared: 0.1296 
+## Multiple R-Squared: 0.1357,	Adjusted R-squared: 0.1296 
 ## Wald test: 8.141 on 3 and 424 DF,  p-value: 2.787e-05</code></pre>
 <div id="example-15.6" class="section level4">
 <h4>Example 15.6</h4>
 <pre class="r"><code>data(&quot;wage2&quot;)
 
-s.iv.1 &lt;- summary(ivreg(lwage ~ educ + exper + tenure + married + south + urban + black +
-                          IQ | KWW + educ + exper + tenure + married + south + urban + black,
-                        data = wage2))
-s.iv.1</code></pre>
+iv_1 &lt;- ivreg(lwage ~ educ + exper + tenure + married + south + urban +
+                black + IQ |
+                KWW + educ + exper + tenure + married + south + urban + black,
+              data = wage2)
+summary_iv_1 &lt;- summary(iv_1)
+summary_iv_1</code></pre>
 <pre><code>## 
 ## Call:
 ## ivreg(formula = lwage ~ educ + exper + tenure + married + south + 
@@ -393,7 +405,7 @@ s.iv.1</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.3807 on 926 degrees of freedom
-## Multiple R-Squared:  0.19,   Adjusted R-squared: 0.183 
+## Multiple R-Squared:  0.19,	Adjusted R-squared: 0.183 
 ## Wald test: 36.96 on 8 and 926 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
 </div>
@@ -401,8 +413,9 @@ s.iv.1</code></pre>
 <h3>Example 15.7</h3>
 <pre class="r"><code>data(&quot;mroz&quot;)
 
-s.lm.1 &lt;- summary(lm.1 &lt;- lm(lwage ~ educ + exper + expersq, data = mroz))
-s.lm.1</code></pre>
+model_1 &lt;- lm(lwage ~ educ + exper + expersq, data = mroz)
+summary_1 &lt;- summary(model_1)
+summary_1</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = lwage ~ educ + exper + expersq, data = mroz)
@@ -422,53 +435,57 @@ s.lm.1</code></pre>
 ## 
 ## Residual standard error: 0.6664 on 424 degrees of freedom
 ##   (325 observations deleted due to missingness)
-## Multiple R-squared:  0.1568, Adjusted R-squared:  0.1509 
+## Multiple R-squared:  0.1568,	Adjusted R-squared:  0.1509 
 ## F-statistic: 26.29 on 3 and 424 DF,  p-value: 1.302e-15</code></pre>
-<pre class="r"><code>s.lm.2 &lt;- summary(lm.2 &lt;- lm(educ ~ exper + expersq + motheduc + fatheduc,
-                             data = mroz[mroz$inlf != 0,]))
+<pre class="r"><code>model_2 &lt;- lm(educ ~ exper + expersq + motheduc + fatheduc,
+              data = mroz[mroz[[&quot;inlf&quot;]] != 0, ])
+summary_2 &lt;- summary(model_2)
 
-s.lm.3 &lt;- summary(lm.3 &lt;- lm(lwage ~ educ + exper + expersq + lm.2$resid,
-                             data = mroz[mroz$inlf != 0,]))
+model_3 &lt;- lm(lwage ~ educ + exper + expersq + model_2[[&quot;residuals&quot;]],
+              data = mroz[mroz[[&quot;inlf&quot;]] != 0, ])
+summary_3 &lt;- summary(model_3)
 
-s.lm.3</code></pre>
+summary_3</code></pre>
 <pre><code>## 
 ## Call:
-## lm(formula = lwage ~ educ + exper + expersq + lm.2$resid, data = mroz[mroz$inlf != 
-##     0, ])
+## lm(formula = lwage ~ educ + exper + expersq + model_2[[&quot;residuals&quot;]], 
+##     data = mroz[mroz[[&quot;inlf&quot;]] != 0, ])
 ## 
 ## Residuals:
 ##      Min       1Q   Median       3Q      Max 
 ## -3.03743 -0.30775  0.04191  0.40361  2.33303 
 ## 
 ## Coefficients:
-##               Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)  0.0481003  0.3945753   0.122 0.903033    
-## educ         0.0613966  0.0309849   1.981 0.048182 *  
-## exper        0.0441704  0.0132394   3.336 0.000924 ***
-## expersq     -0.0008990  0.0003959  -2.271 0.023672 *  
-## lm.2$resid   0.0581666  0.0348073   1.671 0.095441 .  
+##                          Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)             0.0481003  0.3945753   0.122 0.903033    
+## educ                    0.0613966  0.0309849   1.981 0.048182 *  
+## exper                   0.0441704  0.0132394   3.336 0.000924 ***
+## expersq                -0.0008990  0.0003959  -2.271 0.023672 *  
+## model_2[[&quot;residuals&quot;]]  0.0581666  0.0348073   1.671 0.095441 .  
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.665 on 423 degrees of freedom
-## Multiple R-squared:  0.1624, Adjusted R-squared:  0.1544 
+## Multiple R-squared:  0.1624,	Adjusted R-squared:  0.1544 
 ## F-statistic:  20.5 on 4 and 423 DF,  p-value: 1.888e-15</code></pre>
 </div>
 <div id="example-15.8" class="section level3">
 <h3>Example 15.8</h3>
 <pre class="r"><code>data(&quot;mroz&quot;)
 
-s.iv.1 &lt;- summary(iv.1 &lt;- ivreg(lwage ~ educ + exper + expersq | 
-                                  exper + expersq + motheduc + fatheduc,
-                                data = mroz[mroz$inlf!=0,]))
+iv_1 &lt;- ivreg(lwage ~ educ + exper + expersq |
+                exper + expersq + motheduc + fatheduc,
+              data = mroz[mroz[[&quot;inlf&quot;]] != 0, ])
+summary_iv_1 &lt;- summary(iv_1)
 
-s.lm.1 &lt;- summary(lm(iv.1$resid ~ exper + expersq + motheduc + fatheduc,
-                     data=mroz[mroz$inlf!=0,]))
-s.lm.1</code></pre>
+summary_1 &lt;- summary(lm(iv_1[[&quot;residuals&quot;]] ~ exper + expersq + motheduc +
+                          fatheduc,
+                        data = mroz[mroz[[&quot;inlf&quot;]] != 0, ]))
+summary_1</code></pre>
 <pre><code>## 
 ## Call:
-## lm(formula = iv.1$resid ~ exper + expersq + motheduc + fatheduc, 
-##     data = mroz[mroz$inlf != 0, ])
+## lm(formula = iv_1[[&quot;residuals&quot;]] ~ exper + expersq + motheduc + 
+##     fatheduc, data = mroz[mroz[[&quot;inlf&quot;]] != 0, ])
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
@@ -483,21 +500,23 @@ s.lm.1</code></pre>
 ## fatheduc     5.782e-03  1.118e-02   0.517    0.605
 ## 
 ## Residual standard error: 0.6752 on 423 degrees of freedom
-## Multiple R-squared:  0.0008833,  Adjusted R-squared:  -0.008565 
+## Multiple R-squared:  0.0008833,	Adjusted R-squared:  -0.008565 
 ## F-statistic: 0.0935 on 4 and 423 DF,  p-value: 0.9845</code></pre>
 <pre class="r"><code>428 * .0009</code></pre>
 <pre><code>## [1] 0.3852</code></pre>
-<pre class="r"><code>s.iv.2 &lt;- summary(iv.2 &lt;- ivreg(lwage ~ educ + exper + expersq | 
-                                  exper + expersq + motheduc + fatheduc + huseduc,
-                                data = mroz[mroz$inlf!=0,]))
+<pre class="r"><code>iv_2 &lt;- ivreg(lwage ~ educ + exper + expersq |
+                exper + expersq + motheduc + fatheduc + huseduc,
+              data = mroz[mroz[[&quot;inlf&quot;]] != 0, ])
+summary_iv_2 &lt;- summary(iv_2)
 
-s.lm.2 &lt;- summary(lm(iv.2$resid ~ exper + expersq + motheduc + fatheduc + huseduc,
-                     data = mroz[mroz$inlf!=0,]))
-s.lm.2</code></pre>
+summary_2 &lt;- summary(lm(iv_2[[&quot;residuals&quot;]] ~ exper + expersq + motheduc +
+                          fatheduc + huseduc,
+                        data = mroz[mroz[[&quot;inlf&quot;]] != 0, ]))
+summary_2</code></pre>
 <pre><code>## 
 ## Call:
-## lm(formula = iv.2$resid ~ exper + expersq + motheduc + fatheduc + 
-##     huseduc, data = mroz[mroz$inlf != 0, ])
+## lm(formula = iv_2[[&quot;residuals&quot;]] ~ exper + expersq + motheduc + 
+##     fatheduc + huseduc, data = mroz[mroz[[&quot;inlf&quot;]] != 0, ])
 ## 
 ## Residuals:
 ##      Min       1Q   Median       3Q      Max 
@@ -513,16 +532,16 @@ s.lm.2</code></pre>
 ## huseduc      6.781e-03  1.143e-02   0.593    0.553
 ## 
 ## Residual standard error: 0.67 on 422 degrees of freedom
-## Multiple R-squared:  0.002605,   Adjusted R-squared:  -0.009212 
+## Multiple R-squared:  0.002605,	Adjusted R-squared:  -0.009212 
 ## F-statistic: 0.2205 on 5 and 422 DF,  p-value: 0.9537</code></pre>
 <pre class="r"><code>428 * .0026</code></pre>
 <pre><code>## [1] 1.1128</code></pre>
-<pre class="r"><code>s.iv.2</code></pre>
+<pre class="r"><code>summary_iv_2</code></pre>
 <pre><code>## 
 ## Call:
 ## ivreg(formula = lwage ~ educ + exper + expersq | exper + expersq + 
-##     motheduc + fatheduc + huseduc, data = mroz[mroz$inlf != 0, 
-##     ])
+##     motheduc + fatheduc + huseduc, data = mroz[mroz[[&quot;inlf&quot;]] != 
+##     0, ])
 ## 
 ## Residuals:
 ##      Min       1Q   Median       3Q      Max 
@@ -538,21 +557,22 @@ s.lm.2</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.6693 on 424 degrees of freedom
-## Multiple R-Squared: 0.1495,  Adjusted R-squared: 0.1435 
+## Multiple R-Squared: 0.1495,	Adjusted R-squared: 0.1435 
 ## Wald test: 11.52 on 3 and 424 DF,  p-value: 2.817e-07</code></pre>
 </div>
 <div id="example-15.9" class="section level3">
 <h3>Example 15.9</h3>
 <pre class="r"><code>data(&quot;fertil1&quot;)
 
-s.iv.1 &lt;- summary(iv.1 &lt;- ivreg(kids ~ educ + age + agesq + black + east + northcen +
-                                  west + farm + othrural + town + smcity + y74 + y76 +
-                                  y78 + y80 + y82 + y84 |
-                                  meduc + feduc + age + agesq + black + east +
-                                  northcen + west + farm + othrural + town + smcity +
-                                  y74 + y76 + y78 + y80 + y82 + y84,
-                                data = fertil1))
-s.iv.1</code></pre>
+iv_1 &lt;- ivreg(kids ~ educ + age + agesq + black + east + northcen +
+                west + farm + othrural + town + smcity + y74 + y76 +
+                y78 + y80 + y82 + y84 |
+                meduc + feduc + age + agesq + black + east +
+                northcen + west + farm + othrural + town + smcity +
+                y74 + y76 + y78 + y80 + y82 + y84,
+              data = fertil1)
+summary_iv_1 &lt;- summary(iv_1)
+summary_iv_1</code></pre>
 <pre><code>## 
 ## Call:
 ## ivreg(formula = kids ~ educ + age + agesq + black + east + northcen + 
@@ -589,68 +609,70 @@ s.iv.1</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 1.556 on 1111 degrees of freedom
-## Multiple R-Squared: 0.1281,  Adjusted R-squared: 0.1148 
+## Multiple R-Squared: 0.1281,	Adjusted R-squared: 0.1148 
 ## Wald test: 7.723 on 17 and 1111 DF,  p-value: &lt; 2.2e-16</code></pre>
-<pre class="r"><code>lm.r &lt;- lm(educ ~ meduc + feduc + age + agesq + black + east + northcen +
-             west + farm + othrural + town + smcity + y74 + y76 + y78 + y80 + y82 + y84,
-           data = fertil1)
+<pre class="r"><code>model_r &lt;- lm(educ ~ meduc + feduc + age + agesq + black + east + northcen +
+                west + farm + othrural + town + smcity + y74 + y76 + y78 +
+                y80 + y82 + y84,
+              data = fertil1)
 
-lm.1 &lt;- lm(kids ~ educ + age + agesq + black + east + northcen + west + farm +
-             othrural + town + smcity + y74 + y76 + y78 + y80 + y82 + y84 + lm.r$resid,
-           data = fertil1)
+model_1 &lt;- lm(kids ~ educ + age + agesq + black + east + northcen + west +
+                farm + othrural + town + smcity + y74 + y76 + y78 + y80 +
+                y82 + y84 + model_r[[&quot;residuals&quot;]],
+              data = fertil1)
 
-summary(lm.1)</code></pre>
+summary(model_1)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = kids ~ educ + age + agesq + black + east + northcen + 
 ##     west + farm + othrural + town + smcity + y74 + y76 + y78 + 
-##     y80 + y82 + y84 + lm.r$resid, data = fertil1)
+##     y80 + y82 + y84 + model_r[[&quot;residuals&quot;]], data = fertil1)
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
 ## -3.9816 -1.0100 -0.0601  0.9181  4.6688 
 ## 
 ## Coefficients:
-##              Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept) -7.241244   3.134883  -2.310 0.021077 *  
-## educ        -0.152739   0.039201  -3.896 0.000104 ***
-## age          0.523554   0.138957   3.768 0.000173 ***
-## agesq       -0.005716   0.001570  -3.642 0.000283 ***
-## black        1.072952   0.173618   6.180 8.99e-10 ***
-## east         0.228555   0.133779   1.708 0.087831 .  
-## northcen     0.374419   0.121992   3.069 0.002198 ** 
-## west         0.207640   0.167563   1.239 0.215542    
-## farm        -0.077002   0.151287  -0.509 0.610869    
-## othrural    -0.195245   0.181449  -1.076 0.282147    
-## town         0.081810   0.124612   0.657 0.511628    
-## smcity       0.212500   0.160335   1.325 0.185329    
-## y74          0.272129   0.172847   1.574 0.115681    
-## y76         -0.094548   0.179132  -0.528 0.597734    
-## y78         -0.057254   0.182451  -0.314 0.753727    
-## y80         -0.053248   0.184614  -0.288 0.773072    
-## y82         -0.496215   0.176490  -2.812 0.005017 ** 
-## y84         -0.521360   0.177821  -2.932 0.003438 ** 
-## lm.r$resid   0.031137   0.044363   0.702 0.482906    
+##                         Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)            -7.241244   3.134883  -2.310 0.021077 *  
+## educ                   -0.152739   0.039201  -3.896 0.000104 ***
+## age                     0.523554   0.138957   3.768 0.000173 ***
+## agesq                  -0.005716   0.001570  -3.642 0.000283 ***
+## black                   1.072952   0.173618   6.180 8.99e-10 ***
+## east                    0.228555   0.133779   1.708 0.087831 .  
+## northcen                0.374419   0.121992   3.069 0.002198 ** 
+## west                    0.207640   0.167563   1.239 0.215542    
+## farm                   -0.077002   0.151287  -0.509 0.610869    
+## othrural               -0.195245   0.181449  -1.076 0.282147    
+## town                    0.081810   0.124612   0.657 0.511628    
+## smcity                  0.212500   0.160335   1.325 0.185329    
+## y74                     0.272129   0.172847   1.574 0.115681    
+## y76                    -0.094548   0.179132  -0.528 0.597734    
+## y78                    -0.057254   0.182451  -0.314 0.753727    
+## y80                    -0.053248   0.184614  -0.288 0.773072    
+## y82                    -0.496215   0.176490  -2.812 0.005017 ** 
+## y84                    -0.521360   0.177821  -2.932 0.003438 ** 
+## model_r[[&quot;residuals&quot;]]  0.031137   0.044363   0.702 0.482906    
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 1.555 on 1110 degrees of freedom
-## Multiple R-squared:  0.1299, Adjusted R-squared:  0.1158 
+## Multiple R-squared:  0.1299,	Adjusted R-squared:  0.1158 
 ## F-statistic: 9.206 on 18 and 1110 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
 <div id="example-15.10" class="section level3">
 <h3>Example 15.10</h3>
 <pre class="r"><code>data(&quot;jtrain&quot;)
 
-d.lscrap &lt;- with(jtrain, lscrap[year == 1988] - lscrap[year == 1987])
-d.hrsemp &lt;- with(jtrain, hrsemp[year == 1988] - hrsemp[year == 1987])
-d.grant &lt;- with(jtrain, grant[year == 1988] - grant[year == 1987])
+d_lscrap &lt;- with(jtrain, lscrap[year == 1988] - lscrap[year == 1987])
+d_hrsemp &lt;- with(jtrain, hrsemp[year == 1988] - hrsemp[year == 1987])
+d_grant &lt;- with(jtrain, grant[year == 1988] - grant[year == 1987])
 
-s.iv.1 &lt;- summary(ivreg(d.lscrap ~ d.hrsemp | d.grant))
-s.iv.1</code></pre>
+summary_iv_1 &lt;- summary(ivreg(d_lscrap ~ d_hrsemp | d_grant))
+summary_iv_1</code></pre>
 <pre><code>## 
 ## Call:
-## ivreg(formula = d.lscrap ~ d.hrsemp | d.grant)
+## ivreg(formula = d_lscrap ~ d_hrsemp | d_grant)
 ## 
 ## Residuals:
 ##       Min        1Q    Median        3Q       Max 
@@ -659,11 +681,11 @@ s.iv.1</code></pre>
 ## Coefficients:
 ##              Estimate Std. Error t value Pr(&gt;|t|)  
 ## (Intercept) -0.032668   0.126951  -0.257   0.7982  
-## d.hrsemp    -0.014153   0.007915  -1.788   0.0808 .
+## d_hrsemp    -0.014153   0.007915  -1.788   0.0808 .
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.629 on 43 degrees of freedom
-## Multiple R-Squared: 0.0159,  Adjusted R-squared: -0.006984 
+## Multiple R-Squared: 0.0159,	Adjusted R-squared: -0.006984 
 ## Wald test: 3.198 on 1 and 43 DF,  p-value: 0.08079</code></pre>
 </div>

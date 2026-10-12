@@ -8,8 +8,8 @@ tags:
 ---
 
 ```{r, message = FALSE}
-library(AER)
-library(wooldridge)
+library("AER")
+library("wooldridge")
 ```
 
 ### Example 15.1
@@ -20,140 +20,156 @@ data("mroz")
 
 OLS
 ```{r}
-s.lm.1 <- summary(lm(lwage ~ educ, data = mroz))
-s.lm.1
+summary_1 <- summary(lm(lwage ~ educ, data = mroz))
+summary_1
 ```
 
 *fatheduc* as IV for *educ*
 ```{r}
-s.lm.2 <- summary(lm(educ ~ fatheduc, data = mroz[mroz$inlf !=0 ,]))
-s.lm.2
+summary_2 <- summary(lm(educ ~ fatheduc, data = mroz[mroz[["inlf"]] != 0, ]))
+summary_2
 ```
 
 IV estimation
 ```{r}
-s.iv.1 <- summary(ivreg(lwage ~ educ | fatheduc,
-                        data=mroz))
-s.iv.1
+summary_iv_1 <- summary(ivreg(lwage ~ educ | fatheduc,
+                              data = mroz))
+summary_iv_1
 ```
 
 ### Example 15.2
 ```{r}
 data("wage2")
 
-s.lm.1 <- summary(lm(educ ~ sibs, data = wage2))
-s.lm.1
+summary_1 <- summary(lm(educ ~ sibs, data = wage2))
+summary_1
 ```
 
 ```{r}
-s.iv.1 <- summary(ivreg(lwage ~ educ | sibs, data = wage2))
-s.iv.1
+summary_iv_1 <- summary(ivreg(lwage ~ educ | sibs, data = wage2))
+summary_iv_1
 ```
 
 ### Example 15.3
 ```{r}
 data("bwght")
 
-s.lm.1 <- summary(lm(packs ~ cigprice, data = bwght))
-s.lm.1
+summary_1 <- summary(lm(packs ~ cigprice, data = bwght))
+summary_1
 ```
 
 ```{r}
-s.iv.1 <- summary(ivreg(lbwght ~ packs | cigprice,
-                        data = bwght))
-s.iv.1
+summary_iv_1 <- summary(ivreg(lbwght ~ packs | cigprice,
+                              data = bwght))
+summary_iv_1
 ```
 
 ### Example 15.4
 ```{r}
 data("card")
 
-s.lm.1 <- summary(lm(educ ~ nearc4 + exper + expersq + black + smsa + south +
-                       smsa66 + reg662 + reg663 + reg664 + reg665 + reg666 + reg667 +
-                       reg668 + reg669,
-                     data = card))
-s.lm.1
+model_1 <- lm(educ ~ nearc4 + exper + expersq + black + smsa + south +
+                smsa66 + reg662 + reg663 + reg664 + reg665 + reg666 +
+                reg667 + reg668 + reg669,
+              data = card)
+summary_1 <- summary(model_1)
+summary_1
 ```
 
 ```{r}
-s.lm.2 <- summary(lm.2 <- lm(lwage ~ educ + exper + expersq + black + smsa + south +
-                               smsa66 + reg662 + reg663 + reg664 + reg665 + reg666 + reg667 +
-                               reg668 + reg669,
-                             data = card))
-s.lm.2
+model_2 <- lm(lwage ~ educ + exper + expersq + black + smsa + south +
+                smsa66 + reg662 + reg663 + reg664 + reg665 + reg666 +
+                reg667 + reg668 + reg669,
+              data = card)
+summary_2 <- summary(model_2)
+summary_2
 ```
 
 ```{r}
-s.iv.1 <- summary(ivreg(lwage ~ educ + exper + expersq + black + smsa + south +
-                          smsa66 + reg662 + reg663 + reg664 + reg665 + reg666 + reg667 +
-                          reg668 + reg669 | nearc4 + exper + expersq + black + smsa + south +
-                          smsa66 + reg662 + reg663 + reg664 + reg665 + reg666 + reg667 +
-                          reg668 + reg669,
-                        data = card))
-s.iv.1
+iv_1 <- ivreg(lwage ~ educ + exper + expersq + black + smsa + south +
+                smsa66 + reg662 + reg663 + reg664 + reg665 + reg666 +
+                reg667 + reg668 + reg669 |
+                nearc4 + exper + expersq + black + smsa + south +
+                smsa66 + reg662 + reg663 + reg664 + reg665 + reg666 +
+                reg667 + reg668 + reg669,
+              data = card)
+summary_iv_1 <- summary(iv_1)
+summary_iv_1
 ```
 
 ### Example 15.5
 ```{r}
 data("mroz")
 
-s.lm.1 <- summary(lm.1 <- lm(lwage ~ educ + exper + expersq, data = mroz))
-s.lm.1
+model_1 <- lm(lwage ~ educ + exper + expersq, data = mroz)
+summary_1 <- summary(model_1)
+summary_1
 ```
 
 ```{r}
-s.lm.2a <- summary(lm.2a <- lm(educ ~ exper + expersq + motheduc + fatheduc,
-                               data = mroz[mroz$inlf > 0,]))
-s.lm.2b <- summary(lm.2b <- lm(educ ~ exper + expersq,data=mroz[mroz$inlf > 0,]))
+model_2a <- lm(educ ~ exper + expersq + motheduc + fatheduc,
+               data = mroz[mroz[["inlf"]] > 0, ])
+summary_2a <- summary(model_2a)
+model_2b <- lm(educ ~ exper + expersq, data = mroz[mroz[["inlf"]] > 0, ])
+summary_2b <- summary(model_2b)
 
-anova(lm.2a, lm.2b)
+anova(model_2a, model_2b)
 ```
 
 ```{r}
-s.iv.1 <- summary(ivreg(lwage ~ educ + exper + expersq | exper +
-                          expersq + motheduc + fatheduc, data = mroz))
-s.iv.1
+iv_1 <- ivreg(lwage ~ educ + exper + expersq |
+                exper + expersq + motheduc + fatheduc,
+              data = mroz)
+summary_iv_1 <- summary(iv_1)
+summary_iv_1
 ```
 
 #### Example 15.6
 ```{r}
 data("wage2")
 
-s.iv.1 <- summary(ivreg(lwage ~ educ + exper + tenure + married + south + urban + black +
-                          IQ | KWW + educ + exper + tenure + married + south + urban + black,
-                        data = wage2))
-s.iv.1
+iv_1 <- ivreg(lwage ~ educ + exper + tenure + married + south + urban +
+                black + IQ |
+                KWW + educ + exper + tenure + married + south + urban + black,
+              data = wage2)
+summary_iv_1 <- summary(iv_1)
+summary_iv_1
 ```
 
 ### Example 15.7
 ```{r}
 data("mroz")
 
-s.lm.1 <- summary(lm.1 <- lm(lwage ~ educ + exper + expersq, data = mroz))
-s.lm.1
+model_1 <- lm(lwage ~ educ + exper + expersq, data = mroz)
+summary_1 <- summary(model_1)
+summary_1
 ```
 
 ```{r}
-s.lm.2 <- summary(lm.2 <- lm(educ ~ exper + expersq + motheduc + fatheduc,
-                             data = mroz[mroz$inlf != 0,]))
+model_2 <- lm(educ ~ exper + expersq + motheduc + fatheduc,
+              data = mroz[mroz[["inlf"]] != 0, ])
+summary_2 <- summary(model_2)
 
-s.lm.3 <- summary(lm.3 <- lm(lwage ~ educ + exper + expersq + lm.2$resid,
-                             data = mroz[mroz$inlf != 0,]))
+model_3 <- lm(lwage ~ educ + exper + expersq + model_2[["residuals"]],
+              data = mroz[mroz[["inlf"]] != 0, ])
+summary_3 <- summary(model_3)
 
-s.lm.3
+summary_3
 ```
 
 ### Example 15.8
 ```{r}
 data("mroz")
 
-s.iv.1 <- summary(iv.1 <- ivreg(lwage ~ educ + exper + expersq | 
-                                  exper + expersq + motheduc + fatheduc,
-                                data = mroz[mroz$inlf!=0,]))
+iv_1 <- ivreg(lwage ~ educ + exper + expersq |
+                exper + expersq + motheduc + fatheduc,
+              data = mroz[mroz[["inlf"]] != 0, ])
+summary_iv_1 <- summary(iv_1)
 
-s.lm.1 <- summary(lm(iv.1$resid ~ exper + expersq + motheduc + fatheduc,
-                     data=mroz[mroz$inlf!=0,]))
-s.lm.1
+summary_1 <- summary(lm(iv_1[["residuals"]] ~ exper + expersq + motheduc +
+                          fatheduc,
+                        data = mroz[mroz[["inlf"]] != 0, ]))
+summary_1
 ```
 
 ```{r}
@@ -161,13 +177,15 @@ s.lm.1
 ```
 
 ```{r}
-s.iv.2 <- summary(iv.2 <- ivreg(lwage ~ educ + exper + expersq | 
-                                  exper + expersq + motheduc + fatheduc + huseduc,
-                                data = mroz[mroz$inlf!=0,]))
+iv_2 <- ivreg(lwage ~ educ + exper + expersq |
+                exper + expersq + motheduc + fatheduc + huseduc,
+              data = mroz[mroz[["inlf"]] != 0, ])
+summary_iv_2 <- summary(iv_2)
 
-s.lm.2 <- summary(lm(iv.2$resid ~ exper + expersq + motheduc + fatheduc + huseduc,
-                     data = mroz[mroz$inlf!=0,]))
-s.lm.2
+summary_2 <- summary(lm(iv_2[["residuals"]] ~ exper + expersq + motheduc +
+                          fatheduc + huseduc,
+                        data = mroz[mroz[["inlf"]] != 0, ]))
+summary_2
 ```
 
 ```{r}
@@ -175,43 +193,46 @@ s.lm.2
 ```
 
 ```{r}
-s.iv.2
+summary_iv_2
 ```
 
 ### Example 15.9
 ```{r}
 data("fertil1")
 
-s.iv.1 <- summary(iv.1 <- ivreg(kids ~ educ + age + agesq + black + east + northcen +
-                                  west + farm + othrural + town + smcity + y74 + y76 +
-                                  y78 + y80 + y82 + y84 |
-                                  meduc + feduc + age + agesq + black + east +
-                                  northcen + west + farm + othrural + town + smcity +
-                                  y74 + y76 + y78 + y80 + y82 + y84,
-                                data = fertil1))
-s.iv.1
+iv_1 <- ivreg(kids ~ educ + age + agesq + black + east + northcen +
+                west + farm + othrural + town + smcity + y74 + y76 +
+                y78 + y80 + y82 + y84 |
+                meduc + feduc + age + agesq + black + east +
+                northcen + west + farm + othrural + town + smcity +
+                y74 + y76 + y78 + y80 + y82 + y84,
+              data = fertil1)
+summary_iv_1 <- summary(iv_1)
+summary_iv_1
 ```
 
 ```{r}
-lm.r <- lm(educ ~ meduc + feduc + age + agesq + black + east + northcen +
-             west + farm + othrural + town + smcity + y74 + y76 + y78 + y80 + y82 + y84,
-           data = fertil1)
+model_r <- lm(educ ~ meduc + feduc + age + agesq + black + east + northcen +
+                west + farm + othrural + town + smcity + y74 + y76 + y78 +
+                y80 + y82 + y84,
+              data = fertil1)
 
-lm.1 <- lm(kids ~ educ + age + agesq + black + east + northcen + west + farm +
-             othrural + town + smcity + y74 + y76 + y78 + y80 + y82 + y84 + lm.r$resid,
-           data = fertil1)
+model_1 <- lm(kids ~ educ + age + agesq + black + east + northcen + west +
+                farm + othrural + town + smcity + y74 + y76 + y78 + y80 +
+                y82 + y84 + model_r[["residuals"]],
+              data = fertil1)
 
-summary(lm.1)
+summary(model_1)
 ```
 
 ### Example 15.10
 ```{r}
 data("jtrain")
 
-d.lscrap <- with(jtrain, lscrap[year == 1988] - lscrap[year == 1987])
-d.hrsemp <- with(jtrain, hrsemp[year == 1988] - hrsemp[year == 1987])
-d.grant <- with(jtrain, grant[year == 1988] - grant[year == 1987])
+d_lscrap <- with(jtrain, lscrap[year == 1988] - lscrap[year == 1987])
+d_hrsemp <- with(jtrain, hrsemp[year == 1988] - hrsemp[year == 1987])
+d_grant <- with(jtrain, grant[year == 1988] - grant[year == 1987])
 
-s.iv.1 <- summary(ivreg(d.lscrap ~ d.hrsemp | d.grant))
-s.iv.1
+summary_iv_1 <- summary(ivreg(d_lscrap ~ d_hrsemp | d_grant))
+summary_iv_1
 ```

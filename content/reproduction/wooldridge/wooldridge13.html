@@ -6,16 +6,18 @@ date: "2018-02-05"
 
 
 
-<pre class="r"><code>library(wooldridge)</code></pre>
+<pre class="r"><code>library(&quot;wooldridge&quot;)</code></pre>
 <div id="example-13.1" class="section level3">
 <h3>Example 13.1</h3>
 <pre class="r"><code>data(&quot;fertil1&quot;)
 
-s.lm.1 &lt;- summary(lm.1 &lt;- lm(kids ~ educ + age + agesq + black + east + northcen + west +
-                          farm + othrural + town + smcity +
-                          y74 + y76 + y78 + y80 + y82 + y84, data = fertil1))
+model_1 &lt;- lm(kids ~ educ + age + agesq + black + east + northcen + west +
+                farm + othrural + town + smcity +
+                y74 + y76 + y78 + y80 + y82 + y84,
+              data = fertil1)
+summary_1 &lt;- summary(model_1)
 
-s.lm.1</code></pre>
+summary_1</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = kids ~ educ + age + agesq + black + east + northcen + 
@@ -50,12 +52,14 @@ s.lm.1</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 1.555 on 1111 degrees of freedom
-## Multiple R-squared:  0.1295, Adjusted R-squared:  0.1162 
+## Multiple R-squared:  0.1295,	Adjusted R-squared:  0.1162 
 ## F-statistic: 9.723 on 17 and 1111 DF,  p-value: &lt; 2.2e-16</code></pre>
-<pre class="r"><code>s.lm.2 &lt;- summary(lm.2 &lt;- lm(kids ~ educ + age + agesq + black + east + northcen + west +
-                          farm + othrural + town + smcity,data = fertil1))
+<pre class="r"><code>model_2 &lt;- lm(kids ~ educ + age + agesq + black + east + northcen + west +
+                farm + othrural + town + smcity,
+              data = fertil1)
+summary_2 &lt;- summary(model_2)
 
-anova(lm.1, lm.2)</code></pre>
+anova(model_1, model_2)</code></pre>
 <pre><code>## Analysis of Variance Table
 ## 
 ## Model 1: kids ~ educ + age + agesq + black + east + northcen + west + 
@@ -73,10 +77,12 @@ anova(lm.1, lm.2)</code></pre>
 <h3>Example 13.2</h3>
 <pre class="r"><code>data(&quot;cps78_85&quot;)
 
-s.lm.1 &lt;- summary(lm.1 &lt;- lm(lwage ~ y85 + educ + y85educ + exper + expersq +
-                               union + female + y85fem, data = cps78_85))
+model_1 &lt;- lm(lwage ~ y85 + educ + y85educ + exper + expersq +
+                union + female + y85fem,
+              data = cps78_85)
+summary_1 &lt;- summary(model_1)
 
-s.lm.1</code></pre>
+summary_1</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = lwage ~ y85 + educ + y85educ + exper + expersq + 
@@ -101,19 +107,20 @@ s.lm.1</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.4127 on 1075 degrees of freedom
-## Multiple R-squared:  0.4262, Adjusted R-squared:  0.4219 
+## Multiple R-squared:  0.4262,	Adjusted R-squared:  0.4219 
 ## F-statistic:  99.8 on 8 and 1075 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
 <div id="example-13.3" class="section level3">
 <h3>Example 13.3</h3>
 <pre class="r"><code>data(&quot;kielmc&quot;)
 
-s.lm.1 &lt;- summary(lm.1 &lt;- lm(rprice ~ nearinc, data = kielmc[kielmc$year==1981,]))
-s.lm.1</code></pre>
+model_1 &lt;- lm(rprice ~ nearinc, data = kielmc[kielmc[[&quot;year&quot;]] == 1981, ])
+summary_1 &lt;- summary(model_1)
+summary_1</code></pre>
 <pre><code>## 
 ## Call:
-## lm(formula = rprice ~ nearinc, data = kielmc[kielmc$year == 1981, 
-##     ])
+## lm(formula = rprice ~ nearinc, data = kielmc[kielmc[[&quot;year&quot;]] == 
+##     1981, ])
 ## 
 ## Residuals:
 ##    Min     1Q Median     3Q    Max 
@@ -127,14 +134,15 @@ s.lm.1</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 31240 on 140 degrees of freedom
-## Multiple R-squared:  0.1653, Adjusted R-squared:  0.1594 
+## Multiple R-squared:  0.1653,	Adjusted R-squared:  0.1594 
 ## F-statistic: 27.73 on 1 and 140 DF,  p-value: 5.139e-07</code></pre>
-<pre class="r"><code>s.lm.2 &lt;- summary(lm.2 &lt;- lm(rprice ~ nearinc, data = kielmc[kielmc$year == 1978,]))
-s.lm.2</code></pre>
+<pre class="r"><code>model_2 &lt;- lm(rprice ~ nearinc, data = kielmc[kielmc[[&quot;year&quot;]] == 1978, ])
+summary_2 &lt;- summary(model_2)
+summary_2</code></pre>
 <pre><code>## 
 ## Call:
-## lm(formula = rprice ~ nearinc, data = kielmc[kielmc$year == 1978, 
-##     ])
+## lm(formula = rprice ~ nearinc, data = kielmc[kielmc[[&quot;year&quot;]] == 
+##     1978, ])
 ## 
 ## Residuals:
 ##    Min     1Q Median     3Q    Max 
@@ -148,10 +156,11 @@ s.lm.2</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 29430 on 177 degrees of freedom
-## Multiple R-squared:  0.08167,    Adjusted R-squared:  0.07648 
+## Multiple R-squared:  0.08167,	Adjusted R-squared:  0.07648 
 ## F-statistic: 15.74 on 1 and 177 DF,  p-value: 0.0001054</code></pre>
-<pre class="r"><code>s.lm.3.1 &lt;- summary(lm.3.1 &lt;- lm(rprice ~ y81 + nearinc + y81nrinc, data = kielmc))
-s.lm.3.1</code></pre>
+<pre class="r"><code>model_3_1 &lt;- lm(rprice ~ y81 + nearinc + y81nrinc, data = kielmc)
+summary_3_1 &lt;- summary(model_3_1)
+summary_3_1</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = rprice ~ y81 + nearinc + y81nrinc, data = kielmc)
@@ -170,10 +179,12 @@ s.lm.3.1</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 30240 on 317 degrees of freedom
-## Multiple R-squared:  0.1739, Adjusted R-squared:  0.1661 
+## Multiple R-squared:  0.1739,	Adjusted R-squared:  0.1661 
 ## F-statistic: 22.25 on 3 and 317 DF,  p-value: 4.224e-13</code></pre>
-<pre class="r"><code>s.lm.3.2 &lt;- summary(lm.3.2 &lt;- lm(rprice ~ y81 + nearinc + y81nrinc + age + agesq, data = kielmc))
-s.lm.3.2</code></pre>
+<pre class="r"><code>model_3_2 &lt;- lm(rprice ~ y81 + nearinc + y81nrinc + age + agesq,
+                data = kielmc)
+summary_3_2 &lt;- summary(model_3_2)
+summary_3_2</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = rprice ~ y81 + nearinc + y81nrinc + age + agesq, 
@@ -195,11 +206,13 @@ s.lm.3.2</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 25540 on 315 degrees of freedom
-## Multiple R-squared:  0.4144, Adjusted R-squared:  0.4052 
+## Multiple R-squared:  0.4144,	Adjusted R-squared:  0.4052 
 ## F-statistic: 44.59 on 5 and 315 DF,  p-value: &lt; 2.2e-16</code></pre>
-<pre class="r"><code>s.lm.3.3 &lt;- summary(lm.3.3 &lt;- lm(rprice ~ y81 + nearinc + y81nrinc + age + agesq +
-                                   intst + land + area + rooms + baths, data = kielmc))
-s.lm.3.3</code></pre>
+<pre class="r"><code>model_3_3 &lt;- lm(rprice ~ y81 + nearinc + y81nrinc + age + agesq +
+                  intst + land + area + rooms + baths,
+                data = kielmc)
+summary_3_3 &lt;- summary(model_3_3)
+summary_3_3</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = rprice ~ y81 + nearinc + y81nrinc + age + agesq + 
@@ -226,10 +239,11 @@ s.lm.3.3</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 19620 on 310 degrees of freedom
-## Multiple R-squared:   0.66,  Adjusted R-squared:  0.6491 
+## Multiple R-squared:   0.66,	Adjusted R-squared:  0.6491 
 ## F-statistic: 60.19 on 10 and 310 DF,  p-value: &lt; 2.2e-16</code></pre>
-<pre class="r"><code>s.lm.4.1 &lt;- summary(lm.4.1 &lt;- lm(lprice ~ y81 + nearinc + y81nrinc, data = kielmc))
-s.lm.4.1</code></pre>
+<pre class="r"><code>model_4_1 &lt;- lm(lprice ~ y81 + nearinc + y81nrinc, data = kielmc)
+summary_4_1 &lt;- summary(model_4_1)
+summary_4_1</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = lprice ~ y81 + nearinc + y81nrinc, data = kielmc)
@@ -248,11 +262,13 @@ s.lm.4.1</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.3384 on 317 degrees of freedom
-## Multiple R-squared:  0.4091, Adjusted R-squared:  0.4035 
+## Multiple R-squared:  0.4091,	Adjusted R-squared:  0.4035 
 ## F-statistic: 73.15 on 3 and 317 DF,  p-value: &lt; 2.2e-16</code></pre>
-<pre class="r"><code>s.lm.4.2 &lt;- summary(lm.4.2 &lt;- lm(lrprice ~ y81 + nearinc + y81nrinc + age + agesq + 
-                                   lintst + lland + larea + rooms + baths, data = kielmc))
-s.lm.4.2</code></pre>
+<pre class="r"><code>model_4_2 &lt;- lm(lrprice ~ y81 + nearinc + y81nrinc + age + agesq +
+                  lintst + lland + larea + rooms + baths,
+                data = kielmc)
+summary_4_2 &lt;- summary(model_4_2)
+summary_4_2</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = lrprice ~ y81 + nearinc + y81nrinc + age + agesq + 
@@ -279,15 +295,16 @@ s.lm.4.2</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.2038 on 310 degrees of freedom
-## Multiple R-squared:  0.7326, Adjusted R-squared:  0.7239 
+## Multiple R-squared:  0.7326,	Adjusted R-squared:  0.7239 
 ## F-statistic: 84.92 on 10 and 310 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
 <div id="example-13.4" class="section level3">
 <h3>Example 13.4</h3>
 <pre class="r"><code>data(&quot;injury&quot;)
 
-s.lm.1 &lt;- summary(lm.1 &lt;- lm(ldurat ~ afchnge + highearn + afhigh, data = injury))
-s.lm.1</code></pre>
+model_1 &lt;- lm(ldurat ~ afchnge + highearn + afhigh, data = injury)
+summary_1 &lt;- summary(model_1)
+summary_1</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = ldurat ~ afchnge + highearn + afhigh, data = injury)
@@ -306,7 +323,7 @@ s.lm.1</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 1.298 on 7146 degrees of freedom
-## Multiple R-squared:  0.01584,    Adjusted R-squared:  0.01543 
+## Multiple R-squared:  0.01584,	Adjusted R-squared:  0.01543 
 ## F-statistic: 38.34 on 3 and 7146 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>Hmmm, more observations in this estimation and the results differ…</p>
 </div>
@@ -314,12 +331,13 @@ s.lm.1</code></pre>
 <h3>Section 13.3</h3>
 <pre class="r"><code>data(&quot;crime2&quot;)
 
-s.lm.1 &lt;- summary(lm.1 &lt;- lm(crmrte ~ unem, data = crime2[crime2$year == 87,]))
-s.lm.1</code></pre>
+model_1 &lt;- lm(crmrte ~ unem, data = crime2[crime2[[&quot;year&quot;]] == 87, ])
+summary_1 &lt;- summary(model_1)
+summary_1</code></pre>
 <pre><code>## 
 ## Call:
-## lm(formula = crmrte ~ unem, data = crime2[crime2$year == 87, 
-##     ])
+## lm(formula = crmrte ~ unem, data = crime2[crime2[[&quot;year&quot;]] == 
+##     87, ])
 ## 
 ## Residuals:
 ##    Min     1Q Median     3Q    Max 
@@ -333,10 +351,11 @@ s.lm.1</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 34.6 on 44 degrees of freedom
-## Multiple R-squared:  0.03262,    Adjusted R-squared:  0.01063 
+## Multiple R-squared:  0.03262,	Adjusted R-squared:  0.01063 
 ## F-statistic: 1.483 on 1 and 44 DF,  p-value: 0.2297</code></pre>
-<pre class="r"><code>s.lm.2 &lt;- summary(lm.2 &lt;- lm(crmrte ~ d87 + unem, data = crime2))
-s.lm.2</code></pre>
+<pre class="r"><code>model_2 &lt;- lm(crmrte ~ d87 + unem, data = crime2)
+summary_2 &lt;- summary(model_2)
+summary_2</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = crmrte ~ d87 + unem, data = crime2)
@@ -354,18 +373,22 @@ s.lm.2</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 29.99 on 89 degrees of freedom
-## Multiple R-squared:  0.01221,    Adjusted R-squared:  -0.009986 
+## Multiple R-squared:  0.01221,	Adjusted R-squared:  -0.009986 
 ## F-statistic: 0.5501 on 2 and 89 DF,  p-value: 0.5788</code></pre>
 <p>Generate differences</p>
-<pre class="r"><code>crmrte.d &lt;- crime2$crmrte[seq(2,length(crime2$unem), by = 2)] - crime2$crmrte[seq(1, (length(crime2$unem) - 1), by = 2)]
-unem.d &lt;- crime2$unem[seq(2, length(crime2$unem), by = 2)] - crime2$unem[seq(1, (length(crime2$unem) - 1), by = 2)]</code></pre>
+<pre class="r"><code>second_obs &lt;- seq(2, length(crime2[[&quot;unem&quot;]]), by = 2)
+first_obs &lt;- seq(1, (length(crime2[[&quot;unem&quot;]]) - 1), by = 2)
+
+crmrte_d &lt;- crime2[[&quot;crmrte&quot;]][second_obs] - crime2[[&quot;crmrte&quot;]][first_obs]
+unem_d &lt;- crime2[[&quot;unem&quot;]][second_obs] - crime2[[&quot;unem&quot;]][first_obs]</code></pre>
 <p>I suppose there is a better way to do this. I will revise it when I go througth the new edition of the textbook.</p>
 <p>Estimate</p>
-<pre class="r"><code>s.lm.3 &lt;- summary(lm.3 &lt;- lm(crmrte.d ~ unem.d))
-s.lm.3</code></pre>
+<pre class="r"><code>model_3 &lt;- lm(crmrte_d ~ unem_d)
+summary_3 &lt;- summary(model_3)
+summary_3</code></pre>
 <pre><code>## 
 ## Call:
-## lm(formula = crmrte.d ~ unem.d)
+## lm(formula = crmrte_d ~ unem_d)
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
@@ -374,12 +397,12 @@ s.lm.3</code></pre>
 ## Coefficients:
 ##             Estimate Std. Error t value Pr(&gt;|t|)   
 ## (Intercept)  15.4022     4.7021   3.276  0.00206 **
-## unem.d        2.2180     0.8779   2.527  0.01519 * 
+## unem_d        2.2180     0.8779   2.527  0.01519 * 
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 20.05 on 44 degrees of freedom
-## Multiple R-squared:  0.1267, Adjusted R-squared:  0.1069 
+## Multiple R-squared:  0.1267,	Adjusted R-squared:  0.1069 
 ## F-statistic: 6.384 on 1 and 44 DF,  p-value: 0.01519</code></pre>
 </div>
 <div id="example-13.5" class="section level3">
@@ -387,18 +410,19 @@ s.lm.3</code></pre>
 <pre class="r"><code>data(&quot;slp75_81&quot;)
 
 with(slp75_81, {
-     d.slpnap &lt;- slpnap81-slpnap75
-     d.totwrk &lt;- totwrk81-totwrk75
-     d.educ &lt;- educ81-educ75
-     d.marr &lt;- marr81-marr75
-     d.yngkid &lt;- yngkid81-yngkid75
-     d.gdhlth &lt;- gdhlth81-gdhlth75
-     summary(lm(d.slpnap ~ d.totwrk + d.educ + d.marr + d.yngkid + d.gdhlth))
-    })</code></pre>
+  d_slpnap &lt;- slpnap81 - slpnap75
+  d_totwrk &lt;- totwrk81 - totwrk75
+  d_educ &lt;- educ81 - educ75
+  d_marr &lt;- marr81 - marr75
+  d_yngkid &lt;- yngkid81 - yngkid75
+  d_gdhlth &lt;- gdhlth81 - gdhlth75
+
+  summary(lm(d_slpnap ~ d_totwrk + d_educ + d_marr + d_yngkid + d_gdhlth))
+})</code></pre>
 <pre><code>## 
 ## Call:
-## lm(formula = d.slpnap ~ d.totwrk + d.educ + d.marr + d.yngkid + 
-##     d.gdhlth)
+## lm(formula = d_slpnap ~ d_totwrk + d_educ + d_marr + d_yngkid + 
+##     d_gdhlth)
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
@@ -407,16 +431,16 @@ with(slp75_81, {
 ## Coefficients:
 ##              Estimate Std. Error t value Pr(&gt;|t|)    
 ## (Intercept) -92.63404   45.86590  -2.020   0.0446 *  
-## d.totwrk     -0.22667    0.03605  -6.287 1.58e-09 ***
-## d.educ       -0.02447   48.75938  -0.001   0.9996    
-## d.marr      104.21395   92.85536   1.122   0.2629    
-## d.yngkid     94.66540   87.65252   1.080   0.2813    
-## d.gdhlth     87.57785   76.59913   1.143   0.2541    
+## d_totwrk     -0.22667    0.03605  -6.287 1.58e-09 ***
+## d_educ       -0.02447   48.75938  -0.001   0.9996    
+## d_marr      104.21395   92.85536   1.122   0.2629    
+## d_yngkid     94.66540   87.65252   1.080   0.2813    
+## d_gdhlth     87.57785   76.59913   1.143   0.2541    
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 598.6 on 233 degrees of freedom
-## Multiple R-squared:  0.1495, Adjusted R-squared:  0.1313 
+## Multiple R-squared:  0.1495,	Adjusted R-squared:  0.1313 
 ## F-statistic: 8.191 on 5 and 233 DF,  p-value: 3.827e-07</code></pre>
 </div>
 <div id="example-13.6" class="section level3">
@@ -424,14 +448,15 @@ with(slp75_81, {
 <pre class="r"><code>data(&quot;crime3&quot;)
 
 with(crime3, {
-  d.lcrime &lt;- lcrime[year==78] - lcrime[year==72]
-  d.clrprc1 &lt;- clrprc1[year==78] - clrprc1[year==72]
-  d.clrprc2 &lt;- clrprc2[year==78] - clrprc2[year==72]
-  summary(lm(d.lcrime ~ d.clrprc1 + d.clrprc2))
+  d_lcrime &lt;- lcrime[year == 78] - lcrime[year == 72]
+  d_clrprc1 &lt;- clrprc1[year == 78] - clrprc1[year == 72]
+  d_clrprc2 &lt;- clrprc2[year == 78] - clrprc2[year == 72]
+
+  summary(lm(d_lcrime ~ d_clrprc1 + d_clrprc2))
 })</code></pre>
 <pre><code>## 
 ## Call:
-## lm(formula = d.lcrime ~ d.clrprc1 + d.clrprc2)
+## lm(formula = d_lcrime ~ d_clrprc1 + d_clrprc2)
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
@@ -440,13 +465,13 @@ with(crime3, {
 ## Coefficients:
 ##              Estimate Std. Error t value Pr(&gt;|t|)  
 ## (Intercept)  0.085656   0.063782   1.343   0.1854  
-## d.clrprc1   -0.004048   0.004720  -0.858   0.3952  
-## d.clrprc2   -0.013197   0.005195  -2.540   0.0142 *
+## d_clrprc1   -0.004048   0.004720  -0.858   0.3952  
+## d_clrprc2   -0.013197   0.005195  -2.540   0.0142 *
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.3446 on 50 degrees of freedom
-## Multiple R-squared:  0.1933, Adjusted R-squared:  0.1611 
+## Multiple R-squared:  0.1933,	Adjusted R-squared:  0.1611 
 ## F-statistic: 5.992 on 2 and 50 DF,  p-value: 0.004649</code></pre>
 </div>
 <div id="section-13.4" class="section level3">
@@ -454,13 +479,14 @@ with(crime3, {
 <pre class="r"><code>data(&quot;jtrain&quot;)
 
 with(jtrain, {
-  d.scrap &lt;- scrap[year == 1988] - scrap[year == 1987]
-  d.grant &lt;- grant[year == 1988] - grant[year == 1987]
-  summary(lm(d.scrap ~ d.grant))
+  d_scrap &lt;- scrap[year == 1988] - scrap[year == 1987]
+  d_grant &lt;- grant[year == 1988] - grant[year == 1987]
+
+  summary(lm(d_scrap ~ d_grant))
 })</code></pre>
 <pre><code>## 
 ## Call:
-## lm(formula = d.scrap ~ d.grant)
+## lm(formula = d_scrap ~ d_grant)
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
@@ -469,21 +495,22 @@ with(jtrain, {
 ## Coefficients:
 ##             Estimate Std. Error t value Pr(&gt;|t|)
 ## (Intercept)  -0.5637     0.4049  -1.392    0.170
-## d.grant      -0.7394     0.6826  -1.083    0.284
+## d_grant      -0.7394     0.6826  -1.083    0.284
 ## 
 ## Residual standard error: 2.396 on 52 degrees of freedom
 ##   (103 observations deleted due to missingness)
-## Multiple R-squared:  0.02207,    Adjusted R-squared:  0.003261 
+## Multiple R-squared:  0.02207,	Adjusted R-squared:  0.003261 
 ## F-statistic: 1.173 on 1 and 52 DF,  p-value: 0.2837</code></pre>
 <p>With logs of <code>scrap</code></p>
 <pre class="r"><code>with(jtrain, {
-  d.lscrap &lt;- lscrap[year == 1988] - lscrap[year == 1987]
-  d.grant &lt;- grant[year == 1988] - grant[year == 1987]
-  summary(lm(d.lscrap ~ d.grant))
+  d_lscrap &lt;- lscrap[year == 1988] - lscrap[year == 1987]
+  d_grant &lt;- grant[year == 1988] - grant[year == 1987]
+
+  summary(lm(d_lscrap ~ d_grant))
 })</code></pre>
 <pre><code>## 
 ## Call:
-## lm(formula = d.lscrap ~ d.grant)
+## lm(formula = d_lscrap ~ d_grant)
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
@@ -492,13 +519,13 @@ with(jtrain, {
 ## Coefficients:
 ##             Estimate Std. Error t value Pr(&gt;|t|)  
 ## (Intercept) -0.05744    0.09721  -0.591   0.5572  
-## d.grant     -0.31706    0.16388  -1.935   0.0585 .
+## d_grant     -0.31706    0.16388  -1.935   0.0585 .
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.5751 on 52 degrees of freedom
 ##   (103 observations deleted due to missingness)
-## Multiple R-squared:  0.06715,    Adjusted R-squared:  0.04921 
+## Multiple R-squared:  0.06715,	Adjusted R-squared:  0.04921 
 ## F-statistic: 3.743 on 1 and 52 DF,  p-value: 0.05847</code></pre>
 </div>
 <div id="example-13.7" class="section level3">
@@ -506,14 +533,15 @@ with(jtrain, {
 <pre class="r"><code>data(&quot;traffic1&quot;)
 
 with(traffic1, {
-  d.dthrte &lt;- dthrte90 - dthrte85
-  d.open &lt;- open90 - open85
-  d.admn &lt;- admn90 - admn85
-  summary(lm(d.dthrte ~ d.open + d.admn))
+  d_dthrte &lt;- dthrte90 - dthrte85
+  d_open &lt;- open90 - open85
+  d_admn &lt;- admn90 - admn85
+
+  summary(lm(d_dthrte ~ d_open + d_admn))
 })</code></pre>
 <pre><code>## 
 ## Call:
-## lm(formula = d.dthrte ~ d.open + d.admn)
+## lm(formula = d_dthrte ~ d_open + d_admn)
 ## 
 ## Residuals:
 ##      Min       1Q   Median       3Q      Max 
@@ -522,79 +550,80 @@ with(traffic1, {
 ## Coefficients:
 ##             Estimate Std. Error t value Pr(&gt;|t|)    
 ## (Intercept) -0.49679    0.05243  -9.476 1.43e-12 ***
-## d.open      -0.41968    0.20559  -2.041   0.0467 *  
-## d.admn      -0.15060    0.11682  -1.289   0.2035    
+## d_open      -0.41968    0.20559  -2.041   0.0467 *  
+## d_admn      -0.15060    0.11682  -1.289   0.2035    
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.3435 on 48 degrees of freedom
-## Multiple R-squared:  0.1187, Adjusted R-squared:  0.08194 
+## Multiple R-squared:  0.1187,	Adjusted R-squared:  0.08194 
 ## F-statistic: 3.231 on 2 and 48 DF,  p-value: 0.04824</code></pre>
 </div>
 <div id="example-13.8" class="section level3">
 <h3>Example 13.8</h3>
 <pre class="r"><code>data(&quot;ezunem&quot;)
 
-with(ezunem,{
-  d.luclms &lt;- luclms[year == 1981] - luclms[year == 1980]
-  d.luclms &lt;- append(d.luclms, luclms[year == 1982] - luclms[year == 1981])
-  d.luclms &lt;- append(d.luclms, luclms[year == 1983] - luclms[year == 1982])
-  d.luclms &lt;- append(d.luclms, luclms[year == 1984] - luclms[year == 1983])
-  d.luclms &lt;- append(d.luclms, luclms[year == 1985] - luclms[year == 1984])
-  d.luclms &lt;- append(d.luclms, luclms[year == 1986] - luclms[year == 1985])
-  d.luclms &lt;- append(d.luclms, luclms[year == 1987] - luclms[year == 1986])
-  d.luclms &lt;- append(d.luclms, luclms[year == 1988] - luclms[year == 1987])  
-  
-  d.ez &lt;- ez[year == 1981] - ez[year == 1980]
-  d.ez &lt;- append(d.ez, ez[year == 1982] - ez[year == 1981])
-  d.ez &lt;- append(d.ez, ez[year == 1983] - ez[year == 1982])
-  d.ez &lt;- append(d.ez, ez[year == 1984] - ez[year == 1983])
-  d.ez &lt;- append(d.ez, ez[year == 1985] - ez[year == 1984])
-  d.ez &lt;- append(d.ez, ez[year == 1986] - ez[year == 1985])
-  d.ez &lt;- append(d.ez, ez[year == 1987] - ez[year == 1986])
-  d.ez &lt;- append(d.ez, ez[year == 1988] - ez[year == 1987])
-  
-  d.82 &lt;- c()
+with(ezunem, {
+  d_luclms &lt;- luclms[year == 1981] - luclms[year == 1980]
+  d_luclms &lt;- append(d_luclms, luclms[year == 1982] - luclms[year == 1981])
+  d_luclms &lt;- append(d_luclms, luclms[year == 1983] - luclms[year == 1982])
+  d_luclms &lt;- append(d_luclms, luclms[year == 1984] - luclms[year == 1983])
+  d_luclms &lt;- append(d_luclms, luclms[year == 1985] - luclms[year == 1984])
+  d_luclms &lt;- append(d_luclms, luclms[year == 1986] - luclms[year == 1985])
+  d_luclms &lt;- append(d_luclms, luclms[year == 1987] - luclms[year == 1986])
+  d_luclms &lt;- append(d_luclms, luclms[year == 1988] - luclms[year == 1987])
+
+  d_ez &lt;- ez[year == 1981] - ez[year == 1980]
+  d_ez &lt;- append(d_ez, ez[year == 1982] - ez[year == 1981])
+  d_ez &lt;- append(d_ez, ez[year == 1983] - ez[year == 1982])
+  d_ez &lt;- append(d_ez, ez[year == 1984] - ez[year == 1983])
+  d_ez &lt;- append(d_ez, ez[year == 1985] - ez[year == 1984])
+  d_ez &lt;- append(d_ez, ez[year == 1986] - ez[year == 1985])
+  d_ez &lt;- append(d_ez, ez[year == 1987] - ez[year == 1986])
+  d_ez &lt;- append(d_ez, ez[year == 1988] - ez[year == 1987])
+
+  d_82 &lt;- c()
   for (i in 1981:1988) {
-    d.82 &lt;- append(d.82,d82[year == i] - d82[year == (i - 1)])
+    d_82 &lt;- append(d_82, d82[year == i] - d82[year == (i - 1)])
   }
-  
-  d.83 &lt;- c()
+
+  d_83 &lt;- c()
   for (i in 1981:1988) {
-    d.83 &lt;- append(d.83,d83[year == i] - d83[year == (i - 1)])
+    d_83 &lt;- append(d_83, d83[year == i] - d83[year == (i - 1)])
   }
-  
-  d.84 &lt;- c()
+
+  d_84 &lt;- c()
   for (i in 1981:1988) {
-    d.84 &lt;- append(d.84,d84[year == i] - d84[year == (i - 1)])
+    d_84 &lt;- append(d_84, d84[year == i] - d84[year == (i - 1)])
   }
-  
-  d.85 &lt;- c()
+
+  d_85 &lt;- c()
   for (i in 1981:1988) {
-    d.85 &lt;- append(d.85,d85[year == i] - d85[year == (i - 1)])
+    d_85 &lt;- append(d_85, d85[year == i] - d85[year == (i - 1)])
   }
-  
-  d.86 &lt;- c()
+
+  d_86 &lt;- c()
   for (i in 1981:1988) {
-    d.86 &lt;- append(d.86,d86[year == i] - d86[year == (i - 1)])
+    d_86 &lt;- append(d_86, d86[year == i] - d86[year == (i - 1)])
   }
-  
-  d.87 &lt;- c()
+
+  d_87 &lt;- c()
   for (i in 1981:1988) {
-    d.87 &lt;- append(d.87,d87[year == i] - d87[year == (i - 1)])
+    d_87 &lt;- append(d_87, d87[year == i] - d87[year == (i - 1)])
   }
-  
-  d.88 &lt;- c()
+
+  d_88 &lt;- c()
   for (i in 1981:1988) {
-    d.88 &lt;- append(d.88,d88[year == i] - d88[year == (i - 1)])
+    d_88 &lt;- append(d_88, d88[year == i] - d88[year == (i - 1)])
   }
-  
-  summary(lm(d.luclms ~ d.ez + d.82 + d.83 + d.84 + d.85 + d.86 + d.87 + d.88))
+
+  summary(lm(d_luclms ~ d_ez + d_82 + d_83 + d_84 + d_85 + d_86 + d_87 +
+               d_88))
 })</code></pre>
 <pre><code>## 
 ## Call:
-## lm(formula = d.luclms ~ d.ez + d.82 + d.83 + d.84 + d.85 + d.86 + 
-##     d.87 + d.88)
+## lm(formula = d_luclms ~ d_ez + d_82 + d_83 + d_84 + d_85 + d_86 + 
+##     d_87 + d_88)
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
@@ -603,19 +632,19 @@ with(ezunem,{
 ## Coefficients:
 ##             Estimate Std. Error t value Pr(&gt;|t|)    
 ## (Intercept) -0.32163    0.04606  -6.982 6.55e-11 ***
-## d.ez        -0.18188    0.07819  -2.326 0.021209 *  
-## d.82         0.77876    0.06514  11.954  &lt; 2e-16 ***
-## d.83         0.74564    0.11283   6.608 4.99e-10 ***
-## d.84         0.72850    0.16099   4.525 1.14e-05 ***
-## d.85         1.05158    0.20905   5.030 1.25e-06 ***
-## d.86         1.34374    0.25479   5.274 4.09e-07 ***
-## d.87         1.39769    0.30064   4.649 6.74e-06 ***
-## d.88         1.38063    0.34654   3.984 0.000101 ***
+## d_ez        -0.18188    0.07819  -2.326 0.021209 *  
+## d_82         0.77876    0.06514  11.954  &lt; 2e-16 ***
+## d_83         0.74564    0.11283   6.608 4.99e-10 ***
+## d_84         0.72850    0.16099   4.525 1.14e-05 ***
+## d_85         1.05158    0.20905   5.030 1.25e-06 ***
+## d_86         1.34374    0.25479   5.274 4.09e-07 ***
+## d_87         1.39769    0.30064   4.649 6.74e-06 ***
+## d_88         1.38063    0.34654   3.984 0.000101 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.2161 on 167 degrees of freedom
-## Multiple R-squared:  0.623,  Adjusted R-squared:  0.6049 
+## Multiple R-squared:  0.623,	Adjusted R-squared:  0.6049 
 ## F-statistic:  34.5 on 8 and 167 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
 <div id="example-13.9" class="section level3">
@@ -623,68 +652,74 @@ with(ezunem,{
 <pre class="r"><code>data(&quot;crime4&quot;)
 
 with(crime4, {
-  d.lcrmrte &lt;- c()
+  d_lcrmrte &lt;- c()
   for (i in 82:87) {
-    d.lcrmrte &lt;- append(d.lcrmrte, lcrmrte[year==i] - lcrmrte[year==(i - 1)])
-  }
-  
-  d.lprbarr &lt;- c()
-  for (i in 82:87) {
-    d.lprbarr &lt;- append(d.lprbarr, lprbarr[year==i] - lprbarr[year==(i - 1)])
-  }
-  
-  d.lprbconv &lt;- c()
-  for (i in 82:87) {
-    d.lprbconv &lt;- append(d.lprbconv, lprbconv[year==i] - lprbconv[year==(i - 1)])
-  }
-  
-  d.lprbpris &lt;- c()
-  for (i in 82:87) {
-    d.lprbpris &lt;- append(d.lprbpris, lprbpris[year==i] - lprbpris[year==(i - 1)])
-  }
-  
-  d.lavgsen &lt;- c()
-  for (i in 82:87) {
-    d.lavgsen &lt;- append(d.lavgsen, lavgsen[year==i] - lavgsen[year==(i - 1)])
-  }
-  
-  d.lpolpc &lt;- c()
-  for (i in 82:87) {
-    d.lpolpc &lt;- append(d.lpolpc, lpolpc[year==i] - lpolpc[year==(i - 1)])
-  }
-  
-  d.83 &lt;- c()
-  for (i in 82:87) {
-    d.83 &lt;- append(d.83, d83[year==i] - d83[year==(i - 1)])
+    d_lcrmrte &lt;- append(d_lcrmrte,
+                        lcrmrte[year == i] - lcrmrte[year == (i - 1)])
   }
 
-  d.84 &lt;- c()
+  d_lprbarr &lt;- c()
   for (i in 82:87) {
-    d.84 &lt;- append(d.84, d84[year==i] - d84[year==(i - 1)])
+    d_lprbarr &lt;- append(d_lprbarr,
+                        lprbarr[year == i] - lprbarr[year == (i - 1)])
   }
-  
-  d.85 &lt;- c()
+
+  d_lprbconv &lt;- c()
   for (i in 82:87) {
-    d.85 &lt;- append(d.85, d85[year==i] - d85[year==(i - 1)])
+    d_lprbconv &lt;- append(d_lprbconv,
+                         lprbconv[year == i] - lprbconv[year == (i - 1)])
   }
-  
-  d.86 &lt;- c()
+
+  d_lprbpris &lt;- c()
   for (i in 82:87) {
-    d.86 &lt;- append(d.86, d86[year==i] - d86[year==(i - 1)])
+    d_lprbpris &lt;- append(d_lprbpris,
+                         lprbpris[year == i] - lprbpris[year == (i - 1)])
   }
-  
-  d.87 &lt;- c()
+
+  d_lavgsen &lt;- c()
   for (i in 82:87) {
-    d.87 &lt;- append(d.87, d87[year==i] - d87[year==(i - 1)])
+    d_lavgsen &lt;- append(d_lavgsen,
+                        lavgsen[year == i] - lavgsen[year == (i - 1)])
   }
-    
-  summary(lm(d.lcrmrte ~ d.83 + d.84 + d.85 + d.86 + d.87 + d.lprbarr + d.lprbconv +
-               d.lprbpris + d.lavgsen + d.lpolpc))
+
+  d_lpolpc &lt;- c()
+  for (i in 82:87) {
+    d_lpolpc &lt;- append(d_lpolpc,
+                       lpolpc[year == i] - lpolpc[year == (i - 1)])
+  }
+
+  d_83 &lt;- c()
+  for (i in 82:87) {
+    d_83 &lt;- append(d_83, d83[year == i] - d83[year == (i - 1)])
+  }
+
+  d_84 &lt;- c()
+  for (i in 82:87) {
+    d_84 &lt;- append(d_84, d84[year == i] - d84[year == (i - 1)])
+  }
+
+  d_85 &lt;- c()
+  for (i in 82:87) {
+    d_85 &lt;- append(d_85, d85[year == i] - d85[year == (i - 1)])
+  }
+
+  d_86 &lt;- c()
+  for (i in 82:87) {
+    d_86 &lt;- append(d_86, d86[year == i] - d86[year == (i - 1)])
+  }
+
+  d_87 &lt;- c()
+  for (i in 82:87) {
+    d_87 &lt;- append(d_87, d87[year == i] - d87[year == (i - 1)])
+  }
+
+  summary(lm(d_lcrmrte ~ d_83 + d_84 + d_85 + d_86 + d_87 + d_lprbarr +
+               d_lprbconv + d_lprbpris + d_lavgsen + d_lpolpc))
 })</code></pre>
 <pre><code>## 
 ## Call:
-## lm(formula = d.lcrmrte ~ d.83 + d.84 + d.85 + d.86 + d.87 + d.lprbarr + 
-##     d.lprbconv + d.lprbpris + d.lavgsen + d.lpolpc)
+## lm(formula = d_lcrmrte ~ d_83 + d_84 + d_85 + d_86 + d_87 + d_lprbarr + 
+##     d_lprbconv + d_lprbpris + d_lavgsen + d_lpolpc)
 ## 
 ## Residuals:
 ##      Min       1Q   Median       3Q      Max 
@@ -693,20 +728,20 @@ with(crime4, {
 ## Coefficients:
 ##              Estimate Std. Error t value Pr(&gt;|t|)    
 ## (Intercept)  0.007713   0.017058   0.452 0.651320    
-## d.83        -0.099866   0.023895  -4.179 3.42e-05 ***
-## d.84        -0.147803   0.041279  -3.581 0.000374 ***
-## d.85        -0.152414   0.058400  -2.610 0.009315 ** 
-## d.86        -0.124900   0.076004  -1.643 0.100909    
-## d.87        -0.084073   0.094000  -0.894 0.371518    
-## d.lprbarr   -0.327494   0.029980 -10.924  &lt; 2e-16 ***
-## d.lprbconv  -0.238107   0.018234 -13.058  &lt; 2e-16 ***
-## d.lprbpris  -0.165046   0.025969  -6.356 4.49e-10 ***
-## d.lavgsen   -0.021761   0.022091  -0.985 0.325050    
-## d.lpolpc     0.398426   0.026882  14.821  &lt; 2e-16 ***
+## d_83        -0.099866   0.023895  -4.179 3.42e-05 ***
+## d_84        -0.147803   0.041279  -3.581 0.000374 ***
+## d_85        -0.152414   0.058400  -2.610 0.009315 ** 
+## d_86        -0.124900   0.076004  -1.643 0.100909    
+## d_87        -0.084073   0.094000  -0.894 0.371518    
+## d_lprbarr   -0.327494   0.029980 -10.924  &lt; 2e-16 ***
+## d_lprbconv  -0.238107   0.018234 -13.058  &lt; 2e-16 ***
+## d_lprbpris  -0.165046   0.025969  -6.356 4.49e-10 ***
+## d_lavgsen   -0.021761   0.022091  -0.985 0.325050    
+## d_lpolpc     0.398426   0.026882  14.821  &lt; 2e-16 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.1543 on 529 degrees of freedom
-## Multiple R-squared:  0.4325, Adjusted R-squared:  0.4218 
+## Multiple R-squared:  0.4325,	Adjusted R-squared:  0.4218 
 ## F-statistic: 40.32 on 10 and 529 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>

@@ -5,35 +5,41 @@ date: "2018-02-05"
 ---
 
 ```{r}
-library(wooldridge)
+library("wooldridge")
 ```
 
 ### Example 13.1
 ```{r}
 data("fertil1")
 
-s.lm.1 <- summary(lm.1 <- lm(kids ~ educ + age + agesq + black + east + northcen + west +
-                          farm + othrural + town + smcity +
-                          y74 + y76 + y78 + y80 + y82 + y84, data = fertil1))
+model_1 <- lm(kids ~ educ + age + agesq + black + east + northcen + west +
+                farm + othrural + town + smcity +
+                y74 + y76 + y78 + y80 + y82 + y84,
+              data = fertil1)
+summary_1 <- summary(model_1)
 
-s.lm.1
+summary_1
 ```
 
 ```{r}
-s.lm.2 <- summary(lm.2 <- lm(kids ~ educ + age + agesq + black + east + northcen + west +
-                          farm + othrural + town + smcity,data = fertil1))
+model_2 <- lm(kids ~ educ + age + agesq + black + east + northcen + west +
+                farm + othrural + town + smcity,
+              data = fertil1)
+summary_2 <- summary(model_2)
 
-anova(lm.1, lm.2)
+anova(model_1, model_2)
 ```
 
 ### Example 13.2
 ```{r}
 data("cps78_85")
 
-s.lm.1 <- summary(lm.1 <- lm(lwage ~ y85 + educ + y85educ + exper + expersq +
-                               union + female + y85fem, data = cps78_85))
+model_1 <- lm(lwage ~ y85 + educ + y85educ + exper + expersq +
+                union + female + y85fem,
+              data = cps78_85)
+summary_1 <- summary(model_1)
 
-s.lm.1
+summary_1
 ```
 
 ### Example 13.3
@@ -41,48 +47,59 @@ s.lm.1
 ```{r}
 data("kielmc")
 
-s.lm.1 <- summary(lm.1 <- lm(rprice ~ nearinc, data = kielmc[kielmc$year==1981,]))
-s.lm.1
+model_1 <- lm(rprice ~ nearinc, data = kielmc[kielmc[["year"]] == 1981, ])
+summary_1 <- summary(model_1)
+summary_1
 ```
 
 ```{r}
-s.lm.2 <- summary(lm.2 <- lm(rprice ~ nearinc, data = kielmc[kielmc$year == 1978,]))
-s.lm.2
+model_2 <- lm(rprice ~ nearinc, data = kielmc[kielmc[["year"]] == 1978, ])
+summary_2 <- summary(model_2)
+summary_2
 ```
 
 ```{r}
-s.lm.3.1 <- summary(lm.3.1 <- lm(rprice ~ y81 + nearinc + y81nrinc, data = kielmc))
-s.lm.3.1
+model_3_1 <- lm(rprice ~ y81 + nearinc + y81nrinc, data = kielmc)
+summary_3_1 <- summary(model_3_1)
+summary_3_1
 ```
 
 ```{r}
-s.lm.3.2 <- summary(lm.3.2 <- lm(rprice ~ y81 + nearinc + y81nrinc + age + agesq, data = kielmc))
-s.lm.3.2
+model_3_2 <- lm(rprice ~ y81 + nearinc + y81nrinc + age + agesq,
+                data = kielmc)
+summary_3_2 <- summary(model_3_2)
+summary_3_2
 ```
 
 ```{r}
-s.lm.3.3 <- summary(lm.3.3 <- lm(rprice ~ y81 + nearinc + y81nrinc + age + agesq +
-                                   intst + land + area + rooms + baths, data = kielmc))
-s.lm.3.3
+model_3_3 <- lm(rprice ~ y81 + nearinc + y81nrinc + age + agesq +
+                  intst + land + area + rooms + baths,
+                data = kielmc)
+summary_3_3 <- summary(model_3_3)
+summary_3_3
 ```
 
 ```{r}
-s.lm.4.1 <- summary(lm.4.1 <- lm(lprice ~ y81 + nearinc + y81nrinc, data = kielmc))
-s.lm.4.1
+model_4_1 <- lm(lprice ~ y81 + nearinc + y81nrinc, data = kielmc)
+summary_4_1 <- summary(model_4_1)
+summary_4_1
 ```
 
 ```{r}
-s.lm.4.2 <- summary(lm.4.2 <- lm(lrprice ~ y81 + nearinc + y81nrinc + age + agesq + 
-                                   lintst + lland + larea + rooms + baths, data = kielmc))
-s.lm.4.2
+model_4_2 <- lm(lrprice ~ y81 + nearinc + y81nrinc + age + agesq +
+                  lintst + lland + larea + rooms + baths,
+                data = kielmc)
+summary_4_2 <- summary(model_4_2)
+summary_4_2
 ```
 
 ### Example 13.4
 ```{r}
 data("injury")
 
-s.lm.1 <- summary(lm.1 <- lm(ldurat ~ afchnge + highearn + afhigh, data = injury))
-s.lm.1
+model_1 <- lm(ldurat ~ afchnge + highearn + afhigh, data = injury)
+summary_1 <- summary(model_1)
+summary_1
 ```
 Hmmm, more observations in this estimation and the results differ...
 
@@ -91,26 +108,32 @@ Hmmm, more observations in this estimation and the results differ...
 ```{r}
 data("crime2")
 
-s.lm.1 <- summary(lm.1 <- lm(crmrte ~ unem, data = crime2[crime2$year == 87,]))
-s.lm.1
+model_1 <- lm(crmrte ~ unem, data = crime2[crime2[["year"]] == 87, ])
+summary_1 <- summary(model_1)
+summary_1
 ```
 
 ```{r}
-s.lm.2 <- summary(lm.2 <- lm(crmrte ~ d87 + unem, data = crime2))
-s.lm.2
+model_2 <- lm(crmrte ~ d87 + unem, data = crime2)
+summary_2 <- summary(model_2)
+summary_2
 ```
 
 Generate differences
 ```{r}
-crmrte.d <- crime2$crmrte[seq(2,length(crime2$unem), by = 2)] - crime2$crmrte[seq(1, (length(crime2$unem) - 1), by = 2)]
-unem.d <- crime2$unem[seq(2, length(crime2$unem), by = 2)] - crime2$unem[seq(1, (length(crime2$unem) - 1), by = 2)]
+second_obs <- seq(2, length(crime2[["unem"]]), by = 2)
+first_obs <- seq(1, (length(crime2[["unem"]]) - 1), by = 2)
+
+crmrte_d <- crime2[["crmrte"]][second_obs] - crime2[["crmrte"]][first_obs]
+unem_d <- crime2[["unem"]][second_obs] - crime2[["unem"]][first_obs]
 ```
 I suppose there is a better way to do this. I will revise it when I go througth the new edition of the textbook.
 
 Estimate
 ```{r}
-s.lm.3 <- summary(lm.3 <- lm(crmrte.d ~ unem.d))
-s.lm.3
+model_3 <- lm(crmrte_d ~ unem_d)
+summary_3 <- summary(model_3)
+summary_3
 ```
 
 ### Example 13.5
@@ -119,14 +142,15 @@ s.lm.3
 data("slp75_81")
 
 with(slp75_81, {
-     d.slpnap <- slpnap81-slpnap75
-     d.totwrk <- totwrk81-totwrk75
-     d.educ <- educ81-educ75
-     d.marr <- marr81-marr75
-     d.yngkid <- yngkid81-yngkid75
-     d.gdhlth <- gdhlth81-gdhlth75
-     summary(lm(d.slpnap ~ d.totwrk + d.educ + d.marr + d.yngkid + d.gdhlth))
-    })
+  d_slpnap <- slpnap81 - slpnap75
+  d_totwrk <- totwrk81 - totwrk75
+  d_educ <- educ81 - educ75
+  d_marr <- marr81 - marr75
+  d_yngkid <- yngkid81 - yngkid75
+  d_gdhlth <- gdhlth81 - gdhlth75
+
+  summary(lm(d_slpnap ~ d_totwrk + d_educ + d_marr + d_yngkid + d_gdhlth))
+})
 ```
 
 ### Example 13.6
@@ -135,10 +159,11 @@ with(slp75_81, {
 data("crime3")
 
 with(crime3, {
-  d.lcrime <- lcrime[year==78] - lcrime[year==72]
-  d.clrprc1 <- clrprc1[year==78] - clrprc1[year==72]
-  d.clrprc2 <- clrprc2[year==78] - clrprc2[year==72]
-  summary(lm(d.lcrime ~ d.clrprc1 + d.clrprc2))
+  d_lcrime <- lcrime[year == 78] - lcrime[year == 72]
+  d_clrprc1 <- clrprc1[year == 78] - clrprc1[year == 72]
+  d_clrprc2 <- clrprc2[year == 78] - clrprc2[year == 72]
+
+  summary(lm(d_lcrime ~ d_clrprc1 + d_clrprc2))
 })
 ```
 
@@ -148,18 +173,20 @@ with(crime3, {
 data("jtrain")
 
 with(jtrain, {
-  d.scrap <- scrap[year == 1988] - scrap[year == 1987]
-  d.grant <- grant[year == 1988] - grant[year == 1987]
-  summary(lm(d.scrap ~ d.grant))
+  d_scrap <- scrap[year == 1988] - scrap[year == 1987]
+  d_grant <- grant[year == 1988] - grant[year == 1987]
+
+  summary(lm(d_scrap ~ d_grant))
 })
 ```
 
 With logs of `scrap`
 ```{r}
 with(jtrain, {
-  d.lscrap <- lscrap[year == 1988] - lscrap[year == 1987]
-  d.grant <- grant[year == 1988] - grant[year == 1987]
-  summary(lm(d.lscrap ~ d.grant))
+  d_lscrap <- lscrap[year == 1988] - lscrap[year == 1987]
+  d_grant <- grant[year == 1988] - grant[year == 1987]
+
+  summary(lm(d_lscrap ~ d_grant))
 })
 ```
 
@@ -169,10 +196,11 @@ with(jtrain, {
 data("traffic1")
 
 with(traffic1, {
-  d.dthrte <- dthrte90 - dthrte85
-  d.open <- open90 - open85
-  d.admn <- admn90 - admn85
-  summary(lm(d.dthrte ~ d.open + d.admn))
+  d_dthrte <- dthrte90 - dthrte85
+  d_open <- open90 - open85
+  d_admn <- admn90 - admn85
+
+  summary(lm(d_dthrte ~ d_open + d_admn))
 })
 ```
 
@@ -181,61 +209,62 @@ with(traffic1, {
 ```{r}
 data("ezunem")
 
-with(ezunem,{
-  d.luclms <- luclms[year == 1981] - luclms[year == 1980]
-  d.luclms <- append(d.luclms, luclms[year == 1982] - luclms[year == 1981])
-  d.luclms <- append(d.luclms, luclms[year == 1983] - luclms[year == 1982])
-  d.luclms <- append(d.luclms, luclms[year == 1984] - luclms[year == 1983])
-  d.luclms <- append(d.luclms, luclms[year == 1985] - luclms[year == 1984])
-  d.luclms <- append(d.luclms, luclms[year == 1986] - luclms[year == 1985])
-  d.luclms <- append(d.luclms, luclms[year == 1987] - luclms[year == 1986])
-  d.luclms <- append(d.luclms, luclms[year == 1988] - luclms[year == 1987])  
-  
-  d.ez <- ez[year == 1981] - ez[year == 1980]
-  d.ez <- append(d.ez, ez[year == 1982] - ez[year == 1981])
-  d.ez <- append(d.ez, ez[year == 1983] - ez[year == 1982])
-  d.ez <- append(d.ez, ez[year == 1984] - ez[year == 1983])
-  d.ez <- append(d.ez, ez[year == 1985] - ez[year == 1984])
-  d.ez <- append(d.ez, ez[year == 1986] - ez[year == 1985])
-  d.ez <- append(d.ez, ez[year == 1987] - ez[year == 1986])
-  d.ez <- append(d.ez, ez[year == 1988] - ez[year == 1987])
-  
-  d.82 <- c()
+with(ezunem, {
+  d_luclms <- luclms[year == 1981] - luclms[year == 1980]
+  d_luclms <- append(d_luclms, luclms[year == 1982] - luclms[year == 1981])
+  d_luclms <- append(d_luclms, luclms[year == 1983] - luclms[year == 1982])
+  d_luclms <- append(d_luclms, luclms[year == 1984] - luclms[year == 1983])
+  d_luclms <- append(d_luclms, luclms[year == 1985] - luclms[year == 1984])
+  d_luclms <- append(d_luclms, luclms[year == 1986] - luclms[year == 1985])
+  d_luclms <- append(d_luclms, luclms[year == 1987] - luclms[year == 1986])
+  d_luclms <- append(d_luclms, luclms[year == 1988] - luclms[year == 1987])
+
+  d_ez <- ez[year == 1981] - ez[year == 1980]
+  d_ez <- append(d_ez, ez[year == 1982] - ez[year == 1981])
+  d_ez <- append(d_ez, ez[year == 1983] - ez[year == 1982])
+  d_ez <- append(d_ez, ez[year == 1984] - ez[year == 1983])
+  d_ez <- append(d_ez, ez[year == 1985] - ez[year == 1984])
+  d_ez <- append(d_ez, ez[year == 1986] - ez[year == 1985])
+  d_ez <- append(d_ez, ez[year == 1987] - ez[year == 1986])
+  d_ez <- append(d_ez, ez[year == 1988] - ez[year == 1987])
+
+  d_82 <- c()
   for (i in 1981:1988) {
-    d.82 <- append(d.82,d82[year == i] - d82[year == (i - 1)])
+    d_82 <- append(d_82, d82[year == i] - d82[year == (i - 1)])
   }
-  
-  d.83 <- c()
+
+  d_83 <- c()
   for (i in 1981:1988) {
-    d.83 <- append(d.83,d83[year == i] - d83[year == (i - 1)])
+    d_83 <- append(d_83, d83[year == i] - d83[year == (i - 1)])
   }
-  
-  d.84 <- c()
+
+  d_84 <- c()
   for (i in 1981:1988) {
-    d.84 <- append(d.84,d84[year == i] - d84[year == (i - 1)])
+    d_84 <- append(d_84, d84[year == i] - d84[year == (i - 1)])
   }
-  
-  d.85 <- c()
+
+  d_85 <- c()
   for (i in 1981:1988) {
-    d.85 <- append(d.85,d85[year == i] - d85[year == (i - 1)])
+    d_85 <- append(d_85, d85[year == i] - d85[year == (i - 1)])
   }
-  
-  d.86 <- c()
+
+  d_86 <- c()
   for (i in 1981:1988) {
-    d.86 <- append(d.86,d86[year == i] - d86[year == (i - 1)])
+    d_86 <- append(d_86, d86[year == i] - d86[year == (i - 1)])
   }
-  
-  d.87 <- c()
+
+  d_87 <- c()
   for (i in 1981:1988) {
-    d.87 <- append(d.87,d87[year == i] - d87[year == (i - 1)])
+    d_87 <- append(d_87, d87[year == i] - d87[year == (i - 1)])
   }
-  
-  d.88 <- c()
+
+  d_88 <- c()
   for (i in 1981:1988) {
-    d.88 <- append(d.88,d88[year == i] - d88[year == (i - 1)])
+    d_88 <- append(d_88, d88[year == i] - d88[year == (i - 1)])
   }
-  
-  summary(lm(d.luclms ~ d.ez + d.82 + d.83 + d.84 + d.85 + d.86 + d.87 + d.88))
+
+  summary(lm(d_luclms ~ d_ez + d_82 + d_83 + d_84 + d_85 + d_86 + d_87 +
+               d_88))
 })
 ```
 
@@ -245,62 +274,68 @@ with(ezunem,{
 data("crime4")
 
 with(crime4, {
-  d.lcrmrte <- c()
+  d_lcrmrte <- c()
   for (i in 82:87) {
-    d.lcrmrte <- append(d.lcrmrte, lcrmrte[year==i] - lcrmrte[year==(i - 1)])
-  }
-  
-  d.lprbarr <- c()
-  for (i in 82:87) {
-    d.lprbarr <- append(d.lprbarr, lprbarr[year==i] - lprbarr[year==(i - 1)])
-  }
-  
-  d.lprbconv <- c()
-  for (i in 82:87) {
-    d.lprbconv <- append(d.lprbconv, lprbconv[year==i] - lprbconv[year==(i - 1)])
-  }
-  
-  d.lprbpris <- c()
-  for (i in 82:87) {
-    d.lprbpris <- append(d.lprbpris, lprbpris[year==i] - lprbpris[year==(i - 1)])
-  }
-  
-  d.lavgsen <- c()
-  for (i in 82:87) {
-    d.lavgsen <- append(d.lavgsen, lavgsen[year==i] - lavgsen[year==(i - 1)])
-  }
-  
-  d.lpolpc <- c()
-  for (i in 82:87) {
-    d.lpolpc <- append(d.lpolpc, lpolpc[year==i] - lpolpc[year==(i - 1)])
-  }
-  
-  d.83 <- c()
-  for (i in 82:87) {
-    d.83 <- append(d.83, d83[year==i] - d83[year==(i - 1)])
+    d_lcrmrte <- append(d_lcrmrte,
+                        lcrmrte[year == i] - lcrmrte[year == (i - 1)])
   }
 
-  d.84 <- c()
+  d_lprbarr <- c()
   for (i in 82:87) {
-    d.84 <- append(d.84, d84[year==i] - d84[year==(i - 1)])
+    d_lprbarr <- append(d_lprbarr,
+                        lprbarr[year == i] - lprbarr[year == (i - 1)])
   }
-  
-  d.85 <- c()
+
+  d_lprbconv <- c()
   for (i in 82:87) {
-    d.85 <- append(d.85, d85[year==i] - d85[year==(i - 1)])
+    d_lprbconv <- append(d_lprbconv,
+                         lprbconv[year == i] - lprbconv[year == (i - 1)])
   }
-  
-  d.86 <- c()
+
+  d_lprbpris <- c()
   for (i in 82:87) {
-    d.86 <- append(d.86, d86[year==i] - d86[year==(i - 1)])
+    d_lprbpris <- append(d_lprbpris,
+                         lprbpris[year == i] - lprbpris[year == (i - 1)])
   }
-  
-  d.87 <- c()
+
+  d_lavgsen <- c()
   for (i in 82:87) {
-    d.87 <- append(d.87, d87[year==i] - d87[year==(i - 1)])
+    d_lavgsen <- append(d_lavgsen,
+                        lavgsen[year == i] - lavgsen[year == (i - 1)])
   }
-    
-  summary(lm(d.lcrmrte ~ d.83 + d.84 + d.85 + d.86 + d.87 + d.lprbarr + d.lprbconv +
-               d.lprbpris + d.lavgsen + d.lpolpc))
+
+  d_lpolpc <- c()
+  for (i in 82:87) {
+    d_lpolpc <- append(d_lpolpc,
+                       lpolpc[year == i] - lpolpc[year == (i - 1)])
+  }
+
+  d_83 <- c()
+  for (i in 82:87) {
+    d_83 <- append(d_83, d83[year == i] - d83[year == (i - 1)])
+  }
+
+  d_84 <- c()
+  for (i in 82:87) {
+    d_84 <- append(d_84, d84[year == i] - d84[year == (i - 1)])
+  }
+
+  d_85 <- c()
+  for (i in 82:87) {
+    d_85 <- append(d_85, d85[year == i] - d85[year == (i - 1)])
+  }
+
+  d_86 <- c()
+  for (i in 82:87) {
+    d_86 <- append(d_86, d86[year == i] - d86[year == (i - 1)])
+  }
+
+  d_87 <- c()
+  for (i in 82:87) {
+    d_87 <- append(d_87, d87[year == i] - d87[year == (i - 1)])
+  }
+
+  summary(lm(d_lcrmrte ~ d_83 + d_84 + d_85 + d_86 + d_87 + d_lprbarr +
+               d_lprbconv + d_lprbpris + d_lavgsen + d_lpolpc))
 })
 ```

@@ -6,13 +6,13 @@ date: "2018-10-07"
 
 
 
-<pre class="r"><code>library(wooldridge)</code></pre>
+<pre class="r"><code>library(&quot;wooldridge&quot;)</code></pre>
 <div id="example-10.1" class="section level3">
 <h3>Example 10.1</h3>
 <pre class="r"><code>data(&quot;phillips&quot;)
 
-lm.10.1 &lt;- lm(inf ~ unem, data = phillips)
-summary(lm.10.1)</code></pre>
+model_10_1 &lt;- lm(inf ~ unem, data = phillips)
+summary(model_10_1)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = inf ~ unem, data = phillips)
@@ -29,15 +29,15 @@ summary(lm.10.1)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 2.972 on 54 degrees of freedom
-## Multiple R-squared:  0.06215,    Adjusted R-squared:  0.04479 
+## Multiple R-squared:  0.06215,	Adjusted R-squared:  0.04479 
 ## F-statistic: 3.579 on 1 and 54 DF,  p-value: 0.06389</code></pre>
 </div>
 <div id="example-10.2" class="section level3">
 <h3>Example 10.2</h3>
 <pre class="r"><code>data(&quot;intdef&quot;)
 
-lm.10.2 &lt;- lm(i3 ~ inf + def, data = intdef)
-summary(lm.10.2)</code></pre>
+model_10_2 &lt;- lm(i3 ~ inf + def, data = intdef)
+summary(model_10_2)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = i3 ~ inf + def, data = intdef)
@@ -55,15 +55,15 @@ summary(lm.10.2)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 1.843 on 53 degrees of freedom
-## Multiple R-squared:  0.6021, Adjusted R-squared:  0.5871 
+## Multiple R-squared:  0.6021,	Adjusted R-squared:  0.5871 
 ## F-statistic: 40.09 on 2 and 53 DF,  p-value: 2.483e-11</code></pre>
 </div>
 <div id="example-10.3" class="section level3">
 <h3>Example 10.3</h3>
 <pre class="r"><code>data(&quot;prminwge&quot;)
 
-lm.10.3 &lt;- lm(lprepop ~ lmincov + lusgnp, data = prminwge)
-summary(lm.10.3)</code></pre>
+model_10_3 &lt;- lm(lprepop ~ lmincov + lusgnp, data = prminwge)
+summary(model_10_3)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = lprepop ~ lmincov + lusgnp, data = prminwge)
@@ -81,15 +81,15 @@ summary(lm.10.3)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.0557 on 35 degrees of freedom
-## Multiple R-squared:  0.6605, Adjusted R-squared:  0.6411 
+## Multiple R-squared:  0.6605,	Adjusted R-squared:  0.6411 
 ## F-statistic: 34.04 on 2 and 35 DF,  p-value: 6.17e-09</code></pre>
 </div>
 <div id="example-10.4" class="section level3">
 <h3>Example 10.4</h3>
 <pre class="r"><code>data(&quot;fertil3&quot;)
 
-lm.10.4.1 &lt;- lm(gfr ~ pe + ww2 + pill, data = fertil3)
-summary(lm.10.4.1)</code></pre>
+model_10_4_1 &lt;- lm(gfr ~ pe + ww2 + pill, data = fertil3)
+summary(model_10_4_1)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = gfr ~ pe + ww2 + pill, data = fertil3)
@@ -108,10 +108,10 @@ summary(lm.10.4.1)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 14.69 on 68 degrees of freedom
-## Multiple R-squared:  0.4734, Adjusted R-squared:  0.4502 
+## Multiple R-squared:  0.4734,	Adjusted R-squared:  0.4502 
 ## F-statistic: 20.38 on 3 and 68 DF,  p-value: 1.575e-09</code></pre>
-<pre class="r"><code>lm.10.4.2 &lt;- lm(gfr ~ pe + pe_1 + pe_2 + ww2 + pill, data = fertil3)
-summary(lm.10.4.2)</code></pre>
+<pre class="r"><code>model_10_4_2 &lt;- lm(gfr ~ pe + pe_1 + pe_2 + ww2 + pill, data = fertil3)
+summary(model_10_4_2)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = gfr ~ pe + pe_1 + pe_2 + ww2 + pill, data = fertil3)
@@ -133,11 +133,13 @@ summary(lm.10.4.2)</code></pre>
 ## 
 ## Residual standard error: 14.27 on 64 degrees of freedom
 ##   (2 observations deleted due to missingness)
-## Multiple R-squared:  0.4986, Adjusted R-squared:  0.4594 
+## Multiple R-squared:  0.4986,	Adjusted R-squared:  0.4594 
 ## F-statistic: 12.73 on 5 and 64 DF,  p-value: 1.353e-08</code></pre>
 <pre class="r"><code># Joint significance of pe values
-lm.10.4.2res &lt;- lm(gfr ~ ww2 + pill, data = fertil3, subset = (is.na(pe_2) == FALSE))
-anova(lm.10.4.2, lm.10.4.2res)</code></pre>
+model_10_4_2_res &lt;- lm(gfr ~ ww2 + pill,
+                       data = fertil3,
+                       subset = (is.na(pe_2) == FALSE))
+anova(model_10_4_2, model_10_4_2_res)</code></pre>
 <pre><code>## Analysis of Variance Table
 ## 
 ## Model 1: gfr ~ pe + pe_1 + pe_2 + ww2 + pill
@@ -148,8 +150,10 @@ anova(lm.10.4.2, lm.10.4.2res)</code></pre>
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <pre class="r"><code># Joint significance of lagged pe values
-lm.10.4.2res2 &lt;- lm(gfr ~ pe + ww2 + pill, data = fertil3, subset = (is.na(pe_2) == FALSE))
-anova(lm.10.4.2, lm.10.4.2res2)</code></pre>
+model_10_4_2_res2 &lt;- lm(gfr ~ pe + ww2 + pill,
+                        data = fertil3,
+                        subset = (is.na(pe_2) == FALSE))
+anova(model_10_4_2, model_10_4_2_res2)</code></pre>
 <pre><code>## Analysis of Variance Table
 ## 
 ## Model 1: gfr ~ pe + pe_1 + pe_2 + ww2 + pill
@@ -158,7 +162,9 @@ anova(lm.10.4.2, lm.10.4.2res2)</code></pre>
 ## 1     64 13033                           
 ## 2     66 13054 -2   -21.761 0.0534  0.948</code></pre>
 <pre class="r"><code># Standard error of the long run propensity
-summary(lm(gfr ~ pe + I(pe_1 - pe) + I(pe_2 - pe_1) + ww2 + pill, data = fertil3))</code></pre>
+model_10_4_lrp &lt;- lm(gfr ~ pe + I(pe_1 - pe) + I(pe_2 - pe_1) + ww2 + pill,
+                     data = fertil3)
+summary(model_10_4_lrp)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = gfr ~ pe + I(pe_1 - pe) + I(pe_2 - pe_1) + ww2 + 
@@ -181,15 +187,16 @@ summary(lm(gfr ~ pe + I(pe_1 - pe) + I(pe_2 - pe_1) + ww2 + pill, data = fertil3
 ## 
 ## Residual standard error: 14.27 on 64 degrees of freedom
 ##   (2 observations deleted due to missingness)
-## Multiple R-squared:  0.4986, Adjusted R-squared:  0.4594 
+## Multiple R-squared:  0.4986,	Adjusted R-squared:  0.4594 
 ## F-statistic: 12.73 on 5 and 64 DF,  p-value: 1.353e-08</code></pre>
 </div>
 <div id="example-10.5" class="section level3">
 <h3>Example 10.5</h3>
 <pre class="r"><code>data(&quot;barium&quot;)
 
-lm.10.5 &lt;- lm(lchnimp ~ lchempi + lgas + lrtwex + befile6 + affile6 + afdec6, data = barium)
-summary(lm.10.5)</code></pre>
+model_10_5 &lt;- lm(lchnimp ~ lchempi + lgas + lrtwex + befile6 + affile6 + afdec6,
+                 data = barium)
+summary(model_10_5)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = lchnimp ~ lchempi + lgas + lrtwex + befile6 + affile6 + 
@@ -212,15 +219,17 @@ summary(lm.10.5)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.5974 on 124 degrees of freedom
-## Multiple R-squared:  0.3049, Adjusted R-squared:  0.2712 
+## Multiple R-squared:  0.3049,	Adjusted R-squared:  0.2712 
 ## F-statistic: 9.064 on 6 and 124 DF,  p-value: 3.255e-08</code></pre>
 </div>
 <div id="example-10.6" class="section level3">
 <h3>Example 10.6</h3>
 <pre class="r"><code>data(&quot;fair&quot;)
 
-lm.10.6 &lt;- lm(demvote ~ partyWH + incum + I(partyWH*gnews) + I(partyWH*inf), data = fair)
-summary(lm.10.6)</code></pre>
+model_10_6 &lt;- lm(demvote ~ partyWH + incum + I(partyWH * gnews) +
+                   I(partyWH * inf),
+                 data = fair)
+summary(model_10_6)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = demvote ~ partyWH + incum + I(partyWH * gnews) + 
@@ -241,11 +250,14 @@ summary(lm.10.6)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.049 on 16 degrees of freedom
-## Multiple R-squared:  0.6588, Adjusted R-squared:  0.5735 
+## Multiple R-squared:  0.6588,	Adjusted R-squared:  0.5735 
 ## F-statistic: 7.725 on 4 and 16 DF,  p-value: 0.001151</code></pre>
 <p>Slightly different results since the book uses 20 observations to 1992. But the results are the same when we drop the last observation.</p>
-<pre class="r"><code>lm.10.6 &lt;- lm(demvote ~ partyWH + incum + I(partyWH * gnews) + I(partyWH * inf), data = fair, subset = (year != 1996))
-summary(lm.10.6)</code></pre>
+<pre class="r"><code>model_10_6 &lt;- lm(demvote ~ partyWH + incum + I(partyWH * gnews) +
+                   I(partyWH * inf),
+                 data = fair,
+                 subset = (year != 1996))
+summary(model_10_6)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = demvote ~ partyWH + incum + I(partyWH * gnews) + 
@@ -266,15 +278,15 @@ summary(lm.10.6)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.04957 on 15 degrees of freedom
-## Multiple R-squared:  0.6629, Adjusted R-squared:  0.573 
+## Multiple R-squared:  0.6629,	Adjusted R-squared:  0.573 
 ## F-statistic: 7.374 on 4 and 15 DF,  p-value: 0.001716</code></pre>
 </div>
 <div id="example-10.7" class="section level3">
 <h3>Example 10.7</h3>
 <pre class="r"><code>data(&quot;hseinv&quot;)
 
-lm.10.7.1 &lt;- lm(linvpc ~ lprice, data = hseinv)
-summary(lm.10.7.1)</code></pre>
+model_10_7_1 &lt;- lm(linvpc ~ lprice, data = hseinv)
+summary(model_10_7_1)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = linvpc ~ lprice, data = hseinv)
@@ -291,11 +303,11 @@ summary(lm.10.7.1)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.1554 on 40 degrees of freedom
-## Multiple R-squared:  0.2084, Adjusted R-squared:  0.1886 
+## Multiple R-squared:  0.2084,	Adjusted R-squared:  0.1886 
 ## F-statistic: 10.53 on 1 and 40 DF,  p-value: 0.002376</code></pre>
 <p>Add a time trend</p>
-<pre class="r"><code>lm.10.7.2 &lt;- lm(linvpc ~ lprice + t, data = hseinv)
-summary(lm.10.7.2)</code></pre>
+<pre class="r"><code>model_10_7_2 &lt;- lm(linvpc ~ lprice + t, data = hseinv)
+summary(model_10_7_2)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = linvpc ~ lprice + t, data = hseinv)
@@ -313,15 +325,15 @@ summary(lm.10.7.2)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.1436 on 39 degrees of freedom
-## Multiple R-squared:  0.3408, Adjusted R-squared:  0.307 
+## Multiple R-squared:  0.3408,	Adjusted R-squared:  0.307 
 ## F-statistic: 10.08 on 2 and 39 DF,  p-value: 0.000296</code></pre>
 </div>
 <div id="example-10.8" class="section level3">
 <h3>Example 10.8</h3>
 <pre class="r"><code>data(&quot;fertil3&quot;)
 
-lm.10.8.1 &lt;- lm(gfr ~ pe + ww2 + pill + t, data = fertil3)
-summary(lm.10.8.1)</code></pre>
+model_10_8_1 &lt;- lm(gfr ~ pe + ww2 + pill + t, data = fertil3)
+summary(model_10_8_1)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = gfr ~ pe + ww2 + pill + t, data = fertil3)
@@ -341,10 +353,10 @@ summary(lm.10.8.1)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 11.85 on 67 degrees of freedom
-## Multiple R-squared:  0.6622, Adjusted R-squared:  0.642 
+## Multiple R-squared:  0.6622,	Adjusted R-squared:  0.642 
 ## F-statistic: 32.84 on 4 and 67 DF,  p-value: 3.756e-15</code></pre>
-<pre class="r"><code>lm.10.8.2 &lt;- lm(gfr ~ pe + ww2 + pill + t + tsq, data = fertil3)
-summary(lm.10.8.2)</code></pre>
+<pre class="r"><code>model_10_8_2 &lt;- lm(gfr ~ pe + ww2 + pill + t + tsq, data = fertil3)
+summary(model_10_8_2)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = gfr ~ pe + ww2 + pill + t + tsq, data = fertil3)
@@ -365,15 +377,15 @@ summary(lm.10.8.2)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 10.74 on 66 degrees of freedom
-## Multiple R-squared:  0.7267, Adjusted R-squared:  0.706 
+## Multiple R-squared:  0.7267,	Adjusted R-squared:  0.706 
 ## F-statistic: 35.09 on 5 and 66 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
 <div id="example-10.9" class="section level3">
 <h3>Example 10.9</h3>
 <pre class="r"><code>data(&quot;prminwge&quot;)
 
-lm.10.9 &lt;- lm(lprepop ~ lmincov + lusgnp + t, data = prminwge)
-summary(lm.10.9)</code></pre>
+model_10_9 &lt;- lm(lprepop ~ lmincov + lusgnp + t, data = prminwge)
+summary(model_10_9)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = lprepop ~ lmincov + lusgnp + t, data = prminwge)
@@ -392,17 +404,17 @@ summary(lm.10.9)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.03793 on 34 degrees of freedom
-## Multiple R-squared:  0.8471, Adjusted R-squared:  0.8336 
+## Multiple R-squared:  0.8471,	Adjusted R-squared:  0.8336 
 ## F-statistic: 62.78 on 3 and 34 DF,  p-value: 6.007e-14</code></pre>
 <pre class="r"><code># Obtain results by detrending
-lprepop.detrend &lt;- lm(lprepop ~ t, data = prminwge)$resid
-lmincov.detrend &lt;- lm(lmincov ~ t, data = prminwge)$resid
-lusgnp.detrend &lt;- lm(lusgnp ~ t, data = prminwge)$resid
+lprepop_detrend &lt;- lm(lprepop ~ t, data = prminwge)[[&quot;residuals&quot;]]
+lmincov_detrend &lt;- lm(lmincov ~ t, data = prminwge)[[&quot;residuals&quot;]]
+lusgnp_detrend &lt;- lm(lusgnp ~ t, data = prminwge)[[&quot;residuals&quot;]]
 
-summary(lm(lprepop.detrend ~ lmincov.detrend + lusgnp.detrend - 1))</code></pre>
+summary(lm(lprepop_detrend ~ lmincov_detrend + lusgnp_detrend - 1))</code></pre>
 <pre><code>## 
 ## Call:
-## lm(formula = lprepop.detrend ~ lmincov.detrend + lusgnp.detrend - 
+## lm(formula = lprepop_detrend ~ lmincov_detrend + lusgnp_detrend - 
 ##     1)
 ## 
 ## Residuals:
@@ -411,24 +423,24 @@ summary(lm(lprepop.detrend ~ lmincov.detrend + lusgnp.detrend - 1))</code></pre>
 ## 
 ## Coefficients:
 ##                 Estimate Std. Error t value Pr(&gt;|t|)    
-## lmincov.detrend  -0.1687     0.0430  -3.923 0.000377 ***
-## lusgnp.detrend    1.0574     0.1717   6.160 4.26e-07 ***
+## lmincov_detrend  -0.1687     0.0430  -3.923 0.000377 ***
+## lusgnp_detrend    1.0574     0.1717   6.160 4.26e-07 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.03686 on 36 degrees of freedom
-## Multiple R-squared:  0.5327, Adjusted R-squared:  0.5067 
+## Multiple R-squared:  0.5327,	Adjusted R-squared:  0.5067 
 ## F-statistic: 20.52 on 2 and 36 DF,  p-value: 1.129e-06</code></pre>
 </div>
 <div id="example-10.10" class="section level3">
 <h3>Example 10.10</h3>
 <pre class="r"><code>data(&quot;hseinv&quot;)
 
-dtr.linvpc &lt;- lm(linvpc ~ t, data = hseinv)$resid
-summary(lm(dtr.linvpc ~ lprice + t, data = hseinv))</code></pre>
+dtr_linvpc &lt;- lm(linvpc ~ t, data = hseinv)[[&quot;residuals&quot;]]
+summary(lm(dtr_linvpc ~ lprice + t, data = hseinv))</code></pre>
 <pre><code>## 
 ## Call:
-## lm(formula = dtr.linvpc ~ lprice + t, data = hseinv)
+## lm(formula = dtr_linvpc ~ lprice + t, data = hseinv)
 ## 
 ## Residuals:
 ##      Min       1Q   Median       3Q      Max 
@@ -441,18 +453,22 @@ summary(lm(dtr.linvpc ~ lprice + t, data = hseinv))</code></pre>
 ## t            0.001683   0.003512   0.479    0.635
 ## 
 ## Residual standard error: 0.1436 on 39 degrees of freedom
-## Multiple R-squared:  0.008011,   Adjusted R-squared:  -0.04286 
+## Multiple R-squared:  0.008011,	Adjusted R-squared:  -0.04286 
 ## F-statistic: 0.1575 on 2 and 39 DF,  p-value: 0.8548</code></pre>
 </div>
 <div id="example-10.11" class="section level3">
 <h3>Example 10.11</h3>
 <pre class="r"><code>data(&quot;barium&quot;)
 
-lm.10.11 &lt;- lm(lchnimp ~ lchempi + lgas + lrtwex + befile6 + affile6 + afdec6 +
- feb + mar + apr + may + jun + jul + aug + sep + oct + nov + dec, data = barium)
-lm.10.11res &lt;- lm(lchnimp ~ lchempi + lgas + lrtwex + befile6 + affile6 + afdec6, data = barium)
+model_10_11 &lt;- lm(lchnimp ~ lchempi + lgas + lrtwex + befile6 + affile6 +
+                    afdec6 + feb + mar + apr + may + jun + jul + aug + sep +
+                    oct + nov + dec,
+                  data = barium)
+model_10_11_res &lt;- lm(lchnimp ~ lchempi + lgas + lrtwex + befile6 + affile6 +
+                        afdec6,
+                      data = barium)
 
-anova(lm.10.11, lm.10.11res)</code></pre>
+anova(model_10_11, model_10_11_res)</code></pre>
 <pre><code>## Analysis of Variance Table
 ## 
 ## Model 1: lchnimp ~ lchempi + lgas + lrtwex + befile6 + affile6 + afdec6 + 

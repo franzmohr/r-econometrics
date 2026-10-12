@@ -6,16 +6,17 @@ date: "2018-10-07"
 
 
 
-<pre class="r"><code>library(AER)
-library(wooldridge)</code></pre>
+<pre class="r"><code>library(&quot;AER&quot;)
+library(&quot;wooldridge&quot;)</code></pre>
 <div id="example-16.5" class="section level3">
 <h3>Example 16.5</h3>
 <pre class="r"><code>data(&quot;mroz&quot;)
 
-s.iv.1 &lt;- summary(iv.1 &lt;- ivreg(hours ~ lwage + educ + age + kidslt6 + nwifeinc |
-                                  educ + age + kidslt6 + nwifeinc + exper + expersq,
-                                data = mroz))
-s.iv.1</code></pre>
+iv_1 &lt;- ivreg(hours ~ lwage + educ + age + kidslt6 + nwifeinc |
+                educ + age + kidslt6 + nwifeinc + exper + expersq,
+              data = mroz)
+summary_iv_1 &lt;- summary(iv_1)
+summary_iv_1</code></pre>
 <pre><code>## 
 ## Call:
 ## ivreg(formula = hours ~ lwage + educ + age + kidslt6 + nwifeinc | 
@@ -37,46 +38,49 @@ s.iv.1</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 1354 on 422 degrees of freedom
-## Multiple R-Squared: -2.008,  Adjusted R-squared: -2.043 
+## Multiple R-Squared: -2.008,	Adjusted R-squared: -2.043 
 ## Wald test: 3.441 on 5 and 422 DF,  p-value: 0.004648</code></pre>
-<pre class="r"><code>lm.1 &lt;- lm(lwage ~ educ + age + kidslt6 + nwifeinc + exper + expersq,
-           data = mroz[mroz$inlf==1,])
+<pre class="r"><code>model_1 &lt;- lm(lwage ~ educ + age + kidslt6 + nwifeinc + exper + expersq,
+              data = mroz[mroz[[&quot;inlf&quot;]] == 1, ])
 
-lm.2 &lt;- lm(hours ~ lwage + educ + age + kidslt6 + nwifeinc + lm.1$residuals,
-           data = mroz[mroz$inlf==1,])
+model_2 &lt;- lm(hours ~ lwage + educ + age + kidslt6 + nwifeinc +
+                model_1[[&quot;residuals&quot;]],
+              data = mroz[mroz[[&quot;inlf&quot;]] == 1, ])
 
-summary(lm.2)</code></pre>
+summary(model_2)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = hours ~ lwage + educ + age + kidslt6 + nwifeinc + 
-##     lm.1$residuals, data = mroz[mroz$inlf == 1, ])
+##     model_1[[&quot;residuals&quot;]], data = mroz[mroz[[&quot;inlf&quot;]] == 1, 
+##     ])
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
 ## -1600.5  -548.6   107.7   461.4  3075.2 
 ## 
 ## Coefficients:
-##                 Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)     2225.662    309.976   7.180 3.18e-12 ***
-## lwage           1639.556    253.875   6.458 2.93e-10 ***
-## educ            -183.751     31.884  -5.763 1.60e-08 ***
-## age               -7.806      5.059  -1.543  0.12361    
-## kidslt6         -198.154     98.690  -2.008  0.04530 *  
-## nwifeinc         -10.170      3.569  -2.850  0.00459 ** 
-## lm.1$residuals -1714.358    259.439  -6.608 1.18e-10 ***
+##                         Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)             2225.662    309.976   7.180 3.18e-12 ***
+## lwage                   1639.556    253.875   6.458 2.93e-10 ***
+## educ                    -183.751     31.884  -5.763 1.60e-08 ***
+## age                       -7.806      5.059  -1.543  0.12361    
+## kidslt6                 -198.154     98.690  -2.008  0.04530 *  
+## nwifeinc                 -10.170      3.569  -2.850  0.00459 ** 
+## model_1[[&quot;residuals&quot;]] -1714.358    259.439  -6.608 1.18e-10 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 730.6 on 421 degrees of freedom
-## Multiple R-squared:  0.1267, Adjusted R-squared:  0.1142 
+## Multiple R-squared:  0.1267,	Adjusted R-squared:  0.1142 
 ## F-statistic: 10.18 on 6 and 421 DF,  p-value: 1.592e-10</code></pre>
 </div>
 <div id="example-16.6" class="section level3">
 <h3>Example 16.6</h3>
 <pre class="r"><code>data(&quot;openness&quot;)
 
-s.lm.1 &lt;- summary(lm.1 &lt;- lm(open ~ lpcinc + lland, data = openness))
-s.lm.1</code></pre>
+model_1 &lt;- lm(open ~ lpcinc + lland, data = openness)
+summary_1 &lt;- summary(model_1)
+summary_1</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = open ~ lpcinc + lland, data = openness)
@@ -94,12 +98,13 @@ s.lm.1</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 17.8 on 111 degrees of freedom
-## Multiple R-squared:  0.4487, Adjusted R-squared:  0.4387 
+## Multiple R-squared:  0.4487,	Adjusted R-squared:  0.4387 
 ## F-statistic: 45.17 on 2 and 111 DF,  p-value: 4.451e-15</code></pre>
-<pre class="r"><code>s.iv.1 &lt;- summary(iv.1 &lt;- ivreg(inf ~ open +lpcinc |
-                                  lpcinc + lland,
-                                data = openness))
-s.iv.1</code></pre>
+<pre class="r"><code>iv_1 &lt;- ivreg(inf ~ open + lpcinc |
+                lpcinc + lland,
+              data = openness)
+summary_iv_1 &lt;- summary(iv_1)
+summary_iv_1</code></pre>
 <pre><code>## 
 ## Call:
 ## ivreg(formula = inf ~ open + lpcinc | lpcinc + lland, data = openness)
@@ -117,17 +122,18 @@ s.iv.1</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 23.84 on 111 degrees of freedom
-## Multiple R-Squared: 0.03088, Adjusted R-squared: 0.01341 
+## Multiple R-Squared: 0.03088,	Adjusted R-squared: 0.01341 
 ## Wald test:  2.79 on 2 and 111 DF,  p-value: 0.06574</code></pre>
 </div>
 <div id="example-16.7" class="section level3">
 <h3>Example 16.7</h3>
 <pre class="r"><code>data(&quot;consump&quot;)
 
-s.iv.1 &lt;- summary(iv.1 &lt;- ivreg(gc ~ gy + r3 |
-                                  gc_1 + gy_1 +r3_1,
-                                data = consump))
-s.iv.1</code></pre>
+iv_1 &lt;- ivreg(gc ~ gy + r3 |
+                gc_1 + gy_1 + r3_1,
+              data = consump)
+summary_iv_1 &lt;- summary(iv_1)
+summary_iv_1</code></pre>
 <pre><code>## 
 ## Call:
 ## ivreg(formula = gc ~ gy + r3 | gc_1 + gy_1 + r3_1, data = consump)
@@ -145,19 +151,20 @@ s.iv.1</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.007471 on 32 degrees of freedom
-## Multiple R-Squared: 0.6779,  Adjusted R-squared: 0.6578 
+## Multiple R-Squared: 0.6779,	Adjusted R-squared: 0.6578 
 ## Wald test: 9.586 on 2 and 32 DF,  p-value: 0.0005468</code></pre>
 </div>
 <div id="example-16.8" class="section level3">
 <h3>Example 16.8</h3>
 <pre class="r"><code>data(&quot;prison&quot;)
 
-s.lm.1 &lt;- summary(lm.1 &lt;- lm(gcriv ~ y81 + y82 + y83 + y84 + y85 + y86 + y87 + y88 +
-                               y89 + y90 + y91 + y92 + y93 + gpris + gpolpc + gincpc +
-                               cunem + cblack + cmetro + cag0_14 + cag15_17 + cag18_24 +
-                               cag25_34,
-                             data = prison))
-s.lm.1</code></pre>
+model_1 &lt;- lm(gcriv ~ y81 + y82 + y83 + y84 + y85 + y86 + y87 + y88 +
+                y89 + y90 + y91 + y92 + y93 + gpris + gpolpc + gincpc +
+                cunem + cblack + cmetro + cag0_14 + cag15_17 + cag18_24 +
+                cag25_34,
+              data = prison)
+summary_1 &lt;- summary(model_1)
+summary_1</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = gcriv ~ y81 + y82 + y83 + y84 + y85 + y86 + y87 + 
@@ -199,18 +206,19 @@ s.lm.1</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.07893 on 690 degrees of freedom
-## Multiple R-squared:  0.2311, Adjusted R-squared:  0.2055 
+## Multiple R-squared:  0.2311,	Adjusted R-squared:  0.2055 
 ## F-statistic: 9.019 on 23 and 690 DF,  p-value: &lt; 2.2e-16</code></pre>
-<pre class="r"><code>s.iv.1 &lt;- summary(iv.1 &lt;- ivreg(gcriv ~ y81 + y82 + y83 + y84 + y85 + y86 + y87 + y88 +
-                                  y89 + y90 + y91 + y92 + y93 + gpris + gpolpc + gincpc +
-                                  cunem + cblack + cmetro + cag0_14 + cag15_17 + cag18_24 +
-                                  cag25_34 |
-                                  y81 + y82 + y83 + y84 + y85 + y86 + y87 + y88 +
-                                  y89 + y90 + y91 + y92 + y93 + gpolpc + gincpc +
-                                  cunem + cblack + cmetro + cag0_14 + cag15_17 + cag18_24 +
-                                  cag25_34 + final1 + final2,
-                                data = prison))
-s.iv.1</code></pre>
+<pre class="r"><code>iv_1 &lt;- ivreg(gcriv ~ y81 + y82 + y83 + y84 + y85 + y86 + y87 + y88 +
+                y89 + y90 + y91 + y92 + y93 + gpris + gpolpc + gincpc +
+                cunem + cblack + cmetro + cag0_14 + cag15_17 + cag18_24 +
+                cag25_34 |
+                y81 + y82 + y83 + y84 + y85 + y86 + y87 + y88 +
+                y89 + y90 + y91 + y92 + y93 + gpolpc + gincpc +
+                cunem + cblack + cmetro + cag0_14 + cag15_17 + cag18_24 +
+                cag25_34 + final1 + final2,
+              data = prison)
+summary_iv_1 &lt;- summary(iv_1)
+summary_iv_1</code></pre>
 <pre><code>## 
 ## Call:
 ## ivreg(formula = gcriv ~ y81 + y82 + y83 + y84 + y85 + y86 + y87 + 
@@ -255,6 +263,6 @@ s.iv.1</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.09547 on 690 degrees of freedom
-## Multiple R-Squared: -0.1246, Adjusted R-squared: -0.1621 
+## Multiple R-Squared: -0.1246,	Adjusted R-squared: -0.1621 
 ## Wald test: 6.075 on 23 and 690 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>

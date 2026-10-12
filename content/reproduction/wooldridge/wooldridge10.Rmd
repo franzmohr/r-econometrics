@@ -5,145 +5,161 @@ date: "2018-10-07"
 ---
 
 ```{r}
-library(wooldridge)
+library("wooldridge")
 ```
 
 ### Example 10.1
 ```{r}
 data("phillips")
 
-lm.10.1 <- lm(inf ~ unem, data = phillips)
-summary(lm.10.1)
+model_10_1 <- lm(inf ~ unem, data = phillips)
+summary(model_10_1)
 ```
 
 ### Example 10.2
 ```{r}
 data("intdef")
 
-lm.10.2 <- lm(i3 ~ inf + def, data = intdef)
-summary(lm.10.2)
+model_10_2 <- lm(i3 ~ inf + def, data = intdef)
+summary(model_10_2)
 ```
 
 ### Example 10.3
 ```{r}
 data("prminwge")
 
-lm.10.3 <- lm(lprepop ~ lmincov + lusgnp, data = prminwge)
-summary(lm.10.3)
+model_10_3 <- lm(lprepop ~ lmincov + lusgnp, data = prminwge)
+summary(model_10_3)
 ```
 
 ### Example 10.4
 ```{r}
 data("fertil3")
 
-lm.10.4.1 <- lm(gfr ~ pe + ww2 + pill, data = fertil3)
-summary(lm.10.4.1)
+model_10_4_1 <- lm(gfr ~ pe + ww2 + pill, data = fertil3)
+summary(model_10_4_1)
 ```
 
 ```{r}
-lm.10.4.2 <- lm(gfr ~ pe + pe_1 + pe_2 + ww2 + pill, data = fertil3)
-summary(lm.10.4.2)
+model_10_4_2 <- lm(gfr ~ pe + pe_1 + pe_2 + ww2 + pill, data = fertil3)
+summary(model_10_4_2)
 ```
 
 ```{r}
 # Joint significance of pe values
-lm.10.4.2res <- lm(gfr ~ ww2 + pill, data = fertil3, subset = (is.na(pe_2) == FALSE))
-anova(lm.10.4.2, lm.10.4.2res)
+model_10_4_2_res <- lm(gfr ~ ww2 + pill,
+                       data = fertil3,
+                       subset = (is.na(pe_2) == FALSE))
+anova(model_10_4_2, model_10_4_2_res)
 ```
 
 ```{r}
 # Joint significance of lagged pe values
-lm.10.4.2res2 <- lm(gfr ~ pe + ww2 + pill, data = fertil3, subset = (is.na(pe_2) == FALSE))
-anova(lm.10.4.2, lm.10.4.2res2)
+model_10_4_2_res2 <- lm(gfr ~ pe + ww2 + pill,
+                        data = fertil3,
+                        subset = (is.na(pe_2) == FALSE))
+anova(model_10_4_2, model_10_4_2_res2)
 ```
 
 ```{r}
 # Standard error of the long run propensity
-summary(lm(gfr ~ pe + I(pe_1 - pe) + I(pe_2 - pe_1) + ww2 + pill, data = fertil3))
+model_10_4_lrp <- lm(gfr ~ pe + I(pe_1 - pe) + I(pe_2 - pe_1) + ww2 + pill,
+                     data = fertil3)
+summary(model_10_4_lrp)
 ```
 
 ### Example 10.5
 ```{r}
 data("barium")
 
-lm.10.5 <- lm(lchnimp ~ lchempi + lgas + lrtwex + befile6 + affile6 + afdec6, data = barium)
-summary(lm.10.5)
+model_10_5 <- lm(lchnimp ~ lchempi + lgas + lrtwex + befile6 + affile6 + afdec6,
+                 data = barium)
+summary(model_10_5)
 ```
 
 ### Example 10.6
 ```{r}
 data("fair")
 
-lm.10.6 <- lm(demvote ~ partyWH + incum + I(partyWH*gnews) + I(partyWH*inf), data = fair)
-summary(lm.10.6)
+model_10_6 <- lm(demvote ~ partyWH + incum + I(partyWH * gnews) +
+                   I(partyWH * inf),
+                 data = fair)
+summary(model_10_6)
 ```
 
 Slightly different results since the book uses 20 observations to 1992. But the results are the same when we drop the last observation.
 
 ```{r}
-lm.10.6 <- lm(demvote ~ partyWH + incum + I(partyWH * gnews) + I(partyWH * inf), data = fair, subset = (year != 1996))
-summary(lm.10.6)
+model_10_6 <- lm(demvote ~ partyWH + incum + I(partyWH * gnews) +
+                   I(partyWH * inf),
+                 data = fair,
+                 subset = (year != 1996))
+summary(model_10_6)
 ```
 
 ### Example 10.7
 ```{r}
 data("hseinv")
 
-lm.10.7.1 <- lm(linvpc ~ lprice, data = hseinv)
-summary(lm.10.7.1)
+model_10_7_1 <- lm(linvpc ~ lprice, data = hseinv)
+summary(model_10_7_1)
 ```
 
 Add a time trend
 ```{r}
-lm.10.7.2 <- lm(linvpc ~ lprice + t, data = hseinv)
-summary(lm.10.7.2)
+model_10_7_2 <- lm(linvpc ~ lprice + t, data = hseinv)
+summary(model_10_7_2)
 ```
 
 ### Example 10.8
 ```{r}
 data("fertil3")
 
-lm.10.8.1 <- lm(gfr ~ pe + ww2 + pill + t, data = fertil3)
-summary(lm.10.8.1)
+model_10_8_1 <- lm(gfr ~ pe + ww2 + pill + t, data = fertil3)
+summary(model_10_8_1)
 ```
 
 ```{r}
-lm.10.8.2 <- lm(gfr ~ pe + ww2 + pill + t + tsq, data = fertil3)
-summary(lm.10.8.2)
+model_10_8_2 <- lm(gfr ~ pe + ww2 + pill + t + tsq, data = fertil3)
+summary(model_10_8_2)
 ```
 
 ### Example 10.9
 ```{r}
 data("prminwge")
 
-lm.10.9 <- lm(lprepop ~ lmincov + lusgnp + t, data = prminwge)
-summary(lm.10.9)
+model_10_9 <- lm(lprepop ~ lmincov + lusgnp + t, data = prminwge)
+summary(model_10_9)
 ```
 
 ```{r}
 # Obtain results by detrending
-lprepop.detrend <- lm(lprepop ~ t, data = prminwge)$resid
-lmincov.detrend <- lm(lmincov ~ t, data = prminwge)$resid
-lusgnp.detrend <- lm(lusgnp ~ t, data = prminwge)$resid
+lprepop_detrend <- lm(lprepop ~ t, data = prminwge)[["residuals"]]
+lmincov_detrend <- lm(lmincov ~ t, data = prminwge)[["residuals"]]
+lusgnp_detrend <- lm(lusgnp ~ t, data = prminwge)[["residuals"]]
 
-summary(lm(lprepop.detrend ~ lmincov.detrend + lusgnp.detrend - 1))
+summary(lm(lprepop_detrend ~ lmincov_detrend + lusgnp_detrend - 1))
 ```
 
 ### Example 10.10
 ```{r}
 data("hseinv")
 
-dtr.linvpc <- lm(linvpc ~ t, data = hseinv)$resid
-summary(lm(dtr.linvpc ~ lprice + t, data = hseinv))
+dtr_linvpc <- lm(linvpc ~ t, data = hseinv)[["residuals"]]
+summary(lm(dtr_linvpc ~ lprice + t, data = hseinv))
 ```
 
 ### Example 10.11
 ```{r}
 data("barium")
 
-lm.10.11 <- lm(lchnimp ~ lchempi + lgas + lrtwex + befile6 + affile6 + afdec6 +
- feb + mar + apr + may + jun + jul + aug + sep + oct + nov + dec, data = barium)
-lm.10.11res <- lm(lchnimp ~ lchempi + lgas + lrtwex + befile6 + affile6 + afdec6, data = barium)
+model_10_11 <- lm(lchnimp ~ lchempi + lgas + lrtwex + befile6 + affile6 +
+                    afdec6 + feb + mar + apr + may + jun + jul + aug + sep +
+                    oct + nov + dec,
+                  data = barium)
+model_10_11_res <- lm(lchnimp ~ lchempi + lgas + lrtwex + befile6 + affile6 +
+                        afdec6,
+                      data = barium)
 
-anova(lm.10.11, lm.10.11res)
+anova(model_10_11, model_10_11_res)
 ```

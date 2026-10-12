@@ -5,7 +5,7 @@ date: "2018-10-07"
 ---
 
 ```{r}
-library(wooldridge)
+library("wooldridge")
 ```
 
 ### Example 11.4
@@ -15,8 +15,8 @@ For this regression the lagged values of return are already contained in the dat
 ```{r}
 data("nyse")
 
-lm.11.4  <-  lm(return ~ return_1, data = nyse)
-summary(lm.11.4)
+model_11_4 <- lm(return ~ return_1, data = nyse)
+summary(model_11_4)
 ```
 
 ### Equation 11.17
@@ -25,15 +25,16 @@ To estimate this model we have to calculate the lagged values ourselves. First, 
 
 ```{r}
 # Create lagged values
-return <- ts(nyse$return)
-return1 <- lag(return, -1)
-return2 <- lag(return, -2)
+nyse_return <- ts(nyse[["return"]])
+nyse_return_1 <- lag(nyse_return, -1)
+nyse_return_2 <- lag(nyse_return, -2)
 
-return_data <- cbind(return, return1, return2)
+return_data <- cbind(nyse_return, nyse_return_1, nyse_return_2)
 
 # Estimate
-lm.e11.17  <-  lm(return ~ return1 + return2, data = return_data)
-summary(lm.e11.17)
+model_e11_17 <- lm(nyse_return ~ nyse_return_1 + nyse_return_2,
+                   data = return_data)
+summary(model_e11_17)
 ```
 
 ### Example 11.5
@@ -43,13 +44,13 @@ The estimations works as usual. The difference in the inflation rate is calculat
 ```{r}
 data("phillips")
 
-lm.11.15  <-  lm(I(inf-inf_1) ~ unem, data = phillips)
-summary(lm.11.15)
+model_11_15 <- lm(I(inf - inf_1) ~ unem, data = phillips)
+summary(model_11_15)
 ```
 
 Natural rate of unemployment
 ```{r}
-lm.11.15$coeff[1] / -lm.11.15$coeff[2]
+model_11_15[["coefficients"]][1] / -model_11_15[["coefficients"]][2]
 ```
 
 ### Example 11.6
@@ -57,28 +58,28 @@ lm.11.15$coeff[1] / -lm.11.15$coeff[2]
 ```{r}
 data("fertil3")
 
-cor(fertil3$gfr, fertil3$gfr_1, use = "pairwise.complete.obs")
-cor(fertil3$pe, fertil3$pe_1, use = "pairwise.complete.obs")
+cor(fertil3[["gfr"]], fertil3[["gfr_1"]], use = "pairwise.complete.obs")
+cor(fertil3[["pe"]], fertil3[["pe_1"]], use = "pairwise.complete.obs")
 ```
 
 ```{r}
-lm.11.16.1  <- lm(cgfr ~ cpe, data = fertil3)
-summary(lm.11.16.1)
+model_11_16_1 <- lm(cgfr ~ cpe, data = fertil3)
+summary(model_11_16_1)
 ```
 
 ```{r}
-lm.11.16.2  <-  lm(cgfr ~ cpe + cpe_1 + cpe_2, data = fertil3)
-summary(lm.11.16.2)
+model_11_16_2 <- lm(cgfr ~ cpe + cpe_1 + cpe_2, data = fertil3)
+summary(model_11_16_2)
 ```
 
 Joint significance of pe and pe_1
 ```{r}
-lm.11.16.2res  <-  lm(cgfr ~ cpe_2, data = fertil3)
-summary(lm.11.16.2res)
+model_11_16_2_res <- lm(cgfr ~ cpe_2, data = fertil3)
+summary(model_11_16_2_res)
 ```
 
 ```{r}
-anova(lm.11.16.2, lm.11.16.2res)
+anova(model_11_16_2, model_11_16_2_res)
 ```
 
 
@@ -87,30 +88,30 @@ anova(lm.11.16.2, lm.11.16.2res)
 ```{r}
 data("earns")
 
-lm.11.17.1  <-  lm(lhrwage ~ loutphr + t, data = earns)
-summary(lm.11.17.1)
+model_11_17_1 <- lm(lhrwage ~ loutphr + t, data = earns)
+summary(model_11_17_1)
 ```
 
 Detrend the variables
 ```{r}
-dtr.lhrwage  <-  lm(lhrwage ~ t, data = earns)$resid
-dtr.loutphr  <-  lm(loutphr ~ t, data = earns)$resid
-summary(lm(dtr.lhrwage ~ -1 + dtr.loutphr))
+dtr_lhrwage <- lm(lhrwage ~ t, data = earns)[["residuals"]]
+dtr_loutphr <- lm(loutphr ~ t, data = earns)[["residuals"]]
+summary(lm(dtr_lhrwage ~ -1 + dtr_loutphr))
 ```
 
 ```{r}
-cor(dtr.lhrwage, c(dtr.lhrwage[-1],NA), use = "pairwise.complete.obs")
+cor(dtr_lhrwage, c(dtr_lhrwage[-1], NA), use = "pairwise.complete.obs")
 ```
 
 ```{r}
-cor(dtr.loutphr, c(dtr.loutphr[-1],NA), use = "pairwise.complete.obs")
+cor(dtr_loutphr, c(dtr_loutphr[-1], NA), use = "pairwise.complete.obs")
 ```
 
 The `diff` function calculates the difference between elements of a vector. By default, it assumes that the first difference between subsequent observations should be calculated.
 
 ```{r}
-lm.11.17.2 <- lm(I(diff(lhrwage)) ~ I(diff(loutphr)), data = earns)
-summary(lm.11.17.2)
+model_11_17_2 <- lm(I(diff(lhrwage)) ~ I(diff(loutphr)), data = earns)
+summary(model_11_17_2)
 ```
 
 ### Example 11.8
@@ -118,8 +119,8 @@ summary(lm.11.17.2)
 ```{r}
 data("fertil3")
 
-lm.11.18  <-  lm(cgfr ~ cpe + cpe_1 + cpe_2 + cgfr_1, data = fertil3)
-summary(lm.11.18)
+model_11_18 <- lm(cgfr ~ cpe + cpe_1 + cpe_2 + cgfr_1, data = fertil3)
+summary(model_11_18)
 ```
 
 A significant coefficient on `cgfr_1` suggests serial correlations in the errors

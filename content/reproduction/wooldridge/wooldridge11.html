@@ -6,14 +6,14 @@ date: "2018-10-07"
 
 
 
-<pre class="r"><code>library(wooldridge)</code></pre>
+<pre class="r"><code>library(&quot;wooldridge&quot;)</code></pre>
 <div id="example-11.4" class="section level3">
 <h3>Example 11.4</h3>
 <p>For this regression the lagged values of return are already contained in the dataset. Thus, we do not have to calculated them ourselves and can simply run the regression.</p>
 <pre class="r"><code>data(&quot;nyse&quot;)
 
-lm.11.4  &lt;-  lm(return ~ return_1, data = nyse)
-summary(lm.11.4)</code></pre>
+model_11_4 &lt;- lm(return ~ return_1, data = nyse)
+summary(model_11_4)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = return ~ return_1, data = nyse)
@@ -31,41 +31,42 @@ summary(lm.11.4)</code></pre>
 ## 
 ## Residual standard error: 2.11 on 687 degrees of freedom
 ##   (2 observations deleted due to missingness)
-## Multiple R-squared:  0.003481,   Adjusted R-squared:  0.00203 
+## Multiple R-squared:  0.003481,	Adjusted R-squared:  0.00203 
 ## F-statistic: 2.399 on 1 and 687 DF,  p-value: 0.1218</code></pre>
 </div>
 <div id="equation-11.17" class="section level3">
 <h3>Equation 11.17</h3>
 <p>To estimate this model we have to calculate the lagged values ourselves. First, I created a vector of the return values from the nyse data set. To create the series with the first lagged returns I omitted the first value in the list of returns of the nyse data set by adding [-1]. But since this causes the length of the resulting series to decrease by one observation, we have to add an NA so that R can estimate the model. I added this NA by creating a list with c() which contains the values from the first lag list “nyse$return[-1]” and put an NA at the end. For the second list of lagged values I proceeded similarly. I omitted the first and second observation from the return list of the nyse data set and added two NAs. The estimation works as usual.</p>
 <pre class="r"><code># Create lagged values
-return &lt;- ts(nyse$return)
-return1 &lt;- lag(return, -1)
-return2 &lt;- lag(return, -2)
+nyse_return &lt;- ts(nyse[[&quot;return&quot;]])
+nyse_return_1 &lt;- lag(nyse_return, -1)
+nyse_return_2 &lt;- lag(nyse_return, -2)
 
-return_data &lt;- cbind(return, return1, return2)
+return_data &lt;- cbind(nyse_return, nyse_return_1, nyse_return_2)
 
 # Estimate
-lm.e11.17  &lt;-  lm(return ~ return1 + return2, data = return_data)
-summary(lm.e11.17)</code></pre>
+model_e11_17 &lt;- lm(nyse_return ~ nyse_return_1 + nyse_return_2,
+                   data = return_data)
+summary(model_e11_17)</code></pre>
 <pre><code>## 
 ## Call:
-## lm(formula = return ~ return1 + return2, data = return_data)
+## lm(formula = nyse_return ~ nyse_return_1 + nyse_return_2, data = return_data)
 ## 
 ## Residuals:
 ##      Min       1Q   Median       3Q      Max 
 ## -15.2969  -1.3214   0.1099   1.3478   7.9832 
 ## 
 ## Coefficients:
-##             Estimate Std. Error t value Pr(&gt;|t|)  
-## (Intercept)  0.18575    0.08115   2.289   0.0224 *
-## return1      0.06032    0.03818   1.580   0.1146  
-## return2     -0.03807    0.03814  -0.998   0.3185  
+##               Estimate Std. Error t value Pr(&gt;|t|)  
+## (Intercept)    0.18575    0.08115   2.289   0.0224 *
+## nyse_return_1  0.06032    0.03818   1.580   0.1146  
+## nyse_return_2 -0.03807    0.03814  -0.998   0.3185  
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 2.112 on 685 degrees of freedom
 ##   (5 observations deleted due to missingness)
-## Multiple R-squared:  0.004819,   Adjusted R-squared:  0.001914 
+## Multiple R-squared:  0.004819,	Adjusted R-squared:  0.001914 
 ## F-statistic: 1.659 on 2 and 685 DF,  p-value: 0.1912</code></pre>
 </div>
 <div id="example-11.5" class="section level3">
@@ -73,8 +74,8 @@ summary(lm.e11.17)</code></pre>
 <p>The estimations works as usual. The difference in the inflation rate is calculated within the lm() command.</p>
 <pre class="r"><code>data(&quot;phillips&quot;)
 
-lm.11.15  &lt;-  lm(I(inf-inf_1) ~ unem, data = phillips)
-summary(lm.11.15)</code></pre>
+model_11_15 &lt;- lm(I(inf - inf_1) ~ unem, data = phillips)
+summary(model_11_15)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = I(inf - inf_1) ~ unem, data = phillips)
@@ -92,10 +93,10 @@ summary(lm.11.15)</code></pre>
 ## 
 ## Residual standard error: 2.307 on 53 degrees of freedom
 ##   (1 observation deleted due to missingness)
-## Multiple R-squared:  0.1037, Adjusted R-squared:  0.08679 
+## Multiple R-squared:  0.1037,	Adjusted R-squared:  0.08679 
 ## F-statistic: 6.132 on 1 and 53 DF,  p-value: 0.0165</code></pre>
 <p>Natural rate of unemployment</p>
-<pre class="r"><code>lm.11.15$coeff[1] / -lm.11.15$coeff[2]</code></pre>
+<pre class="r"><code>model_11_15[[&quot;coefficients&quot;]][1] / -model_11_15[[&quot;coefficients&quot;]][2]</code></pre>
 <pre><code>## (Intercept) 
 ##    5.463554</code></pre>
 </div>
@@ -103,12 +104,12 @@ summary(lm.11.15)</code></pre>
 <h3>Example 11.6</h3>
 <pre class="r"><code>data(&quot;fertil3&quot;)
 
-cor(fertil3$gfr, fertil3$gfr_1, use = &quot;pairwise.complete.obs&quot;)</code></pre>
+cor(fertil3[[&quot;gfr&quot;]], fertil3[[&quot;gfr_1&quot;]], use = &quot;pairwise.complete.obs&quot;)</code></pre>
 <pre><code>## [1] 0.9764517</code></pre>
-<pre class="r"><code>cor(fertil3$pe, fertil3$pe_1, use = &quot;pairwise.complete.obs&quot;)</code></pre>
+<pre class="r"><code>cor(fertil3[[&quot;pe&quot;]], fertil3[[&quot;pe_1&quot;]], use = &quot;pairwise.complete.obs&quot;)</code></pre>
 <pre><code>## [1] 0.96358</code></pre>
-<pre class="r"><code>lm.11.16.1  &lt;- lm(cgfr ~ cpe, data = fertil3)
-summary(lm.11.16.1)</code></pre>
+<pre class="r"><code>model_11_16_1 &lt;- lm(cgfr ~ cpe, data = fertil3)
+summary(model_11_16_1)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = cgfr ~ cpe, data = fertil3)
@@ -124,10 +125,10 @@ summary(lm.11.16.1)</code></pre>
 ## 
 ## Residual standard error: 4.221 on 69 degrees of freedom
 ##   (1 observation deleted due to missingness)
-## Multiple R-squared:  0.03176,    Adjusted R-squared:  0.01773 
+## Multiple R-squared:  0.03176,	Adjusted R-squared:  0.01773 
 ## F-statistic: 2.263 on 1 and 69 DF,  p-value: 0.137</code></pre>
-<pre class="r"><code>lm.11.16.2  &lt;-  lm(cgfr ~ cpe + cpe_1 + cpe_2, data = fertil3)
-summary(lm.11.16.2)</code></pre>
+<pre class="r"><code>model_11_16_2 &lt;- lm(cgfr ~ cpe + cpe_1 + cpe_2, data = fertil3)
+summary(model_11_16_2)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = cgfr ~ cpe + cpe_1 + cpe_2, data = fertil3)
@@ -147,11 +148,11 @@ summary(lm.11.16.2)</code></pre>
 ## 
 ## Residual standard error: 3.859 on 65 degrees of freedom
 ##   (3 observations deleted due to missingness)
-## Multiple R-squared:  0.2325, Adjusted R-squared:  0.1971 
+## Multiple R-squared:  0.2325,	Adjusted R-squared:  0.1971 
 ## F-statistic: 6.563 on 3 and 65 DF,  p-value: 0.0006054</code></pre>
 <p>Joint significance of pe and pe_1</p>
-<pre class="r"><code>lm.11.16.2res  &lt;-  lm(cgfr ~ cpe_2, data = fertil3)
-summary(lm.11.16.2res)</code></pre>
+<pre class="r"><code>model_11_16_2_res &lt;- lm(cgfr ~ cpe_2, data = fertil3)
+summary(model_11_16_2_res)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = cgfr ~ cpe_2, data = fertil3)
@@ -169,9 +170,9 @@ summary(lm.11.16.2res)</code></pre>
 ## 
 ## Residual standard error: 3.876 on 67 degrees of freedom
 ##   (3 observations deleted due to missingness)
-## Multiple R-squared:  0.202,  Adjusted R-squared:  0.1901 
+## Multiple R-squared:  0.202,	Adjusted R-squared:  0.1901 
 ## F-statistic: 16.96 on 1 and 67 DF,  p-value: 0.0001069</code></pre>
-<pre class="r"><code>anova(lm.11.16.2, lm.11.16.2res)</code></pre>
+<pre class="r"><code>anova(model_11_16_2, model_11_16_2_res)</code></pre>
 <pre><code>## Analysis of Variance Table
 ## 
 ## Model 1: cgfr ~ cpe + cpe_1 + cpe_2
@@ -184,8 +185,8 @@ summary(lm.11.16.2res)</code></pre>
 <h3>Example 11.7</h3>
 <pre class="r"><code>data(&quot;earns&quot;)
 
-lm.11.17.1  &lt;-  lm(lhrwage ~ loutphr + t, data = earns)
-summary(lm.11.17.1)</code></pre>
+model_11_17_1 &lt;- lm(lhrwage ~ loutphr + t, data = earns)
+summary(model_11_17_1)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = lhrwage ~ loutphr + t, data = earns)
@@ -203,15 +204,15 @@ summary(lm.11.17.1)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.02854 on 38 degrees of freedom
-## Multiple R-squared:  0.9712, Adjusted R-squared:  0.9697 
+## Multiple R-squared:  0.9712,	Adjusted R-squared:  0.9697 
 ## F-statistic: 641.2 on 2 and 38 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>Detrend the variables</p>
-<pre class="r"><code>dtr.lhrwage  &lt;-  lm(lhrwage ~ t, data = earns)$resid
-dtr.loutphr  &lt;-  lm(loutphr ~ t, data = earns)$resid
-summary(lm(dtr.lhrwage ~ -1 + dtr.loutphr))</code></pre>
+<pre class="r"><code>dtr_lhrwage &lt;- lm(lhrwage ~ t, data = earns)[[&quot;residuals&quot;]]
+dtr_loutphr &lt;- lm(loutphr ~ t, data = earns)[[&quot;residuals&quot;]]
+summary(lm(dtr_lhrwage ~ -1 + dtr_loutphr))</code></pre>
 <pre><code>## 
 ## Call:
-## lm(formula = dtr.lhrwage ~ -1 + dtr.loutphr)
+## lm(formula = dtr_lhrwage ~ -1 + dtr_loutphr)
 ## 
 ## Residuals:
 ##       Min        1Q    Median        3Q       Max 
@@ -219,20 +220,20 @@ summary(lm(dtr.lhrwage ~ -1 + dtr.loutphr))</code></pre>
 ## 
 ## Coefficients:
 ##             Estimate Std. Error t value Pr(&gt;|t|)    
-## dtr.loutphr  1.63964    0.09098   18.02   &lt;2e-16 ***
+## dtr_loutphr  1.63964    0.09098   18.02   &lt;2e-16 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.02782 on 40 degrees of freedom
-## Multiple R-squared:  0.8903, Adjusted R-squared:  0.8876 
+## Multiple R-squared:  0.8903,	Adjusted R-squared:  0.8876 
 ## F-statistic: 324.8 on 1 and 40 DF,  p-value: &lt; 2.2e-16</code></pre>
-<pre class="r"><code>cor(dtr.lhrwage, c(dtr.lhrwage[-1],NA), use = &quot;pairwise.complete.obs&quot;)</code></pre>
+<pre class="r"><code>cor(dtr_lhrwage, c(dtr_lhrwage[-1], NA), use = &quot;pairwise.complete.obs&quot;)</code></pre>
 <pre><code>## [1] 0.9671587</code></pre>
-<pre class="r"><code>cor(dtr.loutphr, c(dtr.loutphr[-1],NA), use = &quot;pairwise.complete.obs&quot;)</code></pre>
+<pre class="r"><code>cor(dtr_loutphr, c(dtr_loutphr[-1], NA), use = &quot;pairwise.complete.obs&quot;)</code></pre>
 <pre><code>## [1] 0.9452925</code></pre>
 <p>The <code>diff</code> function calculates the difference between elements of a vector. By default, it assumes that the first difference between subsequent observations should be calculated.</p>
-<pre class="r"><code>lm.11.17.2 &lt;- lm(I(diff(lhrwage)) ~ I(diff(loutphr)), data = earns)
-summary(lm.11.17.2)</code></pre>
+<pre class="r"><code>model_11_17_2 &lt;- lm(I(diff(lhrwage)) ~ I(diff(loutphr)), data = earns)
+summary(model_11_17_2)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = I(diff(lhrwage)) ~ I(diff(loutphr)), data = earns)
@@ -249,15 +250,15 @@ summary(lm.11.17.2)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.01695 on 38 degrees of freedom
-## Multiple R-squared:  0.3642, Adjusted R-squared:  0.3475 
+## Multiple R-squared:  0.3642,	Adjusted R-squared:  0.3475 
 ## F-statistic: 21.77 on 1 and 38 DF,  p-value: 3.748e-05</code></pre>
 </div>
 <div id="example-11.8" class="section level3">
 <h3>Example 11.8</h3>
 <pre class="r"><code>data(&quot;fertil3&quot;)
 
-lm.11.18  &lt;-  lm(cgfr ~ cpe + cpe_1 + cpe_2 + cgfr_1, data = fertil3)
-summary(lm.11.18)</code></pre>
+model_11_18 &lt;- lm(cgfr ~ cpe + cpe_1 + cpe_2 + cgfr_1, data = fertil3)
+summary(model_11_18)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = cgfr ~ cpe + cpe_1 + cpe_2 + cgfr_1, data = fertil3)
@@ -278,7 +279,7 @@ summary(lm.11.18)</code></pre>
 ## 
 ## Residual standard error: 3.666 on 64 degrees of freedom
 ##   (3 observations deleted due to missingness)
-## Multiple R-squared:  0.3181, Adjusted R-squared:  0.2755 
+## Multiple R-squared:  0.3181,	Adjusted R-squared:  0.2755 
 ## F-statistic: 7.464 on 4 and 64 DF,  p-value: 5.336e-05</code></pre>
 <p>A significant coefficient on <code>cgfr_1</code> suggests serial correlations in the errors</p>
 </div>
