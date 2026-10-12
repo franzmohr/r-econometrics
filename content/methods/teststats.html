@@ -17,7 +17,8 @@ tags:
 <h2>Data and model</h2>
 <p>To illustrate the calculation of test statistics in R, let’s use the <em>wage1</em> dataset from the <code>wooldridge</code> package and estimate a basic <a href="https://en.wikipedia.org/wiki/Mincer_earnings_function" target="_blank">Mincer earnings function</a>. This standard specification of earnings models explains the natural log of average hourly earnings <code>lwage</code> by years of education <code>educ</code> and experience <code>exper</code>. The standard specification also includes squared values of experience <code>expersq</code> to take into account potential decreasing marginal effects.</p>
 <pre class="r"><code># Load dataset
-library(wooldridge)
+library(&quot;wooldridge&quot;)
+
 data(&quot;wage1&quot;)
 
 # Estimate a model
@@ -47,7 +48,7 @@ model &lt;- lm(lwage ~ educ + exper + expersq, data = wage1)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.4459 on 522 degrees of freedom
-## Multiple R-squared:  0.3003, Adjusted R-squared:  0.2963 
+## Multiple R-squared:  0.3003,	Adjusted R-squared:  0.2963 
 ## F-statistic: 74.67 on 3 and 522 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>The t values for our benchmark model indicate that, except for the constant, all variables are statistically significant. You might think about dropping the intercept term at this point, but let’s forget about this for the moment.</p>
 </div>
@@ -56,7 +57,8 @@ model &lt;- lm(lwage ~ educ + exper + expersq, data = wage1)</code></pre>
 <p>F tests can be used to check, whether one or multiple variables in a model are statistically significant. Basically, the test compares two models with each other, where one model is a special case of the other. This means that we compare a model with more variables - the so-called <em>unrestricted</em> model - to a model with less but otherwise the same variables, i.e. the <em>restriced</em> or nested model. If the additional predictive power of the unrestricted model is sufficiently higher, the variables are jointly significant.</p>
 <p>In our example we add the <code>tenure</code> variable and its square <code>tenuresq</code> to the model equation. This model is now the unrestricted model, which we have to estimate before we can calculate the F test.</p>
 <pre class="r"><code># Estimate unrestricted model
-model_unres &lt;- lm(lwage ~ educ + exper + expersq + tenure + tenursq, data = wage1)
+model_unres &lt;- lm(lwage ~ educ + exper + expersq + tenure + tenursq,
+                  data = wage1)
 
 summary(model_unres)</code></pre>
 <pre><code>## 
@@ -80,7 +82,7 @@ summary(model_unres)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.425 on 520 degrees of freedom
-## Multiple R-squared:  0.3669, Adjusted R-squared:  0.3608 
+## Multiple R-squared:  0.3669,	Adjusted R-squared:  0.3608 
 ## F-statistic: 60.26 on 5 and 520 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>The t values of the new model indicate that all variabes - including the constant - are individually, statistically significant. Thus, the variable <code>tenure</code> provides additional explanatory power to the model. Since <code>tenure</code> also enters in its squared form, we are interested in the joint significance of the tenure terms. This can be checked with an F test, which can be calculated by using the <code>anova</code> function in R. We only have to provide the two estimated models as arguments:</p>
 <pre class="r"><code>anova(model, model_unres)</code></pre>
@@ -106,41 +108,43 @@ summary(model_unres)</code></pre>
 <ul>
 <li>Eyeball test: A rather intuitive way to test for normality is to simply look at the histogram of the model residuals:</li>
 </ul>
-<pre class="r"><code>hist(model$residuals, breaks = 20)</code></pre>
-<p><img src="/methods/teststats_files/figure-html/unnamed-chunk-2-1.png" width="432" /></p>
+<pre class="r"><code>model_residuals &lt;- model[[&quot;residuals&quot;]]
+
+hist(model_residuals, breaks = 20)</code></pre>
+<p><img src="/methods/teststats_files/figure-html/unnamed-chunk-2-1.png" alt="" width="432" /></p>
 <p>Since the shape of the histogram resembles the famous bell shape of a normal distribution, this looks pretty normal to me. However, there are more formal ways to test for normality, which are required by a more sophisticated audience than me…</p>
 <ul>
 <li>The <a href="https://en.wikipedia.org/wiki/Shapiro%E2%80%93Wilk_test" target="_blank">Shapiro-Wilk test</a> is considered to be a very reliable test for normality. It is implemented in the <code>shapiro.test</code> function of the <code>stats</code> package:</li>
 </ul>
-<pre class="r"><code>shapiro.test(model$residuals)</code></pre>
+<pre class="r"><code>shapiro.test(model_residuals)</code></pre>
 <pre><code>## 
-##  Shapiro-Wilk normality test
+## 	Shapiro-Wilk normality test
 ## 
-## data:  model$residuals
+## data:  model_residuals
 ## W = 0.99258, p-value = 0.01031</code></pre>
 <p>The low p-value indicates that the null hypothesis of a normal distribution is not rejected at the 1 percent level.</p>
 <ul>
 <li>The <a href="https://en.wikipedia.org/wiki/Anderson%E2%80%93Darling_test" target="_blank">Anderson–Darling test</a> is also a popular normality test. It also has the advantage that it can be applied to other distributions as well. To test for normal distributions in R, the <code>ad.test</code> function of the <code>nortest</code> package can be used:</li>
 </ul>
-<pre class="r"><code>library(nortest)
+<pre class="r"><code>library(&quot;nortest&quot;)
 
-ad.test(model$residuals)</code></pre>
+ad.test(model_residuals)</code></pre>
 <pre><code>## 
-##  Anderson-Darling normality test
+## 	Anderson-Darling normality test
 ## 
-## data:  model$residuals
+## data:  model_residuals
 ## A = 0.86991, p-value = 0.02559</code></pre>
 <p>The low p-value also indicates that the null hypothesis of a normal distribution is not rejected at the 2.56 percent level.</p>
 <ul>
 <li>The <a href="https://en.wikipedia.org/wiki/Jarque%E2%80%93Bera_test" target="_blank">Jarque-Bera test</a> tests whether the skewness and kurtosis of a model’s residuals match the expected values for normal distribution. In R the function <code>jarque.bera.test</code> of the <code>tseries</code> packages and the function <code>jarque.test</code> in the <code>moments</code> package are, among others, implementations of this test:</li>
 </ul>
-<pre class="r"><code>library(tseries)
+<pre class="r"><code>library(&quot;tseries&quot;)
 
-jarque.bera.test(model$residuals)</code></pre>
+jarque.bera.test(model_residuals)</code></pre>
 <pre><code>## 
-##  Jarque Bera Test
+## 	Jarque Bera Test
 ## 
-## data:  model$residuals
+## data:  model_residuals
 ## X-squared = 7.1519, df = 2, p-value = 0.02799</code></pre>
 <p>Again, the low p-value of the Jarque-Bera test indicates that the skewness and kurtosis of the test are not significantly different from their expected values for normal distribution. Thus, the distribution of the model residuals seems statistically not different from a normal distribution.</p>
 </div>
@@ -163,20 +167,20 @@ jarque.bera.test(model$residuals)</code></pre>
 <li>Eyeball test: One way to check for heteroskedasticity is to look at a plot, where the absolute values of the residuals - or the squared residuals - are plotted against the regressors of the model. If the size of the absolute (or squared) errors appears to vary with the size of a regressor, this migth indicate heteroskedasticity.</li>
 </ul>
 <pre class="r"><code># Create plot input
-hetsk_data &lt;- cbind(abs(model$residuals), model$model[, -1])
+hetsk_data &lt;- cbind(abs(model_residuals), model[[&quot;model&quot;]][, -1])
 
 # Scatterplot matrix
 plot(hetsk_data)</code></pre>
-<p><img src="/methods/teststats_files/figure-html/heterosk_eyeball-1.png" width="528" /></p>
+<p><img src="/methods/teststats_files/figure-html/heterosk_eyeball-1.png" alt="" width="528" /></p>
 <p>By looking at the first row of the above scatter plot we might notice that the absolute errors seem to be larger for higher values of <code>educ</code> and lower for higher values of <code>expersq</code>. This might warrant to test this more formally.</p>
 <ul>
 <li>The <a href="https://en.wikipedia.org/wiki/Breusch%E2%80%93Pagan_test" target="_blank">Breusch-Pagan test</a> is implemented in the function <code>pbtest</code> both of the <code>AER</code> and <code>lmtest</code> package and tests whether the variance of a model’s residuals dependents on the values of the regressors.</li>
 </ul>
-<pre class="r"><code>library(AER)
+<pre class="r"><code>library(&quot;AER&quot;)
 
 bptest(model)</code></pre>
 <pre><code>## 
-##  studentized Breusch-Pagan test
+## 	studentized Breusch-Pagan test
 ## 
 ## data:  model
 ## BP = 19.84, df = 3, p-value = 0.0001832</code></pre>
@@ -185,18 +189,18 @@ bptest(model)</code></pre>
 </ul>
 <pre class="r"><code>bptest(model, ~ lwage + I(lwage^2), data = wage1)</code></pre>
 <pre><code>## 
-##  studentized Breusch-Pagan test
+## 	studentized Breusch-Pagan test
 ## 
 ## data:  model
 ## BP = 319.9, df = 2, p-value &lt; 2.2e-16</code></pre>
 <ul>
 <li>The <a href="https://en.wikipedia.org/wiki/Goldfeld%E2%80%93Quandt_test" target="_blank">Goldfeld-Quandt test</a> basically devides the sample into two groups with low and high values of an explanatory variable and compares the variances of two submodels. If the variances differ, this indicates heteroskedasticity. It is implemented in the function <code>gqtest</code> of the <code>lmtest</code> package:</li>
 </ul>
-<pre class="r"><code>library(lmtest)
+<pre class="r"><code>library(&quot;lmtest&quot;)
 
 gqtest(model)</code></pre>
 <pre><code>## 
-##  Goldfeld-Quandt test
+## 	Goldfeld-Quandt test
 ## 
 ## data:  model
 ## GQ = 0.74514, df1 = 259, df2 = 259, p-value = 0.9909
@@ -217,8 +221,9 @@ gqtest(model)</code></pre>
 <div id="hausman-test" class="section level3">
 <h3>Hausman test</h3>
 <p>A popular method to test for correlation between explanatory variables and the error term is the <em>Hausman test</em>. It basically tests whether the results of the IV estimator are significantly different from the OLS estimator. To illustrate this, let’s use the <em>wage2</em> dataset from the <code>wooldridge</code> package and, again, estimate a basic <a href="https://en.wikipedia.org/wiki/Mincer_earnings_function" target="_blank">Mincer earnings function</a> as described above. However, this time we add <code>IQ</code> as a measure of <em>ability</em>. But since it is assumed that the measure is correlated with the error term, we use an additional measure of ability, <code>KWW</code>, as an instrument for <code>IQ</code>.</p>
-<pre class="r"><code>library(dplyr)
-library(wooldridge)
+<pre class="r"><code>library(&quot;dplyr&quot;)
+library(&quot;wooldridge&quot;)
+
 data(&quot;wage2&quot;)
 
 # Add squared experience &quot;expersq&quot;
@@ -226,7 +231,8 @@ wage2 &lt;- wage2 %&gt;%
   mutate(expersq = exper^2)
 
 # IV estimator
-iv_model &lt;- ivreg(lwage ~ educ + exper + expersq + IQ | KWW + educ + exper + expersq,
+iv_model &lt;- ivreg(lwage ~ educ + exper + expersq + IQ |
+                    KWW + educ + exper + expersq,
                   data = wage2)</code></pre>
 <p>The <code>summary</code> function of the <code>ivreg</code> object, performs the Hausman test automatically. We only have to add the argument <code>diagnostics = TRUE</code>.</p>
 <pre class="r"><code>summary(iv_model, diagnostics = TRUE)</code></pre>
@@ -256,7 +262,7 @@ iv_model &lt;- ivreg(lwage ~ educ + exper + expersq + IQ | KWW + educ + exper + 
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.4231 on 930 degrees of freedom
-## Multiple R-Squared: -0.004854,   Adjusted R-squared: -0.009176 
+## Multiple R-Squared: -0.004854,	Adjusted R-squared: -0.009176 
 ## Wald test: 36.38 on 4 and 930 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>The (Wu-)Hausman test statistic has a very low p-value and, hence, the test rejects the null of no correcation between <code>IQ</code> and the error term in this example.</p>
 </div>

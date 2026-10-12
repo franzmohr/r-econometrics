@@ -18,7 +18,8 @@ To illustrate the calculation of test statistics in R, let's use the *wage1* dat
 
 ```{r data, message = FALSE}
 # Load dataset
-library(wooldridge)
+library("wooldridge")
+
 data("wage1")
 
 # Estimate a model
@@ -45,7 +46,8 @@ In our example we add the `tenure` variable and its square `tenuresq` to the mod
 
 ```{r unrestricted, message = FALSE}
 # Estimate unrestricted model
-model_unres <- lm(lwage ~ educ + exper + expersq + tenure + tenursq, data = wage1)
+model_unres <- lm(lwage ~ educ + exper + expersq + tenure + tenursq,
+                  data = wage1)
 
 summary(model_unres)
 ```
@@ -71,7 +73,9 @@ One key assumption of many test statistics is that the errors of a model are nor
 * Eyeball test: A rather intuitive way to test for normality is to simply look at the histogram of the model residuals:
 
 ```{r, fig.width=4.5, fig.height=3.5}
-hist(model$residuals, breaks = 20)
+model_residuals <- model[["residuals"]]
+
+hist(model_residuals, breaks = 20)
 ```
 
 Since the shape of the histogram resembles the famous bell shape of a normal distribution, this looks pretty normal to me. However, there are more formal ways to test for normality, which are required by a more sophisticated audience than me...
@@ -79,7 +83,7 @@ Since the shape of the histogram resembles the famous bell shape of a normal dis
 * The <a href="https://en.wikipedia.org/wiki/Shapiro%E2%80%93Wilk_test" target="_blank">Shapiro-Wilk test</a> is considered to be a very reliable test for normality. It is implemented in the `shapiro.test` function of the `stats` package:
 
 ```{r shapiro, message=FALSE}
-shapiro.test(model$residuals)
+shapiro.test(model_residuals)
 ```
 
 The low p-value indicates that the null hypothesis of a normal distribution is not rejected at the 1 percent level.
@@ -87,18 +91,18 @@ The low p-value indicates that the null hypothesis of a normal distribution is n
 * The <a href="https://en.wikipedia.org/wiki/Anderson%E2%80%93Darling_test" target="_blank">Anderson–Darling test</a> is also a popular normality test. It also has the advantage that it can be applied to other distributions as well. To test for normal distributions in R, the `ad.test` function of the `nortest` package can be used:
 
 ```{r anderson-darling}
-library(nortest)
+library("nortest")
 
-ad.test(model$residuals)
+ad.test(model_residuals)
 ```
 The low p-value also indicates that the null hypothesis of a normal distribution is not rejected at the 2.56 percent level.
 
 * The <a href="https://en.wikipedia.org/wiki/Jarque%E2%80%93Bera_test" target="_blank">Jarque-Bera test</a> tests whether the skewness and kurtosis of a model's residuals match the expected values for normal distribution. In R the function `jarque.bera.test` of the `tseries` packages and the function `jarque.test` in the `moments` package are, among others, implementations of this test:
 
 ```{r jarque-bera, message=FALSE}
-library(tseries)
+library("tseries")
 
-jarque.bera.test(model$residuals)
+jarque.bera.test(model_residuals)
 ```
 
 Again, the low p-value of the Jarque-Bera test indicates that the skewness and kurtosis of the test are not significantly different from their expected values for normal distribution. Thus, the distribution of the model residuals seems statistically not different from a normal distribution.
@@ -121,7 +125,7 @@ Heteroskedasticity arises when the variance of an observation's error depends on
 
 ```{r heterosk_eyeball, fig.width=5.5, fig.height=5.5}
 # Create plot input
-hetsk_data <- cbind(abs(model$residuals), model$model[, -1])
+hetsk_data <- cbind(abs(model_residuals), model[["model"]][, -1])
 
 # Scatterplot matrix
 plot(hetsk_data)
@@ -132,7 +136,7 @@ By looking at the first row of the above scatter plot we might notice that the a
 * The <a href="https://en.wikipedia.org/wiki/Breusch%E2%80%93Pagan_test" target="_blank">Breusch-Pagan test</a> is implemented in the function `pbtest` both of the `AER` and `lmtest` package and tests whether the variance of a model's residuals dependents on the values of the regressors. 
 
 ```{r breusch-pagan, message=FALSE}
-library(AER)
+library("AER")
 
 bptest(model)
 ```
@@ -146,7 +150,7 @@ bptest(model, ~ lwage + I(lwage^2), data = wage1)
 * The <a href="https://en.wikipedia.org/wiki/Goldfeld%E2%80%93Quandt_test" target="_blank">Goldfeld-Quandt test</a> basically devides the sample into two groups with low and high values of an explanatory variable and compares the variances of two submodels. If the variances differ, this indicates heteroskedasticity. It is implemented in the function `gqtest` of the `lmtest` package:
 
 ```{r goldfeld-quandt, message = FALSE}
-library(lmtest)
+library("lmtest")
 
 gqtest(model)
 ```
@@ -167,8 +171,9 @@ If explanatory variables are correlated with the error term, i.e. when they are 
 A popular method to test for correlation between explanatory variables and the error term is the *Hausman test*. It basically tests whether the results of the IV estimator are significantly different from the OLS estimator. To illustrate this, let's use the *wage2* dataset from the `wooldridge` package and, again, estimate a basic <a href="https://en.wikipedia.org/wiki/Mincer_earnings_function" target="_blank">Mincer earnings function</a> as described above. However, this time we add `IQ` as a measure of *ability*. But since it is assumed that the measure is correlated with the error term, we use an additional measure of ability, `KWW`, as an instrument for `IQ`.
 
 ```{r, message = FALSE}
-library(dplyr)
-library(wooldridge)
+library("dplyr")
+library("wooldridge")
+
 data("wage2")
 
 # Add squared experience "expersq"
@@ -176,7 +181,8 @@ wage2 <- wage2 %>%
   mutate(expersq = exper^2)
 
 # IV estimator
-iv_model <- ivreg(lwage ~ educ + exper + expersq + IQ | KWW + educ + exper + expersq,
+iv_model <- ivreg(lwage ~ educ + exper + expersq + IQ |
+                    KWW + educ + exper + expersq,
                   data = wage2)
 ```
 
