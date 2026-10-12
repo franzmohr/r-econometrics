@@ -17,7 +17,7 @@ description: "Hochmuth and Petz (2026) argue that persistent services inflation 
 knitr::opts_chunk$set(fig.height = 4.5, fig.width = 7)
 ```
 
-Euro area services inflation has come down much more slowly than goods inflation since its peak in 2023. Hochmuth and Petz (2026) read this partly as a relative-price adjustment. Before the pandemic, services prices rose faster than goods prices along a stable trend, which reflects slower productivity growth in services, income-elastic demand for them and their lower tradability. The surge in goods prices in 2021 and 2022 pushed the price of services relative to goods below that trend, and part of what looks like persistent services inflation is the relative price working its way back.
+Euro area services inflation has come down much more slowly than goods inflation since its peak in 2023. [Hochmuth and Petz (2026)](https://www.oenb.at/en/daten-und-forschung/publikationen/publikationsreihen/policy-brief/2026/policy-brief-2026-11.html) read this partly as a relative-price adjustment. Before the pandemic, services prices rose faster than goods prices along a stable trend, which reflects slower productivity growth in services, income-elastic demand for them and their lower tradability. The surge in goods prices in 2021 and 2022 pushed the price of services relative to goods below that trend, and part of what looks like persistent services inflation is the relative price working its way back.
 
 How fast that happens, and whether it happens through higher services inflation or lower goods inflation, is the question of the policy brief's Annex A. It answers it with a small error correction model of services and non-energy industrial goods (NEIG) prices, and finds that half of a gap closes after about three and a half years, mostly through services. With overall goods prices instead of NEIG the gap closes within about five quarters, and mostly through goods.
 
@@ -261,7 +261,7 @@ Half of the gap is closed between quarters `r hl_goods - 1` and `r hl_goods`, wh
 
 ## References
 
-Hochmuth, P., & Petz, N. (2026). On the persistence of services inflation and the price of services relative to goods. *OeNB Policy Brief* 2026/11. Oesterreichische Nationalbank.
+Hochmuth, P., & Petz, N. (2026). On the persistence of services inflation and the price of services relative to goods. *OeNB Policy Brief* 2026/11. Oesterreichische Nationalbank. <https://www.oenb.at/en/daten-und-forschung/publikationen/publikationsreihen/policy-brief/2026/policy-brief-2026-11.html>
 
 Engle, R. F., & Granger, C. W. J. (1987). Co-integration and error correction: Representation, estimation, and testing. *Econometrica, 55*(2), 251--276. <https://doi.org/10.2307/1913236>
 
