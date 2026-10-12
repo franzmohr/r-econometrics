@@ -672,6 +672,8 @@ plot_closure(closure_goods, label = "Goods", colour = colours[["amber"]])
 
 Half of the gap is closed between quarters `r half_life[["goods"]] - 1` and `r half_life[["goods"]]`, which the paper reports as about five quarters. Here, unlike in the benchmark, both components close the gap, and goods inflation does more of it: at quarter `r half_life[["goods"]]` services contribute `r goods_at_half[["services"]]` and goods `r goods_at_half[["other"]]` percentage points, against roughly 15 and 38 in the paper. The goods loading is positive, and its 95% credible interval excludes zero: when services are cheap relative to goods, goods inflation falls. The faster adjustment reflects the energy and food prices in the goods index, which move much more than NEIG prices and return quickly after a shock.
 
+The post [How Long Will Services Inflation in Austria Stay High?](/2026/10/12/how-long-will-services-inflation-in-austria-stay-high/) applies the same model to Austria.
+
 ## Deviations from the paper
 
 * **Data before 2000.** The current vintage of `prc_hicp_minr` starts in December 1999 for the euro area, so the first four years are back-cast from the ECB's ECOICOP version 1 indices, and the NEIG index for 1997 to 2000 from its annual rates.

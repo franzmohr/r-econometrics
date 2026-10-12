@@ -1,0 +1,961 @@
+---
+title: "How Long Will Services Inflation in Austria Stay High?"
+author: "Franz X. Mohr"
+date: '2026-10-12'
+description: "Hochmuth and Petz (2026) explain persistent services inflation in the euro area with services prices catching up with goods. This post applies their error correction model to Austria, where the catch-up is already over, and takes a closer look at the role of gastronomy."
+tags:
+  - r
+  - bvartools
+  - vecm
+  - error-correction
+  - inflation
+  - relative-prices
+  - hicp
+  - austria
+---
+
+
+
+<p>Services inflation in Austria has been stubborn. Energy and food prices have long stopped rising at the pace of 2022, but services, which make up half of the Austrian consumer basket, are still getting more expensive by more than 4% a year. <a href="https://www.oenb.at/en/daten-und-forschung/publikationen/publikationsreihen/policy-brief/2026/policy-brief-2026-11.html">Hochmuth and Petz (2026)</a> offer an explanation for the euro area: before the pandemic, services became steadily more expensive relative to goods, the surge of goods prices in 2021 and 2022 pushed this relative price far below its trend, and part of today’s services inflation is services prices catching up. Their error correction model says how fast that happens.</p>
+<p>This post applies their model to Austria. The <a href="/reproduction/2026_hochmuth_petz_services">reproduction of the paper</a> covers the euro area in detail, and its results serve as the benchmark here. The short answer is that the explanation does not carry over: in Austria the relative price of services has already returned to its trend and gone beyond it. A closer look shows that most of this is due to one item that weighs much more in Austria than elsewhere: restaurants and cafés.</p>
+<!--more-->
+<div id="the-idea-in-one-equation" class="section level2">
+<h2>The idea in one equation</h2>
+<p>Let <span class="math inline">\(s_t\)</span> and <span class="math inline">\(n_t\)</span> be 100 times the log price indices of services and of non-energy industrial goods (NEIG), the goods part of core inflation. The relative price of services <span class="math inline">\(s_t - n_t\)</span> is assumed to follow a linear trend, from which it deviates only temporarily:</p>
+<p><span class="math display">\[s_t - n_t = \mu + \delta t + z_t.\]</span></p>
+<p>The deviation <span class="math inline">\(z_t\)</span> is the <em>relative-price gap</em>. It is estimated as the residual of an OLS regression on a trend, and enters a Bayesian VECM as error correction term:</p>
+<p><span class="math display">\[\Delta y_t = \kappa + \alpha \hat{z}_{t-1} + \Gamma \Delta y_{t-1} + \varepsilon_t, \quad \Delta y_t = (\Delta s_t, \Delta n_t)&#39;.\]</span></p>
+<p>The loadings <span class="math inline">\(\alpha = (\alpha_s, \alpha_n)&#39;\)</span> are the interesting part. A negative <span class="math inline">\(\alpha_s\)</span> means that services inflation picks up when services are cheap relative to their trend, a positive <span class="math inline">\(\alpha_n\)</span> that goods inflation slows. Both close the gap. The priors are those of the paper: standard normal on <span class="math inline">\(\kappa\)</span>, <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\Gamma\)</span>, and <span class="math inline">\(\Sigma \sim IW(4, 0.01 I)\)</span>.</p>
+</div>
+<div id="austrian-prices" class="section level2">
+<h2>Austrian prices</h2>
+<p>The data are the monthly HICP indices for Austria from Eurostat data set <code>prc_hicp_minr</code>, from January 1996 to June 2026, the same sample as the paper’s. As for the euro area, the current ECOICOP version 2 vintage has services, NEIG and overall goods only from December 1999. Before that, they are back-cast with the growth rates of the ECOICOP version 1 indices of the ECB Data Portal, which for Austria are complete from 1996. The overall index, energy, food and core inflation, and the annual item weights are downloaded as well, because they are needed for the composition of inflation below:</p>
+<pre class="r"><code>library(&quot;bvartools&quot;)
+library(&quot;dplyr&quot;)
+library(&quot;ggplot2&quot;)
+library(&quot;knitr&quot;)
+library(&quot;magrittr&quot;)
+library(&quot;seasonal&quot;)
+library(&quot;tibble&quot;)
+library(&quot;tidyr&quot;)</code></pre>
+<pre class="r"><code>library(&quot;ecb&quot;)
+library(&quot;eurostat&quot;)
+
+# Eurostat, ECOICOP ver. 2: index levels, 2025 = 100
+index_filters &lt;- list(geo = &quot;AT&quot;,
+                      unit = &quot;I25&quot;,
+                      coicop18 = c(&quot;TOTAL&quot;, &quot;TOT_X_NRG_FOOD&quot;, &quot;NRG&quot;, &quot;FOOD&quot;,
+                                   &quot;IGD_NNRG&quot;, &quot;SERV&quot;, &quot;GD&quot;))
+
+hicp_new &lt;- get_eurostat(&quot;prc_hicp_minr&quot;,
+                         time_format = &quot;raw&quot;,
+                         cache = FALSE,
+                         filters = index_filters) %&gt;%
+  transmute(month = as.character(time),
+            series = coicop18,
+            index = values) %&gt;%
+  filter(month &lt;= &quot;2026-06&quot;)
+
+# ECB, ECOICOP ver. 1: services, NEIG and goods, 1996-2001
+hicp_old &lt;- get_data(&quot;ICP.M.AT.N.SERV00+IGXE00+GOODS0.4.INX&quot;,
+                     filter = list(startPeriod = &quot;1996-01&quot;,
+                                   endPeriod = &quot;2001-12&quot;)) %&gt;%
+  transmute(month = obstime,
+            series = recode_values(icp_item,
+                                   &quot;SERV00&quot; ~ &quot;SERV&quot;,
+                                   &quot;IGXE00&quot; ~ &quot;IGD_NNRG&quot;,
+                                   &quot;GOODS0&quot; ~ &quot;GD&quot;),
+            old = obsvalue)
+
+# Back-cast each Eurostat series with the growth of its ECB counterpart
+hicp &lt;- hicp_new %&gt;%
+  left_join(hicp_old, by = c(&quot;month&quot;, &quot;series&quot;)) %&gt;%
+  arrange(series, month) %&gt;%
+  group_by(series) %&gt;%
+  mutate(first_month = min(month[!is.na(index)]),
+         first_index = index[month == first_month],
+         first_old = old[month == first_month],
+         index = coalesce(index, first_index * old / first_old)) %&gt;%
+  ungroup()
+
+hicp %&gt;%
+  pivot_wider(id_cols = month,
+              names_from = series,
+              values_from = index) %&gt;%
+  select(month, TOTAL, TOT_X_NRG_FOOD, NRG, FOOD, IGD_NNRG, SERV, GD) %&gt;%
+  arrange(month) %&gt;%
+  write.csv(&quot;_2026-10-12-services-inflation-in-austria-hicp.csv&quot;,
+            row.names = FALSE)
+
+# Eurostat, item weights in per mille of the total
+weight_filters &lt;- list(geo = &quot;AT&quot;,
+                       coicop18 = c(&quot;NRG&quot;, &quot;FOOD&quot;, &quot;IGD_NNRG&quot;, &quot;SERV&quot;))
+
+get_eurostat(&quot;prc_hicp_iw&quot;,
+             time_format = &quot;raw&quot;,
+             cache = FALSE,
+             filters = weight_filters) %&gt;%
+  transmute(year = as.integer(as.character(time)),
+            series = coicop18,
+            weight = values) %&gt;%
+  filter(year &gt;= 2016, year &lt;= 2026) %&gt;%
+  pivot_wider(names_from = series, values_from = weight) %&gt;%
+  select(year, NRG, FOOD, IGD_NNRG, SERV) %&gt;%
+  arrange(year) %&gt;%
+  write.csv(&quot;_2026-10-12-services-inflation-in-austria-weights.csv&quot;,
+            row.names = FALSE)</code></pre>
+<p>Both files are stored next to this post, so that it does not change with the next vintage:</p>
+<pre class="r"><code>hicp &lt;- read.csv(&quot;_2026-10-12-services-inflation-in-austria-hicp.csv&quot;)
+weights &lt;- read.csv(&quot;_2026-10-12-services-inflation-in-austria-weights.csv&quot;)</code></pre>
+</div>
+<div id="what-drives-austrian-inflation" class="section level2">
+<h2>What drives Austrian inflation?</h2>
+<p>Eurostat publishes the contributions of the main components to annual inflation only for the euro area, so they have to be calculated for Austria. The HICP is a chain-linked index: within a year, it is a weighted average of its components relative to their level in the previous December, with that year’s weights. The annual rate in a month therefore spans two links, from the same month a year earlier to December and from December to the current month, which carry different weights. Splitting both links into the components and adding them up gives the contribution of component <span class="math inline">\(i\)</span> in month <span class="math inline">\(t\)</span> of year <span class="math inline">\(y\)</span> (Ribe, 1999):</p>
+<p><span class="math display">\[c_{i,t} = \frac{100}{P_{t-12}} \left[ w_{i,y} P_{D(y-1)} \left( \frac{P^i_t}{P^i_{D(y-1)}} - 1 \right) + w_{i,y-1} P_{D(y-2)} \frac{P^i_{D(y-1)} - P^i_{t-12}}{P^i_{D(y-2)}} \right],\]</span></p>
+<p>where <span class="math inline">\(P\)</span> is the overall index, <span class="math inline">\(P^i\)</span> the index of component <span class="math inline">\(i\)</span>, <span class="math inline">\(w_{i,y}\)</span> its weight in year <span class="math inline">\(y\)</span> as a share of the total and <span class="math inline">\(D(y)\)</span> December of year <span class="math inline">\(y\)</span>. The four components – energy, food including alcohol and tobacco, NEIG and services – make up the whole basket, so their contributions add up to headline inflation. Applied to the euro area indices, the formula matches the contributions that Eurostat publishes to within 0.01 percentage points.</p>
+<p>The formula is needed again further below, so it goes into a function. It works on the months of one component in order, where <code>weight</code> is the share of the component in the aggregate in the year of each month:</p>
+<pre class="r"><code>contribution &lt;- function(month, index, total, weight) {
+  year &lt;- as.integer(substr(month, 1, 4))
+  december_1 &lt;- match(paste0(year - 1, &quot;-12&quot;), month)
+  december_2 &lt;- match(paste0(year - 2, &quot;-12&quot;), month)
+
+  100 / lag(total, 12) *
+    (weight * total[december_1] * (index / index[december_1] - 1) +
+       lag(weight, 12) * total[december_2] *
+         (index[december_1] - lag(index, 12)) / index[december_2])
+}</code></pre>
+<pre class="r"><code>components &lt;- c(&quot;SERV&quot;, &quot;IGD_NNRG&quot;, &quot;FOOD&quot;, &quot;NRG&quot;)
+
+weights_long &lt;- weights %&gt;%
+  pivot_longer(-year, names_to = &quot;series&quot;, values_to = &quot;weight&quot;) %&gt;%
+  mutate(weight = weight / 1000)
+
+contributions &lt;- hicp %&gt;%
+  pivot_longer(all_of(components), names_to = &quot;series&quot;, values_to = &quot;index&quot;) %&gt;%
+  mutate(year = as.integer(substr(month, 1, 4))) %&gt;%
+  left_join(weights_long, by = c(&quot;year&quot;, &quot;series&quot;)) %&gt;%
+  arrange(series, month) %&gt;%
+  group_by(series) %&gt;%
+  mutate(value = contribution(month, index, TOTAL, weight)) %&gt;%
+  ungroup() %&gt;%
+  filter(month &gt;= &quot;2018-01&quot;) %&gt;%
+  select(month, series, value) %&gt;%
+  pivot_wider(names_from = series, values_from = value)
+
+# Annual rates of headline and core inflation
+rates &lt;- hicp %&gt;%
+  arrange(month) %&gt;%
+  transmute(month,
+            TOTAL = 100 * (TOTAL / lag(TOTAL, 12) - 1),
+            TOT_X_NRG_FOOD = 100 * (TOT_X_NRG_FOOD / lag(TOT_X_NRG_FOOD, 12) - 1))
+
+contributions &lt;- contributions %&gt;%
+  left_join(rates, by = &quot;month&quot;) %&gt;%
+  mutate(date = as.Date(paste0(month, &quot;-01&quot;)))</code></pre>
+<p>The charts use the colours of the euro area reproduction, with services always in blue:</p>
+<pre class="r"><code>colours &lt;- c(red = &quot;#C10016&quot;,
+             blue = &quot;#0F4C81&quot;,
+             amber = &quot;#E8A33D&quot;,
+             teal = &quot;#17807A&quot;,
+             ink = &quot;#22282E&quot;)
+
+component_colours &lt;- c(NRG = colours[[&quot;red&quot;]],
+                       FOOD = colours[[&quot;amber&quot;]],
+                       IGD_NNRG = colours[[&quot;teal&quot;]],
+                       SERV = colours[[&quot;blue&quot;]])
+
+component_labels &lt;- c(NRG = &quot;Energy&quot;,
+                      FOOD = &quot;Food including alcohol and tobacco&quot;,
+                      IGD_NNRG = &quot;Non-energy industrial goods&quot;,
+                      SERV = &quot;Services&quot;)</code></pre>
+<p><code>geom_col</code> stacks positive contributions upwards from zero and negative ones downwards. The first level of a factor ends up at the top of a stack, so services, which are listed last, form its base:</p>
+<pre class="r"><code>bars &lt;- contributions %&gt;%
+  pivot_longer(all_of(components),
+               names_to = &quot;component&quot;,
+               values_to = &quot;value&quot;) %&gt;%
+  mutate(component = factor(component, levels = names(component_colours)))
+
+inflation &lt;- contributions %&gt;%
+  pivot_longer(c(TOTAL, TOT_X_NRG_FOOD),
+               names_to = &quot;rate&quot;,
+               values_to = &quot;value&quot;)
+
+ggplot(bars, aes(x = date, y = value)) +
+  geom_col(aes(fill = component), width = 25) +
+  geom_line(data = inflation, aes(linetype = rate), linewidth = 0.7,
+            colour = colours[[&quot;ink&quot;]]) +
+  geom_hline(yintercept = 0) +
+  scale_fill_manual(values = component_colours, labels = component_labels) +
+  scale_linetype_manual(values = c(TOTAL = &quot;solid&quot;, TOT_X_NRG_FOOD = &quot;dashed&quot;),
+                        labels = c(TOTAL = &quot;HICP inflation&quot;,
+                                   TOT_X_NRG_FOOD = &quot;Core inflation&quot;)) +
+  guides(fill = guide_legend(ncol = 2, order = 1),
+         linetype = guide_legend(ncol = 1)) +
+  labs(x = NULL,
+       y = &quot;Contribution to HICP inflation in %&quot;,
+       fill = NULL,
+       linetype = NULL,
+       title = &quot;HICP components (Austria)&quot;) +
+  theme_bw() +
+  theme(legend.position = &quot;bottom&quot;)</code></pre>
+<p><img src="/post/2026-10-12-services-inflation-in-austria_files/figure-html/chart-contributions-1.png" alt="" width="672" /></p>
+<p>Headline inflation peaked at 11.6% in January 2023, higher and later than in the euro area. The contribution of services peaked at 3.7 percentage points in April 2023 and has barely come down since. In June 2026, with services prices 4.7% higher than a year earlier, services accounted for 2.3 of 3.2 points of headline inflation.</p>
+</div>
+<div id="services-fell-behind-goods-and-caught-up" class="section level2">
+<h2>Services fell behind goods, and caught up</h2>
+<p>Chart 2 of the brief shows the price of services relative to goods as a four-quarter moving average with a log-linear trend fitted over 1996 to 2019 and extrapolated from there. The same chart for Austria, with the euro area series of the reproduction for comparison, uses quarterly averages of the unadjusted indices. The following function turns the monthly indices into quarterly averages, unadjusted for the chart and seasonally adjusted for the model below:</p>
+<pre class="r"><code>prepare_prices &lt;- function(hicp) {
+
+  monthly &lt;- hicp %&gt;%
+    select(month, SERV, IGD_NNRG, GD) %&gt;%
+    pivot_longer(-month, names_to = &quot;series&quot;, values_to = &quot;index&quot;) %&gt;%
+    arrange(series, month) %&gt;%
+
+    # X-13ARIMA-SEATS with the defaults of seasonal, series by series
+    group_by(series) %&gt;%
+    mutate(index_sa = ts(index, start = c(1996, 1), frequency = 12) %&gt;%
+             seas() %&gt;%
+             final() %&gt;%
+             as.numeric()) %&gt;%
+    ungroup()
+
+  # Quarterly averages, dated by the start of the quarter: 1996.25 is 1996 Q2
+  quarterly &lt;- monthly %&gt;%
+    mutate(year = as.integer(substr(month, 1, 4)),
+           month_of_year = as.integer(substr(month, 6, 7)),
+           quarter = year + (month_of_year - 1) %/% 3 / 4) %&gt;%
+    group_by(series, quarter) %&gt;%
+    summarise(index = mean(index),
+              index_sa = mean(index_sa),
+              .groups = &quot;drop&quot;)
+
+  return(quarterly)
+}
+
+prices &lt;- bind_rows(
+  AT = prepare_prices(hicp),
+  EA = prepare_prices(read.csv(&quot;../reproduction/_2026_hochmuth_petz_hicp.csv&quot;)),
+  .id = &quot;geo&quot;)</code></pre>
+<pre><code>## Model used in SEATS is different: (0 2 1)(0 1 1)</code></pre>
+<pre><code>## Model used in SEATS is different: (2 2 2)(0 1 1)</code></pre>
+<pre class="r"><code>relative_prices &lt;- prices %&gt;%
+  select(geo, series, quarter, index) %&gt;%
+  pivot_wider(names_from = series, values_from = index) %&gt;%
+  pivot_longer(c(IGD_NNRG, GD),
+               names_to = &quot;goods&quot;,
+               values_to = &quot;goods_index&quot;) %&gt;%
+  arrange(geo, goods, quarter) %&gt;%
+  group_by(geo, goods) %&gt;%
+
+  # Four-quarter moving average, indexed to Q1 2000 = 100
+  mutate(ratio = SERV / goods_index,
+         price = (ratio + lag(ratio) + lag(ratio, 2) + lag(ratio, 3)) / 4,
+         price = 100 * price / price[quarter == 2000]) %&gt;%
+
+  # Log-linear trend fitted over 1996-2019, extrapolated from there
+  mutate(trend = exp(predict(lm(log(price) ~ quarter, subset = quarter &lt; 2020),
+                             newdata = data.frame(quarter = quarter))),
+         growth = 100 * coef(lm(log(price) ~ quarter,
+                                subset = quarter &lt; 2020))[[&quot;quarter&quot;]]) %&gt;%
+  ungroup()</code></pre>
+<pre class="r"><code>goods_labels &lt;- c(IGD_NNRG = &quot;Services relative to NEIG&quot;,
+                  GD = &quot;Services relative to overall goods&quot;)
+
+relative_prices %&gt;%
+  mutate(goods = factor(goods_labels[goods], levels = goods_labels)) %&gt;%
+  pivot_longer(c(price, trend), names_to = &quot;line&quot;, values_to = &quot;value&quot;) %&gt;%
+  ggplot(aes(x = quarter, y = value, colour = geo, linetype = line)) +
+  geom_hline(yintercept = 100) +
+  geom_line(linewidth = 0.8, na.rm = TRUE) +
+  facet_wrap(~ goods, ncol = 1, scales = &quot;free_y&quot;) +
+  scale_colour_manual(values = c(AT = colours[[&quot;red&quot;]],
+                                 EA = colours[[&quot;blue&quot;]]),
+                      labels = c(AT = &quot;Austria&quot;, EA = &quot;Euro area&quot;)) +
+  scale_linetype_manual(values = c(price = &quot;solid&quot;, trend = &quot;dashed&quot;),
+                        labels = c(price = &quot;Relative price&quot;,
+                                   trend = &quot;Trend 1996-2019&quot;)) +
+  labs(x = NULL,
+       y = &quot;Relative price (Q1 2000 = 100)&quot;,
+       colour = NULL,
+       linetype = NULL) +
+  theme_bw() +
+  theme(legend.position = &quot;bottom&quot;)</code></pre>
+<p><img src="/post/2026-10-12-services-inflation-in-austria_files/figure-html/chart-relative-price-1.png" alt="" width="672" /></p>
+<p>Before the pandemic, services in Austria became 1.5% a year more expensive relative to NEIG, against 1.3% in the euro area, and 0.7% relative to overall goods, against 0.3%. Up to 2021 the Austrian relative prices followed their trends closely, and in 2022 and 2023 they fell below them much like those of the euro area. The difference is what happened next. In the euro area the relative price of services is still 3.2% below its extrapolated trend against NEIG and 5% below it against overall goods in the second quarter of 2026. In Austria, services prices rose so much faster than goods prices from 2023 onwards that the relative price crossed its trend in 2025, and it is now 2.5% above it against NEIG and 1.3% above it against overall goods.</p>
+</div>
+<div id="estimation" class="section level2">
+<h2>Estimation</h2>
+<p>Even though the catch-up seems to be over, the model is worth estimating, because it says how strongly Austrian prices respond to a gap at all. The estimation follows the reproduction. A function runs both stages for a country and either goods index: an OLS regression of the relative price on a trend over the whole sample, whose lagged residual enters <code>create_bvarmodel</code> as exogenous variable without further lags, <code>s = 0</code>. <code>add_priors</code> sets the paper’s priors, and the sampler is run for 5,000 burn-in draws, after which 20,000 are kept. The euro area is estimated again alongside Austria with the same code.</p>
+<pre class="r"><code>estimate_gap_model &lt;- function(prices, other) {
+
+  # Log prices of services (s) and of the other index (n), times 100
+  y &lt;- prices %&gt;%
+    filter(series %in% c(&quot;SERV&quot;, other)) %&gt;%
+    transmute(quarter,
+              series = if_else(series == &quot;SERV&quot;, &quot;s&quot;, &quot;n&quot;),
+              value = 100 * log(index_sa)) %&gt;%
+    pivot_wider(names_from = series, values_from = value) %&gt;%
+    arrange(quarter) %&gt;%
+    mutate(trend = row_number())
+
+  # Stage 1: the relative-price gap is the residual of a linear trend
+  stage_1 &lt;- lm(s - n ~ trend, data = y)
+  gap &lt;- residuals(stage_1)
+
+  # Stage 2: a VAR(1) in differences, with the lagged gap as exogenous
+  # regressor
+  dy &lt;- ts(diff(as.matrix(y[, c(&quot;s&quot;, &quot;n&quot;)])),
+           start = y[[&quot;quarter&quot;]][2],
+           frequency = 4)
+
+  ect &lt;- ts(matrix(head(gap, -1), dimnames = list(NULL, &quot;ect&quot;)),
+            start = y[[&quot;quarter&quot;]][2],
+            frequency = 4)
+
+  model &lt;- create_bvarmodel(dy,
+                            p = 1,
+                            exogen = ect,
+                            s = 0,
+                            deterministic = &quot;const&quot;,
+                            iterations = 20000,
+                            burnin = 5000)
+
+  model &lt;- add_priors(model,
+                      coef = list(v_i = 1, v_i_det = 1),
+                      sigma = list(df = 4, scale = 0.01))
+
+  model &lt;- add_initial_values(model, method = &quot;ols&quot;)
+
+  return(add_posterior_coefficients(model))
+}
+
+set.seed(20261012)
+
+models &lt;- list(AT_neig = estimate_gap_model(filter(prices, geo == &quot;AT&quot;),
+                                            &quot;IGD_NNRG&quot;),
+               AT_goods = estimate_gap_model(filter(prices, geo == &quot;AT&quot;), &quot;GD&quot;),
+               EA_neig = estimate_gap_model(filter(prices, geo == &quot;EA&quot;),
+                                            &quot;IGD_NNRG&quot;),
+               EA_goods = estimate_gap_model(filter(prices, geo == &quot;EA&quot;), &quot;GD&quot;))</code></pre>
+<pre class="r"><code>summary(models[[&quot;AT_neig&quot;]])</code></pre>
+<pre><code>## 
+## Bayesian VAR model with p = 1 and s = 0 
+## 
+## Endogenous variables: s, n
+## 
+## Variable: s 
+## 
+##            Mean       SD  Naive SD Time-series SD     2.5%      50%    97.5%  
+## s.l1    0.77390 0.046440 3.284e-04      3.361e-04  0.68312  0.77345 0.865221 *
+## n.l1    0.15321 0.038039 2.690e-04      2.690e-04  0.07937  0.15316 0.228735 *
+## ect.l0 -0.01257 0.009643 6.819e-05      6.819e-05 -0.03152 -0.01249 0.006261  
+## const   0.11912 0.031244 2.209e-04      2.248e-04  0.05766  0.11932 0.180314 *
+## 
+## Variable: n 
+## 
+##            Mean      SD  Naive SD Time-series SD     2.5%      50%   97.5%  
+## s.l1   0.090338 0.09729 0.0006879      0.0006838 -0.09955 0.089699 0.28131  
+## n.l1   0.691794 0.07960 0.0005629      0.0005629  0.53448 0.692319 0.84477 *
+## ect.l0 0.005535 0.02001 0.0001415      0.0001403 -0.03325 0.005614 0.04523  
+## const  0.026143 0.06568 0.0004644      0.0004660 -0.10246 0.026455 0.15464  
+## 
+## Variance-covariance matrix:
+## 
+##         Mean       SD  Naive SD Time-series SD      2.5%      50%   97.5%  
+## s_s 0.020179 0.002668 1.886e-05      1.958e-05 0.0156518 0.019946 0.02611 *
+## s_n 0.008273 0.003993 2.823e-05      2.906e-05 0.0007924 0.008144 0.01652 *
+## n_n 0.087522 0.011710 8.280e-05      8.639e-05 0.0674776 0.086407 0.11319 *</code></pre>
+<p>The trend of the first stage is fitted over the whole sample including the recent years, so its gap differs from the one in the charts above, but it tells the same story. Against NEIG, the Austrian gap reached -4.5% in 2022 Q4 and is 3.9% in the second quarter of 2026, while the euro area gap went from -4.4% to 0.4%. Against overall goods, the Austrian gap is 1.9% and the euro area’s -1.4%.</p>
+<p>The loadings of the four models, with 95% credible intervals:</p>
+<pre class="r"><code>loadings %&gt;%
+  kable(digits = 3,
+        row.names = FALSE,
+        col.names = c(&quot;Model&quot;, &quot;Loading&quot;, &quot;Median&quot;, &quot;2.5%&quot;, &quot;97.5%&quot;))</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Model</th>
+<th align="left">Loading</th>
+<th align="right">Median</th>
+<th align="right">2.5%</th>
+<th align="right">97.5%</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">AT_neig</td>
+<td align="left">alpha_s</td>
+<td align="right">-0.012</td>
+<td align="right">-0.032</td>
+<td align="right">0.006</td>
+</tr>
+<tr class="even">
+<td align="left">AT_neig</td>
+<td align="left">alpha_n</td>
+<td align="right">0.006</td>
+<td align="right">-0.033</td>
+<td align="right">0.045</td>
+</tr>
+<tr class="odd">
+<td align="left">AT_goods</td>
+<td align="left">alpha_s</td>
+<td align="right">-0.004</td>
+<td align="right">-0.016</td>
+<td align="right">0.007</td>
+</tr>
+<tr class="even">
+<td align="left">AT_goods</td>
+<td align="left">alpha_n</td>
+<td align="right">0.054</td>
+<td align="right">0.001</td>
+<td align="right">0.106</td>
+</tr>
+<tr class="odd">
+<td align="left">EA_neig</td>
+<td align="left">alpha_s</td>
+<td align="right">-0.033</td>
+<td align="right">-0.054</td>
+<td align="right">-0.012</td>
+</tr>
+<tr class="even">
+<td align="left">EA_neig</td>
+<td align="left">alpha_n</td>
+<td align="right">-0.010</td>
+<td align="right">-0.038</td>
+<td align="right">0.017</td>
+</tr>
+<tr class="odd">
+<td align="left">EA_goods</td>
+<td align="left">alpha_s</td>
+<td align="right">-0.030</td>
+<td align="right">-0.045</td>
+<td align="right">-0.015</td>
+</tr>
+<tr class="even">
+<td align="left">EA_goods</td>
+<td align="left">alpha_n</td>
+<td align="right">0.057</td>
+<td align="right">0.010</td>
+<td align="right">0.105</td>
+</tr>
+</tbody>
+</table>
+<p>In the euro area, services inflation responds clearly to a gap: <span class="math inline">\(\alpha_s\)</span> is -0.033 with NEIG and -0.030 with overall goods, and both intervals exclude zero. In Austria the services loading is -0.012 with NEIG and -0.004 with goods, much smaller, and neither interval excludes zero. The direct response of Austrian services prices to where they stand relative to goods is weak. Goods prices respond in both places in the same way: with overall goods, <span class="math inline">\(\alpha_n\)</span> is 0.054 in Austria and 0.057 in the euro area, so when services are cheap relative to goods, goods inflation slows.</p>
+</div>
+<div id="how-fast-does-the-gap-close" class="section level2">
+<h2>How fast does the gap close?</h2>
+<p>The paper simulates the model in deviations from a baseline without a gap. From an initial gap <span class="math inline">\(z_0 = -1\)</span>, services about 1% cheaper relative to goods than their trend implies, and <span class="math inline">\(\Delta y_0 = 0\)</span>, the system evolves as</p>
+<p><span class="math display">\[\Delta y_h = \alpha z_{h-1} + \Gamma \Delta y_{h-1}, \quad z_h = z_{h-1} + \Delta s_h - \Delta n_h,\]</span></p>
+<p>and the cumulative contributions of services and goods inflation to closing it, in percent of the initial gap, are <span class="math inline">\(C_{s,h} = 100 \sum_{j \le h} \Delta s_j\)</span> and <span class="math inline">\(C_{n,h} = -100 \sum_{j \le h} \Delta n_j\)</span>. The recursion is run for every posterior draw at once:</p>
+<pre class="r"><code>gap_closure &lt;- function(model, horizon = 40) {
+
+  # Equation i&#39;s coefficient on regressor j is in column (j - 1) k + i. The
+  # regressors are the lags of s and n, the error correction term and the
+  # constant
+  draws &lt;- as.matrix(model[[&quot;posterior&quot;]][[&quot;a&quot;]][[&quot;coeffs&quot;]])
+  k &lt;- model[[&quot;model&quot;]][[&quot;k&quot;]]
+
+  gamma_ss &lt;- draws[, 1]
+  gamma_ns &lt;- draws[, 2]
+  gamma_sn &lt;- draws[, k + 1]
+  gamma_nn &lt;- draws[, k + 2]
+  alpha_s &lt;- draws[, 2 * k + 1]
+  alpha_n &lt;- draws[, 2 * k + 2]
+
+  # Start from z_0 = -1 and dy_0 = 0
+  n_draws &lt;- nrow(draws)
+  z &lt;- rep(-1, n_draws)
+  ds &lt;- rep(0, n_draws)
+  dn &lt;- rep(0, n_draws)
+  services &lt;- rep(0, n_draws)
+  other &lt;- rep(0, n_draws)
+
+  paths &lt;- vector(&quot;list&quot;, horizon)
+
+  for (h in seq_len(horizon)) {
+
+    ds_new &lt;- alpha_s * z + gamma_ss * ds + gamma_sn * dn
+    dn_new &lt;- alpha_n * z + gamma_ns * ds + gamma_nn * dn
+
+    ds &lt;- ds_new
+    dn &lt;- dn_new
+    z &lt;- z + ds - dn
+
+    # Cumulative contributions, in % of the initial gap
+    services &lt;- services + 100 * ds
+    other &lt;- other - 100 * dn
+
+    paths[[h]] &lt;- data.frame(h = h,
+                             remaining = -100 * z,
+                             services = services,
+                             other = other)
+  }
+
+  closure &lt;- bind_rows(paths) %&gt;%
+    group_by(h) %&gt;%
+    summarise(lower = quantile(remaining, 0.16),
+              upper = quantile(remaining, 0.84),
+              remaining = median(remaining),
+              services = median(services),
+              other = median(other))
+
+  start &lt;- data.frame(h = 0,
+                      lower = 100,
+                      upper = 100,
+                      remaining = 100,
+                      services = 0,
+                      other = 0)
+
+  return(bind_rows(start, closure))
+}
+
+closure &lt;- lapply(models, gap_closure) %&gt;%
+  bind_rows(.id = &quot;model&quot;)</code></pre>
+<p>The chart shows the median of the remaining gap in Austria with its 68% credible interval, and the median contributions as bars that start at 100: bars pointing down close the gap, bars pointing up widen it. Where both contributions close the gap, they are stacked. The median remaining gap in the euro area is drawn for comparison.</p>
+<pre class="r"><code>closure &lt;- closure %&gt;%
+  separate(model, c(&quot;region&quot;, &quot;goods&quot;), remove = FALSE) %&gt;%
+  mutate(goods = factor(goods, levels = c(&quot;neig&quot;, &quot;goods&quot;),
+                        labels = c(&quot;Relative to NEIG&quot;,
+                                   &quot;Relative to overall goods&quot;)))
+
+# Bars start at 100. Contributions with the same sign are stacked, opposite
+# ones both start at 100
+closure_bars &lt;- closure %&gt;%
+  filter(region == &quot;AT&quot;) %&gt;%
+  mutate(services_end = 100 - services,
+         other_start = if_else(sign(other) == sign(services),
+                               services_end,
+                               100),
+         other_end = other_start - other)
+
+closure_bars &lt;- bind_rows(
+  transmute(closure_bars, h, goods, component = &quot;Services&quot;,
+            ymin = 100, ymax = services_end),
+  transmute(closure_bars, h, goods,
+            component = if_else(goods == &quot;Relative to NEIG&quot;, &quot;NEIG&quot;, &quot;Goods&quot;),
+            ymin = other_start, ymax = other_end)) %&gt;%
+  mutate(component = factor(component, levels = c(&quot;Services&quot;, &quot;NEIG&quot;, &quot;Goods&quot;)))
+
+ggplot(closure, aes(x = h)) +
+  geom_rect(data = closure_bars,
+            aes(xmin = h - 0.35, xmax = h + 0.35,
+                ymin = pmin(ymin, ymax), ymax = pmax(ymin, ymax),
+                fill = component),
+            alpha = 0.45) +
+  geom_ribbon(data = filter(closure, region == &quot;AT&quot;),
+              aes(ymin = lower, ymax = upper),
+              fill = colours[[&quot;ink&quot;]],
+              alpha = 0.2) +
+  geom_hline(yintercept = c(0, 100)) +
+  geom_line(aes(y = remaining, colour = region, linetype = region),
+            linewidth = 0.9) +
+  facet_wrap(~ goods, ncol = 1) +
+  scale_fill_manual(values = c(Services = colours[[&quot;blue&quot;]],
+                               NEIG = colours[[&quot;teal&quot;]],
+                               Goods = colours[[&quot;amber&quot;]])) +
+  scale_colour_manual(values = c(AT = colours[[&quot;red&quot;]],
+                                 EA = colours[[&quot;ink&quot;]]),
+                      labels = c(AT = &quot;Remaining gap, Austria&quot;,
+                                 EA = &quot;Remaining gap, euro area&quot;)) +
+  scale_linetype_manual(values = c(AT = &quot;solid&quot;, EA = &quot;dashed&quot;),
+                        labels = c(AT = &quot;Remaining gap, Austria&quot;,
+                                   EA = &quot;Remaining gap, euro area&quot;)) +
+  labs(x = &quot;Quarters after the initial gap&quot;,
+       y = &quot;% of initial gap&quot;,
+       fill = NULL,
+       colour = NULL,
+       linetype = NULL,
+       title = &quot;What closes the gap? (Austria)&quot;) +
+  theme_bw() +
+  theme(legend.position = &quot;bottom&quot;)</code></pre>
+<p><img src="/post/2026-10-12-services-inflation-in-austria_files/figure-html/chart-closure-1.png" alt="" width="672" /></p>
+<pre class="r"><code>closure %&gt;%
+  filter(h %in% c(4, 8, 12, 20, 40)) %&gt;%
+  select(region, goods, h, remaining, services, other) %&gt;%
+  arrange(goods, region, h) %&gt;%
+  kable(digits = 0,
+        row.names = FALSE,
+        col.names = c(&quot;Region&quot;, &quot;Goods index&quot;, &quot;Quarter&quot;, &quot;Remaining gap&quot;,
+                      &quot;Services&quot;, &quot;Goods&quot;))</code></pre>
+<table>
+<colgroup>
+<col width="10%" />
+<col width="37%" />
+<col width="11%" />
+<col width="20%" />
+<col width="12%" />
+<col width="8%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Region</th>
+<th align="left">Goods index</th>
+<th align="right">Quarter</th>
+<th align="right">Remaining gap</th>
+<th align="right">Services</th>
+<th align="right">Goods</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">AT</td>
+<td align="left">Relative to NEIG</td>
+<td align="right">4</td>
+<td align="right">88</td>
+<td align="right">9</td>
+<td align="right">3</td>
+</tr>
+<tr class="even">
+<td align="left">AT</td>
+<td align="left">Relative to NEIG</td>
+<td align="right">8</td>
+<td align="right">71</td>
+<td align="right">23</td>
+<td align="right">6</td>
+</tr>
+<tr class="odd">
+<td align="left">AT</td>
+<td align="left">Relative to NEIG</td>
+<td align="right">12</td>
+<td align="right">55</td>
+<td align="right">37</td>
+<td align="right">7</td>
+</tr>
+<tr class="even">
+<td align="left">AT</td>
+<td align="left">Relative to NEIG</td>
+<td align="right">20</td>
+<td align="right">32</td>
+<td align="right">58</td>
+<td align="right">7</td>
+</tr>
+<tr class="odd">
+<td align="left">AT</td>
+<td align="left">Relative to NEIG</td>
+<td align="right">40</td>
+<td align="right">7</td>
+<td align="right">82</td>
+<td align="right">5</td>
+</tr>
+<tr class="even">
+<td align="left">EA</td>
+<td align="left">Relative to NEIG</td>
+<td align="right">4</td>
+<td align="right">86</td>
+<td align="right">21</td>
+<td align="right">-7</td>
+</tr>
+<tr class="odd">
+<td align="left">EA</td>
+<td align="left">Relative to NEIG</td>
+<td align="right">8</td>
+<td align="right">71</td>
+<td align="right">46</td>
+<td align="right">-17</td>
+</tr>
+<tr class="even">
+<td align="left">EA</td>
+<td align="left">Relative to NEIG</td>
+<td align="right">12</td>
+<td align="right">57</td>
+<td align="right">68</td>
+<td align="right">-26</td>
+</tr>
+<tr class="odd">
+<td align="left">EA</td>
+<td align="left">Relative to NEIG</td>
+<td align="right">20</td>
+<td align="right">38</td>
+<td align="right">101</td>
+<td align="right">-40</td>
+</tr>
+<tr class="even">
+<td align="left">EA</td>
+<td align="left">Relative to NEIG</td>
+<td align="right">40</td>
+<td align="right">13</td>
+<td align="right">142</td>
+<td align="right">-57</td>
+</tr>
+<tr class="odd">
+<td align="left">AT</td>
+<td align="left">Relative to overall goods</td>
+<td align="right">4</td>
+<td align="right">67</td>
+<td align="right">0</td>
+<td align="right">33</td>
+</tr>
+<tr class="even">
+<td align="left">AT</td>
+<td align="left">Relative to overall goods</td>
+<td align="right">8</td>
+<td align="right">37</td>
+<td align="right">-7</td>
+<td align="right">69</td>
+</tr>
+<tr class="odd">
+<td align="left">AT</td>
+<td align="left">Relative to overall goods</td>
+<td align="right">12</td>
+<td align="right">21</td>
+<td align="right">-17</td>
+<td align="right">95</td>
+</tr>
+<tr class="even">
+<td align="left">AT</td>
+<td align="left">Relative to overall goods</td>
+<td align="right">20</td>
+<td align="right">8</td>
+<td align="right">-32</td>
+<td align="right">121</td>
+</tr>
+<tr class="odd">
+<td align="left">AT</td>
+<td align="left">Relative to overall goods</td>
+<td align="right">40</td>
+<td align="right">1</td>
+<td align="right">-47</td>
+<td align="right">143</td>
+</tr>
+<tr class="even">
+<td align="left">EA</td>
+<td align="left">Relative to overall goods</td>
+<td align="right">4</td>
+<td align="right">54</td>
+<td align="right">14</td>
+<td align="right">32</td>
+</tr>
+<tr class="odd">
+<td align="left">EA</td>
+<td align="left">Relative to overall goods</td>
+<td align="right">8</td>
+<td align="right">18</td>
+<td align="right">21</td>
+<td align="right">61</td>
+</tr>
+<tr class="even">
+<td align="left">EA</td>
+<td align="left">Relative to overall goods</td>
+<td align="right">12</td>
+<td align="right">3</td>
+<td align="right">23</td>
+<td align="right">74</td>
+</tr>
+<tr class="odd">
+<td align="left">EA</td>
+<td align="left">Relative to overall goods</td>
+<td align="right">20</td>
+<td align="right">-1</td>
+<td align="right">22</td>
+<td align="right">80</td>
+</tr>
+<tr class="even">
+<td align="left">EA</td>
+<td align="left">Relative to overall goods</td>
+<td align="right">40</td>
+<td align="right">0</td>
+<td align="right">21</td>
+<td align="right">79</td>
+</tr>
+</tbody>
+</table>
+<p>Relative to NEIG, the gap closes about as fast in Austria as in the euro area: half of it is gone after 14 quarters, against 15. In both, services inflation does most of the work, but in different ways. In the euro area it responds strongly and has to make up for NEIG inflation, which works against the adjustment. In Austria the response of services inflation is weak but persistent – the coefficient of its own lag is above 0.7 – so it builds up over many quarters, and NEIG inflation does not work against it. Relative to overall goods, the Austrian gap is closed by goods inflation alone, while services inflation even works against it. Half of the gap is gone after 7 quarters, against 5 in the euro area.</p>
+</div>
+<div id="a-closer-look-at-gastronomy" class="section level2">
+<h2>A closer look at gastronomy</h2>
+<p>Austria is a tourism country, and it shows in its consumer basket. The HICP measures the spending of all households on the domestic territory, including that of foreign tourists, so restaurants, cafés and hotels weigh much more than in most other member states. Eurostat publishes indices and weights for food and beverage serving services, here called gastronomy, and accommodation services from 1996, and weights for services as a whole from 2000:</p>
+<pre class="r"><code># Eurostat, ECOICOP ver. 2: services, gastronomy, accommodation and NEIG
+gastronomy_filters &lt;- list(geo = c(&quot;AT&quot;, &quot;EA&quot;),
+                           unit = &quot;I25&quot;,
+                           coicop18 = c(&quot;SERV&quot;, &quot;CP111&quot;, &quot;CP112&quot;, &quot;IGD_NNRG&quot;))
+
+get_eurostat(&quot;prc_hicp_minr&quot;,
+             time_format = &quot;raw&quot;,
+             cache = FALSE,
+             filters = gastronomy_filters) %&gt;%
+  transmute(geo,
+            month = as.character(time),
+            series = coicop18,
+            index = values) %&gt;%
+  filter(month &gt;= &quot;2000-12&quot;, month &lt;= &quot;2026-06&quot;) %&gt;%
+  pivot_wider(names_from = series, values_from = index) %&gt;%
+  select(geo, month, SERV, CP111, CP112, IGD_NNRG) %&gt;%
+  arrange(geo, month) %&gt;%
+  write.csv(&quot;_2026-10-12-services-inflation-in-austria-gastronomy.csv&quot;,
+            row.names = FALSE)
+
+# Item weights in per mille of the total, available for services from 2000
+gastronomy_weight_filters &lt;- list(geo = c(&quot;AT&quot;, &quot;EA&quot;),
+                                  coicop18 = c(&quot;SERV&quot;, &quot;CP111&quot;, &quot;CP112&quot;))
+
+get_eurostat(&quot;prc_hicp_iw&quot;,
+             time_format = &quot;raw&quot;,
+             cache = FALSE,
+             filters = gastronomy_weight_filters) %&gt;%
+  transmute(geo,
+            year = as.integer(as.character(time)),
+            series = coicop18,
+            weight = values) %&gt;%
+  filter(year &gt;= 2001, year &lt;= 2026) %&gt;%
+  pivot_wider(names_from = series, values_from = weight) %&gt;%
+  select(geo, year, SERV, CP111, CP112) %&gt;%
+  arrange(geo, year) %&gt;%
+  write.csv(&quot;_2026-10-12-services-inflation-in-austria-gastronomy-weights.csv&quot;,
+            row.names = FALSE)</code></pre>
+<pre class="r"><code>gastronomy &lt;- read.csv(&quot;_2026-10-12-services-inflation-in-austria-gastronomy.csv&quot;)
+gastronomy_weights &lt;- read.csv(
+  &quot;_2026-10-12-services-inflation-in-austria-gastronomy-weights.csv&quot;)
+
+# Weights as shares of services
+shares &lt;- gastronomy_weights %&gt;%
+  transmute(geo, year, CP111 = CP111 / SERV, CP112 = CP112 / SERV)</code></pre>
+<p>In 2026, gastronomy makes up 22% of the services in the Austrian basket and accommodation 10%, against 20% and 5% in the euro area. Together, they are about a third of Austrian services and a quarter of those of the euro area.</p>
+<div id="contributions-to-services-inflation" class="section level3">
+<h3>Contributions to services inflation</h3>
+<p>The contributions of the two items to services inflation follow from the same formula as above, with services as the aggregate and the weights as shares of services. Since the contributions of all services add up to services inflation, the remainder is the contribution of all other services:</p>
+<pre class="r"><code>services_contributions &lt;- gastronomy %&gt;%
+  pivot_longer(c(CP111, CP112), names_to = &quot;series&quot;, values_to = &quot;index&quot;) %&gt;%
+  mutate(year = as.integer(substr(month, 1, 4))) %&gt;%
+  left_join(pivot_longer(shares, c(CP111, CP112),
+                         names_to = &quot;series&quot;, values_to = &quot;weight&quot;),
+            by = c(&quot;geo&quot;, &quot;year&quot;, &quot;series&quot;)) %&gt;%
+  arrange(geo, series, month) %&gt;%
+  group_by(geo, series) %&gt;%
+  mutate(value = contribution(month, index, SERV, weight),
+         rate = 100 * (SERV / lag(SERV, 12) - 1)) %&gt;%
+  ungroup() %&gt;%
+  filter(month &gt;= &quot;2018-01&quot;) %&gt;%
+  select(geo, month, series, value, rate) %&gt;%
+  pivot_wider(names_from = series, values_from = value) %&gt;%
+  mutate(OTHER = rate - CP111 - CP112,
+         date = as.Date(paste0(month, &quot;-01&quot;)))</code></pre>
+<pre class="r"><code>services_colours &lt;- c(CP111 = colours[[&quot;amber&quot;]],
+                      CP112 = colours[[&quot;teal&quot;]],
+                      OTHER = colours[[&quot;blue&quot;]])
+
+services_labels &lt;- c(CP111 = &quot;Gastronomy&quot;,
+                     CP112 = &quot;Accommodation&quot;,
+                     OTHER = &quot;Other services&quot;)
+
+services_contributions %&gt;%
+  pivot_longer(c(CP111, CP112, OTHER),
+               names_to = &quot;component&quot;,
+               values_to = &quot;value&quot;) %&gt;%
+  mutate(component = factor(component, levels = names(services_colours)),
+         geo = factor(geo, levels = c(&quot;AT&quot;, &quot;EA&quot;),
+                      labels = c(&quot;Austria&quot;, &quot;Euro area&quot;))) %&gt;%
+  ggplot(aes(x = date, y = value)) +
+  geom_col(aes(fill = component), width = 25) +
+  geom_line(aes(y = rate, linetype = &quot;Services inflation&quot;),
+            linewidth = 0.7,
+            colour = colours[[&quot;ink&quot;]]) +
+  geom_hline(yintercept = 0) +
+  facet_wrap(~ geo, ncol = 1) +
+  scale_fill_manual(values = services_colours, labels = services_labels) +
+  labs(x = NULL,
+       y = &quot;Contribution to services inflation in %&quot;,
+       fill = NULL,
+       linetype = NULL,
+       title = &quot;Services inflation and its components&quot;) +
+  theme_bw() +
+  theme(legend.position = &quot;bottom&quot;)</code></pre>
+<p><img src="/post/2026-10-12-services-inflation-in-austria_files/figure-html/chart-services-contributions-1.png" alt="" width="672" /></p>
+<p>Gastronomy prices in Austria have risen by 52% since December 2019, against 31% in the euro area, while services as a whole became 34% and 24% more expensive. At its peak in April 2023, gastronomy alone contributed 3.1 of 8.5 percentage points of Austrian services inflation. In June 2026 it still contributes 1.1 of 4.7 points, against 0.7 of 3.2 in the euro area. Of the difference of 1.5 points between Austrian and euro area services inflation, gastronomy accounts for 0.4. The rest comes from other services, which are rising faster in Austria as well.</p>
+</div>
+<div id="services-excluding-gastronomy" class="section level3">
+<h3>Services excluding gastronomy</h3>
+<p>Does gastronomy also explain why the relative price of services in Austria is above its trend? To find out, the price of services is split into gastronomy and the rest. Eurostat does not publish an index of services excluding gastronomy, but it can be derived from the chain-linking: within a year, the services index relative to December is the weighted average of its components relative to December, so the same holds for services without gastronomy with weights rescaled to add up to one,</p>
+<p><span class="math display">\[\frac{P^{x}_t}{P^{x}_{D(y-1)}} = \frac{1}{1 - s_y} \left( \frac{P^s_t}{P^s_{D(y-1)}} - s_y \frac{P^g_t}{P^g_{D(y-1)}} \right),\]</span></p>
+<p>where <span class="math inline">\(s_y\)</span> is the share of gastronomy in services in year <span class="math inline">\(y\)</span>. Chaining these links from December 2000, the first December for which the weights of both are available, gives the index:</p>
+<pre class="r"><code>chain_excluding &lt;- function(month, total, index, share) {
+  year &lt;- as.integer(substr(month, 1, 4))
+  december &lt;- match(paste0(year - 1, &quot;-12&quot;), month)
+  link &lt;- (total / total[december] - share * index / index[december]) /
+    (1 - share)
+
+  # The first month is a December, from which the links are chained
+  result &lt;- rep(100, length(month))
+  for (t in seq_along(month)[-1]) {
+    result[t] &lt;- result[december[t]] * link[t]
+  }
+
+  return(result)
+}
+
+gastronomy &lt;- gastronomy %&gt;%
+  mutate(year = as.integer(substr(month, 1, 4))) %&gt;%
+  left_join(select(shares, geo, year, share = CP111), by = c(&quot;geo&quot;, &quot;year&quot;)) %&gt;%
+  arrange(geo, month) %&gt;%
+  group_by(geo) %&gt;%
+  mutate(SERV_X_CP111 = chain_excluding(month, SERV, CP111, share)) %&gt;%
+  ungroup()</code></pre>
+<p>The chart compares the price of the three relative to NEIG, as four-quarter moving averages of quarterly averages, indexed to 2019 = 100, with a log-linear trend fitted over 2001 to 2019:</p>
+<pre class="r"><code>series_labels &lt;- c(SERV = &quot;Services&quot;,
+                   SERV_X_CP111 = &quot;Services excluding gastronomy&quot;,
+                   CP111 = &quot;Gastronomy&quot;)
+
+gastronomy_prices &lt;- gastronomy %&gt;%
+  filter(month &gt;= &quot;2001-01&quot;) %&gt;%
+  mutate(quarter = year + (as.integer(substr(month, 6, 7)) - 1) %/% 3 / 4) %&gt;%
+  group_by(geo, quarter) %&gt;%
+  summarise(across(c(SERV, SERV_X_CP111, CP111, IGD_NNRG), mean),
+            .groups = &quot;drop&quot;) %&gt;%
+  pivot_longer(c(SERV, SERV_X_CP111, CP111),
+               names_to = &quot;series&quot;,
+               values_to = &quot;index&quot;) %&gt;%
+  arrange(geo, series, quarter) %&gt;%
+  group_by(geo, series) %&gt;%
+
+  # Four-quarter moving average, indexed to 2019 = 100
+  mutate(ratio = index / IGD_NNRG,
+         price = (ratio + lag(ratio) + lag(ratio, 2) + lag(ratio, 3)) / 4,
+         price = 100 * price / mean(price[floor(quarter) == 2019])) %&gt;%
+
+  # Log-linear trend fitted over 2001-2019, extrapolated from there
+  mutate(trend = exp(predict(lm(log(price) ~ quarter, subset = quarter &lt; 2020),
+                             newdata = data.frame(quarter = quarter))),
+         growth = 100 * coef(lm(log(price) ~ quarter,
+                                subset = quarter &lt; 2020))[[&quot;quarter&quot;]]) %&gt;%
+  ungroup() %&gt;%
+  mutate(series = factor(series_labels[series], levels = series_labels))</code></pre>
+<pre class="r"><code>gastronomy_prices %&gt;%
+  pivot_longer(c(price, trend), names_to = &quot;line&quot;, values_to = &quot;value&quot;) %&gt;%
+  ggplot(aes(x = quarter, y = value, colour = geo, linetype = line)) +
+  geom_hline(yintercept = 100) +
+  geom_line(linewidth = 0.8, na.rm = TRUE) +
+  facet_wrap(~ series, ncol = 1, scales = &quot;free_y&quot;) +
+  scale_colour_manual(values = c(AT = colours[[&quot;red&quot;]],
+                                 EA = colours[[&quot;blue&quot;]]),
+                      labels = c(AT = &quot;Austria&quot;, EA = &quot;Euro area&quot;)) +
+  scale_linetype_manual(values = c(price = &quot;solid&quot;, trend = &quot;dashed&quot;),
+                        labels = c(price = &quot;Relative price&quot;,
+                                   trend = &quot;Trend 2001-2019&quot;)) +
+  labs(x = NULL,
+       y = &quot;Price relative to NEIG (2019 = 100)&quot;,
+       colour = NULL,
+       linetype = NULL) +
+  theme_bw() +
+  theme(legend.position = &quot;bottom&quot;)</code></pre>
+<p><img src="/post/2026-10-12-services-inflation-in-austria_files/figure-html/chart-gastronomy-relative-price-1.png" alt="" width="672" /></p>
+<p>Gastronomy has been getting more expensive relative to NEIG for a long time, by 1.9% a year in Austria before the pandemic, against 1.6% in the euro area. Since 2022 the Austrian relative price has moved far away from that trend, and in the second quarter of 2026 it is 14.6% above it, while that of the euro area is within 1.7% of its trend. Without gastronomy, Austrian services are only 1% above their trend relative to NEIG, against 4% with it, and those of the euro area 3.1% below theirs. The figure for all services differs from the one in the first chart, because the trend is fitted from 2001 rather than 1996.</p>
+<p>Gastronomy therefore explains most of the overshoot of the Austrian relative price. It does not explain why services inflation is still high, though: without gastronomy, Austrian services prices are 4.6% higher than a year earlier, almost as much as with it, and well above the 3.1% of the euro area.</p>
+</div>
+</div>
+<div id="what-it-means" class="section level2">
+<h2>What it means</h2>
+<p>Hochmuth and Petz argue that services inflation in the euro area stays high partly because the price of services has to catch up with that of goods after the shock of 2021 and 2022. For Austria, the data tell a different story:</p>
+<ul>
+<li><strong>The catch-up is over.</strong> The relative price of services fell below its trend in Austria about as much as in the euro area, but it has since climbed back above it, against NEIG and against overall goods. Whatever keeps Austrian services inflation above 4% today, it is not a gap that still has to be closed.</li>
+<li><strong>Gastronomy is behind the overshoot, but not behind today’s inflation.</strong> Restaurants and cafés weigh much more in Austria than in the euro area, their prices have risen by half since 2019 and they are far above their long-run trend relative to goods. Without them, the relative price of Austrian services is close to its trend. Today’s services inflation, however, is broad: services excluding gastronomy rise almost as fast.</li>
+<li><strong>If anything, the gap now argues for lower services inflation.</strong> The model is symmetric: with services above their trend relative to goods, it expects services inflation to slow and goods inflation to pick up. The direct response of Austrian services prices is weak and uncertain, though, so this pull is slow, and relative to overall goods it was goods prices that did the adjusting in the past.</li>
+<li><strong>Other explanations are needed.</strong> Candidates specific to Austria are wage settlements that take the inflation of the past year as their starting point, which pass the energy shock on to labour-intensive services such as gastronomy with a delay, strong demand from tourism, and the indexation of rents and many administered prices to past inflation. Testing them is beyond the scope of a model with two prices.</li>
+</ul>
+<p>There are also reasons for caution. A straight line fitted to thirty years of data is sensitive to its end points, and the finding that Austria is above its trend depends on the trend not having steepened. And the gap is the residual of a first stage whose uncertainty is not carried over to the second, a simplification of the paper that this post keeps.</p>
+</div>
+<div id="references" class="section level2">
+<h2>References</h2>
+<p>Engle, R. F., &amp; Granger, C. W. J. (1987). Co-integration and error correction: Representation, estimation, and testing. <em>Econometrica, 55</em>(2), 251–276. <a href="https://doi.org/10.2307/1913236" class="uri">https://doi.org/10.2307/1913236</a></p>
+<p>Hochmuth, P., &amp; Petz, N. (2026). On the persistence of services inflation and the price of services relative to goods. <em>OeNB Policy Brief</em> 2026/11. Oesterreichische Nationalbank. <a href="https://www.oenb.at/en/daten-und-forschung/publikationen/publikationsreihen/policy-brief/2026/policy-brief-2026-11.html" class="uri">https://www.oenb.at/en/daten-und-forschung/publikationen/publikationsreihen/policy-brief/2026/policy-brief-2026-11.html</a></p>
+<p>Ribe, M. (1999). Effects of subcomponents on chained price indices like the HICPs and the MUICP. Statistics Sweden.</p>
+<p>Sax, C., &amp; Eddelbuettel, D. (2018). Seasonal adjustment by X-13ARIMA-SEATS in R. <em>Journal of Statistical Software, 87</em>(11), 1–17. <a href="https://doi.org/10.18637/jss.v087.i11" class="uri">https://doi.org/10.18637/jss.v087.i11</a></p>
+</div>
