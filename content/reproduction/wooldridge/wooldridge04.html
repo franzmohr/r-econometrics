@@ -11,12 +11,12 @@ date: "2018-02-04"
 
 setwd(&quot;C:/path/to/the/working/directory&quot;)
 
-library(wooldridge)</code></pre>
-<pre class="r"><code>data(wage1)
+library(&quot;wooldridge&quot;)</code></pre>
+<pre class="r"><code>data(&quot;wage1&quot;)
 
-lm.1 &lt;- lm(lwage ~ educ + exper + tenure, data = wage1)
-s.1 &lt;- summary(lm.1)
-s.1</code></pre>
+model_1 &lt;- lm(lwage ~ educ + exper + tenure, data = wage1)
+summary_1 &lt;- summary(model_1)
+summary_1</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = lwage ~ educ + exper + tenure, data = wage1)
@@ -35,30 +35,29 @@ s.1</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.4409 on 522 degrees of freedom
-## Multiple R-squared:  0.316,  Adjusted R-squared:  0.3121 
+## Multiple R-squared:  0.316,	Adjusted R-squared:  0.3121 
 ## F-statistic: 80.39 on 3 and 522 DF,  p-value: &lt; 2.2e-16</code></pre>
-<p>In order to be able to use the values of the coefficients for further calculations, you can use copy and paste with the numbers provided in the summary <code>s.1</code>. Alternatively, and for the sake of more precision, you can access the coefficients directly. If you use the <code>names</code> function and run <code>names(s.1)</code>, you will notice a subdirectory called <em>coefficients</em>, which contains the coefficients, standard errors, t-statistics and p-values of the regression. Entering <code>s.1$coefficients</code> or <code>coefficients(s.1)</code> gives those values for all coefficients, but you can also extract them separately using the <code>[row, column]</code> signs, where the first value defines the row index and the second the column index. If no value is specified for a row or column, R will use all available values. This happens in the third line of the following code, where the t-values are calculated from the betas and their respective standard errors. The forth line of the code specifies a certain row which means that the t-value is calculated only for the parameter listed third in the coefficient list.</p>
-<pre class="r"><code>names(s.1)</code></pre>
-<pre><code>##  [1] &quot;call&quot;          &quot;terms&quot;         &quot;residuals&quot;     &quot;coefficients&quot; 
-##  [5] &quot;aliased&quot;       &quot;sigma&quot;         &quot;df&quot;            &quot;r.squared&quot;    
-##  [9] &quot;adj.r.squared&quot; &quot;fstatistic&quot;    &quot;cov.unscaled&quot;</code></pre>
-<pre class="r"><code>s.1$coefficients</code></pre>
+<p>In order to be able to use the values of the coefficients for further calculations, you can use copy and paste with the numbers provided in the summary <code>summary_1</code>. Alternatively, and for the sake of more precision, you can access the coefficients directly. If you use the <code>names</code> function and run <code>names(summary_1)</code>, you will notice a subdirectory called <em>coefficients</em>, which contains the coefficients, standard errors, t-statistics and p-values of the regression. Entering <code>summary_1[["coefficients"]]</code> or <code>coefficients(summary_1)</code> gives those values for all coefficients, but you can also extract them separately using the <code>[row, column]</code> signs, where the first value defines the row index and the second the column index. If no value is specified for a row or column, R will use all available values. This happens in the third line of the following code, where the t-values are calculated from the betas and their respective standard errors. The forth line of the code specifies a certain row which means that the t-value is calculated only for the parameter listed third in the coefficient list.</p>
+<pre class="r"><code>names(summary_1)</code></pre>
+<pre><code>##  [1] &quot;call&quot;          &quot;terms&quot;         &quot;residuals&quot;     &quot;coefficients&quot;  &quot;aliased&quot;       &quot;sigma&quot;        
+##  [7] &quot;df&quot;            &quot;r.squared&quot;     &quot;adj.r.squared&quot; &quot;fstatistic&quot;    &quot;cov.unscaled&quot;</code></pre>
+<pre class="r"><code>summary_1[[&quot;coefficients&quot;]]</code></pre>
 <pre><code>##                Estimate  Std. Error   t value     Pr(&gt;|t|)
 ## (Intercept) 0.284359541 0.104190379  2.729230 6.562466e-03
 ## educ        0.092028988 0.007329923 12.555246 8.824197e-32
 ## exper       0.004121109 0.001723277  2.391437 1.713562e-02
 ## tenure      0.022067218 0.003093649  7.133070 3.294407e-12</code></pre>
-<pre class="r"><code>s.1$coefficient[, 1] / s.1$coefficient[, 2]</code></pre>
+<pre class="r"><code>summary_1[[&quot;coefficients&quot;]][, 1] / summary_1[[&quot;coefficients&quot;]][, 2]</code></pre>
 <pre><code>## (Intercept)        educ       exper      tenure 
 ##    2.729230   12.555246    2.391437    7.133070</code></pre>
-<pre class="r"><code>s.1$coefficient[3, 1] / s.1$coefficient[3, 2]</code></pre>
+<pre class="r"><code>summary_1[[&quot;coefficients&quot;]][3, 1] / summary_1[[&quot;coefficients&quot;]][3, 2]</code></pre>
 <pre><code>## [1] 2.391437</code></pre>
 <p>The following code illustrates the differences in statistical significance that can result from the use of log-values.</p>
 <p><strong>Example 4.2</strong></p>
 <pre class="r"><code>data(&quot;meap93&quot;)
 
-lm.1 &lt;- lm(math10 ~ totcomp + staff + enroll, data = meap93)
-summary(lm.1)</code></pre>
+model_1 &lt;- lm(math10 ~ totcomp + staff + enroll, data = meap93)
+summary(model_1)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = math10 ~ totcomp + staff + enroll, data = meap93)
@@ -77,10 +76,10 @@ summary(lm.1)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 10.24 on 404 degrees of freedom
-## Multiple R-squared:  0.05406,    Adjusted R-squared:  0.04704 
+## Multiple R-squared:  0.05406,	Adjusted R-squared:  0.04704 
 ## F-statistic: 7.697 on 3 and 404 DF,  p-value: 5.179e-05</code></pre>
-<pre class="r"><code>lm.2 &lt;- lm(math10 ~ ltotcomp + lstaff + lenroll, data = meap93)
-summary(lm.2)</code></pre>
+<pre class="r"><code>model_2 &lt;- lm(math10 ~ ltotcomp + lstaff + lenroll, data = meap93)
+summary(model_2)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = math10 ~ ltotcomp + lstaff + lenroll, data = meap93)
@@ -99,13 +98,13 @@ summary(lm.2)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 10.18 on 404 degrees of freedom
-## Multiple R-squared:  0.06538,    Adjusted R-squared:  0.05844 
+## Multiple R-squared:  0.06538,	Adjusted R-squared:  0.05844 
 ## F-statistic:  9.42 on 3 and 404 DF,  p-value: 4.974e-06</code></pre>
 <p><strong>Example 4.3</strong></p>
 <pre class="r"><code>data(&quot;gpa1&quot;)
 
-lm.1 &lt;- lm(colGPA ~ hsGPA + ACT + skipped, data = gpa1)
-summary(lm.1)</code></pre>
+model_1 &lt;- lm(colGPA ~ hsGPA + ACT + skipped, data = gpa1)
+summary(model_1)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = colGPA ~ hsGPA + ACT + skipped, data = gpa1)
@@ -124,15 +123,15 @@ summary(lm.1)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.3295 on 137 degrees of freedom
-## Multiple R-squared:  0.2336, Adjusted R-squared:  0.2168 
+## Multiple R-squared:  0.2336,	Adjusted R-squared:  0.2168 
 ## F-statistic: 13.92 on 3 and 137 DF,  p-value: 5.653e-08</code></pre>
 <p>The next examples illustrate how the t-statistic is calculated in R if you want to know whether a coefficient is different from a value other than zero. This works by obtaining the coefficients from the regression summary, subtracting the value against which it should be tested and diving the result by the standard error.</p>
 <p><strong>Example 4.4</strong></p>
 <pre class="r"><code>data(&quot;campus&quot;)
 
-lm.1 &lt;- lm(lcrime ~ lenroll, data = campus)
-s.1 &lt;- summary(lm.1)
-s.1</code></pre>
+model_1 &lt;- lm(lcrime ~ lenroll, data = campus)
+summary_1 &lt;- summary(model_1)
+summary_1</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = lcrime ~ lenroll, data = campus)
@@ -149,21 +148,21 @@ s.1</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.8946 on 95 degrees of freedom
-## Multiple R-squared:  0.5848, Adjusted R-squared:  0.5804 
+## Multiple R-squared:  0.5848,	Adjusted R-squared:  0.5804 
 ## F-statistic: 133.8 on 1 and 95 DF,  p-value: &lt; 2.2e-16</code></pre>
-<pre class="r"><code>(s.1$coefficients[2,1] - 1) / s.1$coefficients[2,2]</code></pre>
+<pre class="r"><code>(summary_1[[&quot;coefficients&quot;]][2, 1] - 1) / summary_1[[&quot;coefficients&quot;]][2, 2]</code></pre>
 <pre><code>## [1] 2.45737</code></pre>
 <p><strong>Example 4.5</strong></p>
 <pre class="r"><code>data(&quot;hprice2&quot;)
 
 names(hprice2)</code></pre>
-<pre><code>##  [1] &quot;price&quot;    &quot;crime&quot;    &quot;nox&quot;      &quot;rooms&quot;    &quot;dist&quot;     &quot;radial&quot;  
-##  [7] &quot;proptax&quot;  &quot;stratio&quot;  &quot;lowstat&quot;  &quot;lprice&quot;   &quot;lnox&quot;     &quot;lproptax&quot;</code></pre>
-<pre class="r"><code>ldist &lt;- log(hprice2$dist)
+<pre><code>##  [1] &quot;price&quot;    &quot;crime&quot;    &quot;nox&quot;      &quot;rooms&quot;    &quot;dist&quot;     &quot;radial&quot;   &quot;proptax&quot;  &quot;stratio&quot; 
+##  [9] &quot;lowstat&quot;  &quot;lprice&quot;   &quot;lnox&quot;     &quot;lproptax&quot;</code></pre>
+<pre class="r"><code>ldist &lt;- log(hprice2[[&quot;dist&quot;]])
 
-lm.1 &lt;- lm(lprice ~ lnox + ldist + rooms + stratio, data = hprice2)
-s.1 &lt;- summary(lm.1)
-s.1</code></pre>
+model_1 &lt;- lm(lprice ~ lnox + ldist + rooms + stratio, data = hprice2)
+summary_1 &lt;- summary(model_1)
+summary_1</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = lprice ~ lnox + ldist + rooms + stratio, data = hprice2)
@@ -183,15 +182,15 @@ s.1</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.265 on 501 degrees of freedom
-## Multiple R-squared:  0.584,  Adjusted R-squared:  0.5807 
+## Multiple R-squared:  0.584,	Adjusted R-squared:  0.5807 
 ## F-statistic: 175.9 on 4 and 501 DF,  p-value: &lt; 2.2e-16</code></pre>
-<pre class="r"><code>(s.1$coefficients[2, 1] + 1) / s.1$coefficients[2, 2]</code></pre>
+<pre class="r"><code>(summary_1[[&quot;coefficients&quot;]][2, 1] + 1) / summary_1[[&quot;coefficients&quot;]][2, 2]</code></pre>
 <pre><code>## [1] 0.3979827</code></pre>
 <p><strong>Example 4.6</strong></p>
 <pre class="r"><code>data(&quot;k401k&quot;)
 
-lm.1 &lt;- lm(prate ~ mrate + age + totemp, data = k401k)
-summary(lm.1)</code></pre>
+model_1 &lt;- lm(prate ~ mrate + age + totemp, data = k401k)
+summary(model_1)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = prate ~ mrate + age + totemp, data = k401k)
@@ -210,18 +209,19 @@ summary(lm.1)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 15.88 on 1530 degrees of freedom
-## Multiple R-squared:  0.09954,    Adjusted R-squared:  0.09778 
+## Multiple R-squared:  0.09954,	Adjusted R-squared:  0.09778 
 ## F-statistic: 56.38 on 3 and 1530 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>The following code limits the used data to those observations, where the year is 1987 and the value for union is zero. The specification of <code>data =</code> tells R to take only those observations into consideration which meet these conditions. You could read this command in a way that R takes data from <code>jtrain</code>, where in each row - note that the second part of the <code>[,]</code> sign is empty! - the conditions x and y have to hold.</p>
 <p><strong>Example 4.7</strong></p>
 <pre class="r"><code>data(&quot;jtrain&quot;)
 
-lm.1 &lt;- lm(lscrap ~ hrsemp + lsales + lemploy, data = jtrain[jtrain$year==1987 &amp; jtrain$union==0,])
-summary(lm.1)</code></pre>
+jtrain_1987 &lt;- jtrain[jtrain[[&quot;year&quot;]] == 1987 &amp; jtrain[[&quot;union&quot;]] == 0, ]
+
+model_1 &lt;- lm(lscrap ~ hrsemp + lsales + lemploy, data = jtrain_1987)
+summary(model_1)</code></pre>
 <pre><code>## 
 ## Call:
-## lm(formula = lscrap ~ hrsemp + lsales + lemploy, data = jtrain[jtrain$year == 
-##     1987 &amp; jtrain$union == 0, ])
+## lm(formula = lscrap ~ hrsemp + lsales + lemploy, data = jtrain_1987)
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
@@ -238,14 +238,14 @@ summary(lm.1)</code></pre>
 ## 
 ## Residual standard error: 1.376 on 25 degrees of freedom
 ##   (97 observations deleted due to missingness)
-## Multiple R-squared:  0.2624, Adjusted R-squared:  0.1739 
+## Multiple R-squared:  0.2624,	Adjusted R-squared:  0.1739 
 ## F-statistic: 2.965 on 3 and 25 DF,  p-value: 0.05134</code></pre>
-<p>The next example shows how you can calculate confidence intervals from estimation results. For this purpose you can use the <code>confint</code> function which needs the stored regression results (here <code>lm.1</code>) and the level of confidence specified by the argument <code>level = something</code>.</p>
+<p>The next example shows how you can calculate confidence intervals from estimation results. For this purpose you can use the <code>confint</code> function which needs the stored regression results (here <code>model_1</code>) and the level of confidence specified by the argument <code>level = something</code>.</p>
 <p><strong>Example 4.8</strong></p>
 <pre class="r"><code>data(&quot;rdchem&quot;)
 
-lm.1 &lt;- lm(lrd ~ lsales + profmarg, data = rdchem)
-summary(lm.1)</code></pre>
+model_1 &lt;- lm(lrd ~ lsales + profmarg, data = rdchem)
+summary(model_1)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = lrd ~ lsales + profmarg, data = rdchem)
@@ -263,16 +263,16 @@ summary(lm.1)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.5136 on 29 degrees of freedom
-## Multiple R-squared:  0.918,  Adjusted R-squared:  0.9123 
+## Multiple R-squared:  0.918,	Adjusted R-squared:  0.9123 
 ## F-statistic: 162.2 on 2 and 29 DF,  p-value: &lt; 2.2e-16</code></pre>
 <pre class="r"><code># 10% confidence
-confint(lm.1, level = .90)</code></pre>
+confint(model_1, level = .90)</code></pre>
 <pre><code>##                       5 %      95 %
 ## (Intercept) -5.173496e+00 -3.583051
 ## lsales       9.819409e-01  1.186499
 ## profmarg    -6.362296e-05  0.043375</code></pre>
 <pre class="r"><code># 5% confidence
-confint(lm.1, level = .95)</code></pre>
+confint(model_1, level = .95)</code></pre>
 <pre><code>##                    2.5 %      97.5 %
 ## (Intercept) -5.335478679 -3.42106808
 ## lsales       0.961107260  1.20733251
@@ -280,24 +280,26 @@ confint(lm.1, level = .95)</code></pre>
 <p><strong>Equations 4.21 &amp; 4.27</strong></p>
 <pre class="r"><code>data(&quot;twoyear&quot;)
 
-lm.1 &lt;- lm(lwage ~ jc + univ + exper, data = twoyear)
-s.1 &lt;- summary(lm.1)
+model_1 &lt;- lm(lwage ~ jc + univ + exper, data = twoyear)
+summary_1 &lt;- summary(model_1)
 
-lm.2 &lt;- lm(lwage ~ jc + totcoll + exper, data = twoyear)
-s.2 &lt;- summary(lm.2)
+model_2 &lt;- lm(lwage ~ jc + totcoll + exper, data = twoyear)
+summary_2 &lt;- summary(model_2)
 
-(s.1$coefficient[2, 1] - s.1$coefficient[3, 1]) / s.2$coefficient[2, 2]</code></pre>
+(summary_1[[&quot;coefficients&quot;]][2, 1] - summary_1[[&quot;coefficients&quot;]][3, 1]) /
+  summary_2[[&quot;coefficients&quot;]][2, 2]</code></pre>
 <pre><code>## [1] -1.467657</code></pre>
 <p>Next, we want to calculate the F-test to evaluate the joint significance of independent variables. For this purpose you have to exert the regression of the restricted and the unrestricted model and store the results. Then, use the <code>anova</code> function. Specify which two regressions have to be used and let R do the rest.</p>
 <p><strong>Equations 4.31 &amp; 4.33</strong></p>
 <pre class="r"><code>data(&quot;mlb1&quot;)
 
 # unrestricted model
-lm.1 &lt;- lm(lsalary ~ years + gamesyr + bavg + hrunsyr + rbisyr, data = mlb1)
+model_1 &lt;- lm(lsalary ~ years + gamesyr + bavg + hrunsyr + rbisyr,
+              data = mlb1)
 # restricted model
-lm.2 &lt;- lm(lsalary ~ years + gamesyr, data = mlb1)
+model_2 &lt;- lm(lsalary ~ years + gamesyr, data = mlb1)
 # f-test
-anova(lm.1, lm.2)</code></pre>
+anova(model_1, model_2)</code></pre>
 <pre><code>## Analysis of Variance Table
 ## 
 ## Model 1: lsalary ~ years + gamesyr + bavg + hrunsyr + rbisyr
@@ -310,9 +312,13 @@ anova(lm.1, lm.2)</code></pre>
 <p><strong>Example 4.9</strong></p>
 <pre class="r"><code>data(&quot;bwght&quot;)
 
-lm.1 &lt;- lm(bwght ~ cigs + parity + faminc + motheduc + fatheduc, data = bwght)
-lm.2 &lt;- lm(bwght ~ cigs + parity + faminc, data = bwght[is.na(bwght$motheduc) != TRUE &amp; is.na(bwght$fatheduc) != TRUE,])
-anova(lm.1, lm.2)</code></pre>
+model_1 &lt;- lm(bwght ~ cigs + parity + faminc + motheduc + fatheduc,
+              data = bwght)
+
+bwght_complete &lt;- bwght[is.na(bwght[[&quot;motheduc&quot;]]) != TRUE &amp;
+                          is.na(bwght[[&quot;fatheduc&quot;]]) != TRUE, ]
+model_2 &lt;- lm(bwght ~ cigs + parity + faminc, data = bwght_complete)
+anova(model_1, model_2)</code></pre>
 <pre><code>## Analysis of Variance Table
 ## 
 ## Model 1: bwght ~ cigs + parity + faminc + motheduc + fatheduc
@@ -323,11 +329,11 @@ anova(lm.1, lm.2)</code></pre>
 <p><strong>Equation 4.48</strong></p>
 <pre class="r"><code>data(&quot;hprice1&quot;)
 
-lm.1 &lt;- lm(lprice ~ lassess + llotsize + lsqrft + bdrms, data = hprice1)
+model_1 &lt;- lm(lprice ~ lassess + llotsize + lsqrft + bdrms, data = hprice1)
 
-lprice &lt;- hprice1$lprice - hprice1$lassess
-lm.2 &lt;- lm(lprice ~ 1)
-anova(lm.1, lm.2)</code></pre>
+lprice &lt;- hprice1[[&quot;lprice&quot;]] - hprice1[[&quot;lassess&quot;]]
+model_2 &lt;- lm(lprice ~ 1)
+anova(model_1, model_2)</code></pre>
 <pre><code>## Analysis of Variance Table
 ## 
 ## Model 1: lprice ~ lassess + llotsize + lsqrft + bdrms
@@ -338,12 +344,13 @@ anova(lm.1, lm.2)</code></pre>
 <p><strong>Example 4.10</strong></p>
 <pre class="r"><code>data(&quot;meap93&quot;)
 
-bs &lt;- meap93$benefits / meap93$salary
-lm.1 &lt;- lm(lsalary ~ bs, data = meap93)
-lm.2 &lt;- lm(lsalary ~ bs + lenroll + lstaff, data = meap93)
-lm.3 &lt;- lm(lsalary ~ bs + lenroll + lstaff + droprate + gradrate, data = meap93)
+bs &lt;- meap93[[&quot;benefits&quot;]] / meap93[[&quot;salary&quot;]]
+model_1 &lt;- lm(lsalary ~ bs, data = meap93)
+model_2 &lt;- lm(lsalary ~ bs + lenroll + lstaff, data = meap93)
+model_3 &lt;- lm(lsalary ~ bs + lenroll + lstaff + droprate + gradrate,
+              data = meap93)
 
-summary(lm.1)</code></pre>
+summary(model_1)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = lsalary ~ bs, data = meap93)
@@ -360,9 +367,9 @@ summary(lm.1)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.1514 on 406 degrees of freedom
-## Multiple R-squared:  0.0403, Adjusted R-squared:  0.03794 
+## Multiple R-squared:  0.0403,	Adjusted R-squared:  0.03794 
 ## F-statistic: 17.05 on 1 and 406 DF,  p-value: 4.422e-05</code></pre>
-<pre class="r"><code>summary(lm.2)</code></pre>
+<pre class="r"><code>summary(model_2)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = lsalary ~ bs + lenroll + lstaff, data = meap93)
@@ -381,9 +388,9 @@ summary(lm.1)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.1246 on 404 degrees of freedom
-## Multiple R-squared:  0.3527, Adjusted R-squared:  0.3479 
+## Multiple R-squared:  0.3527,	Adjusted R-squared:  0.3479 
 ## F-statistic: 73.39 on 3 and 404 DF,  p-value: &lt; 2.2e-16</code></pre>
-<pre class="r"><code>summary(lm.3)</code></pre>
+<pre class="r"><code>summary(model_3)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = lsalary ~ bs + lenroll + lstaff + droprate + gradrate, 
@@ -405,5 +412,5 @@ summary(lm.1)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.1241 on 402 degrees of freedom
-## Multiple R-squared:  0.361,  Adjusted R-squared:  0.3531 
+## Multiple R-squared:  0.361,	Adjusted R-squared:  0.3531 
 ## F-statistic: 45.43 on 5 and 402 DF,  p-value: &lt; 2.2e-16</code></pre>

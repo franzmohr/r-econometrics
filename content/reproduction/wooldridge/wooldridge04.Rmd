@@ -10,30 +10,30 @@ rm(list = ls())
 
 setwd("C:/path/to/the/working/directory")
 
-library(wooldridge)
+library("wooldridge")
 ```
 ```{r, echo = FALSE}
 rm(list = ls())
-library(wooldridge)
+library("wooldridge")
 ```
 
 
 
 ```{r}
-data(wage1)
+data("wage1")
 
-lm.1 <- lm(lwage ~ educ + exper + tenure, data = wage1)
-s.1 <- summary(lm.1)
-s.1
+model_1 <- lm(lwage ~ educ + exper + tenure, data = wage1)
+summary_1 <- summary(model_1)
+summary_1
 ```
 
-In order to be able to use the values of the coefficients for further calculations, you can use copy and paste with the numbers provided in the summary `s.1`. Alternatively, and for the sake of more precision, you can access the coefficients directly. If you use the `names` function and run `names(s.1)`, you will notice a subdirectory called *coefficients*, which contains the coefficients, standard errors, t-statistics and p-values of the regression. Entering `s.1$coefficients` or `coefficients(s.1)` gives those values for all coefficients, but you can also extract them separately using the `[row, column]` signs, where the first value defines the row index and the second the column index. If no value is specified for a row or column, R will use all available values. This happens in the third line of the following code, where the t-values are calculated from the betas and their respective standard errors. The forth line of the code specifies a certain row which means that the t-value is calculated only for the parameter listed third in the coefficient list.
+In order to be able to use the values of the coefficients for further calculations, you can use copy and paste with the numbers provided in the summary `summary_1`. Alternatively, and for the sake of more precision, you can access the coefficients directly. If you use the `names` function and run `names(summary_1)`, you will notice a subdirectory called *coefficients*, which contains the coefficients, standard errors, t-statistics and p-values of the regression. Entering `summary_1[["coefficients"]]` or `coefficients(summary_1)` gives those values for all coefficients, but you can also extract them separately using the `[row, column]` signs, where the first value defines the row index and the second the column index. If no value is specified for a row or column, R will use all available values. This happens in the third line of the following code, where the t-values are calculated from the betas and their respective standard errors. The forth line of the code specifies a certain row which means that the t-value is calculated only for the parameter listed third in the coefficient list.
 
 ```{r}
-names(s.1)
-s.1$coefficients
-s.1$coefficient[, 1] / s.1$coefficient[, 2]
-s.1$coefficient[3, 1] / s.1$coefficient[3, 2]
+names(summary_1)
+summary_1[["coefficients"]]
+summary_1[["coefficients"]][, 1] / summary_1[["coefficients"]][, 2]
+summary_1[["coefficients"]][3, 1] / summary_1[["coefficients"]][3, 2]
 ```
 
 The following code illustrates the differences in statistical significance that can result from the use of log-values.
@@ -43,11 +43,11 @@ The following code illustrates the differences in statistical significance that 
 ```{r}
 data("meap93")
 
-lm.1 <- lm(math10 ~ totcomp + staff + enroll, data = meap93)
-summary(lm.1)
+model_1 <- lm(math10 ~ totcomp + staff + enroll, data = meap93)
+summary(model_1)
 
-lm.2 <- lm(math10 ~ ltotcomp + lstaff + lenroll, data = meap93)
-summary(lm.2)
+model_2 <- lm(math10 ~ ltotcomp + lstaff + lenroll, data = meap93)
+summary(model_2)
 ```
 
 **Example 4.3**
@@ -55,8 +55,8 @@ summary(lm.2)
 ```{r}
 data("gpa1")
 
-lm.1 <- lm(colGPA ~ hsGPA + ACT + skipped, data = gpa1)
-summary(lm.1)
+model_1 <- lm(colGPA ~ hsGPA + ACT + skipped, data = gpa1)
+summary(model_1)
 ```
 
 The next examples illustrate how the t-statistic is calculated in R if you want to know whether a coefficient is different from a value other than zero. This works by obtaining the coefficients from the regression summary, subtracting the value against which it should be tested and diving the result by the standard error.
@@ -66,11 +66,11 @@ The next examples illustrate how the t-statistic is calculated in R if you want 
 ```{r}
 data("campus")
 
-lm.1 <- lm(lcrime ~ lenroll, data = campus)
-s.1 <- summary(lm.1)
-s.1
+model_1 <- lm(lcrime ~ lenroll, data = campus)
+summary_1 <- summary(model_1)
+summary_1
 
-(s.1$coefficients[2,1] - 1) / s.1$coefficients[2,2]
+(summary_1[["coefficients"]][2, 1] - 1) / summary_1[["coefficients"]][2, 2]
 ```
 
 **Example 4.5**
@@ -79,13 +79,13 @@ s.1
 data("hprice2")
 
 names(hprice2)
-ldist <- log(hprice2$dist)
+ldist <- log(hprice2[["dist"]])
 
-lm.1 <- lm(lprice ~ lnox + ldist + rooms + stratio, data = hprice2)
-s.1 <- summary(lm.1)
-s.1
+model_1 <- lm(lprice ~ lnox + ldist + rooms + stratio, data = hprice2)
+summary_1 <- summary(model_1)
+summary_1
 
-(s.1$coefficients[2, 1] + 1) / s.1$coefficients[2, 2]
+(summary_1[["coefficients"]][2, 1] + 1) / summary_1[["coefficients"]][2, 2]
 ```
 
 **Example 4.6**
@@ -93,8 +93,8 @@ s.1
 ```{r}
 data("k401k")
 
-lm.1 <- lm(prate ~ mrate + age + totemp, data = k401k)
-summary(lm.1)
+model_1 <- lm(prate ~ mrate + age + totemp, data = k401k)
+summary(model_1)
 ```
 
 The following code limits the used data to those observations, where the year is 1987 and the value for union is zero. The specification of `data =` tells R to take only those observations into consideration which meet these conditions. You could read this command in a way that R takes data from `jtrain`, where in each row - note that the second part of the `[,]` sign is empty! - the conditions x and y have to hold.
@@ -104,37 +104,40 @@ The following code limits the used data to those observations, where the year is
 ```{r}
 data("jtrain")
 
-lm.1 <- lm(lscrap ~ hrsemp + lsales + lemploy, data = jtrain[jtrain$year==1987 & jtrain$union==0,])
-summary(lm.1)
+jtrain_1987 <- jtrain[jtrain[["year"]] == 1987 & jtrain[["union"]] == 0, ]
+
+model_1 <- lm(lscrap ~ hrsemp + lsales + lemploy, data = jtrain_1987)
+summary(model_1)
 ```
 
-The next example shows how you can calculate confidence intervals from estimation results. For this purpose you can use the `confint` function which needs the stored regression results (here `lm.1`) and the level of confidence specified by the argument `level = something`.
+The next example shows how you can calculate confidence intervals from estimation results. For this purpose you can use the `confint` function which needs the stored regression results (here `model_1`) and the level of confidence specified by the argument `level = something`.
 
 **Example 4.8**
 
 ```{r}
 data("rdchem")
 
-lm.1 <- lm(lrd ~ lsales + profmarg, data = rdchem)
-summary(lm.1)
+model_1 <- lm(lrd ~ lsales + profmarg, data = rdchem)
+summary(model_1)
 
 # 10% confidence
-confint(lm.1, level = .90)
+confint(model_1, level = .90)
 # 5% confidence
-confint(lm.1, level = .95)
+confint(model_1, level = .95)
 ```
 
 **Equations 4.21 & 4.27**
 ```{r}
 data("twoyear")
 
-lm.1 <- lm(lwage ~ jc + univ + exper, data = twoyear)
-s.1 <- summary(lm.1)
+model_1 <- lm(lwage ~ jc + univ + exper, data = twoyear)
+summary_1 <- summary(model_1)
 
-lm.2 <- lm(lwage ~ jc + totcoll + exper, data = twoyear)
-s.2 <- summary(lm.2)
+model_2 <- lm(lwage ~ jc + totcoll + exper, data = twoyear)
+summary_2 <- summary(model_2)
 
-(s.1$coefficient[2, 1] - s.1$coefficient[3, 1]) / s.2$coefficient[2, 2]
+(summary_1[["coefficients"]][2, 1] - summary_1[["coefficients"]][3, 1]) /
+  summary_2[["coefficients"]][2, 2]
 ```
 
 Next, we want to calculate the F-test to evaluate the joint significance of independent variables. For this purpose you have to exert the regression of the restricted and the unrestricted model and store the results. Then, use the `anova` function. Specify which two regressions have to be used and let R do the rest.
@@ -145,11 +148,12 @@ Next, we want to calculate the F-test to evaluate the joint significance of inde
 data("mlb1")
 
 # unrestricted model
-lm.1 <- lm(lsalary ~ years + gamesyr + bavg + hrunsyr + rbisyr, data = mlb1)
+model_1 <- lm(lsalary ~ years + gamesyr + bavg + hrunsyr + rbisyr,
+              data = mlb1)
 # restricted model
-lm.2 <- lm(lsalary ~ years + gamesyr, data = mlb1)
+model_2 <- lm(lsalary ~ years + gamesyr, data = mlb1)
 # f-test
-anova(lm.1, lm.2)
+anova(model_1, model_2)
 ```
 
 **Example 4.9**
@@ -157,9 +161,13 @@ anova(lm.1, lm.2)
 ```{r}
 data("bwght")
 
-lm.1 <- lm(bwght ~ cigs + parity + faminc + motheduc + fatheduc, data = bwght)
-lm.2 <- lm(bwght ~ cigs + parity + faminc, data = bwght[is.na(bwght$motheduc) != TRUE & is.na(bwght$fatheduc) != TRUE,])
-anova(lm.1, lm.2)
+model_1 <- lm(bwght ~ cigs + parity + faminc + motheduc + fatheduc,
+              data = bwght)
+
+bwght_complete <- bwght[is.na(bwght[["motheduc"]]) != TRUE &
+                          is.na(bwght[["fatheduc"]]) != TRUE, ]
+model_2 <- lm(bwght ~ cigs + parity + faminc, data = bwght_complete)
+anova(model_1, model_2)
 ```
 
 **Equation 4.48**
@@ -167,11 +175,11 @@ anova(lm.1, lm.2)
 ```{r}
 data("hprice1")
 
-lm.1 <- lm(lprice ~ lassess + llotsize + lsqrft + bdrms, data = hprice1)
+model_1 <- lm(lprice ~ lassess + llotsize + lsqrft + bdrms, data = hprice1)
 
-lprice <- hprice1$lprice - hprice1$lassess
-lm.2 <- lm(lprice ~ 1)
-anova(lm.1, lm.2)
+lprice <- hprice1[["lprice"]] - hprice1[["lassess"]]
+model_2 <- lm(lprice ~ 1)
+anova(model_1, model_2)
 ```
 
 **Example 4.10**
@@ -179,12 +187,13 @@ anova(lm.1, lm.2)
 ```{r}
 data("meap93")
 
-bs <- meap93$benefits / meap93$salary
-lm.1 <- lm(lsalary ~ bs, data = meap93)
-lm.2 <- lm(lsalary ~ bs + lenroll + lstaff, data = meap93)
-lm.3 <- lm(lsalary ~ bs + lenroll + lstaff + droprate + gradrate, data = meap93)
+bs <- meap93[["benefits"]] / meap93[["salary"]]
+model_1 <- lm(lsalary ~ bs, data = meap93)
+model_2 <- lm(lsalary ~ bs + lenroll + lstaff, data = meap93)
+model_3 <- lm(lsalary ~ bs + lenroll + lstaff + droprate + gradrate,
+              data = meap93)
 
-summary(lm.1)
-summary(lm.2)
-summary(lm.3)
+summary(model_1)
+summary(model_2)
+summary(model_3)
 ```

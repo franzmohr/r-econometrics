@@ -6,14 +6,15 @@ date: "2018-02-04"
 
 
 
-<pre class="r"><code>library(wooldridge)</code></pre>
+<pre class="r"><code>library(&quot;wooldridge&quot;)</code></pre>
 <div id="example-9.1" class="section level3">
 <h3>Example 9.1</h3>
 <pre class="r"><code>data(&quot;crime1&quot;)
 
-lm.9.1.1 &lt;- lm(narr86 ~ pcnv + avgsen + tottime + ptime86 + 
-                 qemp86 + inc86 + black + hispan, data = crime1)
-summary(lm.9.1.1)</code></pre>
+model_9_1_1 &lt;- lm(narr86 ~ pcnv + avgsen + tottime + ptime86 +
+                    qemp86 + inc86 + black + hispan,
+                  data = crime1)
+summary(model_9_1_1)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = narr86 ~ pcnv + avgsen + tottime + ptime86 + qemp86 + 
@@ -43,10 +44,11 @@ summary(lm.9.1.1)</code></pre>
 <pre class="r"><code># Seems to be an error in the book.
 # Although all coefficients and their standard errors are equal
 # the intercept term is 0.569 instead of 0.596.</code></pre>
-<pre class="r"><code>lm.9.1.2 &lt;- lm(narr86 ~ pcnv + avgsen + tottime + ptime86 + 
-                 qemp86 + inc86 + black + hispan + pcnvsq + 
-                 pt86sq + inc86sq, data = crime1)
-summary(lm.9.1.2)</code></pre>
+<pre class="r"><code>model_9_1_2 &lt;- lm(narr86 ~ pcnv + avgsen + tottime + ptime86 +
+                    qemp86 + inc86 + black + hispan + pcnvsq +
+                    pt86sq + inc86sq,
+                  data = crime1)
+summary(model_9_1_2)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = narr86 ~ pcnv + avgsen + tottime + ptime86 + qemp86 + 
@@ -76,7 +78,7 @@ summary(lm.9.1.2)</code></pre>
 ## Residual standard error: 0.8151 on 2713 degrees of freedom
 ## Multiple R-squared:  0.1035,	Adjusted R-squared:  0.09982 
 ## F-statistic: 28.46 on 11 and 2713 DF,  p-value: &lt; 2.2e-16</code></pre>
-<pre class="r"><code>anova(lm.9.1.1, lm.9.1.2)</code></pre>
+<pre class="r"><code>anova(model_9_1_1, model_9_1_2)</code></pre>
 <pre><code>## Analysis of Variance Table
 ## 
 ## Model 1: narr86 ~ pcnv + avgsen + tottime + ptime86 + qemp86 + inc86 + 
@@ -93,29 +95,31 @@ summary(lm.9.1.2)</code></pre>
 <h3>Example 9.2</h3>
 <pre class="r"><code>data(&quot;hprice1&quot;)
 
-lm.9.2.1 &lt;- lm(price ~ lotsize + sqrft + bdrms, data = hprice1)
-fit2.1 &lt;- lm.9.2.1$fitted.values^2
-fit3.1 &lt;- lm.9.2.1$fitted.values^3
-lm.9.2.1.reset &lt;- lm(price ~ lotsize + sqrft + bdrms + fit2.1 + fit3.1, data = hprice1)
-anova(lm.9.2.1, lm.9.2.1.reset)</code></pre>
+model_9_2_1 &lt;- lm(price ~ lotsize + sqrft + bdrms, data = hprice1)
+fit2_1 &lt;- model_9_2_1[[&quot;fitted.values&quot;]]^2
+fit3_1 &lt;- model_9_2_1[[&quot;fitted.values&quot;]]^3
+model_9_2_1_reset &lt;- lm(price ~ lotsize + sqrft + bdrms + fit2_1 + fit3_1,
+                        data = hprice1)
+anova(model_9_2_1, model_9_2_1_reset)</code></pre>
 <pre><code>## Analysis of Variance Table
 ## 
 ## Model 1: price ~ lotsize + sqrft + bdrms
-## Model 2: price ~ lotsize + sqrft + bdrms + fit2.1 + fit3.1
+## Model 2: price ~ lotsize + sqrft + bdrms + fit2_1 + fit3_1
 ##   Res.Df    RSS Df Sum of Sq      F  Pr(&gt;F)  
 ## 1     84 300724                              
 ## 2     82 269984  2     30740 4.6682 0.01202 *
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<pre class="r"><code>lm.9.2.2 &lt;- lm(lprice ~ llotsize + lsqrft + bdrms, data = hprice1)
-fit2.2 &lt;- lm.9.2.2$fitted.values^2
-fit3.2 &lt;- lm.9.2.2$fitted.values^3
-lm.9.2.2.reset &lt;- lm(lprice ~ llotsize + lsqrft + bdrms + fit2.2 + fit3.2, data = hprice1)
-anova(lm.9.2.2, lm.9.2.2.reset)</code></pre>
+<pre class="r"><code>model_9_2_2 &lt;- lm(lprice ~ llotsize + lsqrft + bdrms, data = hprice1)
+fit2_2 &lt;- model_9_2_2[[&quot;fitted.values&quot;]]^2
+fit3_2 &lt;- model_9_2_2[[&quot;fitted.values&quot;]]^3
+model_9_2_2_reset &lt;- lm(lprice ~ llotsize + lsqrft + bdrms + fit2_2 + fit3_2,
+                        data = hprice1)
+anova(model_9_2_2, model_9_2_2_reset)</code></pre>
 <pre><code>## Analysis of Variance Table
 ## 
 ## Model 1: lprice ~ llotsize + lsqrft + bdrms
-## Model 2: lprice ~ llotsize + lsqrft + bdrms + fit2.2 + fit3.2
+## Model 2: lprice ~ llotsize + lsqrft + bdrms + fit2_2 + fit3_2
 ##   Res.Df    RSS Df Sum of Sq     F  Pr(&gt;F)  
 ## 1     84 2.8626                             
 ## 2     82 2.6940  2   0.16854 2.565 0.08308 .
@@ -126,9 +130,10 @@ anova(lm.9.2.2, lm.9.2.2.reset)</code></pre>
 <h3>Table 9.2</h3>
 <pre class="r"><code>data(&quot;wage2&quot;)
 
-lm.t9.2.1 &lt;- lm(lwage ~ educ + exper + tenure + married + south + urban + 
-                  black, data = wage2)
-summary(lm.t9.2.1)</code></pre>
+model_t9_2_1 &lt;- lm(lwage ~ educ + exper + tenure + married + south + urban +
+                     black,
+                   data = wage2)
+summary(model_t9_2_1)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = lwage ~ educ + exper + tenure + married + south + 
@@ -154,9 +159,10 @@ summary(lm.t9.2.1)</code></pre>
 ## Residual standard error: 0.3655 on 927 degrees of freedom
 ## Multiple R-squared:  0.2526,	Adjusted R-squared:  0.2469 
 ## F-statistic: 44.75 on 7 and 927 DF,  p-value: &lt; 2.2e-16</code></pre>
-<pre class="r"><code>lm.t9.2.2 &lt;- lm(lwage ~ educ + exper + tenure + married + south + urban + 
-                  black + IQ, data=wage2)
-summary(lm.t9.2.2)</code></pre>
+<pre class="r"><code>model_t9_2_2 &lt;- lm(lwage ~ educ + exper + tenure + married + south + urban +
+                     black + IQ,
+                   data = wage2)
+summary(model_t9_2_2)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = lwage ~ educ + exper + tenure + married + south + 
@@ -183,9 +189,10 @@ summary(lm.t9.2.2)</code></pre>
 ## Residual standard error: 0.3632 on 926 degrees of freedom
 ## Multiple R-squared:  0.2628,	Adjusted R-squared:  0.2564 
 ## F-statistic: 41.27 on 8 and 926 DF,  p-value: &lt; 2.2e-16</code></pre>
-<pre class="r"><code>lm.t9.2.3 &lt;- lm(lwage ~ educ + exper + tenure + married + south + urban + 
-                black + IQ + IQ*educ, data = wage2)
-summary(lm.t9.2.3)</code></pre>
+<pre class="r"><code>model_t9_2_3 &lt;- lm(lwage ~ educ + exper + tenure + married + south + urban +
+                     black + IQ + IQ * educ,
+                   data = wage2)
+summary(model_t9_2_3)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = lwage ~ educ + exper + tenure + married + south + 
@@ -218,8 +225,10 @@ summary(lm.t9.2.3)</code></pre>
 <h3>Example 9.4</h3>
 <pre class="r"><code>data(&quot;crime2&quot;)
 
-lm.9.4.1 &lt;- lm(lcrmrte ~ unem + llawexpc, data = crime2, subset = (d87==1))
-summary(lm.9.4.1)</code></pre>
+model_9_4_1 &lt;- lm(lcrmrte ~ unem + llawexpc,
+                  data = crime2,
+                  subset = (d87 == 1))
+summary(model_9_4_1)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = lcrmrte ~ unem + llawexpc, data = crime2, subset = (d87 == 
@@ -240,8 +249,10 @@ summary(lm.9.4.1)</code></pre>
 ## Residual standard error: 0.3231 on 43 degrees of freedom
 ## Multiple R-squared:  0.05712,	Adjusted R-squared:  0.01326 
 ## F-statistic: 1.302 on 2 and 43 DF,  p-value: 0.2824</code></pre>
-<pre class="r"><code>lm.9.4.2 &lt;- lm(lcrmrte ~ unem + llawexpc + lcrmrt_1, data = crime2, subset = (d87==1))
-summary(lm.9.4.2)</code></pre>
+<pre class="r"><code>model_9_4_2 &lt;- lm(lcrmrte ~ unem + llawexpc + lcrmrt_1,
+                  data = crime2,
+                  subset = (d87 == 1))
+summary(model_9_4_2)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = lcrmrte ~ unem + llawexpc + lcrmrt_1, data = crime2, 
@@ -268,8 +279,8 @@ summary(lm.9.4.2)</code></pre>
 <h3>Example 9.8</h3>
 <pre class="r"><code>data(&quot;rdchem&quot;)
 
-lm.9.8.1 &lt;- lm(rdintens ~ sales + profmarg, data = rdchem)
-summary(lm.9.8.1)</code></pre>
+model_9_8_1 &lt;- lm(rdintens ~ sales + profmarg, data = rdchem)
+summary(model_9_8_1)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = rdintens ~ sales + profmarg, data = rdchem)
@@ -293,8 +304,10 @@ summary(lm.9.8.1)</code></pre>
 with(rdchem, plot(sales, rdintens, pch = 16))</code></pre>
 <p><img src="/reproduction/wooldridge/wooldridge09_files/figure-html/unnamed-chunk-13-1.png" alt="" width="480" style="display: block; margin: auto;" /></p>
 <pre class="r"><code># Test without the biggest firm
-lm.9.8.2 &lt;- lm(rdintens ~ sales + profmarg, data = rdchem, subset = (sales &lt; 30000))
-summary(lm.9.8.2)</code></pre>
+model_9_8_2 &lt;- lm(rdintens ~ sales + profmarg,
+                  data = rdchem,
+                  subset = (sales &lt; 30000))
+summary(model_9_8_2)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = rdintens ~ sales + profmarg, data = rdchem, subset = (sales &lt; 
@@ -317,9 +330,9 @@ summary(lm.9.8.2)</code></pre>
 ## F-statistic: 2.925 on 2 and 28 DF,  p-value: 0.07022</code></pre>
 <p>Hmmm, slightly different result than in the book</p>
 <pre class="r"><code># Dummy for the biggest firm
-big &lt;- as.numeric(rdchem$sales == max(rdchem$sales))
-lm.9.8.3 &lt;- lm(rdintens ~ sales + profmarg + big, data = rdchem)
-summary(lm.9.8.3)</code></pre>
+big &lt;- as.numeric(rdchem[[&quot;sales&quot;]] == max(rdchem[[&quot;sales&quot;]]))
+model_9_8_3 &lt;- lm(rdintens ~ sales + profmarg + big, data = rdchem)
+summary(model_9_8_3)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = rdintens ~ sales + profmarg + big, data = rdchem)
@@ -341,12 +354,12 @@ summary(lm.9.8.3)</code></pre>
 ## Multiple R-squared:  0.1737,	Adjusted R-squared:  0.08513 
 ## F-statistic: 1.962 on 3 and 28 DF,  p-value: 0.1427</code></pre>
 <pre class="r"><code># Dummy for highest rdintens
-hi.rdint &lt;- as.numeric(rdchem$rdintens == max(rdchem$rdintens))
-lm.9.8.4 &lt;- lm(rdintens ~ sales + profmarg + hi.rdint, data = rdchem)
-summary(lm.9.8.4)</code></pre>
+hi_rdint &lt;- as.numeric(rdchem[[&quot;rdintens&quot;]] == max(rdchem[[&quot;rdintens&quot;]]))
+model_9_8_4 &lt;- lm(rdintens ~ sales + profmarg + hi_rdint, data = rdchem)
+summary(model_9_8_4)</code></pre>
 <pre><code>## 
 ## Call:
-## lm(formula = rdintens ~ sales + profmarg + hi.rdint, data = rdchem)
+## lm(formula = rdintens ~ sales + profmarg + hi_rdint, data = rdchem)
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
@@ -357,15 +370,17 @@ summary(lm.9.8.4)</code></pre>
 ## (Intercept) 2.193e+00  4.615e-01   4.753 5.45e-05 ***
 ## sales       5.057e-05  3.400e-05   1.487   0.1481    
 ## profmarg    6.829e-02  3.600e-02   1.897   0.0681 .  
-## hi.rdint    6.718e+00  1.475e+00   4.555 9.35e-05 ***
+## hi_rdint    6.718e+00  1.475e+00   4.555 9.35e-05 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 1.436 on 28 degrees of freedom
 ## Multiple R-squared:  0.4693,	Adjusted R-squared:  0.4125 
 ## F-statistic: 8.255 on 3 and 28 DF,  p-value: 0.0004321</code></pre>
-<pre class="r"><code>lm.9.8.5 &lt;- lm(rdintens ~ sales + profmarg, data = rdchem, subset = (rdintens  &lt; max(rdintens)))
-summary(lm.9.8.5)</code></pre>
+<pre class="r"><code>model_9_8_5 &lt;- lm(rdintens ~ sales + profmarg,
+                  data = rdchem,
+                  subset = (rdintens &lt; max(rdintens)))
+summary(model_9_8_5)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = rdintens ~ sales + profmarg, data = rdchem, subset = (rdintens &lt; 
@@ -387,10 +402,10 @@ summary(lm.9.8.5)</code></pre>
 ## Multiple R-squared:  0.1716,	Adjusted R-squared:  0.1125 
 ## F-statistic:   2.9 on 2 and 28 DF,  p-value: 0.07165</code></pre>
 <pre class="r"><code># Without first and tenth firm
-lm.9.8.6 &lt;- lm(rdintens ~ sales + profmarg, 
-               data = rdchem,
-               subset = (sales &lt; max(sales) &amp; rdintens &lt; max(rdintens)))
-summary(lm.9.8.6)</code></pre>
+model_9_8_6 &lt;- lm(rdintens ~ sales + profmarg,
+                  data = rdchem,
+                  subset = (sales &lt; max(sales) &amp; rdintens &lt; max(rdintens)))
+summary(model_9_8_6)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = rdintens ~ sales + profmarg, data = rdchem, subset = (sales &lt; 
@@ -412,11 +427,11 @@ summary(lm.9.8.6)</code></pre>
 ## Multiple R-squared:  0.2711,	Adjusted R-squared:  0.2171 
 ## F-statistic: 5.021 on 2 and 27 DF,  p-value: 0.014</code></pre>
 <p>Hmm, slighty different results</p>
-<pre class="r"><code>lm.9.8.7 &lt;- lm(rdintens ~ sales + profmarg + big + hi.rdint, data = rdchem)
-summary(lm.9.8.7)</code></pre>
+<pre class="r"><code>model_9_8_7 &lt;- lm(rdintens ~ sales + profmarg + big + hi_rdint, data = rdchem)
+summary(model_9_8_7)</code></pre>
 <pre><code>## 
 ## Call:
-## lm(formula = rdintens ~ sales + profmarg + big + hi.rdint, data = rdchem)
+## lm(formula = rdintens ~ sales + profmarg + big + hi_rdint, data = rdchem)
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
@@ -428,7 +443,7 @@ summary(lm.9.8.7)</code></pre>
 ## sales        1.596e-04  6.457e-05   2.472 0.020029 *  
 ## profmarg     7.007e-02  3.433e-02   2.041 0.051116 .  
 ## big         -5.414e+00  2.773e+00  -1.953 0.061306 .  
-## hi.rdint     6.467e+00  1.412e+00   4.581  9.4e-05 ***
+## hi_rdint     6.467e+00  1.412e+00   4.581  9.4e-05 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
@@ -440,8 +455,8 @@ summary(lm.9.8.7)</code></pre>
 <h3>Example 9.9</h3>
 <pre class="r"><code>data(&quot;rdchem&quot;)
 
-lm.9.9.1 &lt;- lm(lrd ~ lsales + profmarg, data = rdchem)
-summary(lm.9.9.1)</code></pre>
+model_9_9_1 &lt;- lm(lrd ~ lsales + profmarg, data = rdchem)
+summary(model_9_9_1)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = lrd ~ lsales + profmarg, data = rdchem)
@@ -462,8 +477,10 @@ summary(lm.9.9.1)</code></pre>
 ## Multiple R-squared:  0.918,	Adjusted R-squared:  0.9123 
 ## F-statistic: 162.2 on 2 and 29 DF,  p-value: &lt; 2.2e-16</code></pre>
 <pre class="r"><code># Without the largest firm
-lm.9.9.2 &lt;- lm(lrd ~ lsales + profmarg, data = rdchem, subset = (lsales  &lt; max(lsales)))
-summary(lm.9.9.2)</code></pre>
+model_9_9_2 &lt;- lm(lrd ~ lsales + profmarg,
+                  data = rdchem,
+                  subset = (lsales &lt; max(lsales)))
+summary(model_9_9_2)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = lrd ~ lsales + profmarg, data = rdchem, subset = (lsales &lt; 
@@ -489,8 +506,10 @@ summary(lm.9.9.2)</code></pre>
 <h3>Example 9.10</h3>
 <pre class="r"><code>data(&quot;infmrt&quot;)
 
-lm.9.10.1 &lt;- lm(infmort ~ lpcinc + lphysic + lpopul, data = infmrt, subset = (year==1990))
-summary(lm.9.10.1)</code></pre>
+model_9_10_1 &lt;- lm(infmort ~ lpcinc + lphysic + lpopul,
+                   data = infmrt,
+                   subset = (year == 1990))
+summary(model_9_10_1)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = infmort ~ lpcinc + lphysic + lpopul, data = infmrt, 
@@ -512,8 +531,10 @@ summary(lm.9.10.1)</code></pre>
 ## Residual standard error: 2.058 on 47 degrees of freedom
 ## Multiple R-squared:  0.1391,	Adjusted R-squared:  0.08413 
 ## F-statistic: 2.531 on 3 and 47 DF,  p-value: 0.06841</code></pre>
-<pre class="r"><code>lm.9.10.2 &lt;- lm(infmort ~ lpcinc + lphysic + lpopul, data = infmrt, subset = (year==1990 &amp; DC==0))
-summary(lm.9.10.2)</code></pre>
+<pre class="r"><code>model_9_10_2 &lt;- lm(infmort ~ lpcinc + lphysic + lpopul,
+                   data = infmrt,
+                   subset = (year == 1990 &amp; DC == 0))
+summary(model_9_10_2)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = infmort ~ lpcinc + lphysic + lpopul, data = infmrt, 

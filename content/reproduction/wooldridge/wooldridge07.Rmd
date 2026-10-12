@@ -6,7 +6,7 @@ date: "2018-02-04"
 
 
 ```{r}
-library(wooldridge)
+library("wooldridge")
 ```
 
 Estimating dummy variables that reflect qualitative information works quite the same way in R as it does with quantitative variables. You just add it as an independent variable into the formula of the model.
@@ -15,19 +15,19 @@ Estimating dummy variables that reflect qualitative information works quite the 
 # Example 7.1
 data("wage1")
 
-lm.7.1.1 <- lm(wage ~ female + educ + exper + tenure, data = wage1)
-summary(lm.7.1.1)
+model_7_1_1 <- lm(wage ~ female + educ + exper + tenure, data = wage1)
+summary(model_7_1_1)
 
-lm.7.1.2 <- lm(wage ~ female, data = wage1)
-summary(lm.7.1.2)
+model_7_1_2 <- lm(wage ~ female, data = wage1)
+summary(model_7_1_2)
 ```
 
 ```{r}
 # Example 7.2
 data("gpa1")
 
-lm.7.2 <- lm(colGPA ~ PC + hsGPA + ACT, data = gpa1)
-summary(lm.7.2)
+model_7_2 <- lm(colGPA ~ PC + hsGPA + ACT, data = gpa1)
+summary(model_7_2)
 ```
 
 ```{r}
@@ -35,34 +35,35 @@ summary(lm.7.2)
 data("jtrain")
   # Since we do not use the whole data, but just observations from 1988
   # we have to manipulate the sampe
-jtrain <- jtrain[jtrain$d88==1,]
+jtrain <- jtrain[jtrain[["d88"]] == 1, ]
   # We choose those observation, where in each row of the sampel it holds
-  # that jtrain$d88==1.
+  # that jtrain[["d88"]] == 1.
   # Then we estimate the usual regression.
-lm.7.3 <- lm(hrsemp ~ grant + lsales + lemploy, data = jtrain)
-summary(lm.7.3)
+model_7_3 <- lm(hrsemp ~ grant + lsales + lemploy, data = jtrain)
+summary(model_7_3)
 ```
 
 ```{r}
 # Example 7.4
 data("hprice1")
-lm.7.4 <- lm(lprice ~ llotsize + lsqrft + bdrms + colonial, data = hprice1)
-summary(lm.7.4)
+model_7_4 <- lm(lprice ~ llotsize + lsqrft + bdrms + colonial, data = hprice1)
+summary(model_7_4)
 ```
 
 ```{r}
 # Example 7.5
-lm.7.5 <- lm(lwage ~ female + educ + exper + expersq + tenure + tenursq, data = wage1)
-summary(lm.7.5)
+model_7_5 <- lm(lwage ~ female + educ + exper + expersq + tenure + tenursq,
+                data = wage1)
+summary(model_7_5)
 ```
 For the more accurate estimate extract the coefficient on female from the summary function, paste it into the `exp` function and subract 1.
 ```{r}
-exp(summary(lm.7.5)$coeff[2,1])-1
+exp(summary(model_7_5)[["coefficients"]][2, 1]) - 1
 ```
 
 For the estimate of the percentage by which a man's wage exceed a compareable woman's wage we just put a minus sign in front of the coefficient.
 ```{r}
-exp(-summary(lm.7.5)$coeff[2,1])-1
+exp(-summary(model_7_5)[["coefficients"]][2, 1]) - 1
 ```
 
 The central command that allows you to create dummy variables is `as.numeric`. It gives a vector which is one if the conditions that are stated in parentheses are true and zero otherwise.
@@ -71,24 +72,31 @@ The central command that allows you to create dummy variables is `as.numeric`. I
 ```{r}
 # Example 7.6
 # Generate the subgroup dummies
-marrmale <- as.numeric(wage1$female==0 & wage1$married==1)
-marrfem  <- as.numeric(wage1$female==1 & wage1$married==1)
-singfem <- as.numeric(wage1$female==1 & wage1$married==0)
+marrmale <- as.numeric(wage1[["female"]] == 0 & wage1[["married"]] == 1)
+marrfem <- as.numeric(wage1[["female"]] == 1 & wage1[["married"]] == 1)
+singfem <- as.numeric(wage1[["female"]] == 1 & wage1[["married"]] == 0)
 
-lm.7.6.1 <- lm(lwage ~ marrmale + marrfem + singfem + educ + exper + expersq + tenure + tenursq, data = wage1)
-summary(lm.7.6.1)
+model_7_6_1 <- lm(lwage ~ marrmale + marrfem + singfem + educ + exper +
+                    expersq + tenure + tenursq,
+                  data = wage1)
+summary(model_7_6_1)
 
-singmale <- as.numeric(wage1$female==0)*as.numeric(wage1$married==0)
-lm.7.6.2 <- lm(lwage ~ marrmale + singmale + singfem + educ + exper + expersq + tenure + tenursq, data=wage1)
-summary(lm.7.6.2)
+singmale <- as.numeric(wage1[["female"]] == 0) *
+  as.numeric(wage1[["married"]] == 0)
+model_7_6_2 <- lm(lwage ~ marrmale + singmale + singfem + educ + exper +
+                    expersq + tenure + tenursq,
+                  data = wage1)
+summary(model_7_6_2)
 ```
 
 
 ```{r}
 # Example 7.7
 data("beauty")
-lm.7.7 <- lm(lwage ~ belavg + abvavg + educ + exper + expersq + service + married + black, data = beauty)
-summary(lm.7.7)
+model_7_7 <- lm(lwage ~ belavg + abvavg + educ + exper + expersq + service +
+                  married + black,
+                data = beauty)
+summary(model_7_7)
 ```
 Unfortunatly, the results are not the same as in the book, resp. the paper by Hamermesh and Biddle (1994)
 
@@ -100,25 +108,29 @@ data("lawsch85")
 
 # Generate dummies which is not necessary here, but I
 # wanted to show you how it is done.
-# However, you must create the last (r61.100) since it is not contained
+# However, you must create the last (r61_100) since it is not contained
 # in the downloaded data.
-top10 <- as.numeric(lawsch85$rank <= 10)
-r11.25 <- as.numeric(lawsch85$rank >= 11 & lawsch85$rank <= 25)
-r26.40 <- as.numeric(lawsch85$rank >= 26 & lawsch85$rank <= 40)
-r41.60 <- as.numeric(lawsch85$rank >= 41 & lawsch85$rank <= 60)
-r61.100 <- as.numeric(lawsch85$rank >= 61 & lawsch85$rank <= 100)
+top10 <- as.numeric(lawsch85[["rank"]] <= 10)
+r11_25 <- as.numeric(lawsch85[["rank"]] >= 11 & lawsch85[["rank"]] <= 25)
+r26_40 <- as.numeric(lawsch85[["rank"]] >= 26 & lawsch85[["rank"]] <= 40)
+r41_60 <- as.numeric(lawsch85[["rank"]] >= 41 & lawsch85[["rank"]] <= 60)
+r61_100 <- as.numeric(lawsch85[["rank"]] >= 61 & lawsch85[["rank"]] <= 100)
 
-lm.7.8 <- lm(lsalary ~ top10 + r11_25 + r26_40 + r41_60 + r61.100 + LSAT + GPA + llibvol + lcost, data = lawsch85)
-summary(lm.7.8)
+model_7_8 <- lm(lsalary ~ top10 + r11_25 + r26_40 + r41_60 + r61_100 + LSAT +
+                  GPA + llibvol + lcost,
+                data = lawsch85)
+summary(model_7_8)
 ```
 
 ```{r}
 # Equation 7.14
 # Generate the interaction term
-femmarr <- wage1$female*wage1$married
+femmarr <- wage1[["female"]] * wage1[["married"]]
 
-lm.e7.14 <- lm(lwage ~ female + married + femmarr  + educ + exper + expersq + tenure + tenursq, data = wage1)
-summary(lm.e7.14)
+model_e7_14 <- lm(lwage ~ female + married + femmarr + educ + exper +
+                    expersq + tenure + tenursq,
+                  data = wage1)
+summary(model_e7_14)
 
 ```
 
@@ -127,89 +139,101 @@ summary(lm.e7.14)
 # No data found
 
 # Example 7.10
-femmarr <- wage1$female*wage1$married
-lm.7.10 <- lm(lwage ~ female + educ + femmarr + exper + expersq + tenure + tenursq, data = wage1)
+femmarr <- wage1[["female"]] * wage1[["married"]]
+model_7_10 <- lm(lwage ~ female + educ + femmarr + exper + expersq + tenure +
+                   tenursq,
+                 data = wage1)
 # Yields slightly different results
-summary(lm.7.10)
+summary(model_7_10)
 ```
 
 ```{r}
 # Test for d0 and d1
-lm.7.10.t <- lm(lwage ~ + educ + exper + expersq + tenure + tenursq, data = wage1)
+model_7_10_t <- lm(lwage ~ + educ + exper + expersq + tenure + tenursq,
+                   data = wage1)
 # F= 36.717. The book's value is a bit lower.
-anova(lm.7.10,lm.7.10.t)
+anova(model_7_10, model_7_10_t)
 ```
 
 ```{r}
 # Example 7.11
 data("mlb1")
 
-lm.7.11 <- lm(lsalary ~ years + gamesyr + bavg + hrunsyr + 
-                rbisyr + runsyr + fldperc + allstar + 
-                black + hispan + blckpb + hispph, data = mlb1)
+model_7_11 <- lm(lsalary ~ years + gamesyr + bavg + hrunsyr +
+                   rbisyr + runsyr + fldperc + allstar +
+                   black + hispan + blckpb + hispph,
+                 data = mlb1)
 
-summary(lm.7.11)
+summary(model_7_11)
 ```
 
 ```{r}
 # Equation 7.22
 data("gpa3")
 
-lm.e7.22 <- lm(cumgpa ~ female + sat + I(female*sat) + 
-                 hsperc + I(female*hsperc) + 
-                 tothrs + I(female*tothrs), data = gpa3[gpa3$term==2,])
+gpa3_term_2 <- gpa3[gpa3[["term"]] == 2, ]
 
-summary(lm.e7.22)
+model_e7_22 <- lm(cumgpa ~ female + sat + I(female * sat) +
+                    hsperc + I(female * hsperc) +
+                    tothrs + I(female * tothrs),
+                  data = gpa3_term_2)
+
+summary(model_e7_22)
 ```
 
 ```{r}
 # Equation 7.29
 data("mroz")
 
-lm.e7.29 <- lm(inlf ~ nwifeinc + educ + exper + expersq + 
-                 age + kidslt6 + kidsge6, data = mroz)
+model_e7_29 <- lm(inlf ~ nwifeinc + educ + exper + expersq +
+                    age + kidslt6 + kidsge6,
+                  data = mroz)
 
-summary(lm.e7.29)
+summary(model_e7_29)
 ```
 
 ```{r}
 # Example 7.12
 data("crime1")
 # Generate arr86
-arr86 <- as.numeric(crime1$narr86 > 0)
+arr86 <- as.numeric(crime1[["narr86"]] > 0)
 
-lm.7.12 <- lm(arr86 ~ pcnv + avgsen + tottime + ptime86 + qemp86, data = crime1)
+model_7_12 <- lm(arr86 ~ pcnv + avgsen + tottime + ptime86 + qemp86,
+                 data = crime1)
 
-summary(lm.7.12)
+summary(model_7_12)
 ```
 
 ```{r}
 # Equation 7.23
-lm.e7.23 <- lm(arr86 ~ pcnv + avgsen + tottime + ptime86 + qemp86 + 
-                 black + hispan, data = crime1)
+model_e7_23 <- lm(arr86 ~ pcnv + avgsen + tottime + ptime86 + qemp86 +
+                    black + hispan,
+                  data = crime1)
 
-summary(lm.e7.23)
+summary(model_e7_23)
 ```
 
 ```{r}
 # Equation 7.33
-lm.e7.33 <- lm(lscrap ~ grant + lsales + lemploy, data = jtrain[jtrain$d88 == 1,])
+jtrain_1988 <- jtrain[jtrain[["d88"]] == 1, ]
 
-summary(lm.e7.33)
+model_e7_33 <- lm(lscrap ~ grant + lsales + lemploy, data = jtrain_1988)
+
+summary(model_e7_33)
 ```
 
 ```{r}
 # Equation 7.35
 data("fertil2")
 
-lm.e7.35 <- lm(children ~ age + educ, data = fertil2)
+model_e7_35 <- lm(children ~ age + educ, data = fertil2)
 
-summary(lm.e7.35)
+summary(model_e7_35)
 ```
 
 ```{r}
 # Equation 7.37
-lm.e7.37 <- lm(children ~ age + educ + electric, data = fertil2)
+model_e7_37 <- lm(children ~ age + educ + electric, data = fertil2)
 
-summary(lm.e7.37)
+summary(model_e7_37)
 ```

@@ -5,14 +5,15 @@ date: "2018-10-04"
 ---
 
 ```{r, echo = FALSE}
-library(wooldridge)
+library("wooldridge")
 ```
 
 Make a histogram of the variable "prate".
 ```{r, fig.height=3, fig.width=4}
 data("k401k")
 
-hist(k401k$prate)
+prate <- k401k[["prate"]]
+hist(prate)
 ```
 
 **Example 5.2**
@@ -20,33 +21,37 @@ hist(k401k$prate)
 ```{r}
 data("bwght")
 
-lm.1 <- lm(lbwght ~ cigs + lfaminc, data = bwght[1:694,])
-s.1 <- summary(lm.1)
+bwght_half <- bwght[1:694, ]
 
-lm.2 <- lm(lbwght ~ cigs + lfaminc, data = bwght)
-s.2 <- summary(lm.2)
+model_1 <- lm(lbwght ~ cigs + lfaminc, data = bwght_half)
+summary_1 <- summary(model_1)
 
-s.2$coefficients[2, 2] / s.1$coefficients[2, 2]
+model_2 <- lm(lbwght ~ cigs + lfaminc, data = bwght)
+summary_2 <- summary(model_2)
 
-lm.3 <- lm(cigs ~ lfaminc, data = bwght[1:694,])
-s.3 <- summary(lm.3)
+summary_2[["coefficients"]][2, 2] / summary_1[["coefficients"]][2, 2]
 
-sigma.j <- s.3$coefficients[2, 2]
-sigma <- s.3$sigma
-r2 <- s.3$r.squared
-sigma / (sqrt(1388) * sigma.j * sqrt(1 - r2))
+model_3 <- lm(cigs ~ lfaminc, data = bwght_half)
+summary_3 <- summary(model_3)
+
+sigma_j <- summary_3[["coefficients"]][2, 2]
+sigma_hat <- summary_3[["sigma"]]
+r2 <- summary_3[["r.squared"]]
+sigma_hat / (sqrt(1388) * sigma_j * sqrt(1 - r2))
 ```
 
 **Example 5.3**
 
 ```{r}
 data("crime1")
-     
-lm.1 <- lm(narr86 ~ pcnv + ptime86 + qemp86, data = crime1)
+
+model_1 <- lm(narr86 ~ pcnv + ptime86 + qemp86, data = crime1)
 
 # LM test
-lm.u <- lm(lm.1$residuals ~ pcnv + ptime86 + qemp86 + avgsen + tottime, data = crime1)
-summary(lm.u)$r.squared * 2725
+u_hat <- model_1[["residuals"]]
+model_aux <- lm(u_hat ~ pcnv + ptime86 + qemp86 + avgsen + tottime,
+                data = crime1)
+summary(model_aux)[["r.squared"]] * 2725
 ```
 
 ```{r}
@@ -56,6 +61,7 @@ qchisq(.9, 2)
 
 F-Test
 ```{r}
-lm.2 <- lm(narr86 ~ pcnv + ptime86 + qemp86 + avgsen + tottime, data = crime1)
-anova(lm.1, lm.2)
+model_2 <- lm(narr86 ~ pcnv + ptime86 + qemp86 + avgsen + tottime,
+              data = crime1)
+anova(model_1, model_2)
 ```

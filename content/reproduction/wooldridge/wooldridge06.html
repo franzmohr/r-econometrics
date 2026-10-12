@@ -8,17 +8,17 @@ date: "2018-02-04"
 
 <p>Chapter 6 in Wooldridge (2013) deals with some more issues that might have an impact on your estimates. Among these are a change in the scale of your variables, so-called beta-factors and the interpretation of variables that appear together with their squared values, i.e. interaction terms.</p>
 <p>Before you start, set your working directory, load the <code>foreign</code> library and download the data we are going to use in this chapter.</p>
-<pre class="r"><code>library(QuantPsyc)
-library(wooldridge)</code></pre>
+<pre class="r"><code>library(&quot;QuantPsyc&quot;)
+library(&quot;wooldridge&quot;)</code></pre>
 <p><strong>The impact of scales on the estimated coefficients</strong></p>
 <p>Table 6.1</p>
 <pre class="r"><code>data(&quot;bwght&quot;)
 
-lm.1 &lt;- lm(bwght ~ cigs + faminc, data = bwght)
-lm.2 &lt;- lm(bwghtlbs ~ cigs + faminc, data = bwght)
-lm.3 &lt;- lm(bwght ~ packs + faminc, data = bwght)
+model_1 &lt;- lm(bwght ~ cigs + faminc, data = bwght)
+model_2 &lt;- lm(bwghtlbs ~ cigs + faminc, data = bwght)
+model_3 &lt;- lm(bwght ~ packs + faminc, data = bwght)
 
-summary(lm.1)</code></pre>
+summary(model_1)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = bwght ~ cigs + faminc, data = bwght)
@@ -38,7 +38,7 @@ summary(lm.1)</code></pre>
 ## Residual standard error: 20.06 on 1385 degrees of freedom
 ## Multiple R-squared:  0.0298,	Adjusted R-squared:  0.0284 
 ## F-statistic: 21.27 on 2 and 1385 DF,  p-value: 7.942e-10</code></pre>
-<pre class="r"><code>summary(lm.2)</code></pre>
+<pre class="r"><code>summary(model_2)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = bwghtlbs ~ cigs + faminc, data = bwght)
@@ -58,7 +58,7 @@ summary(lm.1)</code></pre>
 ## Residual standard error: 1.254 on 1385 degrees of freedom
 ## Multiple R-squared:  0.0298,	Adjusted R-squared:  0.0284 
 ## F-statistic: 21.27 on 2 and 1385 DF,  p-value: 7.942e-10</code></pre>
-<pre class="r"><code>summary(lm.3)</code></pre>
+<pre class="r"><code>summary(model_3)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = bwght ~ packs + faminc, data = bwght)
@@ -82,14 +82,14 @@ summary(lm.1)</code></pre>
 <p>To estimate beta coefficients I use the <em>QuantPsyc</em> package. Its <code>lm.beta</code> function is neat, however, it does not provide standard errors of the coefficients. Thus, I use the <code>Make.Z()</code> function to obtain z-values for the whole sample, turn it into a data frame and estimate the model as usual.</p>
 <pre class="r"><code>data(&quot;hprice2&quot;)
 
-lm.1 &lt;- lm(price ~ nox + crime + rooms + dist + stratio, data = hprice2)
+model_1 &lt;- lm(price ~ nox + crime + rooms + dist + stratio, data = hprice2)
 
-lm.beta(lm.1) # Beta coefficients with no standard errors.</code></pre>
+lm.beta(model_1) # Beta coefficients with no standard errors.</code></pre>
 <pre><code>##        nox      crime      rooms       dist    stratio 
 ## -0.3404460 -0.1432828  0.5138878 -0.2348385 -0.2702799</code></pre>
-<pre class="r"><code>hprice2.2 &lt;- as.data.frame(Make.Z(hprice2)) # Generate z-values
-lm.2 &lt;- lm(price ~ nox + crime + rooms + dist + stratio, data = hprice2.2)
-summary(lm.1)</code></pre>
+<pre class="r"><code>hprice2_z &lt;- as.data.frame(Make.Z(hprice2)) # Generate z-values
+model_2 &lt;- lm(price ~ nox + crime + rooms + dist + stratio, data = hprice2_z)
+summary(model_1)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = price ~ nox + crime + rooms + dist + stratio, data = hprice2)
@@ -112,10 +112,10 @@ summary(lm.1)</code></pre>
 ## Residual standard error: 5586 on 500 degrees of freedom
 ## Multiple R-squared:  0.6357,	Adjusted R-squared:  0.632 
 ## F-statistic: 174.5 on 5 and 500 DF,  p-value: &lt; 2.2e-16</code></pre>
-<pre class="r"><code>summary(lm.2)</code></pre>
+<pre class="r"><code>summary(model_2)</code></pre>
 <pre><code>## 
 ## Call:
-## lm(formula = price ~ nox + crime + rooms + dist + stratio, data = hprice2.2)
+## lm(formula = price ~ nox + crime + rooms + dist + stratio, data = hprice2_z)
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
@@ -123,7 +123,7 @@ summary(lm.1)</code></pre>
 ## 
 ## Coefficients:
 ##               Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)  5.679e-16  2.697e-02   0.000        1    
+## (Intercept)  4.708e-16  2.697e-02   0.000        1    
 ## nox         -3.404e-01  4.454e-02  -7.643 1.09e-13 ***
 ## crime       -1.433e-01  3.072e-02  -4.665 3.97e-06 ***
 ## rooms        5.139e-01  3.003e-02  17.112  &lt; 2e-16 ***
@@ -140,23 +140,25 @@ summary(lm.1)</code></pre>
 <pre class="r"><code># Equation 6.12
 data(&quot;wage1&quot;)
 
-lm.1 &lt;- lm(wage ~ exper + expersq, data = wage1)
-s.1 &lt;- summary(lm.1)
+model_1 &lt;- lm(wage ~ exper + expersq, data = wage1)
+summary_1 &lt;- summary(model_1)
 
-abs(s.1$coefficient[2, 1] / (2 * s.1$coefficient[3, 1]))</code></pre>
+abs(summary_1[[&quot;coefficients&quot;]][2, 1] /
+      (2 * summary_1[[&quot;coefficients&quot;]][3, 1]))</code></pre>
 <pre><code>## [1] 24.3153</code></pre>
 <p><strong>Example 6.2</strong></p>
 <p>This example is similar to the previous. Again, one exogenous variable is squared and used as an additional estimator to take account of a possible change in the parameter with an increase in the size of the variable. The <code>curve</code> function uses the estimated parameters to simulate such a relationship. The effect on the endogenous variable first decreases at lower values of x, i.e. the number of rooms, and starts to increase with higher values.</p>
 <pre class="r"><code>data(&quot;hprice2&quot;)
 
-ldist &lt;- log(hprice2$dist)
-rooms.sq &lt;- hprice2$rooms^2
-lm.1 &lt;- lm(lprice ~ lnox + ldist + rooms + rooms.sq + stratio, data = hprice2)
+ldist &lt;- log(hprice2[[&quot;dist&quot;]])
+rooms_sq &lt;- hprice2[[&quot;rooms&quot;]]^2
+model_1 &lt;- lm(lprice ~ lnox + ldist + rooms + rooms_sq + stratio,
+              data = hprice2)
 
-summary(lm.1)</code></pre>
+summary(model_1)</code></pre>
 <pre><code>## 
 ## Call:
-## lm(formula = lprice ~ lnox + ldist + rooms + rooms.sq + stratio, 
+## lm(formula = lprice ~ lnox + ldist + rooms + rooms_sq + stratio, 
 ##     data = hprice2)
 ## 
 ## Residuals:
@@ -169,7 +171,7 @@ summary(lm.1)</code></pre>
 ## lnox        -0.901682   0.114687  -7.862 2.34e-14 ***
 ## ldist       -0.086781   0.043281  -2.005  0.04549 *  
 ## rooms       -0.545113   0.165454  -3.295  0.00106 ** 
-## rooms.sq     0.062261   0.012805   4.862 1.56e-06 ***
+## rooms_sq     0.062261   0.012805   4.862 1.56e-06 ***
 ## stratio     -0.047590   0.005854  -8.129 3.42e-15 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
@@ -178,16 +180,21 @@ summary(lm.1)</code></pre>
 ## Multiple R-squared:  0.6028,	Adjusted R-squared:  0.5988 
 ## F-statistic: 151.8 on 5 and 500 DF,  p-value: &lt; 2.2e-16</code></pre>
 <pre class="r"><code># Figure 6.2
-curve(lm.1$coefficients[1] + lm.1$coefficients[4] * x + lm.1$coefficients[5] * x^2, xlim = c(3, 9), ylab = &quot;Effect&quot;)</code></pre>
+beta_hat &lt;- model_1[[&quot;coefficients&quot;]]
+curve(beta_hat[1] + beta_hat[4] * x + beta_hat[5] * x^2,
+      xlim = c(3, 9),
+      ylab = &quot;Effect&quot;)</code></pre>
 <p><img src="/reproduction/wooldridge/wooldridge06_files/figure-html/unnamed-chunk-5-1.png" alt="" width="384" /></p>
 <p><strong>Example 6.3</strong></p>
 <p>This example looks at interaction terms. I use the <code>with</code> function just to spare the <code>attend$</code>-part before each of the variables. I calculate squared values and the interaction term, estimate both models, print the summary - note that you have to use the <code>print</code> command since R will not return this line of code otherwise - and calculate an F-test via <code>anova</code>. The last line gives thee marginal effect of the attendance rate on the outcome variable.</p>
 <p>The problem with this coefficient is that there is no standard error for it. This is achieved by demeaning the second variable of the interaction term and estimating the model again.</p>
 <pre class="r"><code>data(&quot;attend&quot;)
 
-lm.1 &lt;- lm(stndfnl ~ atndrte + priGPA + ACT + I(priGPA^2) + I(ACT^2) + I(priGPA*atndrte), data = attend)
-lm.2 &lt;- lm(stndfnl ~ priGPA + ACT + I(priGPA^2) + I(ACT^2), data = attend)
-summary(lm.1)</code></pre>
+model_1 &lt;- lm(stndfnl ~ atndrte + priGPA + ACT + I(priGPA^2) + I(ACT^2) +
+                I(priGPA * atndrte),
+              data = attend)
+model_2 &lt;- lm(stndfnl ~ priGPA + ACT + I(priGPA^2) + I(ACT^2), data = attend)
+summary(model_1)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = stndfnl ~ atndrte + priGPA + ACT + I(priGPA^2) + 
@@ -212,7 +219,7 @@ summary(lm.1)</code></pre>
 ## Residual standard error: 0.8729 on 673 degrees of freedom
 ## Multiple R-squared:  0.2287,	Adjusted R-squared:  0.2218 
 ## F-statistic: 33.25 on 6 and 673 DF,  p-value: &lt; 2.2e-16</code></pre>
-<pre class="r"><code>anova(lm.1, lm.2)</code></pre>
+<pre class="r"><code>anova(model_1, model_2)</code></pre>
 <pre><code>## Analysis of Variance Table
 ## 
 ## Model 1: stndfnl ~ atndrte + priGPA + ACT + I(priGPA^2) + I(ACT^2) + I(priGPA * 
@@ -223,17 +230,21 @@ summary(lm.1)</code></pre>
 ## 2    675 519.34 -2   -6.5814 4.319 0.01368 *
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<pre class="r"><code>lm.1$coefficients[2] + mean(attend$priGPA) * lm.1$coefficient[7]</code></pre>
+<pre class="r"><code>model_1[[&quot;coefficients&quot;]][2] +
+  mean(attend[[&quot;priGPA&quot;]]) * model_1[[&quot;coefficients&quot;]][7]</code></pre>
 <pre><code>##     atndrte 
 ## 0.007736558</code></pre>
 <p>Typo in the text</p>
-<pre class="r"><code>priGPA.m.atndrte &lt;- (attend$priGPA - mean(attend$priGPA)) * attend$atndrte
-lm.1 &lt;- lm(stndfnl ~ atndrte + priGPA + ACT + I(priGPA^2) + I(ACT^2) + priGPA.m.atndrte, data = attend)
-summary(lm.1)</code></pre>
+<pre class="r"><code>prigpa_m_atndrte &lt;- (attend[[&quot;priGPA&quot;]] - mean(attend[[&quot;priGPA&quot;]])) *
+  attend[[&quot;atndrte&quot;]]
+model_1 &lt;- lm(stndfnl ~ atndrte + priGPA + ACT + I(priGPA^2) + I(ACT^2) +
+                prigpa_m_atndrte,
+              data = attend)
+summary(model_1)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = stndfnl ~ atndrte + priGPA + ACT + I(priGPA^2) + 
-##     I(ACT^2) + priGPA.m.atndrte, data = attend)
+##     I(ACT^2) + prigpa_m_atndrte, data = attend)
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
@@ -247,7 +258,7 @@ summary(lm.1)</code></pre>
 ## ACT              -0.128039   0.098492  -1.300 0.194047    
 ## I(priGPA^2)       0.295905   0.101049   2.928 0.003523 ** 
 ## I(ACT^2)          0.004533   0.002176   2.083 0.037634 *  
-## priGPA.m.atndrte  0.005586   0.004317   1.294 0.196173    
+## prigpa_m_atndrte  0.005586   0.004317   1.294 0.196173    
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
@@ -258,9 +269,9 @@ summary(lm.1)</code></pre>
 <p>See how the estimates and R-squared differ between the two models.</p>
 <pre class="r"><code>data(&quot;rdchem&quot;)
 
-lm.1 &lt;- lm(rdintens ~ lsales, data = rdchem)
-lm.2 &lt;- lm(rdintens ~ sales + salessq, data = rdchem)
-summary(lm.1)</code></pre>
+model_1 &lt;- lm(rdintens ~ lsales, data = rdchem)
+model_2 &lt;- lm(rdintens ~ sales + salessq, data = rdchem)
+summary(model_1)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = rdintens ~ lsales, data = rdchem)
@@ -277,7 +288,7 @@ summary(lm.1)</code></pre>
 ## Residual standard error: 1.845 on 30 degrees of freedom
 ## Multiple R-squared:  0.06133,	Adjusted R-squared:  0.03004 
 ## F-statistic:  1.96 on 1 and 30 DF,  p-value: 0.1718</code></pre>
-<pre class="r"><code>summary(lm.2)</code></pre>
+<pre class="r"><code>summary(model_2)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = rdintens ~ sales + salessq, data = rdchem)
@@ -301,9 +312,9 @@ summary(lm.1)</code></pre>
 <p>See how the estimates and R-squared differ between the following models.</p>
 <pre class="r"><code>data(&quot;ceosal1&quot;)
 
-lm.1 &lt;- lm(salary ~ sales + roe, data = ceosal1)
-lm.2 &lt;- lm(lsalary ~ lsales + roe, data = ceosal1)
-summary(lm.1)</code></pre>
+model_1 &lt;- lm(salary ~ sales + roe, data = ceosal1)
+model_2 &lt;- lm(lsalary ~ lsales + roe, data = ceosal1)
+summary(model_1)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = salary ~ sales + roe, data = ceosal1)
@@ -323,7 +334,7 @@ summary(lm.1)</code></pre>
 ## Residual standard error: 1359 on 206 degrees of freedom
 ## Multiple R-squared:  0.02917,	Adjusted R-squared:  0.01975 
 ## F-statistic: 3.095 on 2 and 206 DF,  p-value: 0.04739</code></pre>
-<pre class="r"><code>summary(lm.2)</code></pre>
+<pre class="r"><code>summary(model_2)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = lsalary ~ lsales + roe, data = ceosal1)
@@ -343,16 +354,16 @@ summary(lm.1)</code></pre>
 ## Residual standard error: 0.4822 on 206 degrees of freedom
 ## Multiple R-squared:  0.282,	Adjusted R-squared:  0.275 
 ## F-statistic: 40.45 on 2 and 206 DF,  p-value: 1.519e-15</code></pre>
-<pre class="r"><code>summary(lm.1)$adj.r.squared</code></pre>
+<pre class="r"><code>summary(model_1)[[&quot;adj.r.squared&quot;]]</code></pre>
 <pre><code>## [1] 0.01974617</code></pre>
-<pre class="r"><code>summary(lm.2)$adj.r.squared</code></pre>
+<pre class="r"><code>summary(model_2)[[&quot;adj.r.squared&quot;]]</code></pre>
 <pre><code>## [1] 0.2750178</code></pre>
 <p><strong>Example 6.5</strong></p>
 <p>Compare the usual estimation of a model with a regression, where interesting values - like means - are subtracted from each variable before the estimation.</p>
 <pre class="r"><code>data(&quot;gpa2&quot;)
 
-lm.1 &lt;- lm(colgpa ~ sat + hsperc + hsize + hsizesq, data = gpa2)
-summary(lm.1)</code></pre>
+model_1 &lt;- lm(colgpa ~ sat + hsperc + hsize + hsizesq, data = gpa2)
+summary(model_1)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = colgpa ~ sat + hsperc + hsize + hsizesq, data = gpa2)
@@ -374,19 +385,23 @@ summary(lm.1)</code></pre>
 ## Residual standard error: 0.5599 on 4132 degrees of freedom
 ## Multiple R-squared:  0.2781,	Adjusted R-squared:  0.2774 
 ## F-statistic:   398 on 4 and 4132 DF,  p-value: &lt; 2.2e-16</code></pre>
-<pre class="r"><code>summary(lm.1)$sigma</code></pre>
+<pre class="r"><code>summary(model_1)[[&quot;sigma&quot;]]</code></pre>
 <pre><code>## [1] 0.5598638</code></pre>
-<pre class="r"><code>lm.1$coefficients</code></pre>
+<pre class="r"><code>beta_hat &lt;- model_1[[&quot;coefficients&quot;]]
+beta_hat</code></pre>
 <pre><code>##  (Intercept)          sat       hsperc        hsize      hsizesq 
 ##  1.492652209  0.001492497 -0.013855782 -0.060881453  0.005460295</code></pre>
-<pre class="r"><code>lm.1$coefficients[1] + lm.1$coefficients[2] * 1200 + lm.1$coefficients[3] * 30 + 
-  lm.1$coefficients[4] * 5 + lm.1$coefficients[5] * 5^2</code></pre>
+<pre class="r"><code>beta_hat[1] + beta_hat[2] * 1200 + beta_hat[3] * 30 +
+  beta_hat[4] * 5 + beta_hat[5] * 5^2</code></pre>
 <pre><code>## (Intercept) 
 ##    2.700075</code></pre>
-<pre class="r"><code>lm.2 &lt;- lm(colgpa ~ I(sat - 1200) + I(hsperc - 30) + I(hsize - 5) + I(hsizesq - 25), data = gpa2) # Estimate the model
+<pre class="r"><code># Estimate the model
+model_2 &lt;- lm(colgpa ~ I(sat - 1200) + I(hsperc - 30) + I(hsize - 5) +
+                I(hsizesq - 25),
+              data = gpa2)
 
-s.2 &lt;- summary(lm.2)
-s.2</code></pre>
+summary_2 &lt;- summary(model_2)
+summary_2</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = colgpa ~ I(sat - 1200) + I(hsperc - 30) + I(hsize - 
@@ -409,34 +424,39 @@ s.2</code></pre>
 ## Residual standard error: 0.5599 on 4132 degrees of freedom
 ## Multiple R-squared:  0.2781,	Adjusted R-squared:  0.2774 
 ## F-statistic:   398 on 4 and 4132 DF,  p-value: &lt; 2.2e-16</code></pre>
-<pre class="r"><code>ci.low &lt;- s.2$coefficients[1, 1] - 1.96 * s.2$coefficients[1, 2] # Create confidence intervals
-ci.high &lt;- s.2$coefficients[1, 1] + 1.96 * s.2$coefficients[1, 2]
-c(ci.low, ci.high)</code></pre>
+<pre class="r"><code># Create confidence intervals
+ci_low &lt;- summary_2[[&quot;coefficients&quot;]][1, 1] -
+  1.96 * summary_2[[&quot;coefficients&quot;]][1, 2]
+ci_high &lt;- summary_2[[&quot;coefficients&quot;]][1, 1] +
+  1.96 * summary_2[[&quot;coefficients&quot;]][1, 2]
+c(ci_low, ci_high)</code></pre>
 <pre><code>## [1] 2.661115 2.739036</code></pre>
 <p><strong>Example 6.6</strong></p>
 <pre class="r"><code>data(&quot;gpa2&quot;)
 
-lm.2 &lt;- lm(colgpa ~ I(sat - 1200) + I(hsperc - 30) + I(hsize - 5) + I(hsizesq - 25), data = gpa2)
-s.2 &lt;- summary(lm.2)
+model_2 &lt;- lm(colgpa ~ I(sat - 1200) + I(hsperc - 30) + I(hsize - 5) +
+                I(hsizesq - 25),
+              data = gpa2)
+summary_2 &lt;- summary(model_2)
 
-se &lt;- sqrt(s.2$coefficients[1, 2]^2 + s.2$sigma^2)
+se &lt;- sqrt(summary_2[[&quot;coefficients&quot;]][1, 2]^2 + summary_2[[&quot;sigma&quot;]]^2)
 se</code></pre>
 <pre><code>## [1] 0.5602166</code></pre>
-<pre class="r"><code>ci.low &lt;- s.2$coefficients[1, 1] - 1.96 * se
-ci.high &lt;- s.2$coefficients[1, 1] + 1.96 * se
-c(ci.low, ci.high)</code></pre>
+<pre class="r"><code>ci_low &lt;- summary_2[[&quot;coefficients&quot;]][1, 1] - 1.96 * se
+ci_high &lt;- summary_2[[&quot;coefficients&quot;]][1, 1] + 1.96 * se
+c(ci_low, ci_high)</code></pre>
 <pre><code>## [1] 1.602051 3.798100</code></pre>
 <p><strong>Example from page 203</strong></p>
 <pre class="r"><code>data(&quot;hprice1&quot;)
 
-lm.1 &lt;- lm(price ~ lotsize + sqrft + bdrms, data = hprice1)
-min(lm.1$residuals)</code></pre>
+model_1 &lt;- lm(price ~ lotsize + sqrft + bdrms, data = hprice1)
+min(model_1[[&quot;residuals&quot;]])</code></pre>
 <pre><code>## [1] -120.0264</code></pre>
 <p><strong>Example 6.7</strong></p>
 <pre class="r"><code>data(&quot;ceosal2&quot;)
 
-lm.1 &lt;- lm(lsalary ~ lsales + lmktval + ceoten, data = ceosal2)
-summary(lm.1)</code></pre>
+model_1 &lt;- lm(lsalary ~ lsales + lmktval + ceoten, data = ceosal2)
+summary(model_1)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = lsalary ~ lsales + lmktval + ceoten, data = ceosal2)
@@ -457,10 +477,11 @@ summary(lm.1)</code></pre>
 ## Residual standard error: 0.5048 on 173 degrees of freedom
 ## Multiple R-squared:  0.3182,	Adjusted R-squared:  0.3063 
 ## F-statistic: 26.91 on 3 and 173 DF,  p-value: 2.474e-14</code></pre>
-<pre class="r"><code>a.1 &lt;- sum(exp(lm.1$residuals)) / 177
+<pre class="r"><code>a_1 &lt;- sum(exp(model_1[[&quot;residuals&quot;]])) / 177
 
-m &lt;- exp(lm.1$fitted.values)
-summary(lm.3 &lt;- lm(salary ~ m - 1, data = ceosal2))</code></pre>
+m &lt;- exp(model_1[[&quot;fitted.values&quot;]])
+model_3 &lt;- lm(salary ~ m - 1, data = ceosal2)
+summary(model_3)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = salary ~ m - 1, data = ceosal2)
@@ -478,46 +499,52 @@ summary(lm.3 &lt;- lm(salary ~ m - 1, data = ceosal2))</code></pre>
 ## Residual standard error: 511.9 on 176 degrees of freedom
 ## Multiple R-squared:  0.7616,	Adjusted R-squared:  0.7603 
 ## F-statistic: 562.4 on 1 and 176 DF,  p-value: &lt; 2.2e-16</code></pre>
-<pre class="r"><code>a.2 &lt;- summary(lm.3 &lt;- lm(salary ~ m - 1, data = ceosal2))$coefficient[1]
+<pre class="r"><code>a_2 &lt;- summary(model_3)[[&quot;coefficients&quot;]][1]
 
-lm.1$coefficients[1] + lm.1$coefficients[2] * log(5000) + lm.1$coefficients[3] * log(10000) + lm.1$coefficients[4] * 10</code></pre>
+beta_hat &lt;- model_1[[&quot;coefficients&quot;]]
+
+beta_hat[1] + beta_hat[2] * log(5000) + beta_hat[3] * log(10000) +
+  beta_hat[4] * 10</code></pre>
 <pre><code>## (Intercept) 
 ##    7.014077</code></pre>
-<pre class="r"><code>exp(lm.1$coefficients[1] + lm.1$coefficients[2] * log(5000) + lm.1$coefficients[3] * log(10000) + lm.1$coefficients[4] * 10)</code></pre>
+<pre class="r"><code>exp(beta_hat[1] + beta_hat[2] * log(5000) + beta_hat[3] * log(10000) +
+      beta_hat[4] * 10)</code></pre>
 <pre><code>## (Intercept) 
 ##     1112.18</code></pre>
-<pre class="r"><code>a.1 * exp(lm.1$coefficients[1] + lm.1$coefficients[2] * log(5000) + lm.1$coefficients[3] * log(10000) + lm.1$coefficients[4] * 10)</code></pre>
+<pre class="r"><code>a_1 * exp(beta_hat[1] + beta_hat[2] * log(5000) + beta_hat[3] * log(10000) +
+            beta_hat[4] * 10)</code></pre>
 <pre><code>## (Intercept) 
 ##    1263.059</code></pre>
-<pre class="r"><code>a.2 * exp(lm.1$coefficients[1] + lm.1$coefficients[2] * log(5000) + lm.1$coefficients[3] * log(10000) + lm.1$coefficients[4] * 10)</code></pre>
+<pre class="r"><code>a_2 * exp(beta_hat[1] + beta_hat[2] * log(5000) + beta_hat[3] * log(10000) +
+            beta_hat[4] * 10)</code></pre>
 <pre><code>## (Intercept) 
 ##    1242.145</code></pre>
 <p><strong>Example 6.8</strong></p>
 <pre class="r"><code>data(&quot;ceosal2&quot;)
 
-lm.1 &lt;- lm(lsalary ~ lsales + lmktval + ceoten, data = ceosal2)
-m &lt;- exp(lm.1$fitted.values)
-cor(ceosal2$salary, m)^2</code></pre>
+model_1 &lt;- lm(lsalary ~ lsales + lmktval + ceoten, data = ceosal2)
+m &lt;- exp(model_1[[&quot;fitted.values&quot;]])
+cor(ceosal2[[&quot;salary&quot;]], m)^2</code></pre>
 <pre><code>## [1] 0.2430808</code></pre>
-<pre class="r"><code>lm.2 &lt;- lm(salary ~ sales + mktval + ceoten, data = ceosal2)
-summary(lm.2)$r.squared</code></pre>
+<pre class="r"><code>model_2 &lt;- lm(salary ~ sales + mktval + ceoten, data = ceosal2)
+summary(model_2)[[&quot;r.squared&quot;]]</code></pre>
 <pre><code>## [1] 0.2012744</code></pre>
-<pre class="r"><code>ceosal2.2 &lt;- ceosal2
-ceosal2.2$lsales &lt;- ceosal2.2$lsales - log(5000)
-ceosal2.2$lmktval &lt;- ceosal2.2$lmktval - log(10000)
-ceosal2.2$ceoten &lt;- ceosal2.2$ceoten - 10
+<pre class="r"><code>ceosal2_centred &lt;- ceosal2
+ceosal2_centred[[&quot;lsales&quot;]] &lt;- ceosal2_centred[[&quot;lsales&quot;]] - log(5000)
+ceosal2_centred[[&quot;lmktval&quot;]] &lt;- ceosal2_centred[[&quot;lmktval&quot;]] - log(10000)
+ceosal2_centred[[&quot;ceoten&quot;]] &lt;- ceosal2_centred[[&quot;ceoten&quot;]] - 10
 
-lm.3 &lt;- lm(lsalary ~ lsales + lmktval + ceoten, data = ceosal2.2)
-s.3 &lt;- summary(lm.3)
+model_3 &lt;- lm(lsalary ~ lsales + lmktval + ceoten, data = ceosal2_centred)
+summary_3 &lt;- summary(model_3)
 
-s.3$sigma</code></pre>
+summary_3[[&quot;sigma&quot;]]</code></pre>
 <pre><code>## [1] 0.504769</code></pre>
-<pre class="r"><code>s.3$coefficients[1, 2]</code></pre>
+<pre class="r"><code>summary_3[[&quot;coefficients&quot;]][1, 2]</code></pre>
 <pre><code>## [1] 0.0745556</code></pre>
-<pre class="r"><code>se &lt;- sqrt(s.3$coefficients[1, 2]^2 + s.3$sigma^2)
+<pre class="r"><code>se &lt;- sqrt(summary_3[[&quot;coefficients&quot;]][1, 2]^2 + summary_3[[&quot;sigma&quot;]]^2)
 se</code></pre>
 <pre><code>## [1] 0.5102453</code></pre>
-<pre class="r"><code>ci.low &lt;- exp(-1.96 * se) * exp(s.3$coefficients[1, 1])
-ci.high &lt;- exp(1.96 * se) * exp(s.3$coefficients[1, 1])
-c(ci.low, ci.high)</code></pre>
+<pre class="r"><code>ci_low &lt;- exp(-1.96 * se) * exp(summary_3[[&quot;coefficients&quot;]][1, 1])
+ci_high &lt;- exp(1.96 * se) * exp(summary_3[[&quot;coefficients&quot;]][1, 1])
+c(ci_low, ci_high)</code></pre>
 <pre><code>## [1]  409.115 3023.462</code></pre>

@@ -11,7 +11,7 @@ Beside the formula, the `lm` function also requires you to specify the data used
 With this knowledge we can already estimate a simple model. In the textbook this is a regression of the variable *salary* on the variable *roe*, where both variables are contained in the *ceosal1* data set. We can access this data set by loading the *wooldridge* data package with `library(wooldridge` and then load the sample with `data("ceosal1")`:
 
 ```{r}
-library(wooldridge) # Load the data package
+library("wooldridge") # Load the data package
 data("ceosal1") # Load the data
 ```
 
@@ -37,13 +37,13 @@ Note that the `lm` function, basically, does nothing else than generating a vect
 
 ```{r}
 # Extract y values and store them as a matrix
-y <- matrix(ceosal1[,"salary"], ncol = 1)
+y <- matrix(ceosal1[, "salary"], ncol = 1)
 
 # Extract x values and store them as a matrix
-x <- as.matrix(cbind(1, ceosal1[,"roe"]))
+x <- as.matrix(cbind(1, ceosal1[, "roe"]))
 
 # Apply the esimation formula
-solve(t(x) %*%x) %*% t(x) %*% y
+solve(t(x) %*% x) %*% t(x) %*% y
 ```
 
 `%*%` tells R that it has to multiply vectors/matrices with each other. `t(x)` generates the transposed matrix of x and the `solve` function calculates the inverse of a square matrix. And as you can see, the values are the same.
@@ -53,11 +53,11 @@ solve(t(x) %*%x) %*% t(x) %*% y
 A very common way to do econometric analyses in R is to estimate a model, save it and let R give you the summary of the saved results. This looks like the following:
 
 ```{r}
-# Estimate and save the model as object lm_1
-lm_1 <- lm(salary ~ roe, data = ceosal1)
+# Estimate and save the model as object model_1
+model_1 <- lm(salary ~ roe, data = ceosal1)
 
 # Show summary statistics
-summary(lm_1)
+summary(model_1)
 ```
 
 The first command generates a new item in the upper right window of RStudio and the `summary` function gives the same values as before, except that it provides additional values like standard errors and R-squared.
@@ -71,8 +71,8 @@ Example 2.4 works exactly in the same way as the last example. Load the data set
 data("wage1")
 
 # Estimate
-lm_1 <- lm(wage ~ educ, data = wage1)
-summary(lm_1)
+model_1 <- lm(wage ~ educ, data = wage1)
+summary(model_1)
 ```
 
 **Example 2.5**
@@ -80,63 +80,64 @@ summary(lm_1)
 ```{r}
 data("vote1")
 
-lm_1 <- lm(voteA ~ shareA, data = vote1)
-summary(lm_1)
+model_1 <- lm(voteA ~ shareA, data = vote1)
+summary(model_1)
 ```
 
 **Example 2.6**
 
-To get the results for table 2.2 redo the script from example 2.3. R does not only save the coefficients, but also some other important values. Type in `names(lm_1)` to get a list of variables that are saved under `lm_._1` as well. Among them are *fitted.values* and *residuals* which represent *salaryhat* and *uhat* from the textbook, respectively.
+To get the results for table 2.2 redo the script from example 2.3. R does not only save the coefficients, but also some other important values. Type in `names(model_1)` to get a list of variables that are saved under `model_1` as well. Among them are *fitted.values* and *residuals* which represent *salaryhat* and *uhat* from the textbook, respectively.
 
 In order to make a table we generate a data frame with the first two colums containing the first 15 observersations from the original dataset and two additional columns into which we later will paste the estimated values. We define the data frame with
 
 ```{r}
-df_1 <- data.frame(roe = ceosal1$roe[1:15],
-                   salary = ceosal1$salary[1:15],
+df_1 <- data.frame(roe = ceosal1[["roe"]][1:15],
+                   salary = ceosal1[["salary"]][1:15],
                    salaryhat = NA,
                    uhat = NA)
 ```
 
 `data.frame` is the function which generates the frame. *roe* is the label of the column which is defined as the value of *ceosal1$salary* at the positions 1 to 15, i.e. `[1:15]`. The structure is the same for the following part with *salary*. *salaryhat* and *uhat* are not defined and `NA` (**n**ot **a**vailable) is used to indicate that. `NA` is in general the indicator of missing values in R.
 
-As a next step we paste the fitted values and the residuals from the regression into the data frame. Therefore, we separately paste the first 15 fitted values (`lm_1$fitted.values[1:15]`) from the regression into the column *salaryhat* (`df_1$salaryhat`). The same method applies to the resudials. Finally, display the table with *df_1*
+As a next step we paste the fitted values and the residuals from the regression into the data frame. Therefore, we separately paste the first 15 fitted values (`model_1[["fitted.values"]][1:15]`) from the regression into the column *salaryhat* (`df_1[["salaryhat"]]`). The same method applies to the resudials. Finally, display the table with *df_1*
 
 ```{r}
-df_1$salaryhat <- lm_1$fitted.values[1:15]
-df_1$uhat <- lm_1$resid[1:15]
+df_1[["salaryhat"]] <- model_1[["fitted.values"]][1:15]
+df_1[["uhat"]] <- model_1[["residuals"]][1:15]
 df_1
 ```
 
 **Example 2.7**
 
-For example 2.7 we have to make R recall the coefficients from the regression of wage on education. Thus, we save the regression and access the saved results via the `$` operator.
+For example 2.7 we have to make R recall the coefficients from the regression of wage on education. Thus, we save the regression and access the saved results by name with double brackets, such as `model_1[["coefficients"]]`.
 
 ```{r}
 data("wage1")
 
-lm_1 <- lm(wage ~ educ, data = wage1)
-lm_1$coefficients
+model_1 <- lm(wage ~ educ, data = wage1)
+model_1[["coefficients"]]
 ```
 
-Since `lm_1$coefficients` is a vector, we can access each position by "[#]", where "#" is the position of the element. So, to get the intercept value we have to access the first position and to get the coefficient of educ we have to take the second position.
+Since `model_1[["coefficients"]]` is a vector, we can access each position by "[#]", where "#" is the position of the element. So, to get the intercept value we have to access the first position and to get the coefficient of educ we have to take the second position.
 
 ```{r}
 # Get value for "(Intercept)"
-lm_1$coefficients[1]
+model_1[["coefficients"]][1]
 
 # Get value for educ
-lm_1$coefficients[2]
+model_1[["coefficients"]][2]
 ```
 
 Example 2.7 calculates the fittet value for a person with an average amount of years of education. Recall the function `mean` from the chapter on summary statistics and take into account what you have learned so far about obtaining the coefficient values of an estimation. This allows us to calculate the fitted values by typing
 
 ```{r}
-lm_1$coefficients[1] + lm_1$coefficients[2] * mean(wage1$educ)
+model_1[["coefficients"]][1] +
+  model_1[["coefficients"]][2] * mean(wage1[["educ"]])
 ```
 
 **Example 2.8**
 
-This is the same example as 2.3. But this time it is about the R-squared. Repeat the command from above and let R display `summary(lm_1)`. You will find the R-squared in the second line from the bottom called "Multiple R-squared". Rounded it should be the same value as in [2.39] in the book.
+This is the same example as 2.3. But this time it is about the R-squared. Repeat the command from above and let R display `summary(model_1)`. You will find the R-squared in the second line from the bottom called "Multiple R-squared". Rounded it should be the same value as in [2.39] in the book.
 
 **Example 2.9**
 
@@ -149,7 +150,7 @@ The example uses logged values as dependent variable. How do we get them? Just t
 ```{r}
 data("wage1")
 
-lwage <- log(wage1$wage)
+lwage <- log(wage1[["wage"]])
 ```
 
 The last line is what we are looking for. `log` takes the natural logarithm of the variable in parentheses. In this example R calculates this value for each position in *wage* and saves it as a separate object, which I named *lwage*.
@@ -157,8 +158,9 @@ The last line is what we are looking for. `log` takes the natural logarithm of t
 Now we can proceed with the regression which works in the usual manner, except that *lwage* is the dependent variable now:
 
 ```{r}
-lm_1 <- lm(lwage ~ wage1$educ)
-summary(lm_1)
+educ <- wage1[["educ"]]
+model_1 <- lm(lwage ~ educ)
+summary(model_1)
 ```
 
 **Example 2.11**
@@ -166,10 +168,10 @@ summary(lm_1)
 In 2.11 we proceed the same way as in 2.10. We generate the log values of salary and sales in the same manner and estimate the model to obtain the elasticities.
 
 ```{r}
-lsalary <- log(ceosal1$salary)
-lsales <- log(ceosal1$sales)
-lm_1 <- lm(lsalary ~ lsales)
-summary(lm_1)
+lsalary <- log(ceosal1[["salary"]])
+lsales <- log(ceosal1[["sales"]])
+model_1 <- lm(lsalary ~ lsales)
+summary(model_1)
 ```
 
 **Example 2.12**
@@ -179,8 +181,8 @@ The only new thing in this expamle is the sample. So load it and estimate the mo
 ```{r}
 data("meap93")
 
-lm_1 <- lm(math10 ~ lnchprg, data = meap93)
-summary(lm_1)
+model_1 <- lm(math10 ~ lnchprg, data = meap93)
+summary(model_1)
 ```
 
 So, this was chapter 2, where we estimated simple OLS models. But since we would like to introduce more independent variabels in order to get better estimates and to avoid spurious correlation we move on to chapter 3 on [multiple regression analysis](/reproduction/wooldridge/wooldridge03).
