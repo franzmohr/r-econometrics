@@ -15,9 +15,7 @@ description: "Hochmuth and Petz (2026) argue that persistent services inflation 
 
 
 
-<p>Euro area services inflation has come down much more slowly than goods inflation since its peak in 2023. <a href="https://www.oenb.at/en/daten-und-forschung/publikationen/publikationsreihen/policy-brief/2026/policy-brief-2026-11.html">Hochmuth and Petz (2026)</a> read this partly as a relative-price adjustment. Before the pandemic, services prices rose faster than goods prices along a stable trend, which reflects slower productivity growth in services, income-elastic demand for them and their lower tradability. The surge in goods prices in 2021 and 2022 pushed the price of services relative to goods below that trend, and part of what looks like persistent services inflation is the relative price working its way back.</p>
-<p>How fast that happens, and whether it happens through higher services inflation or lower goods inflation, is the question of the policy brief’s Annex A. It answers it with a small error correction model of services and non-energy industrial goods (NEIG) prices, and finds that half of a gap closes after about three and a half years, mostly through services. With overall goods prices instead of NEIG the gap closes within about five quarters, and mostly through goods.</p>
-<p>This post reproduces both results with <a href="https://github.com/franzmohr/bvartools"><code>bvartools</code></a>, together with the brief’s three descriptive charts: the composition of euro area inflation, and the relative price of services in the euro area and the United States.</p>
+<p>This post reproduces results from <a href="https://www.oenb.at/en/daten-und-forschung/publikationen/publikationsreihen/policy-brief/2026/policy-brief-2026-11.html">Hochmuth and Petz (2026)</a> with <a href="https://github.com/franzmohr/bvartools"><code>bvartools</code></a>, including the brief’s three descriptive charts: the composition of euro area inflation, and the relative price of services in the euro area and the United States.</p>
 <!--more-->
 <div id="the-model" class="section level2">
 <h2>The model</h2>
@@ -31,37 +29,37 @@ description: "Hochmuth and Petz (2026) argue that persistent services inflation 
 </div>
 <div id="the-data" class="section level2">
 <h2>The data</h2>
-<p>The paper uses monthly harmonised indices of consumer prices (HICP) for the euro area (changing composition) from Eurostat data set <code>prc_hicp_minr</code>, from January 1996 to June 2026. They are seasonally adjusted with X-13ARIMA-SEATS from the <a href="https://cran.r-project.org/package=seasonal"><code>seasonal</code></a> package and averaged to quarters.</p>
-<p>The data set is the first that Eurostat publishes under the new ECOICOP version 2, and the vintage of October 2026 has no euro area index before December 1999, although the paper says it started in January 1996 when it was downloaded in August. The ECB Data Portal still has the old ECOICOP version 1 indices, which start in 1996, so the missing months are filled in with their month-on-month growth rates. The ECB’s NEIG index itself has a hole from January 1997 to November 2000, which its published annual rates of change fill: <span class="math inline">\(P_t = P_{t-12} (1 + \pi^{yoy}_t / 100)\)</span>. Since those rates have only one decimal, each year rebuilt that way is off by at most 0.05%.</p>
-<pre class="r"><code>library(&quot;jsonlite&quot;)
+<p>The paper uses monthly harmonised indices of consumer prices (HICP) for the euro area (changing composition) from Eurostat data set <code>prc_hicp_minr</code>, from January 1996 to June 2026, which the <a href="https://cran.r-project.org/package=eurostat"><code>eurostat</code></a> package downloads. They are seasonally adjusted with X-13ARIMA-SEATS from the <a href="https://cran.r-project.org/package=seasonal"><code>seasonal</code></a> package and averaged to quarters.</p>
+<p>The data set is the first that Eurostat publishes under the new ECOICOP version 2, and the vintage of October 2026 has no euro area index before December 1999, although the paper says it started in January 1996 when it was downloaded in August. The ECB Data Portal still has the old ECOICOP version 1 indices, which start in 1996 and which the <a href="https://cran.r-project.org/package=ecb"><code>ecb</code></a> package downloads, so the missing months are filled in with their month-on-month growth rates. The ECB’s NEIG index itself has a hole from January 1997 to November 2000, which its published annual rates of change fill: <span class="math inline">\(P_t = P_{t-12} (1 + \pi^{yoy}_t / 100)\)</span>. Since those rates have only one decimal, each year rebuilt that way is off by at most 0.05%.</p>
+<pre class="r"><code>library(&quot;eurostat&quot;)
+library(&quot;ecb&quot;)
+
+# A long Eurostat or ECB table as a matrix, one row per month, one column per series
+as_matrix &lt;- function(value, month, series) {
+  tapply(value, list(as.character(month), series), sum)
+}
 
 # Eurostat, ECOICOP ver. 2: services, NEIG and goods, 2025 = 100
-url &lt;- paste0(&quot;https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/&quot;,
-              &quot;prc_hicp_minr?format=JSON&amp;geo=EA&amp;unit=I25&quot;,
-              &quot;&amp;coicop18=SERV&amp;coicop18=IGD_NNRG&amp;coicop18=GD&quot;)
-js &lt;- fromJSON(url)
-items &lt;- names(sort(unlist(js$dimension$coicop18$category$index)))
-months &lt;- names(sort(unlist(js$dimension$time$category$index)))
-hicp &lt;- matrix(NA_real_, length(months), length(items), dimnames = list(months, items))
-pos &lt;- as.integer(names(js$value))   # JSON-stat: item position * months + month position
-hicp[cbind(pos %% length(months) + 1, pos %/% length(months) + 1)] &lt;- unlist(js$value)
-hicp &lt;- hicp[months &lt;= &quot;2026-06&quot;, ]
+x &lt;- get_eurostat(&quot;prc_hicp_minr&quot;, time_format = &quot;raw&quot;, cache = FALSE,
+                  filters = list(geo = &quot;EA&quot;, unit = &quot;I25&quot;,
+                                 coicop18 = c(&quot;SERV&quot;, &quot;IGD_NNRG&quot;, &quot;GD&quot;)))
+hicp &lt;- as_matrix(x$values, x$time, x$coicop18)
+hicp &lt;- hicp[rownames(hicp) &lt;= &quot;2026-06&quot;, ]
 
 # ECB, ECOICOP ver. 1: index levels (INX) and annual rates (ANR) for 1996 to 2001
-ecb &lt;- function(item, suffix) {
-  x &lt;- read.csv(paste0(&quot;https://data-api.ecb.europa.eu/service/data/ICP/M.U2.N.&quot;,
-                       item, &quot;.4.&quot;, suffix,
-                       &quot;?format=csvdata&amp;detail=dataonly&amp;startPeriod=1996-01&amp;endPeriod=2001-12&quot;))
-  setNames(x$OBS_VALUE, x$TIME_PERIOD)
-}
+x &lt;- get_data(&quot;ICP.M.U2.N.SERV00+IGXE00+GOODS0.4.INX+ANR&quot;,
+              filter = list(startPeriod = &quot;1996-01&quot;, endPeriod = &quot;2001-12&quot;))
+inx &lt;- as_matrix(x$obsvalue[x$icp_suffix == &quot;INX&quot;], x$obstime[x$icp_suffix == &quot;INX&quot;],
+                 x$icp_item[x$icp_suffix == &quot;INX&quot;])
+anr &lt;- as_matrix(x$obsvalue[x$icp_suffix == &quot;ANR&quot;], x$obstime[x$icp_suffix == &quot;ANR&quot;],
+                 x$icp_item[x$icp_suffix == &quot;ANR&quot;])
+
 early &lt;- rownames(hicp)[rownames(hicp) &lt;= &quot;2001-12&quot;]
-for (i in items) {
+for (i in colnames(hicp)) {
   item &lt;- c(SERV = &quot;SERV00&quot;, IGD_NNRG = &quot;IGXE00&quot;, GD = &quot;GOODS0&quot;)[[i]]
-  old &lt;- ecb(item, &quot;INX&quot;)[early]
-  anr &lt;- ecb(item, &quot;ANR&quot;)
-  names(old) &lt;- early
+  old &lt;- setNames(inx[early, item], early)
   for (j in which(is.na(old))) {
-    old[j] &lt;- old[j - 12] * (1 + anr[[early[j]]] / 100)
+    old[j] &lt;- old[j - 12] * (1 + anr[early[j], item] / 100)
   }
   first &lt;- min(which(!is.na(hicp[, i])))
   hicp[1:(first - 1), i] &lt;- hicp[first, i] * old[1:(first - 1)] / old[first]
@@ -86,24 +84,20 @@ colnames(prices) &lt;- c(&quot;services&quot;, &quot;neig&quot;, &quot;goods&quo
 <div id="the-composition-of-euro-area-inflation" class="section level2">
 <h2>The composition of euro area inflation</h2>
 <p>Chart 1 of the brief splits euro area HICP inflation since 2018 into the contributions of energy, food including alcohol and tobacco, NEIG and services. Eurostat publishes these contributions in percentage points as data set <code>prc_hicp_ctr</code>, and the annual rates of headline and core inflation – the overall index excluding energy, food, alcohol and tobacco – are in <code>prc_hicp_minr</code>:</p>
-<pre class="r"><code># One euro area series per COICOP aggregate from a Eurostat JSON-stat query
-eurostat &lt;- function(dataset, query) {
-  js &lt;- fromJSON(paste0(&quot;https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/&quot;,
-                        dataset, &quot;?format=JSON&amp;geo=EA&amp;sinceTimePeriod=2018-01&amp;&quot;, query))
-  items &lt;- names(sort(unlist(js$dimension$coicop18$category$index)))
-  months &lt;- names(sort(unlist(js$dimension$time$category$index)))
-  x &lt;- matrix(NA_real_, length(months), length(items), dimnames = list(months, items))
-  pos &lt;- as.integer(names(js$value))
-  x[cbind(pos %% length(months) + 1, pos %/% length(months) + 1)] &lt;- unlist(js$value)
-  x
-}
+<pre class="r"><code>ctr &lt;- get_eurostat(&quot;prc_hicp_ctr&quot;, time_format = &quot;raw&quot;, cache = FALSE,
+                    filters = list(geo = &quot;EA&quot;, coicop18 = c(&quot;NRG&quot;, &quot;FOOD&quot;, &quot;IGD_NNRG&quot;, &quot;SERV&quot;)))
+rates &lt;- get_eurostat(&quot;prc_hicp_minr&quot;, time_format = &quot;raw&quot;, cache = FALSE,
+                      filters = list(geo = &quot;EA&quot;, unit = &quot;RCH_A&quot;,
+                                     coicop18 = c(&quot;TOTAL&quot;, &quot;TOT_X_NRG_FOOD&quot;)))
+ctr &lt;- as_matrix(ctr$values, ctr$time, ctr$coicop18)
+rates &lt;- as_matrix(rates$values, rates$time, rates$coicop18)
 
-ctr &lt;- eurostat(&quot;prc_hicp_ctr&quot;, &quot;coicop18=NRG&amp;coicop18=FOOD&amp;coicop18=IGD_NNRG&amp;coicop18=SERV&quot;)
-rates &lt;- eurostat(&quot;prc_hicp_minr&quot;, &quot;unit=RCH_A&amp;coicop18=TOTAL&amp;coicop18=TOT_X_NRG_FOOD&quot;)
+# From 2018 to the brief&#39;s last observation
 months &lt;- intersect(rownames(ctr), rownames(rates))
-months &lt;- months[months &lt;= &quot;2026-07&quot;]   # the brief&#39;s last observation
+months &lt;- months[months &gt;= &quot;2018-01&quot; &amp; months &lt;= &quot;2026-07&quot;]
 
-write.csv(data.frame(month = months, ctr[months, ], rates[months, ]),
+write.csv(data.frame(month = months, ctr[months, c(&quot;FOOD&quot;, &quot;IGD_NNRG&quot;, &quot;NRG&quot;, &quot;SERV&quot;)],
+                     rates[months, c(&quot;TOTAL&quot;, &quot;TOT_X_NRG_FOOD&quot;)]),
           &quot;_2026_hochmuth_petz_contributions.csv&quot;, row.names = FALSE)</code></pre>
 <p>The contributions add up to headline inflation up to rounding. The bars of a month are stacked upwards from zero where they are positive and downwards where they are negative. All charts on this page share one set of colours, with services always in blue:</p>
 <pre class="r"><code>colours &lt;- c(red = &quot;#C10016&quot;, blue = &quot;#0F4C81&quot;, amber = &quot;#E8A33D&quot;, teal = &quot;#17807A&quot;,
@@ -162,29 +156,14 @@ legend(&quot;topleft&quot;, legend = c(&quot;Services relative to NEIG&quot;, &q
        col = colours[c(&quot;teal&quot;, &quot;amber&quot;)], lwd = 2, bty = &quot;n&quot;)</code></pre>
 <p><img src="/reproduction/2026_hochmuth_petz_services_files/figure-html/chart2-1.png" alt="" width="672" /></p>
 <p>Before the pandemic services became 1.3% a year more expensive relative to NEIG, and 0.3% relative to overall goods. Both relative prices fell below their trends in 2021 and 2022. The one against overall goods fell much more, because the energy and food prices it includes rose most, and it has made up less of the loss since. In the second quarter of 2026 services relative to NEIG are 3.2% below the extrapolated trend, which the brief puts at 3.5%, and relative to overall goods 5% below it.</p>
-<p>The euro area series is short, so the brief turns to post-war US data to ask whether such a trend survives large shocks. Chart 3 is the price of services relative to commodities in the US consumer price index for all urban consumers (CPI-U), series <code>CUUR0000SAS</code> and <code>CUUR0000SAC</code> of the Bureau of Labor Statistics. Its public API returns at most ten years per request:</p>
-<pre class="r"><code>library(&quot;httr&quot;)
-library(&quot;jsonlite&quot;)
+<p>The euro area series is short, so the brief turns to post-war US data to ask whether such a trend survives large shocks. Chart 3 is the price of services relative to commodities in the US consumer price index for all urban consumers (CPI-U), series <code>CUUR0000SAS</code> and <code>CUUR0000SAC</code> of the Bureau of Labor Statistics. FRED, the database of the Federal Reserve Bank of St. Louis, carries both, and the <a href="https://cran.r-project.org/package=alfred"><code>alfred</code></a> package downloads them:</p>
+<pre class="r"><code>library(&quot;alfred&quot;)
 
-bls &lt;- function(start, end) {
-  body &lt;- toJSON(list(seriesid = c(&quot;CUUR0000SAS&quot;, &quot;CUUR0000SAC&quot;),
-                      startyear = as.character(start), endyear = as.character(end)),
-                 auto_unbox = TRUE)
-  res &lt;- fromJSON(content(POST(&quot;https://api.bls.gov/publicAPI/v2/timeseries/data/&quot;,
-                               body = body, content_type_json()), &quot;text&quot;, encoding = &quot;UTF-8&quot;))
-  series &lt;- res$Results$series
-  do.call(rbind, lapply(seq_along(series$seriesID), function(i) {
-    d &lt;- series$data[[i]]
-    d &lt;- d[d$period != &quot;M13&quot;, ]   # M13 is the annual average
-    data.frame(series = series$seriesID[i], month = paste0(d$year, &quot;-&quot;, substr(d$period, 2, 3)),
-               value = suppressWarnings(as.numeric(d$value)))
-  }))
-}
-us &lt;- do.call(rbind, lapply(seq(1947, 2026, by = 10), function(y) bls(y, min(y + 9, 2026))))
-us &lt;- reshape(us, idvar = &quot;month&quot;, timevar = &quot;series&quot;, direction = &quot;wide&quot;)
-names(us) &lt;- sub(&quot;value.&quot;, &quot;&quot;, names(us), fixed = TRUE)
-us &lt;- us[us$month &lt;= &quot;2026-06&quot;, ]
-us &lt;- us[order(us$month), ]
+us &lt;- merge(get_fred_series(&quot;CUUR0000SAS&quot;, &quot;CUUR0000SAS&quot;),
+            get_fred_series(&quot;CUUR0000SAC&quot;, &quot;CUUR0000SAC&quot;), by = &quot;date&quot;)
+us$month &lt;- format(us$date, &quot;%Y-%m&quot;)
+us &lt;- us[us$month &gt;= &quot;1947-01&quot; &amp; us$month &lt;= &quot;2026-06&quot; &amp; !is.na(us$CUUR0000SAS),
+         c(&quot;month&quot;, &quot;CUUR0000SAS&quot;, &quot;CUUR0000SAC&quot;)]   # FRED pads the quarterly years
 
 write.csv(us, &quot;_2026_hochmuth_petz_us_cpi.csv&quot;, row.names = FALSE)</code></pre>
 <p>Both indices are published quarterly until 1955 and monthly after that, and October 2025, when the federal government was shut down, is missing. Quarterly averages of what is there take care of both. The trend is fitted over the whole sample:</p>
