@@ -5,10 +5,11 @@ date: "2018-10-07"
 ---
 
 ```{r, message = FALSE}
-library(lmtest)
-library(sandwich)
-library(tseries)
-library(wooldridge)
+library("lmtest")
+library("prais")
+library("sandwich")
+library("tseries")
+library("wooldridge")
 ```
 
 ### Example 12.1
@@ -18,32 +19,38 @@ data("phillips")
 
 Static Phillips curve
 ```{r}
-lm.12.1.1 <- lm(inf ~ unem, data = phillips)
-res.static <- lm.12.1.1$res
-res.static_1 <- c(NA, lm.12.1.1$res[-(length(res.static))])
-lm.12.1.1.test <- lm(res.static ~ res.static_1)
-summary(lm.12.1.1.test)
+model_12_1_1 <- lm(inf ~ unem, data = phillips)
+
+res_static <- model_12_1_1[["residuals"]]
+res_static_1 <- c(NA, model_12_1_1[["residuals"]][-(length(res_static))])
+
+model_12_1_1_test <- lm(res_static ~ res_static_1)
+summary(model_12_1_1_test)
 ```
 
 Augmented Phillips curve
 ```{r}
-lm.12.1.2 <- lm(I(inf - inf_1) ~ unem, data = phillips)
-res.aug <- lm.12.1.2$res
-res.aug_1 <- c(NA, lm.12.1.2$res[-length(res.aug)])
-lm.12.1.2.test <- lm(res.aug ~ res.aug_1)
-summary(lm.12.1.2.test)
+model_12_1_2 <- lm(I(inf - inf_1) ~ unem, data = phillips)
+
+res_aug <- model_12_1_2[["residuals"]]
+res_aug_1 <- c(NA, model_12_1_2[["residuals"]][-length(res_aug)])
+
+model_12_1_2_test <- lm(res_aug ~ res_aug_1)
+summary(model_12_1_2_test)
 ```
 
 Heteroskedasticity robust t statistic
 ```{r}
-coeftest(lm.12.1.1.test, vcov = vcovHC(lm.12.1.1.test, type = "HC0"))
+coeftest(model_12_1_1_test,
+         vcov = vcovHC(model_12_1_1_test, type = "HC0"))
 ```
 
 ```{r}
-coeftest(lm.12.1.2.test, vcov = vcovHC(lm.12.1.2.test, type = "HC0"))
+coeftest(model_12_1_2_test,
+         vcov = vcovHC(model_12_1_2_test, type = "HC0"))
 ```
 
-# Durbin-Watson Test
+### Durbin-Watson Test
 ```{r}
 # from package lmtest
 dwtest(inf ~ unem, data = phillips)
@@ -54,16 +61,19 @@ dwtest(I(inf - inf_1) ~ unem, data = phillips)
 ```{r}
 data("prminwge")
 
-lm.12.2 <- lm(lprepop ~ lmincov + lusgnp + lprgnp + t, data = prminwge)
-lm.12.2.res <- lm.12.2$res
-lm.12.2.res_1 <- c(NA, lm.12.2$res[-length(lm.12.2.res)])
-lm.12.2.test <- lm(lm.12.2.res ~ lmincov + lusgnp + lprgnp + t + lm.12.2.res_1, data = prminwge)
-summary(lm.12.2.test)
+model_12_2 <- lm(lprepop ~ lmincov + lusgnp + lprgnp + t, data = prminwge)
+
+res_12_2 <- model_12_2[["residuals"]]
+res_12_2_1 <- c(NA, model_12_2[["residuals"]][-length(res_12_2)])
+
+model_12_2_test <- lm(res_12_2 ~ lmincov + lusgnp + lprgnp + t + res_12_2_1,
+                      data = prminwge)
+summary(model_12_2_test)
 ```
 
 For comparison the test with strict exogenous regressors
 ```{r}
-summary(lm(lm.12.2.res ~ lm.12.2.res_1))
+summary(lm(res_12_2 ~ res_12_2_1))
 ```
 
 ### Example 12.3
@@ -71,37 +81,46 @@ summary(lm(lm.12.2.res ~ lm.12.2.res_1))
 ```{r}
 data("barium")
 
-lm.12.3 <- lm(lchnimp ~ lchempi + lgas + lrtwex + befile6 + affile6 + afdec6, data = barium)
+model_12_3 <- lm(lchnimp ~ lchempi + lgas + lrtwex + befile6 + affile6 +
+                   afdec6,
+                 data = barium)
 
-lm.12.3.res <- lm.12.3$res
-lm.12.3.res_1 <- c(NA,lm.12.3$res[1:(length(lm.12.3.res)-1)])
-lm.12.3.res_2 <- c(NA,NA,lm.12.3$res[1:(length(lm.12.3.res)-2)])
-lm.12.3.res_3 <- c(NA,NA,NA,lm.12.3$res[1:(length(lm.12.3.res)-3)])
+res_12_3 <- model_12_3[["residuals"]]
+n_res <- length(res_12_3)
+res_12_3_1 <- c(NA, model_12_3[["residuals"]][1:(n_res - 1)])
+res_12_3_2 <- c(NA, NA, model_12_3[["residuals"]][1:(n_res - 2)])
+res_12_3_3 <- c(NA, NA, NA, model_12_3[["residuals"]][1:(n_res - 3)])
 
-data <- cbind(barium, lm.12.3.res)
-data <- cbind(data, lm.12.3.res_1)
-data <- cbind(data, lm.12.3.res_2)
-data <- cbind(data, lm.12.3.res_3)
+barium_res <- cbind(barium, res_12_3)
+barium_res <- cbind(barium_res, res_12_3_1)
+barium_res <- cbind(barium_res, res_12_3_2)
+barium_res <- cbind(barium_res, res_12_3_3)
 
-lm.12.3.test <- lm(lm.12.3.res ~ lchempi + lgas + lrtwex + befile6 + affile6 + afdec6 +
- lm.12.3.res_1 + lm.12.3.res_2 + lm.12.3.res_3, data = data)
+model_12_3_test <- lm(res_12_3 ~ lchempi + lgas + lrtwex + befile6 + affile6 +
+                        afdec6 + res_12_3_1 + res_12_3_2 + res_12_3_3,
+                      data = barium_res)
 
-lm.12.3.test.res <- lm(lm.12.3.res ~ lchempi + lgas + lrtwex + befile6 + affile6 + afdec6,
- data = data[-(1:3),]) # Drop first 3 observations to make test statistics comparable
+# Drop the first 3 observations to make the test statistics comparable
+model_12_3_test_res <- lm(res_12_3 ~ lchempi + lgas + lrtwex + befile6 +
+                            affile6 + afdec6,
+                          data = barium_res[-(1:3), ])
 
-anova(lm.12.3.test, lm.12.3.test.res)
+anova(model_12_3_test, model_12_3_test_res)
 ```
 
 Seasonal autocorrelation
 ```{r}
-data <- cbind(data, lm.12.3.res_12 = c(rep(NA, 12), lm.12.3$res[1:(length(lm.12.3.res) - 12)]))
-summary(lm(lm.12.3.res ~ lm.12.3.res_12, data = data))
+res_12_3_12 <- c(rep(NA, 12), model_12_3[["residuals"]][1:(n_res - 12)])
+barium_res <- cbind(barium_res, res_12_3_12)
+
+summary(lm(res_12_3 ~ res_12_3_12, data = barium_res))
 ```
 
 Include regressors
 ```{r}
-summary(lm(lm.12.3.res ~ lchempi + lgas + lrtwex + befile6 + affile6 + afdec6 +
- lm.12.3.res_12, data = data))
+summary(lm(res_12_3 ~ lchempi + lgas + lrtwex + befile6 + affile6 + afdec6 +
+             res_12_3_12,
+           data = barium_res))
 ```
 
 ### Example 12.4
@@ -109,11 +128,10 @@ summary(lm(lm.12.3.res ~ lchempi + lgas + lrtwex + befile6 + affile6 + afdec6 +
 ```{r}
 data("barium")
 
-# Download my prais package
-library(prais)
-
-pw_1 <- prais_winsten(lchnimp ~ lchempi + lgas + lrtwex + befile6 + 
- affile6 + afdec6, data = barium)
+pw_1 <- prais_winsten(lchnimp ~ lchempi + lgas + lrtwex + befile6 + affile6 +
+                        afdec6,
+                      data = barium,
+                      index = "t")
 ```
 
 ```{r}
@@ -128,13 +146,13 @@ data("phillips")
 
 First column
 ```{r}
-lm.12.5 <- lm(inf ~ unem, data = phillips)
-summary(lm.12.5)
+model_12_5 <- lm(inf ~ unem, data = phillips)
+summary(model_12_5)
 ```
 
 Second column
 ```{r}
-pw_2 <- prais_winsten(inf ~ unem, data=phillips)
+pw_2 <- prais_winsten(inf ~ unem, data = phillips, index = "year")
 summary(pw_2)
 ```
 
@@ -142,29 +160,31 @@ summary(pw_2)
 ```{r}
 data("intdef")
 
-summary(lm.12.6.1 <- lm(i3 ~ inf + def, data = intdef))
+model_12_6_1 <- lm(i3 ~ inf + def, data = intdef)
+summary(model_12_6_1)
 ```
 
 ```{r}
-res <- lm.12.6.1$residuals
+res <- model_12_6_1[["residuals"]]
 res_1 <- c(NA, res[-length(res)])
 summary(lm(res ~ -1 + res_1))
 ```
 
 ```{r}
-lm.12.6.2 <- lm(I(diff(i3)) ~ I(diff(inf)) + I(diff(def)), data = intdef)
-summary(lm.12.6.2)
+model_12_6_2 <- lm(I(diff(i3)) ~ I(diff(inf)) + I(diff(def)), data = intdef)
+summary(model_12_6_2)
 ```
 
 Correlation between $i3_t$ and $i3_{t-1}$
 ```{r}
-cor(intdef$i3, c(NA, intdef$i3[-length(intdef$i3)]), use = "pairwise.complete.obs")
+i3 <- intdef[["i3"]]
+cor(i3, c(NA, i3[-length(i3)]), use = "pairwise.complete.obs")
 ```
 
 Regression of $e_t$ on $e_{t-1}$
 ```{r}
-res <- lm.12.6.2$residuals
-res_1 <- res_1 <- c(NA, res[-length(res)])
+res <- model_12_6_2[["residuals"]]
+res_1 <- c(NA, res[-length(res)])
 summary(lm(res ~ -1 + res_1))
 ```
 
@@ -172,13 +192,15 @@ summary(lm(res ~ -1 + res_1))
 ```{r}
 data("prminwge")
 
-lm.12.7.1 <- lm(lprepop ~ lmincov + lusgnp + lprgnp + t, data = prminwge)
-summary(lm.12.7.1)
+model_12_7_1 <- lm(lprepop ~ lmincov + lusgnp + lprgnp + t, data = prminwge)
+summary(model_12_7_1)
 ```
 
-### Still looking for the SC/heteroskedasticiy robust se.
+### Still looking for the SC/heteroskedasticity robust se.
 ```{r}
-pw_12_7_1 <- prais_winsten(lprepop ~ lmincov + lusgnp + lprgnp + t, data = prminwge)
+pw_12_7_1 <- prais_winsten(lprepop ~ lmincov + lusgnp + lprgnp + t,
+                           data = prminwge,
+                           index = "t")
 summary(pw_12_7_1)
 ```
 
@@ -186,36 +208,36 @@ summary(pw_12_7_1)
 ```{r}
 data("nyse")
 
-lm.12.8 <- lm(return ~ return_1, data = nyse)
-summary(lm.12.8)
+model_12_8 <- lm(return ~ return_1, data = nyse)
+summary(model_12_8)
 ```
 
 ```{r}
-res <- lm.12.8$residuals^2
+res <- model_12_8[["residuals"]]^2
 
-lm.12.8.bp <- lm(res ~ return_1, data = na.omit(nyse))
-summary(lm.12.8.bp)
+model_12_8_bp <- lm(res ~ return_1, data = na.omit(nyse))
+summary(model_12_8_bp)
 ```
 
 ### Example 12.9
 ```{r}
 data("nyse")
 
-lm.12.9 <- lm(return ~ return_1, data = nyse)
-summary(lm.12.9)
+model_12_9 <- lm(return ~ return_1, data = nyse)
+summary(model_12_9)
 ```
 
 ```{r}
-u <- lm.12.8$residuals
+u <- model_12_8[["residuals"]]
 u_1 <- c(NA, u[-length(u)])
-usq <- lm.12.8$residuals^2
+usq <- model_12_8[["residuals"]]^2
 usq_1 <- c(NA, usq[-length(usq)])
 
-lm.12.9.arch <- lm(usq ~ usq_1)
-summary(lm.12.9.arch)
+model_12_9_arch <- lm(usq ~ usq_1)
+summary(model_12_9_arch)
 ```
 
 ```{r}
-lm.12.9.3 <- lm(u ~ u_1)
-summary(lm.12.9.3)
+model_12_9_3 <- lm(u ~ u_1)
+summary(model_12_9_3)
 ```

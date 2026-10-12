@@ -6,22 +6,25 @@ date: "2018-10-07"
 
 
 
-<pre class="r"><code>library(lmtest)
-library(sandwich)
-library(tseries)
-library(wooldridge)</code></pre>
+<pre class="r"><code>library(&quot;lmtest&quot;)
+library(&quot;prais&quot;)
+library(&quot;sandwich&quot;)
+library(&quot;tseries&quot;)
+library(&quot;wooldridge&quot;)</code></pre>
 <div id="example-12.1" class="section level3">
 <h3>Example 12.1</h3>
 <pre class="r"><code>data(&quot;phillips&quot;)</code></pre>
 <p>Static Phillips curve</p>
-<pre class="r"><code>lm.12.1.1 &lt;- lm(inf ~ unem, data = phillips)
-res.static &lt;- lm.12.1.1$res
-res.static_1 &lt;- c(NA, lm.12.1.1$res[-(length(res.static))])
-lm.12.1.1.test &lt;- lm(res.static ~ res.static_1)
-summary(lm.12.1.1.test)</code></pre>
+<pre class="r"><code>model_12_1_1 &lt;- lm(inf ~ unem, data = phillips)
+
+res_static &lt;- model_12_1_1[[&quot;residuals&quot;]]
+res_static_1 &lt;- c(NA, model_12_1_1[[&quot;residuals&quot;]][-(length(res_static))])
+
+model_12_1_1_test &lt;- lm(res_static ~ res_static_1)
+summary(model_12_1_1_test)</code></pre>
 <pre><code>## 
 ## Call:
-## lm(formula = res.static ~ res.static_1)
+## lm(formula = res_static ~ res_static_1)
 ## 
 ## Residuals:
 ##    Min     1Q Median     3Q    Max 
@@ -30,23 +33,25 @@ summary(lm.12.1.1.test)</code></pre>
 ## Coefficients:
 ##              Estimate Std. Error t value Pr(&gt;|t|)    
 ## (Intercept)   -0.1118     0.3180  -0.352    0.727    
-## res.static_1   0.5725     0.1084   5.283 2.43e-06 ***
+## res_static_1   0.5725     0.1084   5.283 2.43e-06 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 2.358 on 53 degrees of freedom
 ##   (1 observation deleted due to missingness)
-## Multiple R-squared:  0.345,  Adjusted R-squared:  0.3326 
+## Multiple R-squared:  0.345,	Adjusted R-squared:  0.3326 
 ## F-statistic: 27.91 on 1 and 53 DF,  p-value: 2.43e-06</code></pre>
 <p>Augmented Phillips curve</p>
-<pre class="r"><code>lm.12.1.2 &lt;- lm(I(inf - inf_1) ~ unem, data = phillips)
-res.aug &lt;- lm.12.1.2$res
-res.aug_1 &lt;- c(NA, lm.12.1.2$res[-length(res.aug)])
-lm.12.1.2.test &lt;- lm(res.aug ~ res.aug_1)
-summary(lm.12.1.2.test)</code></pre>
+<pre class="r"><code>model_12_1_2 &lt;- lm(I(inf - inf_1) ~ unem, data = phillips)
+
+res_aug &lt;- model_12_1_2[[&quot;residuals&quot;]]
+res_aug_1 &lt;- c(NA, model_12_1_2[[&quot;residuals&quot;]][-length(res_aug)])
+
+model_12_1_2_test &lt;- lm(res_aug ~ res_aug_1)
+summary(model_12_1_2_test)</code></pre>
 <pre><code>## 
 ## Call:
-## lm(formula = res.aug ~ res.aug_1)
+## lm(formula = res_aug ~ res_aug_1)
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
@@ -55,59 +60,65 @@ summary(lm.12.1.2.test)</code></pre>
 ## Coefficients:
 ##             Estimate Std. Error t value Pr(&gt;|t|)
 ## (Intercept)   0.1674     0.2655   0.631    0.531
-## res.aug_1    -0.0327     0.1164  -0.281    0.780
+## res_aug_1    -0.0327     0.1164  -0.281    0.780
 ## 
 ## Residual standard error: 1.951 on 52 degrees of freedom
 ##   (1 observation deleted due to missingness)
-## Multiple R-squared:  0.001516,   Adjusted R-squared:  -0.01769 
+## Multiple R-squared:  0.001516,	Adjusted R-squared:  -0.01769 
 ## F-statistic: 0.07896 on 1 and 52 DF,  p-value: 0.7798</code></pre>
 <p>Heteroskedasticity robust t statistic</p>
-<pre class="r"><code>coeftest(lm.12.1.1.test, vcov = vcovHC(lm.12.1.1.test, type = &quot;HC0&quot;))</code></pre>
+<pre class="r"><code>coeftest(model_12_1_1_test,
+         vcov = vcovHC(model_12_1_1_test, type = &quot;HC0&quot;))</code></pre>
 <pre><code>## 
 ## t test of coefficients:
 ## 
 ##              Estimate Std. Error t value  Pr(&gt;|t|)    
 ## (Intercept)  -0.11181    0.30962 -0.3611 0.7194474    
-## res.static_1  0.57247    0.14225  4.0243 0.0001826 ***
+## res_static_1  0.57247    0.14225  4.0243 0.0001826 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<pre class="r"><code>coeftest(lm.12.1.2.test, vcov = vcovHC(lm.12.1.2.test, type = &quot;HC0&quot;))</code></pre>
+<pre class="r"><code>coeftest(model_12_1_2_test,
+         vcov = vcovHC(model_12_1_2_test, type = &quot;HC0&quot;))</code></pre>
 <pre><code>## 
 ## t test of coefficients:
 ## 
 ##              Estimate Std. Error t value Pr(&gt;|t|)
 ## (Intercept)  0.167446   0.262215  0.6386   0.5259
-## res.aug_1   -0.032697   0.193249 -0.1692   0.8663</code></pre>
+## res_aug_1   -0.032697   0.193249 -0.1692   0.8663</code></pre>
 </div>
-<div id="durbin-watson-test" class="section level1">
-<h1>Durbin-Watson Test</h1>
+<div id="durbin-watson-test" class="section level3">
+<h3>Durbin-Watson Test</h3>
 <pre class="r"><code># from package lmtest
 dwtest(inf ~ unem, data = phillips)</code></pre>
 <pre><code>## 
-##  Durbin-Watson test
+## 	Durbin-Watson test
 ## 
 ## data:  inf ~ unem
 ## DW = 0.80148, p-value = 1.486e-07
 ## alternative hypothesis: true autocorrelation is greater than 0</code></pre>
 <pre class="r"><code>dwtest(I(inf - inf_1) ~ unem, data = phillips)</code></pre>
 <pre><code>## 
-##  Durbin-Watson test
+## 	Durbin-Watson test
 ## 
 ## data:  I(inf - inf_1) ~ unem
 ## DW = 1.771, p-value = 0.1673
 ## alternative hypothesis: true autocorrelation is greater than 0</code></pre>
+</div>
 <div id="example-12.2" class="section level3">
 <h3>Example 12.2</h3>
 <pre class="r"><code>data(&quot;prminwge&quot;)
 
-lm.12.2 &lt;- lm(lprepop ~ lmincov + lusgnp + lprgnp + t, data = prminwge)
-lm.12.2.res &lt;- lm.12.2$res
-lm.12.2.res_1 &lt;- c(NA, lm.12.2$res[-length(lm.12.2.res)])
-lm.12.2.test &lt;- lm(lm.12.2.res ~ lmincov + lusgnp + lprgnp + t + lm.12.2.res_1, data = prminwge)
-summary(lm.12.2.test)</code></pre>
+model_12_2 &lt;- lm(lprepop ~ lmincov + lusgnp + lprgnp + t, data = prminwge)
+
+res_12_2 &lt;- model_12_2[[&quot;residuals&quot;]]
+res_12_2_1 &lt;- c(NA, model_12_2[[&quot;residuals&quot;]][-length(res_12_2)])
+
+model_12_2_test &lt;- lm(res_12_2 ~ lmincov + lusgnp + lprgnp + t + res_12_2_1,
+                      data = prminwge)
+summary(model_12_2_test)</code></pre>
 <pre><code>## 
 ## Call:
-## lm(formula = lm.12.2.res ~ lmincov + lusgnp + lprgnp + t + lm.12.2.res_1, 
+## lm(formula = res_12_2 ~ lmincov + lusgnp + lprgnp + t + res_12_2_1, 
 ##     data = prminwge)
 ## 
 ## Residuals:
@@ -115,155 +126,163 @@ summary(lm.12.2.test)</code></pre>
 ## -0.041317 -0.018004 -0.004599  0.012378  0.067226 
 ## 
 ## Coefficients:
-##                Estimate Std. Error t value Pr(&gt;|t|)   
-## (Intercept)   -0.850772   1.092691  -0.779  0.44212   
-## lmincov        0.037500   0.035212   1.065  0.29511   
-## lusgnp         0.203932   0.195159   1.045  0.30412   
-## lprgnp        -0.078466   0.070524  -1.113  0.27443   
-## t             -0.003466   0.004074  -0.851  0.40134   
-## lm.12.2.res_1  0.480509   0.166444   2.887  0.00703 **
+##              Estimate Std. Error t value Pr(&gt;|t|)   
+## (Intercept) -0.850772   1.092691  -0.779  0.44212   
+## lmincov      0.037500   0.035212   1.065  0.29511   
+## lusgnp       0.203932   0.195159   1.045  0.30412   
+## lprgnp      -0.078466   0.070524  -1.113  0.27443   
+## t           -0.003466   0.004074  -0.851  0.40134   
+## res_12_2_1   0.480509   0.166444   2.887  0.00703 **
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.02755 on 31 degrees of freedom
 ##   (1 observation deleted due to missingness)
-## Multiple R-squared:  0.2424, Adjusted R-squared:  0.1202 
+## Multiple R-squared:  0.2424,	Adjusted R-squared:  0.1202 
 ## F-statistic: 1.983 on 5 and 31 DF,  p-value: 0.1089</code></pre>
 <p>For comparison the test with strict exogenous regressors</p>
-<pre class="r"><code>summary(lm(lm.12.2.res ~ lm.12.2.res_1))</code></pre>
+<pre class="r"><code>summary(lm(res_12_2 ~ res_12_2_1))</code></pre>
 <pre><code>## 
 ## Call:
-## lm(formula = lm.12.2.res ~ lm.12.2.res_1)
+## lm(formula = res_12_2 ~ res_12_2_1)
 ## 
 ## Residuals:
 ##       Min        1Q    Median        3Q       Max 
 ## -0.043815 -0.024235 -0.002278  0.015155  0.063480 
 ## 
 ## Coefficients:
-##                 Estimate Std. Error t value Pr(&gt;|t|)  
-## (Intercept)   -0.0008953  0.0044883  -0.199   0.8431  
-## lm.12.2.res_1  0.4173219  0.1589351   2.626   0.0127 *
+##               Estimate Std. Error t value Pr(&gt;|t|)  
+## (Intercept) -0.0008953  0.0044883  -0.199   0.8431  
+## res_12_2_1   0.4173219  0.1589351   2.626   0.0127 *
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.02723 on 35 degrees of freedom
 ##   (1 observation deleted due to missingness)
-## Multiple R-squared:  0.1646, Adjusted R-squared:  0.1407 
+## Multiple R-squared:  0.1646,	Adjusted R-squared:  0.1407 
 ## F-statistic: 6.895 on 1 and 35 DF,  p-value: 0.01274</code></pre>
 </div>
 <div id="example-12.3" class="section level3">
 <h3>Example 12.3</h3>
 <pre class="r"><code>data(&quot;barium&quot;)
 
-lm.12.3 &lt;- lm(lchnimp ~ lchempi + lgas + lrtwex + befile6 + affile6 + afdec6, data = barium)
+model_12_3 &lt;- lm(lchnimp ~ lchempi + lgas + lrtwex + befile6 + affile6 +
+                   afdec6,
+                 data = barium)
 
-lm.12.3.res &lt;- lm.12.3$res
-lm.12.3.res_1 &lt;- c(NA,lm.12.3$res[1:(length(lm.12.3.res)-1)])
-lm.12.3.res_2 &lt;- c(NA,NA,lm.12.3$res[1:(length(lm.12.3.res)-2)])
-lm.12.3.res_3 &lt;- c(NA,NA,NA,lm.12.3$res[1:(length(lm.12.3.res)-3)])
+res_12_3 &lt;- model_12_3[[&quot;residuals&quot;]]
+n_res &lt;- length(res_12_3)
+res_12_3_1 &lt;- c(NA, model_12_3[[&quot;residuals&quot;]][1:(n_res - 1)])
+res_12_3_2 &lt;- c(NA, NA, model_12_3[[&quot;residuals&quot;]][1:(n_res - 2)])
+res_12_3_3 &lt;- c(NA, NA, NA, model_12_3[[&quot;residuals&quot;]][1:(n_res - 3)])
 
-data &lt;- cbind(barium, lm.12.3.res)
-data &lt;- cbind(data, lm.12.3.res_1)
-data &lt;- cbind(data, lm.12.3.res_2)
-data &lt;- cbind(data, lm.12.3.res_3)
+barium_res &lt;- cbind(barium, res_12_3)
+barium_res &lt;- cbind(barium_res, res_12_3_1)
+barium_res &lt;- cbind(barium_res, res_12_3_2)
+barium_res &lt;- cbind(barium_res, res_12_3_3)
 
-lm.12.3.test &lt;- lm(lm.12.3.res ~ lchempi + lgas + lrtwex + befile6 + affile6 + afdec6 +
- lm.12.3.res_1 + lm.12.3.res_2 + lm.12.3.res_3, data = data)
+model_12_3_test &lt;- lm(res_12_3 ~ lchempi + lgas + lrtwex + befile6 + affile6 +
+                        afdec6 + res_12_3_1 + res_12_3_2 + res_12_3_3,
+                      data = barium_res)
 
-lm.12.3.test.res &lt;- lm(lm.12.3.res ~ lchempi + lgas + lrtwex + befile6 + affile6 + afdec6,
- data = data[-(1:3),]) # Drop first 3 observations to make test statistics comparable
+# Drop the first 3 observations to make the test statistics comparable
+model_12_3_test_res &lt;- lm(res_12_3 ~ lchempi + lgas + lrtwex + befile6 +
+                            affile6 + afdec6,
+                          data = barium_res[-(1:3), ])
 
-anova(lm.12.3.test, lm.12.3.test.res)</code></pre>
+anova(model_12_3_test, model_12_3_test_res)</code></pre>
 <pre><code>## Analysis of Variance Table
 ## 
-## Model 1: lm.12.3.res ~ lchempi + lgas + lrtwex + befile6 + affile6 + afdec6 + 
-##     lm.12.3.res_1 + lm.12.3.res_2 + lm.12.3.res_3
-## Model 2: lm.12.3.res ~ lchempi + lgas + lrtwex + befile6 + affile6 + afdec6
+## Model 1: res_12_3 ~ lchempi + lgas + lrtwex + befile6 + affile6 + afdec6 + 
+##     res_12_3_1 + res_12_3_2 + res_12_3_3
+## Model 2: res_12_3 ~ lchempi + lgas + lrtwex + befile6 + affile6 + afdec6
 ##   Res.Df    RSS Df Sum of Sq      F  Pr(&gt;F)   
 ## 1    118 38.394                               
 ## 2    121 43.394 -3   -5.0005 5.1229 0.00229 **
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <p>Seasonal autocorrelation</p>
-<pre class="r"><code>data &lt;- cbind(data, lm.12.3.res_12 = c(rep(NA, 12), lm.12.3$res[1:(length(lm.12.3.res) - 12)]))
-summary(lm(lm.12.3.res ~ lm.12.3.res_12, data = data))</code></pre>
+<pre class="r"><code>res_12_3_12 &lt;- c(rep(NA, 12), model_12_3[[&quot;residuals&quot;]][1:(n_res - 12)])
+barium_res &lt;- cbind(barium_res, res_12_3_12)
+
+summary(lm(res_12_3 ~ res_12_3_12, data = barium_res))</code></pre>
 <pre><code>## 
 ## Call:
-## lm(formula = lm.12.3.res ~ lm.12.3.res_12, data = data)
+## lm(formula = res_12_3 ~ res_12_3_12, data = barium_res)
 ## 
 ## Residuals:
 ##      Min       1Q   Median       3Q      Max 
 ## -1.96217 -0.33069  0.03732  0.36389  1.46367 
 ## 
 ## Coefficients:
-##                Estimate Std. Error t value Pr(&gt;|t|)  
-## (Intercept)     0.03789    0.05047   0.751    0.454  
-## lm.12.3.res_12 -0.18744    0.08425  -2.225    0.028 *
+##             Estimate Std. Error t value Pr(&gt;|t|)  
+## (Intercept)  0.03789    0.05047   0.751    0.454  
+## res_12_3_12 -0.18744    0.08425  -2.225    0.028 *
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.5506 on 117 degrees of freedom
 ##   (12 observations deleted due to missingness)
-## Multiple R-squared:  0.04059,    Adjusted R-squared:  0.03239 
+## Multiple R-squared:  0.04059,	Adjusted R-squared:  0.03239 
 ## F-statistic:  4.95 on 1 and 117 DF,  p-value: 0.02801</code></pre>
 <p>Include regressors</p>
-<pre class="r"><code>summary(lm(lm.12.3.res ~ lchempi + lgas + lrtwex + befile6 + affile6 + afdec6 +
- lm.12.3.res_12, data = data))</code></pre>
+<pre class="r"><code>summary(lm(res_12_3 ~ lchempi + lgas + lrtwex + befile6 + affile6 + afdec6 +
+             res_12_3_12,
+           data = barium_res))</code></pre>
 <pre><code>## 
 ## Call:
-## lm(formula = lm.12.3.res ~ lchempi + lgas + lrtwex + befile6 + 
-##     affile6 + afdec6 + lm.12.3.res_12, data = data)
+## lm(formula = res_12_3 ~ lchempi + lgas + lrtwex + befile6 + affile6 + 
+##     afdec6 + res_12_3_12, data = barium_res)
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
 ## -2.0259 -0.3467  0.0158  0.3770  1.3676 
 ## 
 ## Coefficients:
-##                 Estimate Std. Error t value Pr(&gt;|t|)  
-## (Intercept)    -28.57195   22.64780  -1.262   0.2097  
-## lchempi         -0.92803    0.54647  -1.698   0.0923 .
-## lgas             1.50251    1.01497   1.480   0.1416  
-## lrtwex          -0.27439    0.38127  -0.720   0.4732  
-## befile6          0.04437    0.24581   0.180   0.8571  
-## affile6          0.06253    0.24600   0.254   0.7998  
-## afdec6           0.17231    0.27038   0.637   0.5253  
-## lm.12.3.res_12  -0.17002    0.08670  -1.961   0.0524 .
+##              Estimate Std. Error t value Pr(&gt;|t|)  
+## (Intercept) -28.57195   22.64780  -1.262   0.2097  
+## lchempi      -0.92803    0.54647  -1.698   0.0923 .
+## lgas          1.50251    1.01497   1.480   0.1416  
+## lrtwex       -0.27439    0.38127  -0.720   0.4732  
+## befile6       0.04437    0.24581   0.180   0.8571  
+## affile6       0.06253    0.24600   0.254   0.7998  
+## afdec6        0.17231    0.27038   0.637   0.5253  
+## res_12_3_12  -0.17002    0.08670  -1.961   0.0524 .
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.5541 on 111 degrees of freedom
 ##   (12 observations deleted due to missingness)
-## Multiple R-squared:  0.07811,    Adjusted R-squared:  0.01997 
+## Multiple R-squared:  0.07811,	Adjusted R-squared:  0.01997 
 ## F-statistic: 1.344 on 7 and 111 DF,  p-value: 0.2367</code></pre>
 </div>
 <div id="example-12.4" class="section level3">
 <h3>Example 12.4</h3>
 <pre class="r"><code>data(&quot;barium&quot;)
 
-# Download my prais package
-library(prais)
-
-pw_1 &lt;- prais_winsten(lchnimp ~ lchempi + lgas + lrtwex + befile6 + 
- affile6 + afdec6, data = barium)</code></pre>
-<pre><code>## Iteration 0: rho = 0
-## Iteration 1: rho = 0.2708
-## Iteration 2: rho = 0.291
-## Iteration 3: rho = 0.293
-## Iteration 4: rho = 0.2932
-## Iteration 5: rho = 0.2932
-## Iteration 6: rho = 0.2932
-## Iteration 7: rho = 0.2932</code></pre>
+pw_1 &lt;- prais_winsten(lchnimp ~ lchempi + lgas + lrtwex + befile6 + affile6 +
+                        afdec6,
+                      data = barium,
+                      index = &quot;t&quot;)</code></pre>
+<pre><code>## Iteration 0: rho = 0</code></pre>
+<pre><code>## Iteration 1: rho = 0.2708</code></pre>
+<pre><code>## Iteration 2: rho = 0.291</code></pre>
+<pre><code>## Iteration 3: rho = 0.293</code></pre>
+<pre><code>## Iteration 4: rho = 0.2932</code></pre>
+<pre><code>## Iteration 5: rho = 0.2932</code></pre>
+<pre><code>## Iteration 6: rho = 0.2932</code></pre>
+<pre><code>## Iteration 7: rho = 0.2932</code></pre>
 <pre class="r"><code>summary(pw_1)</code></pre>
 <pre><code>## 
 ## Call:
 ## prais_winsten(formula = lchnimp ~ lchempi + lgas + lrtwex + befile6 + 
-##     affile6 + afdec6, data = barium)
+##     affile6 + afdec6, data = barium, index = &quot;t&quot;)
 ## 
-## Residuals:
+## Residuals of the transformed model:
 ##      Min       1Q   Median       3Q      Max 
-## -1.99386 -0.32219  0.03747  0.40226  1.50281 
+## -2.01146 -0.39152  0.06758  0.35063  1.35021 
 ## 
-## AR(1) coefficient rho after 7 Iterations: 0.2932
+## AR(1) coefficient rho after 7 iterations: 0.2932
 ## 
 ## Coefficients:
 ##              Estimate Std. Error t value Pr(&gt;|t|)    
@@ -278,7 +297,7 @@ pw_1 &lt;- prais_winsten(lchnimp ~ lchempi + lgas + lrtwex + befile6 +
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.5733 on 124 degrees of freedom
-## Multiple R-squared:  0.2021, Adjusted R-squared:  0.1635 
+## Multiple R-squared:  0.2021,	Adjusted R-squared:  0.1635 
 ## F-statistic: 5.235 on 6 and 124 DF,  p-value: 7.764e-05
 ## 
 ## Durbin-Watson statistic (original): 1.458 
@@ -288,8 +307,8 @@ pw_1 &lt;- prais_winsten(lchnimp ~ lchempi + lgas + lrtwex + befile6 +
 <h3>Example 12.5</h3>
 <pre class="r"><code>data(&quot;phillips&quot;)</code></pre>
 <p>First column</p>
-<pre class="r"><code>lm.12.5 &lt;- lm(inf ~ unem, data = phillips)
-summary(lm.12.5)</code></pre>
+<pre class="r"><code>model_12_5 &lt;- lm(inf ~ unem, data = phillips)
+summary(model_12_5)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = inf ~ unem, data = phillips)
@@ -306,30 +325,30 @@ summary(lm.12.5)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 2.972 on 54 degrees of freedom
-## Multiple R-squared:  0.06215,    Adjusted R-squared:  0.04479 
+## Multiple R-squared:  0.06215,	Adjusted R-squared:  0.04479 
 ## F-statistic: 3.579 on 1 and 54 DF,  p-value: 0.06389</code></pre>
 <p>Second column</p>
-<pre class="r"><code>pw_2 &lt;- prais_winsten(inf ~ unem, data=phillips)</code></pre>
-<pre><code>## Iteration 0: rho = 0
-## Iteration 1: rho = 0.5721
-## Iteration 2: rho = 0.735
-## Iteration 3: rho = 0.7792
-## Iteration 4: rho = 0.7871
-## Iteration 5: rho = 0.7883
-## Iteration 6: rho = 0.7885
-## Iteration 7: rho = 0.7885
-## Iteration 8: rho = 0.7885
-## Iteration 9: rho = 0.7885</code></pre>
+<pre class="r"><code>pw_2 &lt;- prais_winsten(inf ~ unem, data = phillips, index = &quot;year&quot;)</code></pre>
+<pre><code>## Iteration 0: rho = 0</code></pre>
+<pre><code>## Iteration 1: rho = 0.5721</code></pre>
+<pre><code>## Iteration 2: rho = 0.735</code></pre>
+<pre><code>## Iteration 3: rho = 0.7792</code></pre>
+<pre><code>## Iteration 4: rho = 0.7871</code></pre>
+<pre><code>## Iteration 5: rho = 0.7883</code></pre>
+<pre><code>## Iteration 6: rho = 0.7885</code></pre>
+<pre><code>## Iteration 7: rho = 0.7885</code></pre>
+<pre><code>## Iteration 8: rho = 0.7885</code></pre>
+<pre><code>## Iteration 9: rho = 0.7885</code></pre>
 <pre class="r"><code>summary(pw_2)</code></pre>
 <pre><code>## 
 ## Call:
-## prais_winsten(formula = inf ~ unem, data = phillips)
+## prais_winsten(formula = inf ~ unem, data = phillips, index = &quot;year&quot;)
 ## 
-## Residuals:
-##    Min     1Q Median     3Q    Max 
-## -5.258 -2.447 -1.073  1.463 10.570 
+## Residuals of the transformed model:
+##     Min      1Q  Median      3Q     Max 
+## -7.2057 -0.9265 -0.2019  0.9384  5.6591 
 ## 
-## AR(1) coefficient rho after 9 Iterations: 0.7885
+## AR(1) coefficient rho after 9 iterations: 0.7885
 ## 
 ## Coefficients:
 ##             Estimate Std. Error t value Pr(&gt;|t|)    
@@ -339,7 +358,7 @@ summary(lm.12.5)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 2.138 on 54 degrees of freedom
-## Multiple R-squared:  0.1345, Adjusted R-squared:  0.1185 
+## Multiple R-squared:  0.1345,	Adjusted R-squared:  0.1185 
 ## F-statistic: 8.393 on 1 and 54 DF,  p-value: 0.00543
 ## 
 ## Durbin-Watson statistic (original): 0.8015 
@@ -349,7 +368,8 @@ summary(lm.12.5)</code></pre>
 <h3>Example 12.6</h3>
 <pre class="r"><code>data(&quot;intdef&quot;)
 
-summary(lm.12.6.1 &lt;- lm(i3 ~ inf + def, data = intdef))</code></pre>
+model_12_6_1 &lt;- lm(i3 ~ inf + def, data = intdef)
+summary(model_12_6_1)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = i3 ~ inf + def, data = intdef)
@@ -367,9 +387,9 @@ summary(lm.12.6.1 &lt;- lm(i3 ~ inf + def, data = intdef))</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 1.843 on 53 degrees of freedom
-## Multiple R-squared:  0.6021, Adjusted R-squared:  0.5871 
+## Multiple R-squared:  0.6021,	Adjusted R-squared:  0.5871 
 ## F-statistic: 40.09 on 2 and 53 DF,  p-value: 2.483e-11</code></pre>
-<pre class="r"><code>res &lt;- lm.12.6.1$residuals
+<pre class="r"><code>res &lt;- model_12_6_1[[&quot;residuals&quot;]]
 res_1 &lt;- c(NA, res[-length(res)])
 summary(lm(res ~ -1 + res_1))</code></pre>
 <pre><code>## 
@@ -388,10 +408,10 @@ summary(lm(res ~ -1 + res_1))</code></pre>
 ## 
 ## Residual standard error: 1.397 on 54 degrees of freedom
 ##   (1 observation deleted due to missingness)
-## Multiple R-squared:  0.3781, Adjusted R-squared:  0.3666 
+## Multiple R-squared:  0.3781,	Adjusted R-squared:  0.3666 
 ## F-statistic: 32.83 on 1 and 54 DF,  p-value: 4.612e-07</code></pre>
-<pre class="r"><code>lm.12.6.2 &lt;- lm(I(diff(i3)) ~ I(diff(inf)) + I(diff(def)), data = intdef)
-summary(lm.12.6.2)</code></pre>
+<pre class="r"><code>model_12_6_2 &lt;- lm(I(diff(i3)) ~ I(diff(inf)) + I(diff(def)), data = intdef)
+summary(model_12_6_2)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = I(diff(i3)) ~ I(diff(inf)) + I(diff(def)), data = intdef)
@@ -407,14 +427,15 @@ summary(lm.12.6.2)</code></pre>
 ## I(diff(def)) -0.18132    0.14768  -1.228    0.225
 ## 
 ## Residual standard error: 1.265 on 52 degrees of freedom
-## Multiple R-squared:  0.1763, Adjusted R-squared:  0.1446 
+## Multiple R-squared:  0.1763,	Adjusted R-squared:  0.1446 
 ## F-statistic: 5.566 on 2 and 52 DF,  p-value: 0.006451</code></pre>
 <p>Correlation between <span class="math inline">\(i3_t\)</span> and <span class="math inline">\(i3_{t-1}\)</span></p>
-<pre class="r"><code>cor(intdef$i3, c(NA, intdef$i3[-length(intdef$i3)]), use = &quot;pairwise.complete.obs&quot;)</code></pre>
+<pre class="r"><code>i3 &lt;- intdef[[&quot;i3&quot;]]
+cor(i3, c(NA, i3[-length(i3)]), use = &quot;pairwise.complete.obs&quot;)</code></pre>
 <pre><code>## [1] 0.8845033</code></pre>
 <p>Regression of <span class="math inline">\(e_t\)</span> on <span class="math inline">\(e_{t-1}\)</span></p>
-<pre class="r"><code>res &lt;- lm.12.6.2$residuals
-res_1 &lt;- res_1 &lt;- c(NA, res[-length(res)])
+<pre class="r"><code>res &lt;- model_12_6_2[[&quot;residuals&quot;]]
+res_1 &lt;- c(NA, res[-length(res)])
 summary(lm(res ~ -1 + res_1))</code></pre>
 <pre><code>## 
 ## Call:
@@ -430,15 +451,15 @@ summary(lm(res ~ -1 + res_1))</code></pre>
 ## 
 ## Residual standard error: 1.212 on 53 degrees of freedom
 ##   (1 observation deleted due to missingness)
-## Multiple R-squared:  0.005454,   Adjusted R-squared:  -0.01331 
+## Multiple R-squared:  0.005454,	Adjusted R-squared:  -0.01331 
 ## F-statistic: 0.2906 on 1 and 53 DF,  p-value: 0.5921</code></pre>
 </div>
 <div id="example-12.7" class="section level3">
 <h3>Example 12.7</h3>
 <pre class="r"><code>data(&quot;prminwge&quot;)
 
-lm.12.7.1 &lt;- lm(lprepop ~ lmincov + lusgnp + lprgnp + t, data = prminwge)
-summary(lm.12.7.1)</code></pre>
+model_12_7_1 &lt;- lm(lprepop ~ lmincov + lusgnp + lprgnp + t, data = prminwge)
+summary(model_12_7_1)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = lprepop ~ lmincov + lusgnp + lprgnp + t, data = prminwge)
@@ -458,40 +479,42 @@ summary(lm.12.7.1)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.03277 on 33 degrees of freedom
-## Multiple R-squared:  0.8892, Adjusted R-squared:  0.8758 
+## Multiple R-squared:  0.8892,	Adjusted R-squared:  0.8758 
 ## F-statistic: 66.23 on 4 and 33 DF,  p-value: 2.677e-15</code></pre>
 </div>
-<div id="still-looking-for-the-scheteroskedasticiy-robust-se." class="section level3">
-<h3>Still looking for the SC/heteroskedasticiy robust se.</h3>
-<pre class="r"><code>pw_12_7_1 &lt;- prais_winsten(lprepop ~ lmincov + lusgnp + lprgnp + t, data = prminwge)</code></pre>
-<pre><code>## Iteration 0: rho = 0
-## Iteration 1: rho = 0.4197
-## Iteration 2: rho = 0.5325
-## Iteration 3: rho = 0.5796
-## Iteration 4: rho = 0.5999
-## Iteration 5: rho = 0.6086
-## Iteration 6: rho = 0.6123
-## Iteration 7: rho = 0.6139
-## Iteration 8: rho = 0.6146
-## Iteration 9: rho = 0.6149
-## Iteration 10: rho = 0.615
-## Iteration 11: rho = 0.6151
-## Iteration 12: rho = 0.6151
-## Iteration 13: rho = 0.6151
-## Iteration 14: rho = 0.6151
-## Iteration 15: rho = 0.6151
-## Iteration 16: rho = 0.6151</code></pre>
+<div id="still-looking-for-the-scheteroskedasticity-robust-se." class="section level3">
+<h3>Still looking for the SC/heteroskedasticity robust se.</h3>
+<pre class="r"><code>pw_12_7_1 &lt;- prais_winsten(lprepop ~ lmincov + lusgnp + lprgnp + t,
+                           data = prminwge,
+                           index = &quot;t&quot;)</code></pre>
+<pre><code>## Iteration 0: rho = 0</code></pre>
+<pre><code>## Iteration 1: rho = 0.4197</code></pre>
+<pre><code>## Iteration 2: rho = 0.5325</code></pre>
+<pre><code>## Iteration 3: rho = 0.5796</code></pre>
+<pre><code>## Iteration 4: rho = 0.5999</code></pre>
+<pre><code>## Iteration 5: rho = 0.6086</code></pre>
+<pre><code>## Iteration 6: rho = 0.6123</code></pre>
+<pre><code>## Iteration 7: rho = 0.6139</code></pre>
+<pre><code>## Iteration 8: rho = 0.6146</code></pre>
+<pre><code>## Iteration 9: rho = 0.6149</code></pre>
+<pre><code>## Iteration 10: rho = 0.615</code></pre>
+<pre><code>## Iteration 11: rho = 0.6151</code></pre>
+<pre><code>## Iteration 12: rho = 0.6151</code></pre>
+<pre><code>## Iteration 13: rho = 0.6151</code></pre>
+<pre><code>## Iteration 14: rho = 0.6151</code></pre>
+<pre><code>## Iteration 15: rho = 0.6151</code></pre>
+<pre><code>## Iteration 16: rho = 0.6151</code></pre>
 <pre class="r"><code>summary(pw_12_7_1)</code></pre>
 <pre><code>## 
 ## Call:
 ## prais_winsten(formula = lprepop ~ lmincov + lusgnp + lprgnp + 
-##     t, data = prminwge)
+##     t, data = prminwge, index = &quot;t&quot;)
 ## 
-## Residuals:
+## Residuals of the transformed model:
 ##       Min        1Q    Median        3Q       Max 
-## -0.079574 -0.028121 -0.004816  0.005918  0.075978 
+## -0.056867 -0.017884 -0.003432  0.011239  0.062688 
 ## 
-## AR(1) coefficient rho after 16 Iterations: 0.6151
+## AR(1) coefficient rho after 16 iterations: 0.6151
 ## 
 ## Coefficients:
 ##              Estimate Std. Error t value Pr(&gt;|t|)   
@@ -504,7 +527,7 @@ summary(lm.12.7.1)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.02852 on 33 degrees of freedom
-## Multiple R-squared:  0.7509, Adjusted R-squared:  0.7207 
+## Multiple R-squared:  0.7509,	Adjusted R-squared:  0.7207 
 ## F-statistic: 24.87 on 4 and 33 DF,  p-value: 1.47e-09
 ## 
 ## Durbin-Watson statistic (original): 1.014 
@@ -514,8 +537,8 @@ summary(lm.12.7.1)</code></pre>
 <h3>Example 12.8</h3>
 <pre class="r"><code>data(&quot;nyse&quot;)
 
-lm.12.8 &lt;- lm(return ~ return_1, data = nyse)
-summary(lm.12.8)</code></pre>
+model_12_8 &lt;- lm(return ~ return_1, data = nyse)
+summary(model_12_8)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = return ~ return_1, data = nyse)
@@ -533,12 +556,12 @@ summary(lm.12.8)</code></pre>
 ## 
 ## Residual standard error: 2.11 on 687 degrees of freedom
 ##   (2 observations deleted due to missingness)
-## Multiple R-squared:  0.003481,   Adjusted R-squared:  0.00203 
+## Multiple R-squared:  0.003481,	Adjusted R-squared:  0.00203 
 ## F-statistic: 2.399 on 1 and 687 DF,  p-value: 0.1218</code></pre>
-<pre class="r"><code>res &lt;- lm.12.8$residuals^2
+<pre class="r"><code>res &lt;- model_12_8[[&quot;residuals&quot;]]^2
 
-lm.12.8.bp &lt;- lm(res ~ return_1, data = na.omit(nyse))
-summary(lm.12.8.bp)</code></pre>
+model_12_8_bp &lt;- lm(res ~ return_1, data = na.omit(nyse))
+summary(model_12_8_bp)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = res ~ return_1, data = na.omit(nyse))
@@ -555,15 +578,15 @@ summary(lm.12.8.bp)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 11.18 on 687 degrees of freedom
-## Multiple R-squared:  0.04191,    Adjusted R-squared:  0.04052 
+## Multiple R-squared:  0.04191,	Adjusted R-squared:  0.04052 
 ## F-statistic: 30.05 on 1 and 687 DF,  p-value: 5.905e-08</code></pre>
 </div>
 <div id="example-12.9" class="section level3">
 <h3>Example 12.9</h3>
 <pre class="r"><code>data(&quot;nyse&quot;)
 
-lm.12.9 &lt;- lm(return ~ return_1, data = nyse)
-summary(lm.12.9)</code></pre>
+model_12_9 &lt;- lm(return ~ return_1, data = nyse)
+summary(model_12_9)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = return ~ return_1, data = nyse)
@@ -581,15 +604,15 @@ summary(lm.12.9)</code></pre>
 ## 
 ## Residual standard error: 2.11 on 687 degrees of freedom
 ##   (2 observations deleted due to missingness)
-## Multiple R-squared:  0.003481,   Adjusted R-squared:  0.00203 
+## Multiple R-squared:  0.003481,	Adjusted R-squared:  0.00203 
 ## F-statistic: 2.399 on 1 and 687 DF,  p-value: 0.1218</code></pre>
-<pre class="r"><code>u &lt;- lm.12.8$residuals
+<pre class="r"><code>u &lt;- model_12_8[[&quot;residuals&quot;]]
 u_1 &lt;- c(NA, u[-length(u)])
-usq &lt;- lm.12.8$residuals^2
+usq &lt;- model_12_8[[&quot;residuals&quot;]]^2
 usq_1 &lt;- c(NA, usq[-length(usq)])
 
-lm.12.9.arch &lt;- lm(usq ~ usq_1)
-summary(lm.12.9.arch)</code></pre>
+model_12_9_arch &lt;- lm(usq ~ usq_1)
+summary(model_12_9_arch)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = usq ~ usq_1)
@@ -607,10 +630,10 @@ summary(lm.12.9.arch)</code></pre>
 ## 
 ## Residual standard error: 10.76 on 686 degrees of freedom
 ##   (1 observation deleted due to missingness)
-## Multiple R-squared:  0.1136, Adjusted R-squared:  0.1123 
+## Multiple R-squared:  0.1136,	Adjusted R-squared:  0.1123 
 ## F-statistic: 87.92 on 1 and 686 DF,  p-value: &lt; 2.2e-16</code></pre>
-<pre class="r"><code>lm.12.9.3 &lt;- lm(u ~ u_1)
-summary(lm.12.9.3)</code></pre>
+<pre class="r"><code>model_12_9_3 &lt;- lm(u ~ u_1)
+summary(model_12_9_3)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = u ~ u_1)
@@ -626,7 +649,6 @@ summary(lm.12.9.3)</code></pre>
 ## 
 ## Residual standard error: 2.112 on 686 degrees of freedom
 ##   (1 observation deleted due to missingness)
-## Multiple R-squared:  1.974e-06,  Adjusted R-squared:  -0.001456 
+## Multiple R-squared:  1.974e-06,	Adjusted R-squared:  -0.001456 
 ## F-statistic: 0.001354 on 1 and 686 DF,  p-value: 0.9707</code></pre>
-</div>
 </div>
