@@ -10,35 +10,36 @@ tags:
 
 
 
-<p>The updated paper and dataset can be downloaded from <a href="http://www.unescap.org/resources/gravity-model-international-trade-user-guide-updated-version" target="_blank">UNESCAP</a>.</p>
+<p>The updated paper and dataset can be downloaded from
+<a href="http://www.unescap.org/resources/gravity-model-international-trade-user-guide-updated-version" target="_blank">UNESCAP</a>.</p>
 <div id="load-libraries-and-read-data" class="section level2">
 <h2>Load libraries and read data</h2>
-<pre class="r"><code>library(AER)
-library(dplyr)
-library(foreign)
-library(ggplot2)
-library(lmtest)
-library(multiwayvcov)
-library(sampleSelection)
+<pre class="r"><code>library(&quot;AER&quot;)
+library(&quot;dplyr&quot;)
+library(&quot;foreign&quot;)
+library(&quot;ggplot2&quot;)
+library(&quot;lmtest&quot;)
+library(&quot;multiwayvcov&quot;)
+library(&quot;sampleSelection&quot;)
 
-data &lt;- read.dta(&quot;servicesdataset_2016.dta&quot;)</code></pre>
+services &lt;- read.dta(&quot;servicesdataset_2016.dta&quot;)</code></pre>
 </div>
 <div id="correlations" class="section level2">
 <h2>Correlations</h2>
 <p>Table 1</p>
-<pre class="r"><code>data &lt;- data %&gt;% 
+<pre class="r"><code>services &lt;- services %&gt;%
   mutate(ln_trade = log(trade),
          ln_distance = log(dist),
          ln_gdp_exp = log(gdp_exp),
          ln_gdp_imp = log(gdp_imp))
 
-cor.data &lt;- data %&gt;% 
-  filter(sector == &quot;SER&quot;) %&gt;% 
+cor_data &lt;- services %&gt;%
+  filter(sector == &quot;SER&quot;) %&gt;%
   select(ln_trade, ln_gdp_exp, ln_gdp_imp, ln_distance) %&gt;%
-  na.omit %&gt;% 
+  na.omit() %&gt;%
   filter(ln_trade &gt; -Inf)
 
-round(cor(cor.data), 4)</code></pre>
+round(cor(cor_data), 4)</code></pre>
 <pre><code>##             ln_trade ln_gdp_exp ln_gdp_imp ln_distance
 ## ln_trade      1.0000     0.3643     0.3731     -0.2648
 ## ln_gdp_exp    0.3643     1.0000    -0.3103      0.0518
@@ -48,52 +49,57 @@ round(cor(cor.data), 4)</code></pre>
 <div id="graphics" class="section level2">
 <h2>Graphics</h2>
 <p>Prepare data</p>
-<pre class="r"><code>data &lt;- data %&gt;% 
-  mutate(ln_gdp_both = log(gdp_exp*gdp_imp))
+<pre class="r"><code>services &lt;- services %&gt;%
+  mutate(ln_gdp_both = log(gdp_exp * gdp_imp))
 
-plot.data &lt;- data %&gt;% 
-  filter(sector == &quot;SER&quot;) %&gt;% 
-  select(ln_gdp_both, ln_trade, ln_distance) %&gt;% 
-  na.omit %&gt;% filter(ln_trade &gt; -Inf)</code></pre>
+plot_data &lt;- services %&gt;%
+  filter(sector == &quot;SER&quot;) %&gt;%
+  select(ln_gdp_both, ln_trade, ln_distance) %&gt;%
+  na.omit() %&gt;%
+  filter(ln_trade &gt; -Inf)</code></pre>
 <div id="figure-1" class="section level3">
 <h3>Figure 1</h3>
-<pre class="r"><code>figure1 &lt;- ggplot(plot.data, aes(x = ln_gdp_both, y = ln_trade)) + 
+<pre class="r"><code>figure_1 &lt;- ggplot(plot_data, aes(x = ln_gdp_both, y = ln_trade)) +
   geom_point() +
   geom_smooth(se = FALSE, method = &quot;lm&quot;) +
   scale_x_continuous(limits = c(40, 60)) +
   scale_y_continuous(limits = c(-7, 11))
 
-figure1</code></pre>
-<p><img src="/reproduction/2016_sheperd_gravity_files/figure-html/unnamed-chunk-5-1.png" width="384" /></p>
+figure_1</code></pre>
+<pre><code>## `geom_smooth()` using formula = &#39;y ~ x&#39;</code></pre>
+<p><img src="/reproduction/2016_sheperd_gravity_files/figure-html/unnamed-chunk-5-1.png" alt="" width="384" /></p>
 </div>
 <div id="figure-2" class="section level3">
 <h3>Figure 2</h3>
-<pre class="r"><code>figure2 &lt;- ggplot(plot.data, aes(x = ln_distance, y = ln_trade)) + 
+<pre class="r"><code>figure_2 &lt;- ggplot(plot_data, aes(x = ln_distance, y = ln_trade)) +
   geom_point() +
   geom_smooth(se = FALSE, method = &quot;lm&quot;) +
   scale_x_continuous(limits = c(2, 10)) +
   scale_y_continuous(limits = c(-7, 11))
 
-figure2</code></pre>
-<p><img src="/reproduction/2016_sheperd_gravity_files/figure-html/unnamed-chunk-6-1.png" width="384" /></p>
+figure_2</code></pre>
+<pre><code>## `geom_smooth()` using formula = &#39;y ~ x&#39;</code></pre>
+<p><img src="/reproduction/2016_sheperd_gravity_files/figure-html/unnamed-chunk-6-1.png" alt="" width="384" /></p>
 </div>
 </div>
 <div id="table-2" class="section level2">
 <h2>Table 2</h2>
-<pre class="r"><code>data.table.02 &lt;- data %&gt;% filter(sector == &quot;SER&quot;) %&gt;%
-  select(ln_trade, ln_gdp_exp, ln_gdp_imp, ln_distance, contig, 
+<pre class="r"><code>data_table_02 &lt;- services %&gt;%
+  filter(sector == &quot;SER&quot;) %&gt;%
+  select(ln_trade, ln_gdp_exp, ln_gdp_imp, ln_distance, contig,
          comlang_off, colony, comcol, dist) %&gt;%
-  na.omit %&gt;% filter(ln_trade != -Inf)
+  na.omit() %&gt;%
+  filter(ln_trade != -Inf)
 
-lm.table.02 &lt;- lm(ln_trade ~ ln_gdp_exp + ln_gdp_imp + ln_distance + 
+lm_table_02 &lt;- lm(ln_trade ~ ln_gdp_exp + ln_gdp_imp + ln_distance +
                     contig + comlang_off + colony + comcol,
-                  data = data.table.02)
+                  data = data_table_02)
 
-summary(lm.table.02)</code></pre>
+summary(lm_table_02)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = ln_trade ~ ln_gdp_exp + ln_gdp_imp + ln_distance + 
-##     contig + comlang_off + colony + comcol, data = data.table.02)
+##     contig + comlang_off + colony + comcol, data = data_table_02)
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
@@ -113,10 +119,10 @@ summary(lm.table.02)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 1.528 on 3876 degrees of freedom
-## Multiple R-squared:  0.5431, Adjusted R-squared:  0.5422 
+## Multiple R-squared:  0.5431,	Adjusted R-squared:  0.5422 
 ## F-statistic: 658.1 on 7 and 3876 DF,  p-value: &lt; 2.2e-16</code></pre>
-<pre class="r"><code>vcov.02 &lt;- cluster.vcov(lm.table.02, ~ dist)
-coeftest(lm.table.02, vcov. = vcov.02)</code></pre>
+<pre class="r"><code>vcov_02 &lt;- cluster.vcov(lm_table_02, ~ dist)
+coeftest(lm_table_02, vcov. = vcov_02)</code></pre>
 <pre><code>## 
 ## t test of coefficients:
 ## 
@@ -139,10 +145,10 @@ coeftest(lm.table.02, vcov. = vcov.02)</code></pre>
 </div>
 <div id="table-4" class="section level2">
 <h2>Table 4</h2>
-<pre class="r"><code>lm.ols.ncult &lt;- lm(ln_trade ~ ln_gdp_exp + ln_gdp_imp + ln_distance,
-                   data = data.table.02)
+<pre class="r"><code>lm_ols_ncult &lt;- lm(ln_trade ~ ln_gdp_exp + ln_gdp_imp + ln_distance,
+                   data = data_table_02)
 
-waldtest(lm.ols.ncult, lm.table.02, vcov = vcov.02)</code></pre>
+waldtest(lm_ols_ncult, lm_table_02, vcov = vcov_02)</code></pre>
 <pre><code>## Wald test
 ## 
 ## Model 1: ln_trade ~ ln_gdp_exp + ln_gdp_imp + ln_distance
@@ -156,17 +162,19 @@ waldtest(lm.ols.ncult, lm.table.02, vcov = vcov.02)</code></pre>
 </div>
 <div id="table-5" class="section level2">
 <h2>Table 5</h2>
-<pre class="r"><code>data.table.05 &lt;- data %&gt;% filter(sector == &quot;SER&quot;) %&gt;%
-  select(ln_trade, etcr_exp, etcr_imp, ln_gdp_exp, ln_gdp_imp, ln_distance, contig, 
-         comlang_off, colony, comcol, dist) %&gt;%
-  na.omit %&gt;% filter(ln_trade != -Inf)
+<pre class="r"><code>data_table_05 &lt;- services %&gt;%
+  filter(sector == &quot;SER&quot;) %&gt;%
+  select(ln_trade, etcr_exp, etcr_imp, ln_gdp_exp, ln_gdp_imp, ln_distance,
+         contig, comlang_off, colony, comcol, dist) %&gt;%
+  na.omit() %&gt;%
+  filter(ln_trade != -Inf)
 
-lm.table.05 &lt;- lm(ln_trade ~ etcr_exp + etcr_imp + ln_gdp_exp + ln_gdp_imp +
+lm_table_05 &lt;- lm(ln_trade ~ etcr_exp + etcr_imp + ln_gdp_exp + ln_gdp_imp +
                     ln_distance + contig + comlang_off + colony + comcol,
-                  data = data.table.05)
+                  data = data_table_05)
 
-vcov.05 &lt;- cluster.vcov(lm.table.05, ~ dist)
-coeftest(lm.table.05, vcov. = vcov.05)</code></pre>
+vcov_05 &lt;- cluster.vcov(lm_table_05, ~ dist)
+coeftest(lm_table_05, vcov. = vcov_05)</code></pre>
 <pre><code>## 
 ## t test of coefficients:
 ## 
@@ -185,19 +193,19 @@ coeftest(lm.table.05, vcov. = vcov.05)</code></pre>
 </div>
 <div id="table-6" class="section level2">
 <h2>Table 6</h2>
-<pre class="r"><code>data.table.06 &lt;- data %&gt;% 
+<pre class="r"><code>data_table_06 &lt;- services %&gt;%
   filter(sector == &quot;SER&quot;) %&gt;%
   select(ln_trade, ln_distance, contig, comlang_off, colony,
          comcol, dist, exp, imp) %&gt;%
-  na.omit %&gt;% 
+  na.omit() %&gt;%
   filter(ln_trade != -Inf)
 
-lm.table.06 &lt;- lm(ln_trade ~ ln_distance + contig + comlang_off +
+lm_table_06 &lt;- lm(ln_trade ~ ln_distance + contig + comlang_off +
                     colony + comcol + exp + imp,
-                  data = data.table.06)
+                  data = data_table_06)
 
-vcov.06 &lt;- cluster.vcov(lm.table.06, ~ dist)
-coeftest(lm.table.06, vcov. = vcov.06)</code></pre>
+vcov_06 &lt;- cluster.vcov(lm_table_06, ~ dist)
+coeftest(lm_table_06, vcov. = vcov_06)</code></pre>
 <pre><code>## 
 ## t test of coefficients:
 ## 
@@ -212,26 +220,26 @@ coeftest(lm.table.06, vcov. = vcov.06)</code></pre>
 ## expAGO       2.01064971  0.68592191   2.9313 0.0033956 ** 
 ## expAIA      -0.84611895  0.61167757  -1.3833 0.1666619    
 ## expALB      -1.75333683  0.81322640  -2.1560 0.0311446 *  
-##  [ reached getOption(&quot;max.print&quot;) -- omitted 395 rows ]
+##  [ reached &#39;max&#39; / getOption(&quot;max.print&quot;) -- omitted 395 rows ]
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 </div>
 <div id="table-7" class="section level2">
 <h2>Table 7</h2>
 <p>Not sure yet</p>
-<pre class="r"><code>data.table.07 &lt;- data %&gt;% 
+<pre class="r"><code>data_table_07 &lt;- services %&gt;%
   filter(sector == &quot;SER&quot;) %&gt;%
   select(ln_trade, ln_distance, contig, comlang_off, colony,
          comcol, dist, exp, imp) %&gt;%
-  na.omit %&gt;% 
+  na.omit() %&gt;%
   filter(ln_trade != -Inf)
 
-lm.table.07 &lt;- lm(ln_trade ~ ln_distance + contig + comlang_off + 
-                    colony + comcol + exp + imp, 
-                  data = data.table.07)
+lm_table_07 &lt;- lm(ln_trade ~ ln_distance + contig + comlang_off +
+                    colony + comcol + exp + imp,
+                  data = data_table_07)
 
-vcov.07 &lt;- cluster.vcov(lm.table.07, ~ dist)
-coeftest(lm.table.07, vcov. = vcov.07)</code></pre>
+vcov_07 &lt;- cluster.vcov(lm_table_07, ~ dist)
+coeftest(lm_table_07, vcov. = vcov_07)</code></pre>
 <pre><code>## 
 ## t test of coefficients:
 ## 
@@ -246,26 +254,26 @@ coeftest(lm.table.07, vcov. = vcov.07)</code></pre>
 ## expAGO       2.01064971  0.68592191   2.9313 0.0033956 ** 
 ## expAIA      -0.84611895  0.61167757  -1.3833 0.1666619    
 ## expALB      -1.75333683  0.81322640  -2.1560 0.0311446 *  
-##  [ reached getOption(&quot;max.print&quot;) -- omitted 395 rows ]
+##  [ reached &#39;max&#39; / getOption(&quot;max.print&quot;) -- omitted 395 rows ]
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 </div>
 <div id="table-8" class="section level2">
 <h2>Table 8</h2>
-<pre class="r"><code>data.table.08 &lt;- data %&gt;% 
+<pre class="r"><code>data_table_08 &lt;- services %&gt;%
   filter(sector == &quot;SER&quot;) %&gt;%
-  select(ln_trade, etcr_exp, etcr_imp, ln_distance, contig, 
+  select(ln_trade, etcr_exp, etcr_imp, ln_distance, contig,
          comlang_off, colony, comcol, dist, exp, imp) %&gt;%
-  mutate(etcr_both = etcr_exp*etcr_imp) %&gt;%
-  na.omit %&gt;% 
+  mutate(etcr_both = etcr_exp * etcr_imp) %&gt;%
+  na.omit() %&gt;%
   filter(ln_trade != -Inf)
 
-lm.table.08 &lt;- lm(ln_trade ~ etcr_both + ln_distance + contig + 
-                    comlang_off + colony + comcol + exp + imp, 
-                  data = data.table.08)
+lm_table_08 &lt;- lm(ln_trade ~ etcr_both + ln_distance + contig +
+                    comlang_off + colony + comcol + exp + imp,
+                  data = data_table_08)
 
-vcov.08 &lt;- cluster.vcov(lm.table.08, ~ dist)
-coeftest(lm.table.08, vcov. = vcov.08)</code></pre>
+vcov_08 &lt;- cluster.vcov(lm_table_08, ~ dist)
+coeftest(lm_table_08, vcov. = vcov_08)</code></pre>
 <pre><code>## 
 ## t test of coefficients:
 ## 
@@ -280,22 +288,23 @@ coeftest(lm.table.08, vcov. = vcov.08)</code></pre>
 ## expBEL       0.316488   0.429214  0.7374 0.4611299    
 ## expCAN       0.434073   0.332142  1.3069 0.1916496    
 ## expCHE       1.345860   0.447139  3.0099 0.0027004 ** 
-##  [ reached getOption(&quot;max.print&quot;) -- omitted 54 rows ]
+##  [ reached &#39;max&#39; / getOption(&quot;max.print&quot;) -- omitted 54 rows ]
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 </div>
 <div id="table-9" class="section level2">
 <h2>Table 9</h2>
-<pre class="r"><code>data.table.09 &lt;- data %&gt;% 
+<pre class="r"><code>data_table_09 &lt;- services %&gt;%
   filter(sector == &quot;SER&quot;) %&gt;%
   select(ln_trade, ln_distance, dist, exp, imp) %&gt;%
-  na.omit %&gt;% filter(ln_trade != -Inf)
+  na.omit() %&gt;%
+  filter(ln_trade != -Inf)
 
-lm.table.09 &lt;- lm(ln_trade ~ ln_distance + exp + imp,
-                  data = data.table.09)
+lm_table_09 &lt;- lm(ln_trade ~ ln_distance + exp + imp,
+                  data = data_table_09)
 
-vcov.09 &lt;- cluster.vcov(lm.table.09, ~ dist)
-coeftest(lm.table.09, vcov. = vcov.09)</code></pre>
+vcov_09 &lt;- cluster.vcov(lm_table_09, ~ dist)
+coeftest(lm_table_09, vcov. = vcov_09)</code></pre>
 <pre><code>## 
 ## t test of coefficients:
 ## 
@@ -310,44 +319,47 @@ coeftest(lm.table.09, vcov. = vcov.09)</code></pre>
 ## expANT       2.2124493  0.6912184   3.2008 0.0013818 ** 
 ## expARE       3.3236739  0.5783296   5.7470 9.800e-09 ***
 ## expARG       1.6644259  0.6427583   2.5895 0.0096482 ** 
-##  [ reached getOption(&quot;max.print&quot;) -- omitted 391 rows ]
+##  [ reached &#39;max&#39; / getOption(&quot;max.print&quot;) -- omitted 391 rows ]
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 </div>
 <div id="table-10" class="section level2">
 <h2>Table 10</h2>
-<pre class="r"><code>data.table.10 &lt;- data %&gt;% 
-  select(ln_trade, ln_distance, dist, exp, imp, sector, ln_gdp_exp, ln_gdp_imp)
+<pre class="r"><code>data_table_10 &lt;- services %&gt;%
+  select(ln_trade, ln_distance, dist, exp, imp, sector, ln_gdp_exp,
+         ln_gdp_imp)
 
-temp1 &lt;- data.table.10 %&gt;% 
-  group_by(exp, sector) %&gt;% 
+temp1 &lt;- data_table_10 %&gt;%
+  group_by(exp, sector) %&gt;%
   summarise(temp1 = mean(ln_distance, na.rm = TRUE))
 
-temp2 &lt;- data.table.10 %&gt;% 
-  group_by(imp, sector) %&gt;% 
+temp2 &lt;- data_table_10 %&gt;%
+  group_by(imp, sector) %&gt;%
   summarise(temp2 = mean(ln_distance, na.rm = TRUE))
 
-temp3 &lt;- data.table.10 %&gt;% 
-  group_by(sector) %&gt;% 
+temp3 &lt;- data_table_10 %&gt;%
+  group_by(sector) %&gt;%
   summarise(temp3 = sum(ln_distance, na.rm = TRUE))
 
-data.table.10 &lt;- left_join(data.table.10, temp1)
-data.table.10 &lt;- left_join(data.table.10, temp2)
-data.table.10 &lt;- left_join(data.table.10, temp3)
+data_table_10 &lt;- left_join(data_table_10, temp1)
+data_table_10 &lt;- left_join(data_table_10, temp2)
+data_table_10 &lt;- left_join(data_table_10, temp3)
 
-data.table.10 &lt;- data.table.10 %&gt;% 
-  mutate(ln_distance_star = ln_distance - temp1 - temp2 + (1/218^2)*temp3)
+data_table_10 &lt;- data_table_10 %&gt;%
+  mutate(ln_distance_star = ln_distance - temp1 - temp2 +
+           (1 / 218^2) * temp3)
 
-data.table.10 &lt;- filter(data.table.10, sector == &quot;SER&quot;) %&gt;%
+data_table_10 &lt;- data_table_10 %&gt;%
+  filter(sector == &quot;SER&quot;) %&gt;%
   select(ln_trade, ln_distance_star, ln_gdp_exp, ln_gdp_imp, dist) %&gt;%
-  na.omit %&gt;% 
+  na.omit() %&gt;%
   filter(ln_trade != -Inf)
 
-lm.table.10 &lt;- lm(ln_trade ~ ln_distance_star + ln_gdp_exp + ln_gdp_imp,
-                  data = data.table.10)
+lm_table_10 &lt;- lm(ln_trade ~ ln_distance_star + ln_gdp_exp + ln_gdp_imp,
+                  data = data_table_10)
 
-vcov.10 &lt;- cluster.vcov(lm.table.10, ~ dist)
-coeftest(lm.table.10, vcov. = vcov.10)</code></pre>
+vcov_10 &lt;- cluster.vcov(lm_table_10, ~ dist)
+coeftest(lm_table_10, vcov. = vcov_10)</code></pre>
 <pre><code>## 
 ## t test of coefficients:
 ## 
@@ -361,20 +373,21 @@ coeftest(lm.table.10, vcov. = vcov.10)</code></pre>
 </div>
 <div id="table-11a" class="section level2">
 <h2>Table 11a</h2>
-<pre class="r"><code>data.table.11 &lt;- data %&gt;% 
+<pre class="r"><code>data_table_11 &lt;- services %&gt;%
   mutate(ln_lat_exp = log(abs(lat_exp)),
          ln_lat_imp = log(abs(lat_imp))) %&gt;%
   select(ln_trade, etcr_exp, etcr_imp, ln_lat_exp, ln_lat_imp, ln_gdp_exp,
-         ln_gdp_imp, ln_distance, contig, comlang_off, colony, comcol, dist) %&gt;% 
-  na.omit %&gt;% 
+         ln_gdp_imp, ln_distance, contig, comlang_off, colony, comcol,
+         dist) %&gt;%
+  na.omit() %&gt;%
   filter(ln_trade != -Inf)
 
-iv.t11a &lt;- ivreg(etcr_exp ~ ln_gdp_exp + ln_gdp_imp + ln_distance + contig +
-                   comlang_off + colony + ln_lat_exp + ln_lat_imp, 
-                 data = data.table.11)
+iv_t11a &lt;- ivreg(etcr_exp ~ ln_gdp_exp + ln_gdp_imp + ln_distance + contig +
+                   comlang_off + colony + ln_lat_exp + ln_lat_imp,
+                 data = data_table_11)
 
-vcov.11a &lt;- cluster.vcov(iv.t11a, ~ dist)
-coeftest(iv.t11a, vcov. = vcov.11a)</code></pre>
+vcov_11a &lt;- cluster.vcov(iv_t11a, ~ dist)
+coeftest(iv_t11a, vcov. = vcov_11a)</code></pre>
 <pre><code>## 
 ## t test of coefficients:
 ## 
@@ -393,12 +406,12 @@ coeftest(iv.t11a, vcov. = vcov.11a)</code></pre>
 </div>
 <div id="table-11b" class="section level2">
 <h2>Table 11b</h2>
-<pre class="r"><code>iv.t11b &lt;- ivreg(etcr_imp ~ ln_gdp_exp + ln_gdp_imp + ln_distance + contig +
-                   comlang_off + colony + ln_lat_exp + ln_lat_imp, 
-                 data = data.table.11)
+<pre class="r"><code>iv_t11b &lt;- ivreg(etcr_imp ~ ln_gdp_exp + ln_gdp_imp + ln_distance + contig +
+                   comlang_off + colony + ln_lat_exp + ln_lat_imp,
+                 data = data_table_11)
 
-vcov.11b &lt;- cluster.vcov(iv.t11b, ~ dist)
-coeftest(iv.t11b, vcov. = vcov.11b)</code></pre>
+vcov_11b &lt;- cluster.vcov(iv_t11b, ~ dist)
+coeftest(iv_t11b, vcov. = vcov_11b)</code></pre>
 <pre><code>## 
 ## t test of coefficients:
 ## 
@@ -417,14 +430,14 @@ coeftest(iv.t11b, vcov. = vcov.11b)</code></pre>
 </div>
 <div id="table-11c" class="section level2">
 <h2>Table 11c</h2>
-<pre class="r"><code>iv.t11c &lt;- ivreg(ln_trade ~ etcr_exp + etcr_imp + ln_gdp_exp + ln_gdp_imp +
-                   ln_distance + contig + comlang_off + colony | 
-                   ln_lat_exp + ln_lat_imp + ln_gdp_exp + ln_gdp_imp + 
-                   ln_distance + contig + comlang_off + colony, 
-                 data = data.table.11)
+<pre class="r"><code>iv_t11c &lt;- ivreg(ln_trade ~ etcr_exp + etcr_imp + ln_gdp_exp + ln_gdp_imp +
+                   ln_distance + contig + comlang_off + colony |
+                   ln_lat_exp + ln_lat_imp + ln_gdp_exp + ln_gdp_imp +
+                   ln_distance + contig + comlang_off + colony,
+                 data = data_table_11)
 
-vcov.11c &lt;- cluster.vcov(iv.t11c, ~ dist)
-coeftest(iv.t11c, vcov. = vcov.11c)</code></pre>
+vcov_11c &lt;- cluster.vcov(iv_t11c, ~ dist)
+coeftest(iv_t11c, vcov. = vcov_11c)</code></pre>
 <pre><code>## 
 ## t test of coefficients:
 ## 
@@ -444,18 +457,19 @@ coeftest(iv.t11c, vcov. = vcov.11c)</code></pre>
 </div>
 <div id="table-12" class="section level2">
 <h2>Table 12</h2>
-<pre class="r"><code>data.table.12 &lt;- data %&gt;% 
+<pre class="r"><code>data_table_12 &lt;- services %&gt;%
   filter(sector == &quot;SER&quot;) %&gt;%
-  select(trade, ln_distance, contig, comlang_off, colony, 
-         comcol, exp, imp, dist) %&gt;% 
-  na.omit
+  select(trade, ln_distance, contig, comlang_off, colony,
+         comcol, exp, imp, dist) %&gt;%
+  na.omit()
 
-est.table.12 &lt;- glm(trade ~ ln_distance + contig + comlang_off + colony + 
-                      comcol + exp + imp, family = &quot;quasipoisson&quot;, 
-                    data = data.table.12)
+est_table_12 &lt;- glm(trade ~ ln_distance + contig + comlang_off + colony +
+                      comcol + exp + imp,
+                    family = &quot;quasipoisson&quot;,
+                    data = data_table_12)
 
-vcov.12 &lt;- cluster.vcov(est.table.12, ~ dist)
-coeftest(est.table.12, vcov. = vcov.12)</code></pre>
+vcov_12 &lt;- cluster.vcov(est_table_12, ~ dist)
+coeftest(est_table_12, vcov. = vcov_12)</code></pre>
 <pre><code>## 
 ## z test of coefficients:
 ## 
@@ -470,34 +484,36 @@ coeftest(est.table.12, vcov. = vcov.12)</code></pre>
 ## expAGO        2.469760   0.824305   2.9962 0.0027339 ** 
 ## expAIA       -2.196090   0.823901  -2.6655 0.0076879 ** 
 ## expALB       -3.260660   1.149748  -2.8360 0.0045686 ** 
-##  [ reached getOption(&quot;max.print&quot;) -- omitted 408 rows ]
+##  [ reached &#39;max&#39; / getOption(&quot;max.print&quot;) -- omitted 408 rows ]
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <p>The coefficients are the same, but the clustered standard errors are not. I am not sure, where this comes from.</p>
 </div>
 <div id="table-13" class="section level1">
 <h1>Table 13</h1>
-<pre class="r"><code>data &lt;- mutate(data, ent_cost_both = ent_cost_exp*ent_cost_imp)
+<pre class="r"><code>services &lt;- mutate(services, ent_cost_both = ent_cost_exp * ent_cost_imp)
 
-data.table.13 &lt;- data %&gt;% 
+data_table_13 &lt;- services %&gt;%
   filter(sector == &quot;SER&quot;) %&gt;%
-  select(ln_trade, ln_distance, contig, comlang_off, colony, comcol, 
-         exp, imp, ent_cost_both, dist) %&gt;% 
-  na.omit %&gt;%
+  select(ln_trade, ln_distance, contig, comlang_off, colony, comcol,
+         exp, imp, ent_cost_both, dist) %&gt;%
+  na.omit() %&gt;%
   mutate(select = as.numeric(ln_trade != -Inf))
 
-data.table.13[!data.table.13[,&quot;select&quot;], &quot;ln_trade&quot;] &lt;- NA
-data.table.13[, &quot;exp&quot;] &lt;- factor(data.table.13[, &quot;exp&quot;])
-data.table.13[, &quot;imp&quot;] &lt;- factor(data.table.13[, &quot;imp&quot;])
+data_table_13[!data_table_13[[&quot;select&quot;]], &quot;ln_trade&quot;] &lt;- NA
+data_table_13[[&quot;exp&quot;]] &lt;- factor(data_table_13[[&quot;exp&quot;]])
+data_table_13[[&quot;imp&quot;]] &lt;- factor(data_table_13[[&quot;imp&quot;]])
 
 # Deviates from the 1st-step results in the paper
-summary(probit(select ~ ln_distance + contig + comlang_off + colony + 
-                 comcol + ent_cost_both + exp + imp, 
-               data = data.table.13))</code></pre>
+probit_table_13 &lt;- probit(select ~ ln_distance + contig + comlang_off +
+                            colony + comcol + ent_cost_both + exp + imp,
+                          data = data_table_13)
+
+summary(probit_table_13)</code></pre>
 <pre><code>## --------------------------------------------
 ## Probit binary choice model/Maximum Likelihood estimation
 ## Newton-Raphson maximisation, 15 iterations
-## Return code 2: successive function values within tolerance limit
+## Return code 8: successive function values within relative tolerance limit (reltol)
 ## Log-Likelihood: -1304.324 
 ## Model: Y == &#39;1&#39; in contrary to &#39;0&#39;
 ## 5164 observations (1681 &#39;negative&#39; and 3483 &#39;positive&#39;) and 337 free parameters (df = 4827)
@@ -513,16 +529,20 @@ summary(probit(select ~ ln_distance + contig + comlang_off + colony +
 ## expAGO         1.5698e+00  6.6724e-01  2.3527 0.0186387 *  
 ## expALB        -1.1498e+00  6.1461e-01 -1.8708 0.0613727 .  
 ## expARE         2.9294e+00  8.9968e-01  3.2561 0.0011295 ** 
-##  [ reached getOption(&quot;max.print&quot;) -- omitted 327 rows ]
+##  [ reached &#39;max&#39; / getOption(&quot;max.print&quot;) -- omitted 327 rows ]
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## Significance test:
 ## chi2(336) = 3907.932 (p=0)
 ## --------------------------------------------</code></pre>
-<pre class="r"><code># est.table.13 &lt;- selection(select ~ ln_distance + contig + comlang_off + colony + comcol + ent_cost_both + exp + imp, ln_trade ~ ln_distance + contig + comlang_off + colony + comcol + exp + imp, data = data.table.13)
+<pre class="r"><code># est_table_13 &lt;- selection(select ~ ln_distance + contig + comlang_off +
+#                             colony + comcol + ent_cost_both + exp + imp,
+#                           ln_trade ~ ln_distance + contig + comlang_off +
+#                             colony + comcol + exp + imp,
+#                           data = data_table_13)
 
 # Produces an error
 
-#vcov.13 &lt;- cluster.vcov(est.table.13, ~ dist)
-#coeftest(est.table.13, vcov. = vcov.13)</code></pre>
+# vcov_13 &lt;- cluster.vcov(est_table_13, ~ dist)
+# coeftest(est_table_13, vcov. = vcov_13)</code></pre>
 </div>
