@@ -29,11 +29,20 @@ description: "Hochmuth and Petz (2026) argue that persistent services inflation 
 </div>
 <div id="the-data" class="section level2">
 <h2>The data</h2>
-<p>The paper uses monthly harmonised indices of consumer prices (HICP) for the euro area (changing composition) from Eurostat data set <code>prc_hicp_minr</code>, from January 1996 to June 2026, which the <a href="https://cran.r-project.org/package=eurostat"><code>eurostat</code></a> package downloads. They are seasonally adjusted with X-13ARIMA-SEATS from the <a href="https://cran.r-project.org/package=seasonal"><code>seasonal</code></a> package and averaged to quarters. The code calls every function together with its package, as in <code>dplyr::mutate()</code>, so nothing needs to be attached but the pipe of <code>magrittr</code>, which as an infix operator cannot be called that way. <code>bvartools</code>, <code>dplyr</code>, <code>tidyr</code>, <code>tibble</code>, <code>eurostat</code>, <code>ecb</code>, <code>alfred</code> and <code>seasonal</code> need to be installed as well:</p>
-<pre class="r"><code>library(&quot;magrittr&quot;)</code></pre>
+<p>The paper uses monthly harmonised indices of consumer prices (HICP) for the euro area (changing composition) from Eurostat data set <code>prc_hicp_minr</code>, from January 1996 to June 2026, which the <a href="https://cran.r-project.org/package=eurostat"><code>eurostat</code></a> package downloads. They are seasonally adjusted with X-13ARIMA-SEATS from the <a href="https://cran.r-project.org/package=seasonal"><code>seasonal</code></a> package and averaged to quarters. The code uses the following packages:</p>
+<pre class="r"><code>library(&quot;bvartools&quot;)
+library(&quot;dplyr&quot;)
+library(&quot;knitr&quot;)
+library(&quot;magrittr&quot;)
+library(&quot;seasonal&quot;)
+library(&quot;tibble&quot;)
+library(&quot;tidyr&quot;)</code></pre>
 <p>The data set is the first that Eurostat publishes under the new ECOICOP version 2, and the vintage of October 2026 has no euro area index before December 1999, although the paper says it started in January 1996 when it was downloaded in August. The ECB Data Portal still has the old ECOICOP version 1 indices, which start in 1996 and which the <a href="https://cran.r-project.org/package=ecb"><code>ecb</code></a> package downloads, so the missing months are filled in with their month-on-month growth rates. The ECB’s NEIG index itself has a hole from January 1997 to November 2000, which its published annual rates of change fill: <span class="math inline">\(P_t = P_{t-12} (1 + \pi^{yoy}_t / 100)\)</span>. Since those rates have only one decimal, each year rebuilt that way is off by at most 0.05%.</p>
-<pre class="r"><code># Eurostat, ECOICOP ver. 2: services, NEIG and goods, 2025 = 100
-hicp_new &lt;- eurostat::get_eurostat(
+<pre class="r"><code>library(&quot;ecb&quot;)
+library(&quot;eurostat&quot;)
+
+# Eurostat, ECOICOP ver. 2: services, NEIG and goods, 2025 = 100
+hicp_new &lt;- get_eurostat(
   &quot;prc_hicp_minr&quot;,
   time_format = &quot;raw&quot;,
   cache = FALSE,
@@ -43,21 +52,21 @@ hicp_new &lt;- eurostat::get_eurostat(
     coicop18 = c(&quot;SERV&quot;, &quot;IGD_NNRG&quot;, &quot;GD&quot;)
   )
 ) %&gt;%
-  dplyr::transmute(
+  transmute(
     month = as.character(time),
     series = coicop18,
     index = values
   ) %&gt;%
-  dplyr::filter(month &lt;= &quot;2026-06&quot;)
+  filter(month &lt;= &quot;2026-06&quot;)
 
 # ECB, ECOICOP ver. 1: index levels (INX) and annual rates (ANR), 1996-2001
-hicp_old &lt;- ecb::get_data(
+hicp_old &lt;- get_data(
   &quot;ICP.M.U2.N.SERV00+IGXE00+GOODS0.4.INX+ANR&quot;,
   filter = list(startPeriod = &quot;1996-01&quot;, endPeriod = &quot;2001-12&quot;)
 ) %&gt;%
-  dplyr::transmute(
+  transmute(
     month = obstime,
-    series = dplyr::recode_values(
+    series = recode_values(
       icp_item,
       &quot;SERV00&quot; ~ &quot;SERV&quot;,
       &quot;IGXE00&quot; ~ &quot;IGD_NNRG&quot;,
@@ -66,68 +75,68 @@ hicp_old &lt;- ecb::get_data(
     suffix = icp_suffix,
     value = obsvalue
   ) %&gt;%
-  tidyr::pivot_wider(names_from = suffix, values_from = value)
+  pivot_wider(names_from = suffix, values_from = value)
 
 # Fill a missing index level from the same month a year earlier and the
 # annual rate: chained from 1996, I_t = I_{t-12} (1 + ANR_t / 100)
 hicp_old &lt;- hicp_old %&gt;%
-  dplyr::mutate(calendar_month = substr(month, 6, 7)) %&gt;%
-  dplyr::arrange(series, calendar_month, month) %&gt;%
-  dplyr::group_by(series, calendar_month) %&gt;%
-  dplyr::mutate(
+  mutate(calendar_month = substr(month, 6, 7)) %&gt;%
+  arrange(series, calendar_month, month) %&gt;%
+  group_by(series, calendar_month) %&gt;%
+  mutate(
     chained = cumprod(
-      dplyr::if_else(dplyr::row_number() == 1, INX, 1 + ANR / 100)
+      if_else(row_number() == 1, INX, 1 + ANR / 100)
     ),
-    INX = dplyr::coalesce(INX, chained)
+    INX = coalesce(INX, chained)
   ) %&gt;%
-  dplyr::ungroup()
+  ungroup()
 
 # Back-cast each Eurostat series with the growth of its ECB counterpart
 hicp_old_index &lt;- hicp_old %&gt;%
-  dplyr::select(month, series, old = INX)
+  select(month, series, old = INX)
 
 hicp &lt;- hicp_new %&gt;%
-  dplyr::full_join(hicp_old_index, by = c(&quot;month&quot;, &quot;series&quot;)) %&gt;%
-  dplyr::arrange(series, month) %&gt;%
-  dplyr::group_by(series) %&gt;%
-  dplyr::mutate(
+  full_join(hicp_old_index, by = c(&quot;month&quot;, &quot;series&quot;)) %&gt;%
+  arrange(series, month) %&gt;%
+  group_by(series) %&gt;%
+  mutate(
     first_month = min(month[!is.na(index)]),
-    index = dplyr::coalesce(
+    index = coalesce(
       index,
       index[month == first_month] * old / old[month == first_month]
     )
   ) %&gt;%
-  dplyr::ungroup()
+  ungroup()
 
 hicp %&gt;%
-  tidyr::pivot_wider(id_cols = month, names_from = series,
+  pivot_wider(id_cols = month, names_from = series,
                      values_from = index) %&gt;%
-  dplyr::select(month, GD, IGD_NNRG, SERV) %&gt;%
+  select(month, GD, IGD_NNRG, SERV) %&gt;%
   write.csv(&quot;_2026_hochmuth_petz_hicp.csv&quot;, row.names = FALSE)</code></pre>
 <p>The result is in a small file next to this page, so that the post does not change with the next vintage:</p>
 <pre class="r"><code>hicp &lt;- read.csv(&quot;_2026_hochmuth_petz_hicp.csv&quot;) %&gt;%
-  tidyr::pivot_longer(-month, names_to = &quot;series&quot;, values_to = &quot;index&quot;) %&gt;%
-  dplyr::arrange(series, month)
+  pivot_longer(-month, names_to = &quot;series&quot;, values_to = &quot;index&quot;) %&gt;%
+  arrange(series, month)
 
 # X-13ARIMA-SEATS with the defaults of seasonal, series by series
 hicp &lt;- hicp %&gt;%
-  dplyr::group_by(series) %&gt;%
-  dplyr::mutate(
-    index_sa = stats::ts(index, start = c(1996, 1), frequency = 12) %&gt;%
-      seasonal::seas() %&gt;%
-      seasonal::final() %&gt;%
+  group_by(series) %&gt;%
+  mutate(
+    index_sa = ts(index, start = c(1996, 1), frequency = 12) %&gt;%
+      seas() %&gt;%
+      final() %&gt;%
       as.numeric()
   ) %&gt;%
-  dplyr::ungroup()
+  ungroup()
 
 # Quarterly averages, dated by the start of the quarter: 1996.25 is 1996 Q2
 prices &lt;- hicp %&gt;%
-  dplyr::mutate(
+  mutate(
     quarter = as.integer(substr(month, 1, 4)) +
       (as.integer(substr(month, 6, 7)) - 1) %/% 3 / 4
   ) %&gt;%
-  dplyr::group_by(series, quarter) %&gt;%
-  dplyr::summarise(
+  group_by(series, quarter) %&gt;%
+  summarise(
     index = mean(index),
     index_sa = mean(index_sa),
     .groups = &quot;drop&quot;
@@ -136,7 +145,7 @@ prices &lt;- hicp %&gt;%
 <div id="the-composition-of-euro-area-inflation" class="section level2">
 <h2>The composition of euro area inflation</h2>
 <p>Chart 1 of the brief splits euro area HICP inflation since 2018 into the contributions of energy, food including alcohol and tobacco, NEIG and services. Eurostat publishes these contributions in percentage points as data set <code>prc_hicp_ctr</code>, and the annual rates of headline and core inflation – the overall index excluding energy, food, alcohol and tobacco – are in <code>prc_hicp_minr</code>:</p>
-<pre class="r"><code>contributions &lt;- eurostat::get_eurostat(
+<pre class="r"><code>contributions &lt;- get_eurostat(
   &quot;prc_hicp_ctr&quot;,
   time_format = &quot;raw&quot;,
   cache = FALSE,
@@ -146,7 +155,7 @@ prices &lt;- hicp %&gt;%
   )
 )
 
-inflation &lt;- eurostat::get_eurostat(
+inflation &lt;- get_eurostat(
   &quot;prc_hicp_minr&quot;,
   time_format = &quot;raw&quot;,
   cache = FALSE,
@@ -158,16 +167,16 @@ inflation &lt;- eurostat::get_eurostat(
 )
 
 # From 2018 to the brief&#39;s last observation
-dplyr::bind_rows(contributions, inflation) %&gt;%
-  dplyr::transmute(
+bind_rows(contributions, inflation) %&gt;%
+  transmute(
     month = as.character(time),
     series = coicop18,
     value = values
   ) %&gt;%
-  dplyr::filter(month &gt;= &quot;2018-01&quot;, month &lt;= &quot;2026-07&quot;) %&gt;%
-  tidyr::pivot_wider(names_from = series, values_from = value) %&gt;%
-  dplyr::select(month, FOOD, IGD_NNRG, NRG, SERV, TOTAL, TOT_X_NRG_FOOD) %&gt;%
-  dplyr::arrange(month) %&gt;%
+  filter(month &gt;= &quot;2018-01&quot;, month &lt;= &quot;2026-07&quot;) %&gt;%
+  pivot_wider(names_from = series, values_from = value) %&gt;%
+  select(month, FOOD, IGD_NNRG, NRG, SERV, TOTAL, TOT_X_NRG_FOOD) %&gt;%
+  arrange(month) %&gt;%
   write.csv(&quot;_2026_hochmuth_petz_contributions.csv&quot;, row.names = FALSE)</code></pre>
 <p>The contributions add up to headline inflation up to rounding. The bars of a month are stacked upwards from zero where they are positive and downwards where they are negative. All charts on this page share one set of colours, with services always in blue:</p>
 <pre class="r"><code>colours &lt;- c(
@@ -186,7 +195,7 @@ component_colours &lt;- c(
   NRG = colours[[&quot;red&quot;]]
 )</code></pre>
 <pre class="r"><code>contributions &lt;- read.csv(&quot;_2026_hochmuth_petz_contributions.csv&quot;) %&gt;%
-  dplyr::mutate(
+  mutate(
     period = as.integer(substr(month, 1, 4)) +
       (as.integer(substr(month, 6, 7)) - 1) / 12
   )
@@ -194,18 +203,18 @@ component_colours &lt;- c(
 # Stack the positive contributions of a month upwards from zero, the negative
 # ones downwards, services first
 bars &lt;- contributions %&gt;%
-  tidyr::pivot_longer(
+  pivot_longer(
     c(SERV, IGD_NNRG, FOOD, NRG),
     names_to = &quot;component&quot;,
     values_to = &quot;value&quot;
   ) %&gt;%
-  dplyr::mutate(
+  mutate(
     component = factor(component, levels = names(component_colours))
   ) %&gt;%
-  dplyr::arrange(month, component) %&gt;%
-  dplyr::group_by(month, positive = value &gt;= 0) %&gt;%
-  dplyr::mutate(top = cumsum(value), bottom = top - value) %&gt;%
-  dplyr::ungroup()
+  arrange(month, component) %&gt;%
+  group_by(month, positive = value &gt;= 0) %&gt;%
+  mutate(top = cumsum(value), bottom = top - value) %&gt;%
+  ungroup()
 
 plot(
   NA,
@@ -252,34 +261,33 @@ legend(
 <h2>The price of services relative to goods</h2>
 <p>Chart 2 of the brief shows the price of services relative to NEIG and to overall goods as a four-quarter moving average, indexed to 100 in the first quarter of 2000, together with a log-linear trend fitted over 1996 to 2019 and extrapolated from there. The moving average removes the seasonal pattern, so the chart works with quarterly averages of the unadjusted indices:</p>
 <pre class="r"><code>relative_prices &lt;- prices %&gt;%
-  dplyr::select(series, quarter, index) %&gt;%
-  tidyr::pivot_wider(names_from = series, values_from = index) %&gt;%
-  tidyr::pivot_longer(
+  select(series, quarter, index) %&gt;%
+  pivot_wider(names_from = series, values_from = index) %&gt;%
+  pivot_longer(
     c(IGD_NNRG, GD),
     names_to = &quot;goods&quot;,
     values_to = &quot;goods_index&quot;
   ) %&gt;%
-  dplyr::arrange(goods, quarter) %&gt;%
-  dplyr::group_by(goods) %&gt;%
-  dplyr::mutate(
+  arrange(goods, quarter) %&gt;%
+  group_by(goods) %&gt;%
+  mutate(
     # Four-quarter moving average, indexed to Q1 2000 = 100
-    price = as.numeric(
-      stats::filter(SERV / goods_index, rep(1 / 4, 4), sides = 1)
-    ),
+    ratio = SERV / goods_index,
+    price = (ratio + lag(ratio) + lag(ratio, 2) + lag(ratio, 3)) / 4,
     price = 100 * price / price[quarter == 2000],
 
     # Log-linear trend fitted over 1996-2019, extrapolated from there
-    trend = exp(stats::predict(
-      stats::lm(log(price) ~ quarter, subset = quarter &lt; 2020),
+    trend = exp(predict(
+      lm(log(price) ~ quarter, subset = quarter &lt; 2020),
       newdata = data.frame(quarter = quarter)
     )),
-    growth = 100 * stats::coef(
-      stats::lm(log(price) ~ quarter, subset = quarter &lt; 2020)
+    growth = 100 * coef(
+      lm(log(price) ~ quarter, subset = quarter &lt; 2020)
     )[[&quot;quarter&quot;]]
   ) %&gt;%
-  dplyr::ungroup()</code></pre>
-<pre class="r"><code>ea_neig &lt;- dplyr::filter(relative_prices, goods == &quot;IGD_NNRG&quot;)
-ea_goods &lt;- dplyr::filter(relative_prices, goods == &quot;GD&quot;)
+  ungroup()</code></pre>
+<pre class="r"><code>ea_neig &lt;- filter(relative_prices, goods == &quot;IGD_NNRG&quot;)
+ea_goods &lt;- filter(relative_prices, goods == &quot;GD&quot;)
 
 plot(
   ea_neig[[&quot;quarter&quot;]], ea_neig[[&quot;price&quot;]],
@@ -314,47 +322,48 @@ legend(
 <p><img src="/reproduction/2026_hochmuth_petz_services_files/figure-html/chart2-1.png" alt="" width="672" /></p>
 <p>Before the pandemic services became 1.3% a year more expensive relative to NEIG, and 0.3% relative to overall goods. Both relative prices fell below their trends in 2021 and 2022. The one against overall goods fell much more, because the energy and food prices it includes rose most, and it has made up less of the loss since. In the second quarter of 2026 services relative to NEIG are 3.2% below the extrapolated trend, which the brief puts at 3.5%, and relative to overall goods 5% below it.</p>
 <p>The euro area series is short, so the brief turns to post-war US data to ask whether such a trend survives large shocks. Chart 3 is the price of services relative to commodities in the US consumer price index for all urban consumers (CPI-U), series <code>CUUR0000SAS</code> and <code>CUUR0000SAC</code> of the Bureau of Labor Statistics. FRED, the database of the Federal Reserve Bank of St. Louis, carries both, and the <a href="https://cran.r-project.org/package=alfred"><code>alfred</code></a> package downloads them:</p>
-<pre class="r"><code>us_services &lt;- alfred::get_fred_series(&quot;CUUR0000SAS&quot;, &quot;CUUR0000SAS&quot;)
-us_commodities &lt;- alfred::get_fred_series(&quot;CUUR0000SAC&quot;, &quot;CUUR0000SAC&quot;)
+<pre class="r"><code>library(&quot;alfred&quot;)
 
-dplyr::full_join(us_services, us_commodities, by = &quot;date&quot;) %&gt;%
-  dplyr::mutate(month = format(date, &quot;%Y-%m&quot;)) %&gt;%
+us_services &lt;- get_fred_series(&quot;CUUR0000SAS&quot;, &quot;CUUR0000SAS&quot;)
+us_commodities &lt;- get_fred_series(&quot;CUUR0000SAC&quot;, &quot;CUUR0000SAC&quot;)
+
+full_join(us_services, us_commodities, by = &quot;date&quot;) %&gt;%
+  mutate(month = format(date, &quot;%Y-%m&quot;)) %&gt;%
 
   # FRED pads the years with quarterly observations with empty months
-  dplyr::filter(
+  filter(
     month &gt;= &quot;1947-01&quot;,
     month &lt;= &quot;2026-06&quot;,
     !is.na(CUUR0000SAS)
   ) %&gt;%
-  dplyr::select(month, CUUR0000SAS, CUUR0000SAC) %&gt;%
+  select(month, CUUR0000SAS, CUUR0000SAC) %&gt;%
   write.csv(&quot;_2026_hochmuth_petz_us_cpi.csv&quot;, row.names = FALSE)</code></pre>
 <p>Both indices are published quarterly until 1955 and monthly after that, and October 2025, when the federal government was shut down, is missing. Quarterly averages of what is there take care of both. The trend is fitted over the whole sample:</p>
 <pre class="r"><code>us_relative_price &lt;- read.csv(&quot;_2026_hochmuth_petz_us_cpi.csv&quot;) %&gt;%
 
   # Quarterly averages of the months observed
-  dplyr::mutate(
+  mutate(
     quarter = as.integer(substr(month, 1, 4)) +
       (as.integer(substr(month, 6, 7)) - 1) %/% 3 / 4
   ) %&gt;%
-  dplyr::group_by(quarter) %&gt;%
-  dplyr::summarise(
+  group_by(quarter) %&gt;%
+  summarise(
     services = mean(CUUR0000SAS),
     commodities = mean(CUUR0000SAC)
   ) %&gt;%
 
   # Four-quarter moving average, indexed to Q1 2000 = 100
-  dplyr::mutate(
-    price = as.numeric(
-      stats::filter(services / commodities, rep(1 / 4, 4), sides = 1)
-    ),
+  mutate(
+    ratio = services / commodities,
+    price = (ratio + lag(ratio) + lag(ratio, 2) + lag(ratio, 3)) / 4,
     price = 100 * price / price[quarter == 2000]
   ) %&gt;%
 
   # Log-linear trend over the whole sample since 1950
-  dplyr::filter(quarter &gt;= 1950) %&gt;%
-  dplyr::mutate(
-    trend = exp(stats::fitted(stats::lm(log(price) ~ quarter))),
-    growth = 100 * stats::coef(stats::lm(log(price) ~ quarter))[[&quot;quarter&quot;]]
+  filter(quarter &gt;= 1950) %&gt;%
+  mutate(
+    trend = exp(fitted(lm(log(price) ~ quarter))),
+    growth = 100 * coef(lm(log(price) ~ quarter))[[&quot;quarter&quot;]]
   )
 
 plot(
@@ -381,35 +390,35 @@ abline(h = 100, col = colours[[&quot;ink&quot;]])</code></pre>
 
   # Log prices of services (s) and of the other index (n), times 100
   y &lt;- prices %&gt;%
-    dplyr::filter(series %in% c(&quot;SERV&quot;, other)) %&gt;%
-    dplyr::transmute(
+    filter(series %in% c(&quot;SERV&quot;, other)) %&gt;%
+    transmute(
       quarter,
-      series = dplyr::if_else(series == &quot;SERV&quot;, &quot;s&quot;, &quot;n&quot;),
+      series = if_else(series == &quot;SERV&quot;, &quot;s&quot;, &quot;n&quot;),
       value = 100 * log(index_sa)
     ) %&gt;%
-    tidyr::pivot_wider(names_from = series, values_from = value) %&gt;%
-    dplyr::arrange(quarter) %&gt;%
-    dplyr::mutate(trend = dplyr::row_number())
+    pivot_wider(names_from = series, values_from = value) %&gt;%
+    arrange(quarter) %&gt;%
+    mutate(trend = row_number())
 
   # Stage 1: the relative-price gap is the residual of a linear trend
-  stage_1 &lt;- stats::lm(s - n ~ trend, data = y)
-  gap &lt;- stats::residuals(stage_1)
+  stage_1 &lt;- lm(s - n ~ trend, data = y)
+  gap &lt;- residuals(stage_1)
 
   # Stage 2: a VAR(1) in differences, with the lagged gap as exogenous
   # regressor
-  dy &lt;- stats::ts(
+  dy &lt;- ts(
     diff(as.matrix(y[, c(&quot;s&quot;, &quot;n&quot;)])),
     start = y[[&quot;quarter&quot;]][2],
     frequency = 4
   )
 
-  ect &lt;- stats::ts(
-    matrix(utils::head(gap, -1), dimnames = list(NULL, &quot;ect&quot;)),
+  ect &lt;- ts(
+    matrix(head(gap, -1), dimnames = list(NULL, &quot;ect&quot;)),
     start = y[[&quot;quarter&quot;]][2],
     frequency = 4
   )
 
-  model &lt;- bvartools::create_bvarmodel(
+  model &lt;- create_bvarmodel(
     dy,
     p = 1,
     exogen = ect,
@@ -419,15 +428,15 @@ abline(h = 100, col = colours[[&quot;ink&quot;]])</code></pre>
     burnin = 5000
   )
 
-  model &lt;- bvartools::add_priors(
+  model &lt;- add_priors(
     model,
     coef = list(v_i = 1, v_i_det = 1),
     sigma = list(df = 4, scale = 0.01)
   )
 
-  model &lt;- bvartools::add_initial_values(model, method = &quot;ols&quot;)
+  model &lt;- add_initial_values(model, method = &quot;ols&quot;)
 
-  return(bvartools::add_posterior_coefficients(model))
+  return(add_posterior_coefficients(model))
 }
 
 set.seed(20261012)
@@ -518,27 +527,27 @@ model_goods &lt;- estimate_gap_model(prices, &quot;GD&quot;)</code></pre>
     )
   }
 
-  closure &lt;- dplyr::bind_rows(paths) %&gt;%
-    dplyr::group_by(h) %&gt;%
-    dplyr::summarise(
-      lower = stats::quantile(remaining, 0.16),
-      upper = stats::quantile(remaining, 0.84),
-      remaining = stats::median(remaining),
-      services = stats::median(services),
-      other = stats::median(other)
+  closure &lt;- bind_rows(paths) %&gt;%
+    group_by(h) %&gt;%
+    summarise(
+      lower = quantile(remaining, 0.16),
+      upper = quantile(remaining, 0.84),
+      remaining = median(remaining),
+      services = median(services),
+      other = median(other)
     )
 
   start &lt;- data.frame(
     h = 0, lower = 100, upper = 100, remaining = 100, services = 0, other = 0
   )
 
-  return(dplyr::bind_rows(start, closure))
+  return(bind_rows(start, closure))
 }
 
 closure_neig &lt;- gap_closure(model_neig)
 closure_goods &lt;- gap_closure(model_goods)
 
-closure &lt;- dplyr::bind_rows(
+closure &lt;- bind_rows(
   neig = closure_neig,
   goods = closure_goods,
   .id = &quot;spec&quot;
@@ -546,7 +555,7 @@ closure &lt;- dplyr::bind_rows(
 <p>Chart 4 of the paper shows the median of the remaining gap with its 68% credible interval, and the median contributions as bars that start at 100: the services bars point down, because higher services inflation closes the gap, and the NEIG bars point up, because higher NEIG inflation widens it. Where both contributions close the gap, as in the specification with overall goods below, the bars are stacked.</p>
 <pre class="r"><code>plot_closure &lt;- function(closure, label, colour) {
 
-  bar_colours &lt;- grDevices::adjustcolor(c(colours[[&quot;blue&quot;]], colour), 0.45)
+  bar_colours &lt;- adjustcolor(c(colours[[&quot;blue&quot;]], colour), 0.45)
 
   plot(
     NA,
@@ -584,7 +593,7 @@ closure &lt;- dplyr::bind_rows(
   polygon(
     c(closure[[&quot;h&quot;]], rev(closure[[&quot;h&quot;]])),
     c(closure[[&quot;lower&quot;]], rev(closure[[&quot;upper&quot;]])),
-    col = grDevices::adjustcolor(colours[[&quot;ink&quot;]], 0.2),
+    col = adjustcolor(colours[[&quot;ink&quot;]], 0.2),
     border = NA
   )
 
@@ -614,9 +623,9 @@ closure &lt;- dplyr::bind_rows(
 <p><img src="/reproduction/2026_hochmuth_petz_services_files/figure-html/chart4-1.png" alt="" width="672" /></p>
 <p>The chart is close to the published one. The remaining gap falls below 50% between quarters 14 and 15, exactly where the paper puts it, about three and a half years. At quarter 14 services inflation has closed 77 percentage points of the gap and NEIG inflation has widened it by 29, against 76 and 26 in the paper. After ten years 13% of the gap is left, as in the published chart.</p>
 <pre class="r"><code>closure %&gt;%
-  dplyr::filter(spec == &quot;neig&quot;, h %in% c(4, 8, 14, 15, 20, 40)) %&gt;%
-  dplyr::select(h, remaining, lower, upper, services, other) %&gt;%
-  knitr::kable(
+  filter(spec == &quot;neig&quot;, h %in% c(4, 8, 14, 15, 20, 40)) %&gt;%
+  select(h, remaining, lower, upper, services, other) %&gt;%
+  kable(
     digits = 1,
     row.names = FALSE,
     col.names = c(&quot;Quarter&quot;, &quot;Remaining gap&quot;, &quot;16%&quot;, &quot;84%&quot;, &quot;Services&quot;, &quot;NEIG&quot;)
