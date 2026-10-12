@@ -17,7 +17,7 @@ A general drawback of vector autoregressive (VAR) models is that the number of e
 This post presents code for the estimation of a Bayesian vector autoregressive (BVAR) model with SSVS. It uses [dataset E1](http://www.jmulti.de/download/datasets/e1.dat) from Lütkepohl (2007), which contains data on West German fixed investment, disposable income and consumption expenditures in billions of DM from 1960Q1 to 1982Q4. Following a related example in Lütkepohl (2007, Section 5.2.10) only the first 71 observations of a VAR(4) model are used. The `bvartools` package can be used to load the data and generate the data matrices. Function `create_bvarmodel` stores them in element `data$train` of its output with one row per period. Since the formulas below are written for matrices with one column per period, they are transposed:
 
 ```{r data, message=FALSE}
-library(bvartools) # install.packages("bvartools")
+library("bvartools") # install.packages("bvartools")
 
 # Load and transform data
 data("e1")
@@ -30,8 +30,8 @@ e1 <- window(e1, end = c(1978, 4))
 model <- create_bvarmodel(e1, p = 4, deterministic = "const")
 
 # Get data matrices
-y <- t(model$data$train$y)
-x <- t(model$data$train$x)
+y <- t(model[["data"]][["train"]][["y"]])
+x <- t(model[["data"]][["train"]][["x"]])
 ```
 
 ## Estimation
@@ -42,7 +42,7 @@ The prior variances of the parameters are set in accordance with the semiautomat
 # Reset random number generator for reproducibility
 set.seed(1234567)
 
-t <- ncol(y) # Number of observations
+tt <- ncol(y) # Number of observations
 k <- nrow(y) # Number of endogenous variables
 m <- k * nrow(x) # Number of estimated coefficients
 
@@ -51,7 +51,8 @@ a_mu_prior <- matrix(0, m) # Vector of prior means
 
 # SSVS priors (semiautomatic approach)
 ols <- tcrossprod(y, x) %*% solve(tcrossprod(x)) # OLS estimates
-sigma_ols <- tcrossprod(y - ols %*% x) / (t - nrow(x)) # OLS error covariance matrix
+# OLS error covariance matrix
+sigma_ols <- tcrossprod(y - ols %*% x) / (tt - nrow(x))
 cov_ols <- kronecker(solve(tcrossprod(x)), sigma_ols)
 se_ols <- matrix(sqrt(diag(cov_ols))) # OLS standard errors
 
@@ -64,7 +65,7 @@ prob_prior <- matrix(0.5, m)
 # Prior for variance-covariance matrix
 u_sigma_df_prior <- 0 # Prior degrees of freedom
 u_sigma_scale_prior <- diag(0, k) # Prior covariance matrix
-u_sigma_df_post <- t + u_sigma_df_prior # Posterior degrees of freedom
+u_sigma_df_post <- tt + u_sigma_df_prior # Posterior degrees of freedom
 ```
 
 The initial parameter values are set to zero and their corresponding prior variances are set to $\tau_1^2$, which implies that all parameters should be estimated relatively freely in the first step of the Gibbs sampler.
@@ -97,21 +98,22 @@ for (draw in 1:iter) {
   # Scale posterior
   u_sigma_scale_post <- solve(u_sigma_scale_prior + tcrossprod(u))
   # Draw posterior of inverse sigma
-  u_sigma_i <- matrix(rWishart(1, u_sigma_df_post, u_sigma_scale_post)[,, 1], k)
+  u_sigma_i <- rWishart(1, u_sigma_df_post, u_sigma_scale_post)[, , 1]
+  u_sigma_i <- matrix(u_sigma_i, k)
   # Obtain sigma
   u_sigma <- solve(u_sigma_i)
-  
+
   # Draw conditional mean parameters
   a <- post_normal(y, x, u_sigma_i, a_mu_prior, a_v_i_prior)
-  
+
   # Draw inclusion parameters and update priors
   temp <- ssvs(a, tau0, tau1, prob_prior, include = 1:36)
-  a_v_i_prior <- temp$v_i # Update prior
-  
+  a_v_i_prior <- temp[["v_i"]] # Update prior
+
   # Store draws
   if (draw > burnin) {
     draws_a[, draw - burnin] <- a
-    draws_lambda[, draw - burnin] <- temp$lambda
+    draws_lambda[, draw - burnin] <- temp[["lambda"]]
     draws_sigma[, draw - burnin] <- u_sigma
   }
 }
@@ -120,12 +122,13 @@ for (draw in 1:iter) {
 The output of a Gibbs sampler with SSVS can be further analysed in the usual way. Therefore, point estimates can be obtained by calculating the means of the parameters' posterior draws:
 
 ```{r}
-A <- rowMeans(draws_a) # Obtain means for every parameter
-A <- matrix(A, k) # Transform mean vector into matrix
-A <- round(A, 3) # Round values
-dimnames(A) <- list(dimnames(y)[[1]], dimnames(x)[[1]]) # Rename matrix dimensions
+a_mean <- rowMeans(draws_a) # Obtain means for every parameter
+a_mean <- matrix(a_mean, k) # Transform mean vector into matrix
+a_mean <- round(a_mean, 3) # Round values
+# Rename matrix dimensions
+dimnames(a_mean) <- list(dimnames(y)[[1]], dimnames(x)[[1]])
 
-t(A) # Print
+t(a_mean) # Print
 ```
 
 It is also possible to obtain the posterior inclusion probabilites of each variable by calculating the means of their posterior draws. As can be seen in the output below, only few variables appear to be relevant in the VAR(4) model, because most inclusion probabilities are relatively low. The inclusion probabilities of the constant terms are 100 percent, because they were excluded from SSVS.
@@ -134,7 +137,8 @@ It is also possible to obtain the posterior inclusion probabilites of each varia
 lambda <- rowMeans(draws_lambda) # Obtain means for every row
 lambda <- matrix(lambda, k) # Transform mean vector into a matrix
 lambda <- round(lambda, 2) # Round values
-dimnames(lambda) <- list(dimnames(y)[[1]], dimnames(x)[[1]]) # Rename matrix dimensions
+# Rename matrix dimensions
+dimnames(lambda) <- list(dimnames(y)[[1]], dimnames(x)[[1]])
 
 t(lambda) # Print
 ```
@@ -142,7 +146,9 @@ t(lambda) # Print
 Given these values, the researcher could proceed in the usual way and obtain forecasts and impulse responses based on the output of the Gibbs sampler. The advantage of this approach is that it does not only take into account parameter uncertainty, but also model uncertainty. This can be illustrated by the histogram of the posterior draws of the 6th coefficient, which describes the relationship between the first lag of income and the current value of consumption.
 
 ```{r, fig.height=3.5, fig.width=4.5}
-hist(draws_a[6,], main = "Consumption ~ First lag of income", xlab = "Value of posterior draw")
+hist(draws_a[6, ],
+     main = "Consumption ~ First lag of income",
+     xlab = "Value of posterior draw")
 ```
 
 A non-negligible mass of some 37 percent, i.e. 1 - 0.63, of the parameter draws is concentrated around zero. This is the result of SSVS, where posterior draws are close to zero if a constant is assessed to be irrelevant during an iteration of the Gibbs sampler and, therefore, $\tau_{0,6}^2$ is used as its prior variance. On the other hand, about 63 percent of the draws are dispersed around a positive value, where SSVS suggests to include the variable in the model and the larger value $\tau_{1,6}^2$ is used as prior variance. Model uncertainty is then described by the two peaks and parameter uncertainty by the dispersion of the posterior draws around them.
@@ -165,13 +171,14 @@ draws_sigma <- matrix(NA, k^2, store)
 for (draw in 1:iter) {
   # Draw conditional mean parameters
   a <- post_normal(y, x, u_sigma_i, a_mu_prior, a_v_i_prior)
-  
+
   # Draw variance-covariance matrix
   u <- y - matrix(a, k) %*% x # Obtain residuals
   u_sigma_scale_post <- solve(u_sigma_scale_prior + tcrossprod(u))
-  u_sigma_i <- matrix(rWishart(1, u_sigma_df_post, u_sigma_scale_post)[,, 1], k)
+  u_sigma_i <- rWishart(1, u_sigma_df_post, u_sigma_scale_post)[, , 1]
+  u_sigma_i <- matrix(u_sigma_i, k)
   u_sigma <- solve(u_sigma_i) # Invert Sigma_i to obtain Sigma
-  
+
   # Store draws
   if (draw > burnin) {
     draws_a[, draw - burnin] <- a
@@ -183,12 +190,13 @@ for (draw in 1:iter) {
 The means of the posterior draws are similar to the OLS estimates in Lütkepohl (2007, Section 5.2.10):
 
 ```{r}
-A <- rowMeans(draws_a) # Obtain means for every row
-A <- matrix(A, k) # Transform mean vector into a matrix
-A <- round(A, 3) # Round values
-dimnames(A) <- list(dimnames(y)[[1]], dimnames(x)[[1]]) # Rename matrix dimensions
+a_mean <- rowMeans(draws_a) # Obtain means for every row
+a_mean <- matrix(a_mean, k) # Transform mean vector into a matrix
+a_mean <- round(a_mean, 3) # Round values
+# Rename matrix dimensions
+dimnames(a_mean) <- list(dimnames(y)[[1]], dimnames(x)[[1]])
 
-t(A) # Print
+t(a_mean) # Print
 ```
 
 ## Evaluation
@@ -196,8 +204,11 @@ t(A) # Print
 The `bvar` function can be used to collect relevant output of the Gibbs sampler into a standardised object, which can be used by further functions such as `predict` to obtain forecasts or `irf` for impulse respons analysis.
 
 ```{r bvar-object}
-bvar_est <- bvar(y = model$data$train$y, x = model$data$train$x, A = draws_a[1:36, ],
-                 C = draws_a[37:39, ], Sigma = draws_sigma)
+bvar_est <- bvar(y = model[["data"]][["train"]][["y"]],
+                 x = model[["data"]][["train"]][["x"]],
+                 A = draws_a[1:36, ],
+                 C = draws_a[37:39, ],
+                 Sigma = draws_sigma)
 ```
 
 Posterior draws can be thinned with function `thin`:
@@ -223,9 +234,16 @@ plot(bvar_pred, n_pre = 20)
 ### Impulse response analysis
 
 ```{r oir, fig.width=5.5, fig.height=4.5}
-OIR <- irf(bvar_est, impulse = "income", response = "cons", n_ahead = 8, type = "oir")
+oir <- irf(bvar_est,
+           impulse = "income",
+           response = "cons",
+           n_ahead = 8,
+           type = "oir")
 
-plot(OIR, main = "Orthogonalised Impulse Response", xlab = "Period", ylab = "Response")
+plot(oir,
+     main = "Orthogonalised Impulse Response",
+     xlab = "Period",
+     ylab = "Response")
 ```
 
 ## References

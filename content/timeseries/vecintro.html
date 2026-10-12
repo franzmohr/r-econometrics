@@ -23,7 +23,7 @@ where <span class="math inline">\(\Delta x\)</span> is the first difference of t
 <p>The above equation shows that the only difference to a VAR model is the error correction term <span class="math inline">\(\Pi x_{t-1}\)</span>, which captures the effect of how the growth rate of a variable in <span class="math inline">\(x\)</span> changes, if one of the variables departs from its equilibrium value. The coefficient matrix <span class="math inline">\(\Pi\)</span> can be written as the matrix product <span class="math inline">\(\Pi = \alpha \beta^{\prime}\)</span> so that the error correction term becomes <span class="math inline">\(\alpha \beta^{\prime} x_{t-1}\)</span>. The cointegration matrix <span class="math inline">\(\beta\)</span> contains information on the equilibrium relationships between the variables in levels. The vector described by <span class="math inline">\(\beta^{\prime} x_{t-1}\)</span> can be interpreted as the distance of the variables form their equilibrium values. <span class="math inline">\(\alpha\)</span> is a so-called loading matrix describing the speed at which a dependent variable converges back to its equilibrium value.</p>
 <p>Note that <span class="math inline">\(\Pi\)</span> is assumed to be of reduced rank, which means that <span class="math inline">\(\alpha\)</span> is a <span class="math inline">\(K \times r\)</span> matrix and <span class="math inline">\(\beta\)</span> is a <span class="math inline">\(K^{co} \times r\)</span> matrix, where <span class="math inline">\(K\)</span> is the number of endogenous variables, <span class="math inline">\(K^{co}\)</span> is the number of variables in the cointegration term and <span class="math inline">\(r\)</span> is the rank of <span class="math inline">\(\Pi\)</span>, which describes the number of cointegrating relationships that exist between the variables. Note that if <span class="math inline">\(r = 0\)</span>, there is no cointegration between the variables so that <span class="math inline">\(\Pi = 0\)</span>.</p>
 <p>To illustrate the estimation of VECMs in R, we use dataset E6 from Lütkepohl (2007), which contains quarterly, seasonally unadjusted time series for German long-term interest and inflation rates from 1972Q2 to 1998Q4. It comes with the <code>bvartools</code> package.</p>
-<pre class="r"><code>library(bvartools) # Load the package, which contains the data
+<pre class="r"><code>library(&quot;bvartools&quot;) # Load the package, which contains the data
 data(&quot;e6&quot;) # Load data
 plot(e6) # Plot data</code></pre>
 <p><img src="/timeseries/vecintro_files/figure-html/data-1.png" alt="" width="480" /></p>
@@ -32,13 +32,17 @@ plot(e6) # Plot data</code></pre>
 <h2>Estimation</h2>
 <p>There are multiple ways to estimate VEC models. A first approach would be to use ordinary least squares, which yields accurate result, but does not allow to estimate the cointegrating relations among the variables. The estimated generalised least squares (EGLS) approach would be an alternative. However, the most popular estimator for VECMs seems to be the maximum likelihood estimator of Johansen (1995), which is implemented in R by the <code>ca.jo</code> function of the <code>urca</code> package of Pfaff (2008a). Alternatively, function <code>VECM</code> of the <code>tsDyn</code> package of Di Narzo et al. (2020) can be used as well.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></p>
 <p>But before the VEC model can be estimated, the lag order <span class="math inline">\(p\)</span>, the rank of the cointegration matrix <span class="math inline">\(r\)</span> and deterministic terms have to be specified. A valid strategy to choose the lag order is to estimated the VAR in levels and choose the lag specification that minimises an Information criterion. Since the time series show strong seasonal pattern, we control for this by specifying <code>season = 4</code>, where 4 is the frequency of the data.</p>
-<pre class="r"><code>library(vars) # Load package
+<pre class="r"><code>library(&quot;vars&quot;) # Load package
 
 # Estimate VAR
-var_aic &lt;- VAR(e6, type = &quot;const&quot;, lag.max = 8, ic = &quot;AIC&quot;, season = 4)
+var_aic &lt;- VAR(e6,
+               type = &quot;const&quot;,
+               lag.max = 8,
+               ic = &quot;AIC&quot;,
+               season = 4)
 
 # Lag order suggested by AIC
-var_aic$p</code></pre>
+var_aic[[&quot;p&quot;]]</code></pre>
 <pre><code>## AIC(n) 
 ##      4</code></pre>
 <p>According to the AIC, a lag order of 4 can be used, which is the same value used in Lütkepohl (2007). This means the VEC model corresponding to the VAR in levels has 3 lags. Since the <code>ca.jo</code> function requires the lag order of the VAR model we set <code>K = 4</code>.<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></p>
@@ -46,11 +50,15 @@ var_aic$p</code></pre>
 <p>The <code>ca.jo</code> function does not just estimate the VECM. It also calculates the test statistics for different specificaions of <span class="math inline">\(r\)</span> and the user can choose between two alternative approaches, the trace and the eigenvalue test. For this example the trace test is used, i.e. <code>type = "trace"</code>.</p>
 <p>By default, the <code>ca.jo</code> function sets <code>spec = "longrun"</code> This specification would mean that the error correction term does not refer to the first lag of the variables in levels as decribed above, but to the <span class="math inline">\(p-1\)</span>th lag instead. By setting <code>spec = "transitory"</code> the first lag will be used instead. Further information on the interpretation the two alternatives can be found in the function’s documentation <code>?ca.jo</code>.</p>
 <p>For further details on VEC modelling I recommend Lütkepohl (2006, Chapters 6, 7 and 8).</p>
-<pre class="r"><code>library(urca) # Load package
+<pre class="r"><code>library(&quot;urca&quot;) # Load package
 
 # Estimate
-vec &lt;- ca.jo(e6, ecdet = &quot;none&quot;, type = &quot;trace&quot;,
-             K = 4, spec = &quot;transitory&quot;, season = 4)
+vec &lt;- ca.jo(e6,
+             ecdet = &quot;none&quot;,
+             type = &quot;trace&quot;,
+             K = 4,
+             spec = &quot;transitory&quot;,
+             season = 4)
 
 summary(vec)</code></pre>
 <pre><code>## 
@@ -101,15 +109,24 @@ round(vec@W, 2)</code></pre>
 <p>The deterministic terms are different from the results in Lütkepohl (2006), because different reference dates are used.</p>
 <p>Using the <code>tsDyn</code> package, estimates of the coefficients can be obtained in the following way:</p>
 <pre class="r"><code># Load package
-library(tsDyn)
+library(&quot;tsDyn&quot;)
 
 # Obtain constant and seasonal dummies
-seas &lt;- create_bvecmodel(e6, p = 4, r = 1, const = &quot;unrestricted&quot;, seasonal = &quot;unrestricted&quot;)
+bvec_model &lt;- create_bvecmodel(e6,
+                               p = 4,
+                               r = 1,
+                               const = &quot;unrestricted&quot;,
+                               seasonal = &quot;unrestricted&quot;)
 # Lag order p is 4 since create_bvecmodel assumes that p corresponds to VAR form
-seas &lt;- seas$data$train$x[, 7:10]
+seas &lt;- bvec_model[[&quot;data&quot;]][[&quot;train&quot;]][[&quot;x&quot;]][, 7:10]
 
 # Estimate
-est_tsdyn &lt;- VECM(e6, lag = 3, r = 1, include = &quot;none&quot;, estim = &quot;ML&quot;, exogen = seas)
+est_tsdyn &lt;- VECM(e6,
+                  lag = 3,
+                  r = 1,
+                  include = &quot;none&quot;,
+                  estim = &quot;ML&quot;,
+                  exogen = seas)
 
 # Print results
 summary(est_tsdyn)</code></pre>
@@ -137,11 +154,15 @@ summary(est_tsdyn)</code></pre>
 <h3>Impulse response analysis</h3>
 <p>The impulse response function of a VECM is usually obtained from its VAR form. The function <code>vec2var</code> of the <code>vars</code> package can be used to transform the output of the <code>ca.jo</code> function into an object that can be handled by the <code>irf</code> function of the <code>vars</code> package. Note that since <code>ur.jo</code> does not set the rank <span class="math inline">\(r\)</span> of the cointegration matrix automatically, it has to be specified manually.</p>
 <pre class="r"><code># Transform VEC to VAR with r = 1
-var &lt;- vec2var(vec, r = 1)</code></pre>
+var_form &lt;- vec2var(vec, r = 1)</code></pre>
 <p>The impulse response function is then calculated in the usual manner by using the <code>irf</code> function.</p>
 <pre class="r"><code># Obtain IRF
-ir &lt;- irf(var, n.ahead = 20, impulse = &quot;R&quot;, response = &quot;Dp&quot;,
-          ortho = FALSE, runs = 500)
+ir &lt;- irf(var_form,
+          n.ahead = 20,
+          impulse = &quot;R&quot;,
+          response = &quot;Dp&quot;,
+          ortho = FALSE,
+          runs = 500)
 
 # Plot
 plot(ir)</code></pre>

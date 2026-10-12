@@ -70,23 +70,25 @@ The artificial sample for this example is generated in R with
 set.seed(123) # Reset random number generator for reasons of reproducability
 
 # Generate sample
-t <- 200 # Number of time series observations
+tt <- 200 # Number of time series observations
 k <- 2 # Number of endogenous variables
 p <- 2 # Number of lags
 
 # Generate coefficient matrices
-A.1 <- matrix(c(-.3, .6, -.4, .5), k) # Coefficient matrix of lag 1
-A.2 <- matrix(c(-.1, -.2, .1, .05), k) # Coefficient matrix of lag 2
-A <- cbind(A.1, A.2) # Companion form of the coefficient matrices
+a_1 <- matrix(c(-.3, .6, -.4, .5), k) # Coefficient matrix of lag 1
+a_2 <- matrix(c(-.1, -.2, .1, .05), k) # Coefficient matrix of lag 2
+a_true <- cbind(a_1, a_2) # Companion form of the coefficient matrices
 
 # Generate series
-series <- matrix(0, k, t + 2*p) # Raw series with zeros
-for (i in (p + 1):(t + 2*p)){ # Generate series with e ~ N(0,0.5)
-  series[, i] <- A.1%*%series[, i-1] + A.2%*%series[, i-2] + rnorm(k, 0, .5)
+series <- matrix(0, k, tt + 2 * p) # Raw series with zeros
+for (i in (p + 1):(tt + 2 * p)) { # Generate series with e ~ N(0,0.5)
+  series[, i] <- a_1 %*% series[, i - 1] +
+    a_2 %*% series[, i - 2] +
+    rnorm(k, 0, .5)
 }
 
 series <- ts(t(series[, -(1:p)])) # Convert to time series format
-names <- c("V1", "V2") # Rename variables
+var_names <- c("V1", "V2") # Rename variables
 
 plot.ts(series) # Plot the series
 ```
@@ -98,9 +100,9 @@ The estimation of the parameters and the covariance matrix of a simple VAR model
 In order to estimate the VAR model I use the `vars` package by Pfaff (2008). The relevant function is `VAR` and its use is straightforward. You just have to load the package and specify the data (`y`), order (`p`) and the `type` of the model. The option `type` determines whether to include an intercept term, a trend or both in the model. Since the artificial sample does not contain any deterministic term, we neglect it in the estimation by setting `type = "none"`.
 
 ```{r, message = FALSE}
-library(vars) # Load package
+library("vars") # Load package
 
-var.1 <- VAR(series, 2, type = "none") # Estimate the model
+var_1 <- VAR(series, 2, type = "none") # Estimate the model
 ```
 
 ### Model comparison
@@ -110,34 +112,34 @@ A central issue in VAR analysis is to find the number of lags, which yields the 
 The `VAR` function of the `vars` package already allows to calculate standard information criteria to find the best model. In this example we use the AIC:
 
 ```{r}
-var.aic <- VAR(series, type = "none", lag.max = 5, ic = "AIC")
+var_aic <- VAR(series, type = "none", lag.max = 5, ic = "AIC")
 ```
 
-Note that instead of specifying the order `p`, we now set the maximum lag length of the model and the information criterion used to select the best model. The function then estimates all five models, compares them according to their AIC values and automatically selects the most favourable. Looking at `summary(var.aic)` we see that the AIC suggests to use an order of 2 which is the true order.
+Note that instead of specifying the order `p`, we now set the maximum lag length of the model and the information criterion used to select the best model. The function then estimates all five models, compares them according to their AIC values and automatically selects the most favourable. Looking at `summary(var_aic)` we see that the AIC suggests to use an order of 2 which is the true order.
 
 ```{r}
-summary(var.aic)
+summary(var_aic)
 ```
 
-Looking at the results more closely we can compare the true values - cointained in object `A` - with the parameter estimates of the model:
+Looking at the results more closely we can compare the true values - cointained in object `a_true` - with the parameter estimates of the model:
 
 ```{r}
 # True values
-A
+a_true
 
 # Extract coefficients, standard errors etc. from the object
 # produced by the VAR function
-est_coefs <- coef(var.aic)
+est_coefs <- coef(var_aic)
 
 # Extract only the coefficients for both dependent variables
 # and combine them to a single matrix
-est_coefs <- rbind(est_coefs[[1]][, 1], est_coefs[[2]][, 1]) 
+est_coefs <- rbind(est_coefs[[1]][, 1], est_coefs[[2]][, 1])
 
 # Print the rounded estimates in the console
 round(est_coefs, 2)
 ```
 
-All the estimates have the right sign and are relatively close to their true values. I leave it to you to look at the standard errors of `summary(var.aic)` to check whether the true values fall into the confidence bands of the estimates.
+All the estimates have the right sign and are relatively close to their true values. I leave it to you to look at the standard errors of `summary(var_aic)` to check whether the true values fall into the confidence bands of the estimates.
 
 ### Impulse response
 
@@ -147,10 +149,14 @@ In R the `irf` function of the `vars` package can be used to obtain an impulse r
 
 ```{r}
 # Calculate the IRF
-ir.1 <- irf(var.1, impulse = "Series.1", response = "Series.2", n.ahead = 20, ortho = FALSE)
+ir_1 <- irf(var_1,
+            impulse = "Series.1",
+            response = "Series.2",
+            n.ahead = 20,
+            ortho = FALSE)
 
 # Plot the IRF
-plot(ir.1)
+plot(ir_1)
 ```
 
 Note that the *ortho* option is important, because it says something about the contemporaneous relationships between the variables. In our example we already know that such relationships do not exist, because the true variance-covariance matrix -- or simply covariance matrix -- is diagonal with zeros in the off-diagonal elements. However, since the limited time series data with 200 observations restricts the precision of the parameter estimates, the covariance matrix has positive values in its off-diagonal elements which implies non-zero contemporaneous effects of a shock. To rule this out in the IR, we set `ortho = FALSE`. The result of this is that the impulse response starts at zero in period 0. You could also try out the alternative and set `ortho = TRUE`, which results in a plot that start below zero. I do not want to go into more detail here, but suffice it so say that the issue of so-called orthogonal errors is one of the central problems in VAR analysis and you should definitely read more about it, if you plan to set up your own VAR models.
@@ -159,11 +165,15 @@ Sometimes it is interesting to see what the long-run effects of a shock are. To 
 
 ```{r}
 # Calculate impulse response
-ir.2 <- irf(var.1,impulse="Series.1",response="Series.2",n.ahead = 20,ortho = FALSE,
-cumulative = TRUE)
+ir_2 <- irf(var_1,
+            impulse = "Series.1",
+            response = "Series.2",
+            n.ahead = 20,
+            ortho = FALSE,
+            cumulative = TRUE)
 
 # Plot
-plot(ir.2)
+plot(ir_2)
 ```
 
 We see that although the reaction of series 2 to a shock in series 1 is negative during some periods, the overall effect significantly positive.

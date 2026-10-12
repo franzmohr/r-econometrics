@@ -16,7 +16,7 @@ tags:
 <h2>Introduction</h2>
 <p>A general drawback of vector autoregressive (VAR) models is that the number of estimated coefficients increases disproportionately with the number of lags. Therefore, fewer information per parameter is available for the estimation as the number of lags increases. In the Bayesian VAR literature one approach to mitigate this so-called <em>curse of dimensionality</em> is <em>stochastic search variable selection</em> (SSVS) as proposed by George et al. (2008). The basic idea of SSVS is to assign commonly used prior variances to parameters, which should be included in a model, and prior variances close to zero to irrelevant parameters. By that, relevant parameters are estimated in the usual way and posterior draws of irrelevant variables are close to zero so that they have no significant effect on forecasts and impulse responses. This is achieved by adding a hierarchial prior to the model, where the relevance of a variable is assessed in each step of the sampling algorithm.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></p>
 <p>This post presents code for the estimation of a Bayesian vector autoregressive (BVAR) model with SSVS. It uses <a href="http://www.jmulti.de/download/datasets/e1.dat">dataset E1</a> from Lütkepohl (2007), which contains data on West German fixed investment, disposable income and consumption expenditures in billions of DM from 1960Q1 to 1982Q4. Following a related example in Lütkepohl (2007, Section 5.2.10) only the first 71 observations of a VAR(4) model are used. The <code>bvartools</code> package can be used to load the data and generate the data matrices. Function <code>create_bvarmodel</code> stores them in element <code>data$train</code> of its output with one row per period. Since the formulas below are written for matrices with one column per period, they are transposed:</p>
-<pre class="r"><code>library(bvartools) # install.packages(&quot;bvartools&quot;)
+<pre class="r"><code>library(&quot;bvartools&quot;) # install.packages(&quot;bvartools&quot;)
 
 # Load and transform data
 data(&quot;e1&quot;)
@@ -29,8 +29,8 @@ e1 &lt;- window(e1, end = c(1978, 4))
 model &lt;- create_bvarmodel(e1, p = 4, deterministic = &quot;const&quot;)
 
 # Get data matrices
-y &lt;- t(model$data$train$y)
-x &lt;- t(model$data$train$x)</code></pre>
+y &lt;- t(model[[&quot;data&quot;]][[&quot;train&quot;]][[&quot;y&quot;]])
+x &lt;- t(model[[&quot;data&quot;]][[&quot;train&quot;]][[&quot;x&quot;]])</code></pre>
 </div>
 <div id="estimation" class="section level2">
 <h2>Estimation</h2>
@@ -38,7 +38,7 @@ x &lt;- t(model$data$train$x)</code></pre>
 <pre class="r"><code># Reset random number generator for reproducibility
 set.seed(1234567)
 
-t &lt;- ncol(y) # Number of observations
+tt &lt;- ncol(y) # Number of observations
 k &lt;- nrow(y) # Number of endogenous variables
 m &lt;- k * nrow(x) # Number of estimated coefficients
 
@@ -47,7 +47,8 @@ a_mu_prior &lt;- matrix(0, m) # Vector of prior means
 
 # SSVS priors (semiautomatic approach)
 ols &lt;- tcrossprod(y, x) %*% solve(tcrossprod(x)) # OLS estimates
-sigma_ols &lt;- tcrossprod(y - ols %*% x) / (t - nrow(x)) # OLS error covariance matrix
+# OLS error covariance matrix
+sigma_ols &lt;- tcrossprod(y - ols %*% x) / (tt - nrow(x))
 cov_ols &lt;- kronecker(solve(tcrossprod(x)), sigma_ols)
 se_ols &lt;- matrix(sqrt(diag(cov_ols))) # OLS standard errors
 
@@ -60,7 +61,7 @@ prob_prior &lt;- matrix(0.5, m)
 # Prior for variance-covariance matrix
 u_sigma_df_prior &lt;- 0 # Prior degrees of freedom
 u_sigma_scale_prior &lt;- diag(0, k) # Prior covariance matrix
-u_sigma_df_post &lt;- t + u_sigma_df_prior # Posterior degrees of freedom</code></pre>
+u_sigma_df_post &lt;- tt + u_sigma_df_prior # Posterior degrees of freedom</code></pre>
 <p>The initial parameter values are set to zero and their corresponding prior variances are set to <span class="math inline">\(\tau_1^2\)</span>, which implies that all parameters should be estimated relatively freely in the first step of the Gibbs sampler.</p>
 <pre class="r"><code># Initial values
 a &lt;- matrix(0, m)
@@ -85,68 +86,73 @@ for (draw in 1:iter) {
   # Scale posterior
   u_sigma_scale_post &lt;- solve(u_sigma_scale_prior + tcrossprod(u))
   # Draw posterior of inverse sigma
-  u_sigma_i &lt;- matrix(rWishart(1, u_sigma_df_post, u_sigma_scale_post)[,, 1], k)
+  u_sigma_i &lt;- rWishart(1, u_sigma_df_post, u_sigma_scale_post)[, , 1]
+  u_sigma_i &lt;- matrix(u_sigma_i, k)
   # Obtain sigma
   u_sigma &lt;- solve(u_sigma_i)
-  
+
   # Draw conditional mean parameters
   a &lt;- post_normal(y, x, u_sigma_i, a_mu_prior, a_v_i_prior)
-  
+
   # Draw inclusion parameters and update priors
   temp &lt;- ssvs(a, tau0, tau1, prob_prior, include = 1:36)
-  a_v_i_prior &lt;- temp$v_i # Update prior
-  
+  a_v_i_prior &lt;- temp[[&quot;v_i&quot;]] # Update prior
+
   # Store draws
   if (draw &gt; burnin) {
     draws_a[, draw - burnin] &lt;- a
-    draws_lambda[, draw - burnin] &lt;- temp$lambda
+    draws_lambda[, draw - burnin] &lt;- temp[[&quot;lambda&quot;]]
     draws_sigma[, draw - burnin] &lt;- u_sigma
   }
 }</code></pre>
 <p>The output of a Gibbs sampler with SSVS can be further analysed in the usual way. Therefore, point estimates can be obtained by calculating the means of the parameters’ posterior draws:</p>
-<pre class="r"><code>A &lt;- rowMeans(draws_a) # Obtain means for every parameter
-A &lt;- matrix(A, k) # Transform mean vector into matrix
-A &lt;- round(A, 3) # Round values
-dimnames(A) &lt;- list(dimnames(y)[[1]], dimnames(x)[[1]]) # Rename matrix dimensions
+<pre class="r"><code>a_mean &lt;- rowMeans(draws_a) # Obtain means for every parameter
+a_mean &lt;- matrix(a_mean, k) # Transform mean vector into matrix
+a_mean &lt;- round(a_mean, 3) # Round values
+# Rename matrix dimensions
+dimnames(a_mean) &lt;- list(dimnames(y)[[1]], dimnames(x)[[1]])
 
-t(A) # Print</code></pre>
+t(a_mean) # Print</code></pre>
 <pre><code>##           invest income   cons
-## invest.01 -0.103  0.011 -0.002
-## income.01  0.042 -0.027  0.159
-## cons.01    0.086  0.137 -0.275
-## invest.02 -0.014  0.001  0.005
-## income.02  0.010  0.004  0.304
-## cons.02    0.027 -0.001  0.009
-## invest.03  0.032  0.000  0.001
-## income.03 -0.009  0.017  0.011
-## cons.03   -0.047  0.007  0.019
-## invest.04  0.267  0.002 -0.005
-## income.04 -0.056 -0.009  0.028
-## cons.04   -0.027  0.001  0.000
+## invest.l1 -0.103  0.011 -0.002
+## income.l1  0.042 -0.027  0.159
+## cons.l1    0.086  0.137 -0.275
+## invest.l2 -0.014  0.001  0.005
+## income.l2  0.010  0.004  0.304
+## cons.l2    0.027 -0.001  0.009
+## invest.l3  0.032  0.000  0.001
+## income.l3 -0.009  0.017  0.011
+## cons.l3   -0.047  0.007  0.019
+## invest.l4  0.267  0.002 -0.005
+## income.l4 -0.056 -0.009  0.028
+## cons.l4   -0.027  0.001  0.000
 ## const      0.013  0.017  0.014</code></pre>
 <p>It is also possible to obtain the posterior inclusion probabilites of each variable by calculating the means of their posterior draws. As can be seen in the output below, only few variables appear to be relevant in the VAR(4) model, because most inclusion probabilities are relatively low. The inclusion probabilities of the constant terms are 100 percent, because they were excluded from SSVS.</p>
 <pre class="r"><code>lambda &lt;- rowMeans(draws_lambda) # Obtain means for every row
 lambda &lt;- matrix(lambda, k) # Transform mean vector into a matrix
 lambda &lt;- round(lambda, 2) # Round values
-dimnames(lambda) &lt;- list(dimnames(y)[[1]], dimnames(x)[[1]]) # Rename matrix dimensions
+# Rename matrix dimensions
+dimnames(lambda) &lt;- list(dimnames(y)[[1]], dimnames(x)[[1]])
 
 t(lambda) # Print</code></pre>
 <pre><code>##           invest income cons
-## invest.01   0.43   0.23 0.09
-## income.01   0.10   0.17 0.63
-## cons.01     0.13   0.40 0.73
-## invest.02   0.12   0.07 0.15
-## income.02   0.08   0.07 0.95
-## cons.02     0.08   0.05 0.08
-## invest.03   0.19   0.07 0.08
-## income.03   0.07   0.11 0.10
-## cons.03     0.09   0.08 0.12
-## invest.04   0.84   0.08 0.15
-## income.04   0.11   0.09 0.20
-## cons.04     0.09   0.07 0.07
+## invest.l1   0.43   0.23 0.09
+## income.l1   0.10   0.17 0.63
+## cons.l1     0.13   0.40 0.73
+## invest.l2   0.12   0.07 0.15
+## income.l2   0.08   0.07 0.95
+## cons.l2     0.08   0.05 0.08
+## invest.l3   0.19   0.07 0.08
+## income.l3   0.07   0.11 0.10
+## cons.l3     0.09   0.08 0.12
+## invest.l4   0.84   0.08 0.15
+## income.l4   0.11   0.09 0.20
+## cons.l4     0.09   0.07 0.07
 ## const       1.00   1.00 1.00</code></pre>
 <p>Given these values, the researcher could proceed in the usual way and obtain forecasts and impulse responses based on the output of the Gibbs sampler. The advantage of this approach is that it does not only take into account parameter uncertainty, but also model uncertainty. This can be illustrated by the histogram of the posterior draws of the 6th coefficient, which describes the relationship between the first lag of income and the current value of consumption.</p>
-<pre class="r"><code>hist(draws_a[6,], main = &quot;Consumption ~ First lag of income&quot;, xlab = &quot;Value of posterior draw&quot;)</code></pre>
+<pre class="r"><code>hist(draws_a[6, ],
+     main = &quot;Consumption ~ First lag of income&quot;,
+     xlab = &quot;Value of posterior draw&quot;)</code></pre>
 <p><img src="/timeseries/ssvs_files/figure-html/unnamed-chunk-6-1.png" alt="" width="432" /></p>
 <p>A non-negligible mass of some 37 percent, i.e. 1 - 0.63, of the parameter draws is concentrated around zero. This is the result of SSVS, where posterior draws are close to zero if a constant is assessed to be irrelevant during an iteration of the Gibbs sampler and, therefore, <span class="math inline">\(\tau_{0,6}^2\)</span> is used as its prior variance. On the other hand, about 63 percent of the draws are dispersed around a positive value, where SSVS suggests to include the variable in the model and the larger value <span class="math inline">\(\tau_{1,6}^2\)</span> is used as prior variance. Model uncertainty is then described by the two peaks and parameter uncertainty by the dispersion of the posterior draws around them.</p>
 <p>However, if the researcher prefers not want to work with a model, where the relevance of a variable can change from one step of the sampling algorithm to another, a different approach would be to work only with a highly probable model. This can be done with a further simulation, where very tight priors are used for irrelevant variables and relatively uninformative priors for relevant parameters. In this example, coefficients with a posterior inclusion probability of above 40 percent are considered to be relevant.<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a> The prior variance is set to 0.00001 for irrelevant and to 9 for relevant variables. No additional SSVS step is required. Everything else remains unchanged.</p>
@@ -165,13 +171,14 @@ draws_sigma &lt;- matrix(NA, k^2, store)
 for (draw in 1:iter) {
   # Draw conditional mean parameters
   a &lt;- post_normal(y, x, u_sigma_i, a_mu_prior, a_v_i_prior)
-  
+
   # Draw variance-covariance matrix
   u &lt;- y - matrix(a, k) %*% x # Obtain residuals
   u_sigma_scale_post &lt;- solve(u_sigma_scale_prior + tcrossprod(u))
-  u_sigma_i &lt;- matrix(rWishart(1, u_sigma_df_post, u_sigma_scale_post)[,, 1], k)
+  u_sigma_i &lt;- rWishart(1, u_sigma_df_post, u_sigma_scale_post)[, , 1]
+  u_sigma_i &lt;- matrix(u_sigma_i, k)
   u_sigma &lt;- solve(u_sigma_i) # Invert Sigma_i to obtain Sigma
-  
+
   # Store draws
   if (draw &gt; burnin) {
     draws_a[, draw - burnin] &lt;- a
@@ -179,32 +186,36 @@ for (draw in 1:iter) {
   }
 }</code></pre>
 <p>The means of the posterior draws are similar to the OLS estimates in Lütkepohl (2007, Section 5.2.10):</p>
-<pre class="r"><code>A &lt;- rowMeans(draws_a) # Obtain means for every row
-A &lt;- matrix(A, k) # Transform mean vector into a matrix
-A &lt;- round(A, 3) # Round values
-dimnames(A) &lt;- list(dimnames(y)[[1]], dimnames(x)[[1]]) # Rename matrix dimensions
+<pre class="r"><code>a_mean &lt;- rowMeans(draws_a) # Obtain means for every row
+a_mean &lt;- matrix(a_mean, k) # Transform mean vector into a matrix
+a_mean &lt;- round(a_mean, 3) # Round values
+# Rename matrix dimensions
+dimnames(a_mean) &lt;- list(dimnames(y)[[1]], dimnames(x)[[1]])
 
-t(A) # Print</code></pre>
+t(a_mean) # Print</code></pre>
 <pre><code>##           invest income   cons
-## invest.01 -0.219  0.001 -0.001
-## income.01  0.000  0.000  0.262
-## cons.01    0.000  0.238 -0.334
-## invest.02  0.000  0.000  0.001
-## income.02  0.000  0.000  0.329
-## cons.02    0.000  0.000  0.000
-## invest.03  0.000  0.000  0.000
-## income.03  0.000  0.000  0.000
-## cons.03    0.000  0.000  0.000
-## invest.04  0.328  0.000 -0.001
-## income.04  0.000  0.000  0.000
-## cons.04    0.000  0.000  0.000
+## invest.l1 -0.219  0.001 -0.001
+## income.l1  0.000  0.000  0.262
+## cons.l1    0.000  0.238 -0.334
+## invest.l2  0.000  0.000  0.001
+## income.l2  0.000  0.000  0.329
+## cons.l2    0.000  0.000  0.000
+## invest.l3  0.000  0.000  0.000
+## income.l3  0.000  0.000  0.000
+## cons.l3    0.000  0.000  0.000
+## invest.l4  0.328  0.000 -0.001
+## income.l4  0.000  0.000  0.000
+## cons.l4    0.000  0.000  0.000
 ## const      0.015  0.015  0.014</code></pre>
 </div>
 <div id="evaluation" class="section level2">
 <h2>Evaluation</h2>
 <p>The <code>bvar</code> function can be used to collect relevant output of the Gibbs sampler into a standardised object, which can be used by further functions such as <code>predict</code> to obtain forecasts or <code>irf</code> for impulse respons analysis.</p>
-<pre class="r"><code>bvar_est &lt;- bvar(y = model$data$train$y, x = model$data$train$x, A = draws_a[1:36, ],
-                 C = draws_a[37:39, ], Sigma = draws_sigma)</code></pre>
+<pre class="r"><code>bvar_est &lt;- bvar(y = model[[&quot;data&quot;]][[&quot;train&quot;]][[&quot;y&quot;]],
+                 x = model[[&quot;data&quot;]][[&quot;train&quot;]][[&quot;x&quot;]],
+                 A = draws_a[1:36, ],
+                 C = draws_a[37:39, ],
+                 Sigma = draws_sigma)</code></pre>
 <p>Posterior draws can be thinned with function <code>thin</code>:</p>
 <pre class="r"><code>bvar_est &lt;- thin(bvar_est, thin = 5)</code></pre>
 <div id="forecasts" class="section level3">
@@ -220,9 +231,16 @@ plot(bvar_pred, n_pre = 20)</code></pre>
 </div>
 <div id="impulse-response-analysis" class="section level3">
 <h3>Impulse response analysis</h3>
-<pre class="r"><code>OIR &lt;- irf(bvar_est, impulse = &quot;income&quot;, response = &quot;cons&quot;, n_ahead = 8, type = &quot;oir&quot;)
+<pre class="r"><code>oir &lt;- irf(bvar_est,
+           impulse = &quot;income&quot;,
+           response = &quot;cons&quot;,
+           n_ahead = 8,
+           type = &quot;oir&quot;)
 
-plot(OIR, main = &quot;Orthogonalised Impulse Response&quot;, xlab = &quot;Period&quot;, ylab = &quot;Response&quot;)</code></pre>
+plot(oir,
+     main = &quot;Orthogonalised Impulse Response&quot;,
+     xlab = &quot;Period&quot;,
+     ylab = &quot;Response&quot;)</code></pre>
 <p><img src="/timeseries/ssvs_files/figure-html/oir-1.png" alt="" width="528" /></p>
 </div>
 </div>

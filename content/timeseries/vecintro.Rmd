@@ -28,7 +28,7 @@ Note that $\Pi$ is assumed to be of reduced rank, which means that $\alpha$ is a
 To illustrate the estimation of VECMs in R, we use dataset E6 from Lütkepohl (2007), which contains quarterly, seasonally unadjusted time series for German long-term interest and inflation rates from 1972Q2 to 1998Q4. It comes with the `bvartools` package.
 
 ```{r data, message=FALSE, fig.height=4.5, fig.width=5}
-library(bvartools) # Load the package, which contains the data
+library("bvartools") # Load the package, which contains the data
 data("e6") # Load data
 plot(e6) # Plot data
 ```
@@ -40,13 +40,17 @@ There are multiple ways to estimate VEC models. A first approach would be to use
 But before the VEC model can be estimated, the lag order $p$, the rank of the cointegration matrix $r$ and deterministic terms have to be specified. A valid strategy to choose the lag order is to estimated the VAR in levels and choose the lag specification that minimises an Information criterion. Since the time series show strong seasonal pattern, we control for this by specifying `season = 4`, where 4 is the frequency of the data.
 
 ```{r var, message=FALSE}
-library(vars) # Load package
+library("vars") # Load package
 
 # Estimate VAR
-var_aic <- VAR(e6, type = "const", lag.max = 8, ic = "AIC", season = 4)
+var_aic <- VAR(e6,
+               type = "const",
+               lag.max = 8,
+               ic = "AIC",
+               season = 4)
 
 # Lag order suggested by AIC
-var_aic$p
+var_aic[["p"]]
 ```
 
 According to the AIC, a lag order of 4 can be used, which is the same value used in Lütkepohl (2007). This means the VEC model corresponding to the VAR in levels has 3 lags. Since the `ca.jo` function requires the lag order of the VAR model we set `K = 4`.[^lag]
@@ -60,11 +64,15 @@ By default, the `ca.jo` function sets `spec = "longrun"` This specification woul
 For further details on VEC modelling I recommend Lütkepohl (2006, Chapters 6, 7 and 8).
 
 ```{r vec, message=FALSE}
-library(urca) # Load package
+library("urca") # Load package
 
 # Estimate
-vec <- ca.jo(e6, ecdet = "none", type = "trace",
-             K = 4, spec = "transitory", season = 4)
+vec <- ca.jo(e6,
+             ecdet = "none",
+             type = "trace",
+             K = 4,
+             spec = "transitory",
+             season = 4)
 
 summary(vec)
 ```
@@ -93,15 +101,24 @@ Using the `tsDyn` package, estimates of the coefficients can be obtained in the 
 
 ```{r, message=FALSE, warning=FALSE}
 # Load package
-library(tsDyn)
+library("tsDyn")
 
 # Obtain constant and seasonal dummies
-seas <- create_bvecmodel(e6, p = 4, r = 1, const = "unrestricted", seasonal = "unrestricted")
+bvec_model <- create_bvecmodel(e6,
+                               p = 4,
+                               r = 1,
+                               const = "unrestricted",
+                               seasonal = "unrestricted")
 # Lag order p is 4 since create_bvecmodel assumes that p corresponds to VAR form
-seas <- seas$data$train$x[, 7:10]
+seas <- bvec_model[["data"]][["train"]][["x"]][, 7:10]
 
 # Estimate
-est_tsdyn <- VECM(e6, lag = 3, r = 1, include = "none", estim = "ML", exogen = seas)
+est_tsdyn <- VECM(e6,
+                  lag = 3,
+                  r = 1,
+                  include = "none",
+                  estim = "ML",
+                  exogen = seas)
 
 # Print results
 summary(est_tsdyn)
@@ -114,15 +131,19 @@ The impulse response function of a VECM is usually obtained from its VAR form. T
 
 ```{r vec2var}
 # Transform VEC to VAR with r = 1
-var <- vec2var(vec, r = 1)
+var_form <- vec2var(vec, r = 1)
 ```
 
 The impulse response function is then calculated in the usual manner by using the `irf` function.
 
 ```{r ir, fig.height=4.5, fig.width=6}
 # Obtain IRF
-ir <- irf(var, n.ahead = 20, impulse = "R", response = "Dp",
-          ortho = FALSE, runs = 500)
+ir <- irf(var_form,
+          n.ahead = 20,
+          impulse = "R",
+          response = "Dp",
+          ortho = FALSE,
+          runs = 500)
 
 # Plot
 plot(ir)

@@ -19,7 +19,7 @@ To illustrate this concept, let's look at quarterly data on disposable income in
 
 ```{r, fig.height = 3.5,fig.width=5}
 # Load data
-library(bvartools)
+library("bvartools")
 data("e1")
 
 # Disposable income in levels
@@ -43,8 +43,10 @@ lincome <- log(income)
 t_lincome <- (lincome - fitted(lm(lincome ~ I(1:length(lincome))))) * 100
 
 # Plot and add horizontal line at 0
-plot(t_lincome, main = "West German Disposable Income",
-     ylab = "Deviation from linear trend"); abline(h = 0)
+plot(t_lincome,
+     main = "West German Disposable Income",
+     ylab = "Deviation from linear trend")
+abline(h = 0)
 ```
 
 Although the mean of the resulting series is (practially) zero, its variance could be considered to increase over time. This might be due to the assumption of a simple linear trend. In this case we could search for better ways to extract the trend from this series, for example by adding a squared trend or by useing <a href="https://www.r-econometrics.com/timeseries/economic-cycle-extraction/" target="_blank">more sophisticated routines</a>. *However, note that the results of any time series analysis with trend stationary data might be sensitive to the method that was chosen to estimated the trend component of the series. It is very important to keep this in mind.*
@@ -61,11 +63,13 @@ In the case of the time series of disposable income it appears that the series i
 
 ```{r, fig.height = 3.5,fig.width=5}
 # Obtain first log-differences of disposable income
-d_lincome <- diff(log(e1[,"income"])) * 100
+d_lincome <- diff(log(e1[, "income"])) * 100
 
 # # Plot and add horizontal line at 0
-plot(d_lincome, main = "West German disposable income",
-     ylab = "Log growth rate"); abline(h = 0)
+plot(d_lincome,
+     main = "West German disposable income",
+     ylab = "Log growth rate")
+abline(h = 0)
 ```
 
 By looking at the results above, it seems that disposable income is difference-stationary with $I$(1). But since these are rather subjective impressions, more formal tests should be applied to check this.
@@ -110,19 +114,19 @@ d1_lincome <- diff(lincome) # First difference
 d2_lincome <- diff(d1_lincome) # Second difference
 
 # Combine
-data <- cbind(lincome, d1_lincome, d2_lincome)
+lincome_data <- cbind(lincome, d1_lincome, d2_lincome)
 
 # Get rid of NAs so that all have same length
-data <- na.omit(data)
+lincome_data <- na.omit(lincome_data)
 
 # Rename columsn
-dimnames(data)[[2]] <- c("level", "diff_1", "diff_2")
+dimnames(lincome_data)[[2]] <- c("level", "diff_1", "diff_2")
 ```
 
 The `tseries` package contains the unit root tests that are used here.
 
 ```{r, message=FALSE}
-library(tseries)
+library("tseries")
 ```
 
 
@@ -135,18 +139,20 @@ $$\Delta y_t = \mu + \beta t + (\theta - 1) y_{t - 1} + \sum \delta_i \Delta y_{
 where $\theta$ is the variable of interest. The null hypothesis of the ADF test is that the series contains a unit root. If $\theta$ is significantly different from 1, this would indicate stationarity. The DF-statistic is used to assess the statistical significance of this paramenter. If this value is below a certain threshold, $\theta$ this is indication for stationarity. If the null cannot be rejected, this is an indication for a unit root. In the following code the ADF test is performed for a series of lag orders and differences. Instead of the DF-test statistic, the p-values of the hypothesis test is provided in the table. A p-value close to one indicates a unit root.
 
 ```{r, message = FALSE, warning=FALSE}
-adf <- data.frame(k = 0:9, 
+adf <- data.frame(k = 0:9,
                   level = NA,
                   diff_1 = NA,
                   diff_2 = NA)
 
 # Run test for a series fo models
 for (i in 1:nrow(adf)) {
-  k <- adf$k[i]
-  pos <- (9 - k + 1):nrow(data) # Position of used observations
+  k <- adf[["k"]][i]
+  pos <- (9 - k + 1):nrow(lincome_data) # Position of used observations
   for (j in c("level", "diff_1", "diff_2")) {
-    adf_test <- adf.test(data[pos, j], alternative = "stationary", k = k)
-    adf[i, j] <- adf_test$p.value
+    adf_test <- adf.test(lincome_data[pos, j],
+                         alternative = "stationary",
+                         k = k)
+    adf[i, j] <- adf_test[["p.value"]]
   }
 }
 
@@ -168,13 +174,16 @@ kpss <- data.frame(level = NA,
                    diff_2 = NA)
 
 # Run test for level data
-kpss[, "level"] <- kpss.test(data[pos, "level"], null = "Trend")$p.value 
+kpss_level <- kpss.test(lincome_data[pos, "level"], null = "Trend")
+kpss[, "level"] <- kpss_level[["p.value"]]
 
 # Run test for first differences
-kpss[, "diff_1"] <- kpss.test(data[pos, "diff_1"], null = "Level")$p.value 
+kpss_diff_1 <- kpss.test(lincome_data[pos, "diff_1"], null = "Level")
+kpss[, "diff_1"] <- kpss_diff_1[["p.value"]]
 
 # Run test for second differences
-kpss[, "diff_2"] <- kpss.test(data[pos, "diff_2"], null = "Level")$p.value 
+kpss_diff_2 <- kpss.test(lincome_data[pos, "diff_2"], null = "Level")
+kpss[, "diff_2"] <- kpss_diff_2[["p.value"]]
 
 # Show results
 kpss

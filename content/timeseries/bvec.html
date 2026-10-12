@@ -19,18 +19,22 @@ tags:
 <div id="data" class="section level2">
 <h2>Data</h2>
 <p>To illustrate the estimation process, the dataset E6 from Lütkepohl (2007) is used, which contains data on German long-term interest rates and inflation from 1972Q2 to 1998Q4.</p>
-<pre class="r"><code>library(bvartools)
+<pre class="r"><code>library(&quot;bvartools&quot;)
 
 data(&quot;e6&quot;)
 
 plot(e6) # Plot the series</code></pre>
 <p><img src="/timeseries/bvec_files/figure-html/data-1.png" alt="" width="432" style="display: block; margin: auto;" /></p>
 <p>The <code>create_bvecmodel</code> function produces an object of class <code>bvecmodel</code>, whose element <code>data$train</code> contains the inputs <code>y</code>, <code>w</code> and <code>x</code> for the BVEC estimator, where <code>y</code> is the matrix of dependent variables, <code>w</code> is a matrix of potentially cointegrated regressors, and <code>x</code> is the matrix of non-cointegration regressors. The matrices contain one row per period. Since the sampler below is written for matrices with one column per period, they are transposed.</p>
-<pre class="r"><code>model &lt;- create_bvecmodel(e6, p = 4, r = 1, const = &quot;unrestricted&quot;, seasonal = &quot;unrestricted&quot;)
+<pre class="r"><code>model &lt;- create_bvecmodel(e6,
+                          p = 4,
+                          r = 1,
+                          const = &quot;unrestricted&quot;,
+                          seasonal = &quot;unrestricted&quot;)
 
-y &lt;- t(model$data$train$y)
-w &lt;- t(model$data$train$w)
-x &lt;- t(model$data$train$x)</code></pre>
+y &lt;- t(model[[&quot;data&quot;]][[&quot;train&quot;]][[&quot;y&quot;]])
+w &lt;- t(model[[&quot;data&quot;]][[&quot;train&quot;]][[&quot;w&quot;]])
+x &lt;- t(model[[&quot;data&quot;]][[&quot;train&quot;]][[&quot;x&quot;]])</code></pre>
 </div>
 <div id="estimation" class="section level2">
 <h2>Estimation</h2>
@@ -43,10 +47,11 @@ store &lt;- iter - burnin
 
 r &lt;- 1 # Set rank
 
-t &lt;- ncol(y) # Number of observations
+tt &lt;- ncol(y) # Number of observations
 k &lt;- nrow(y) # Number of endogenous variables
 k_w &lt;- nrow(w) # Number of regressors in error correction term
-k_x &lt;- nrow(x) # Number of differenced regressors and unrestrictec deterministic terms
+# Number of differenced regressors and unrestrictec deterministic terms
+k_x &lt;- nrow(x)
 
 k_alpha &lt;- k * r # Number of elements in alpha
 k_beta &lt;- k_w * r # Number of elements in beta
@@ -54,8 +59,10 @@ k_gamma &lt;- k * k_x
 
 # Set uninformative priors
 # ...for loadings and non-cointegration parameters
-a_mu_prior &lt;- matrix(0, k_alpha + k_gamma) # Vector of prior parameter means
-a_v_i_prior &lt;- diag(0, k_alpha + k_gamma) # Inverse of the prior covariance matrix
+# Vector of prior parameter means
+a_mu_prior &lt;- matrix(0, k_alpha + k_gamma)
+# Inverse of the prior covariance matrix
+a_v_i_prior &lt;- diag(0, k_alpha + k_gamma)
 
 # ...for cointegration parameters
 v_i &lt;- 0
@@ -65,10 +72,10 @@ p_tau_i[1:r, 1:r] &lt;- diag(1, r)
 #...for the error term
 u_sigma_df_prior &lt;- r # Prior degrees of freedom
 u_sigma_scale_prior &lt;- diag(0, k) # Prior covariance matrix
-u_sigma_df_post &lt;- t + u_sigma_df_prior # Posterior degrees of freedom
+u_sigma_df_post &lt;- tt + u_sigma_df_prior # Posterior degrees of freedom
 
 # Initial values
-beta &lt;- matrix(c(1, -4), k_w, r)
+beta_draw &lt;- matrix(c(1, -4), k_w, r)
 
 u_sigma_i &lt;- diag(.0001, k)
 u_sigma &lt;- solve(u_sigma_i)
@@ -85,58 +92,70 @@ draws_sigma &lt;- matrix(NA, k^2, store)
 # Start Gibbs sampler
 for (draw in 1:iter) {
   # Draw conditional mean parameters
-  temp &lt;- post_coint_kls(y = y, beta = beta, w = w, x = x, sigma_i = u_sigma_i,
-                           v_i = v_i, p_tau_i = p_tau_i, g_i = g_i,
-                           gamma_mu_prior = a_mu_prior,
-                           gamma_v_i_prior = a_v_i_prior)
-  alpha &lt;- temp$alpha
-  beta &lt;- temp$beta
-  Pi &lt;- temp$Pi
-  gamma &lt;- temp$Gamma
-  
+  temp &lt;- post_coint_kls(y = y,
+                         beta = beta_draw,
+                         w = w,
+                         x = x,
+                         sigma_i = u_sigma_i,
+                         v_i = v_i,
+                         p_tau_i = p_tau_i,
+                         g_i = g_i,
+                         gamma_mu_prior = a_mu_prior,
+                         gamma_v_i_prior = a_v_i_prior)
+  alpha_draw &lt;- temp[[&quot;alpha&quot;]]
+  beta_draw &lt;- temp[[&quot;beta&quot;]]
+  pi_draw &lt;- temp[[&quot;Pi&quot;]]
+  gamma_draw &lt;- temp[[&quot;Gamma&quot;]]
+
   # Draw variance-covariance matrix
-  u &lt;- y - Pi %*% w - matrix(gamma, k) %*% x
-  u_sigma_scale_post &lt;- solve(tcrossprod(u) + v_i * alpha %*% tcrossprod(crossprod(beta, p_tau_i) %*% beta, alpha))
-  u_sigma_i &lt;- matrix(rWishart(1, u_sigma_df_post, u_sigma_scale_post)[,, 1], k)
+  u &lt;- y - pi_draw %*% w - matrix(gamma_draw, k) %*% x
+  beta_p_beta &lt;- crossprod(beta_draw, p_tau_i) %*% beta_draw
+  alpha_prior &lt;- v_i * alpha_draw %*% tcrossprod(beta_p_beta, alpha_draw)
+  u_sigma_scale_post &lt;- solve(tcrossprod(u) + alpha_prior)
+  u_sigma_i &lt;- rWishart(1, u_sigma_df_post, u_sigma_scale_post)[, , 1]
+  u_sigma_i &lt;- matrix(u_sigma_i, k)
   u_sigma &lt;- solve(u_sigma_i)
-  
+
   # Update g_i
   g_i &lt;- u_sigma_i
-  
+
   # Store draws
   if (draw &gt; burnin) {
-    draws_alpha[, draw - burnin] &lt;- alpha
-    draws_beta[, draw - burnin] &lt;- beta
-    draws_pi[, draw - burnin] &lt;- Pi
-    draws_gamma[, draw - burnin] &lt;- gamma
+    draws_alpha[, draw - burnin] &lt;- alpha_draw
+    draws_beta[, draw - burnin] &lt;- beta_draw
+    draws_pi[, draw - burnin] &lt;- pi_draw
+    draws_gamma[, draw - burnin] &lt;- gamma_draw
     draws_sigma[, draw - burnin] &lt;- u_sigma
   }
 }</code></pre>
 <p>Obtain point estimates as the mean of the parameter draws:</p>
-<pre class="r"><code>Gamma &lt;- rowMeans(draws_gamma) # Obtain means for every row
-Gamma &lt;- matrix(Gamma, k) # Transform mean vector into a matrix
-Gamma &lt;- round(Gamma, 3) # Round values
-dimnames(Gamma) &lt;- list(dimnames(y)[[1]], dimnames(x)[[1]]) # Rename matrix dimensions
+<pre class="r"><code>gamma_mean &lt;- rowMeans(draws_gamma) # Obtain means for every row
+gamma_mean &lt;- matrix(gamma_mean, k) # Transform mean vector into a matrix
+gamma_mean &lt;- round(gamma_mean, 3) # Round values
+# Rename matrix dimensions
+dimnames(gamma_mean) &lt;- list(dimnames(y)[[1]], dimnames(x)[[1]])
 
-round(Gamma, 3) # Print</code></pre>
+round(gamma_mean, 3) # Print</code></pre>
 <pre><code>##      d.R.l01 d.Dp.l01 d.R.l02 d.Dp.l02 d.R.l03 d.Dp.l03 const season.1 season.2 season.3
 ## d.R    0.267   -0.187  -0.017   -0.207   0.225   -0.099 0.002    0.001    0.009    0.000
 ## d.Dp   0.074   -0.383   0.000   -0.421   0.025   -0.361 0.011   -0.034   -0.018   -0.017</code></pre>
-<pre class="r"><code>beta &lt;- rowMeans(t(t(draws_beta) / t(draws_beta)[, 1])) # Obtain means for every row
-beta &lt;- matrix(beta, k_w) # Transform mean vector into a matrix
-beta &lt;- round(beta, 3) # Round values
-dimnames(beta) &lt;- list(dimnames(w)[[1]], NULL) # Rename matrix dimensions
+<pre class="r"><code># Obtain means for every row
+beta_mean &lt;- rowMeans(t(t(draws_beta) / t(draws_beta)[, 1]))
+beta_mean &lt;- matrix(beta_mean, k_w) # Transform mean vector into a matrix
+beta_mean &lt;- round(beta_mean, 3) # Round values
+dimnames(beta_mean) &lt;- list(dimnames(w)[[1]], NULL) # Rename matrix dimensions
 
-beta # Print</code></pre>
+beta_mean # Print</code></pre>
 <pre><code>##        [,1]
 ## l.R   1.000
 ## l.Dp -3.969</code></pre>
-<pre class="r"><code>Sigma &lt;- rowMeans(draws_sigma) # Obtain means for every row
-Sigma &lt;- matrix(Sigma, k) # Transform mean vector into a matrix
-Sigma &lt;- round(Sigma * 10^4, 2) # Round values
-dimnames(Sigma) &lt;- list(dimnames(y)[[1]], dimnames(y)[[1]]) # Rename matrix dimensions
+<pre class="r"><code>sigma_mean &lt;- rowMeans(draws_sigma) # Obtain means for every row
+sigma_mean &lt;- matrix(sigma_mean, k) # Transform mean vector into a matrix
+sigma_mean &lt;- round(sigma_mean * 10^4, 2) # Round values
+# Rename matrix dimensions
+dimnames(sigma_mean) &lt;- list(dimnames(y)[[1]], dimnames(y)[[1]])
 
-Sigma # Print</code></pre>
+sigma_mean # Print</code></pre>
 <pre><code>##        d.R  d.Dp
 ## d.R   0.29 -0.02
 ## d.Dp -0.02  0.27</code></pre>
@@ -148,10 +167,10 @@ Sigma # Print</code></pre>
 k_nondet &lt;- (k_x - 4) * k
 
 # Generate bvec object
-bvec_est &lt;- bvec(y = model$data$train$y,
-                 w = model$data$train$w,
-                 x = model$data$train$x[, 1:6],
-                 x_d = model$data$train$x[, 7:10],
+bvec_est &lt;- bvec(y = model[[&quot;data&quot;]][[&quot;train&quot;]][[&quot;y&quot;]],
+                 w = model[[&quot;data&quot;]][[&quot;train&quot;]][[&quot;w&quot;]],
+                 x = model[[&quot;data&quot;]][[&quot;train&quot;]][[&quot;x&quot;]][, 1:6],
+                 x_d = model[[&quot;data&quot;]][[&quot;train&quot;]][[&quot;x&quot;]][, 7:10],
                  r = 1,
                  alpha = draws_alpha,
                  beta = draws_beta,
@@ -178,22 +197,39 @@ plot(bvar_pred, n_pre = 20)</code></pre>
 <div id="impulse-response-analysis" class="section level2">
 <h2>Impulse response analysis</h2>
 <p>Impulse responses for VECs can be constructed from their VAR respresentations.</p>
-<pre class="r"><code>IR &lt;- irf(bvar_form, impulse = &quot;R&quot;, response = &quot;Dp&quot;, n_ahead = 20)
+<pre class="r"><code>ir &lt;- irf(bvar_form, impulse = &quot;R&quot;, response = &quot;Dp&quot;, n_ahead = 20)
 
-plot(IR, main = &quot;Forecast Error Impulse Response&quot;, xlab = &quot;Year&quot;, ylab = &quot;Response&quot;)</code></pre>
+plot(ir,
+     main = &quot;Forecast Error Impulse Response&quot;,
+     xlab = &quot;Year&quot;,
+     ylab = &quot;Response&quot;)</code></pre>
 <p><img src="/timeseries/bvec_files/figure-html/feir-1.png" alt="" width="528" /></p>
 <div id="orthogonalised-impulse-response" class="section level3">
 <h3>Orthogonalised impulse response</h3>
-<pre class="r"><code>OIR &lt;- irf(bvar_form, impulse = &quot;R&quot;, response = &quot;Dp&quot;, n_ahead = 20, type = &quot;oir&quot;)
+<pre class="r"><code>oir &lt;- irf(bvar_form,
+           impulse = &quot;R&quot;,
+           response = &quot;Dp&quot;,
+           n_ahead = 20,
+           type = &quot;oir&quot;)
 
-plot(OIR, main = &quot;Orthogonalised Impulse Response&quot;, xlab = &quot;Year&quot;, ylab = &quot;Response&quot;)</code></pre>
+plot(oir,
+     main = &quot;Orthogonalised Impulse Response&quot;,
+     xlab = &quot;Year&quot;,
+     ylab = &quot;Response&quot;)</code></pre>
 <p><img src="/timeseries/bvec_files/figure-html/oir-1.png" alt="" width="528" /></p>
 </div>
 <div id="generalised-impulse-response" class="section level3">
 <h3>Generalised impulse response</h3>
-<pre class="r"><code>GIR &lt;- irf(bvar_form, impulse = &quot;R&quot;, response = &quot;Dp&quot;, n_ahead = 20, type = &quot;gir&quot;)
+<pre class="r"><code>gir &lt;- irf(bvar_form,
+           impulse = &quot;R&quot;,
+           response = &quot;Dp&quot;,
+           n_ahead = 20,
+           type = &quot;gir&quot;)
 
-plot(GIR, main = &quot;Generalised Impulse Response&quot;, xlab = &quot;Year&quot;, ylab = &quot;Response&quot;)</code></pre>
+plot(gir,
+     main = &quot;Generalised Impulse Response&quot;,
+     xlab = &quot;Year&quot;,
+     ylab = &quot;Response&quot;)</code></pre>
 <p><img src="/timeseries/bvec_files/figure-html/gir-1.png" alt="" width="528" /></p>
 </div>
 <div id="forecast-error-variance-decomposition" class="section level3">
