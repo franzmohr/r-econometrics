@@ -5,7 +5,7 @@ date: "2018-02-06"
 ---
 
 ```{r}
-library(wooldridge)
+library("wooldridge")
 ```
 
 In order to estimate panel data models, I use the `plm` function from the `plm` package. The intuition behind its structure is similar to the ordinary linear model, except that it allows you to specify the panel's group and time variables and the effects model.
@@ -20,14 +20,13 @@ The specification `model = "within"` indicates that the effects occur within a g
 data("jtrain")
 
 # install.packages("plm")
-library(plm)
+library("plm")
 
 summary(plm(lscrap ~ d88 + d89 + grant + grant_1,
             data = jtrain,
-            index= c("fcode", "year"),
+            index = c("fcode", "year"),
             model = "within",
-            effect = "individual"
-            ))
+            effect = "individual"))
 ```
 
 
@@ -39,27 +38,28 @@ Additionally, a specific F-test `pFtest(estimatedmodel1, estimatedmodel2)` is av
 ```{r}
 data("wagepan")
 
-plm.1 <- plm(lwage ~ married + union +
-               d81 + d82 + d83 +d84 + d85 + d86 + d87 +
-               I(d81*educ) + I(d82*educ) + I(d83*educ) + I(d84*educ) + I(d85*educ) +
-               I(d86*educ) + I(d87*educ),
-             data=wagepan,
-             model="within",
-             effect="individual",
-             index=c("nr", "year"))
-
-summary(plm.1)
-```
-
-```{r}
-plm.2 <- plm(lwage ~ married + union +
-               d81 + d82 + d83 +d84 + d85 + d86 + d87,
+plm_1 <- plm(lwage ~ married + union +
+               d81 + d82 + d83 + d84 + d85 + d86 + d87 +
+               I(d81 * educ) + I(d82 * educ) + I(d83 * educ) +
+               I(d84 * educ) + I(d85 * educ) + I(d86 * educ) +
+               I(d87 * educ),
              data = wagepan,
              model = "within",
              effect = "individual",
              index = c("nr", "year"))
 
-pFtest(plm.1,plm.2)
+summary(plm_1)
+```
+
+```{r}
+plm_2 <- plm(lwage ~ married + union +
+               d81 + d82 + d83 + d84 + d85 + d86 + d87,
+             data = wagepan,
+             model = "within",
+             effect = "individual",
+             index = c("nr", "year"))
+
+pFtest(plm_1, plm_2)
 ```
 
 ### Example 14.3
@@ -77,20 +77,20 @@ summary(plm(lscrap ~ d88 + d89 + grant + grant_1 + lsales + lemploy,
 ### Example 14.4
 
 This example compares the estimated coefficients of an OLS, random effects and fixed effects model with each other.
-The random effects model is estimated by setting `model`= "random"`. Note that you do not need to specify the effect option.
+The random effects model is estimated by setting `model = "random"`. Note that you do not need to specify the effect option.
 
 OLS
 ```{r}
 # OLS
-lm.1 <- lm(lwage ~ educ + black + hisp + exper + expersq + married + union +
-             d81 + d82 + d83 + d84 + d85 + d86 + d87,
-           data =  wagepan)
+model_1 <- lm(lwage ~ educ + black + hisp + exper + expersq + married +
+                union + d81 + d82 + d83 + d84 + d85 + d86 + d87,
+              data = wagepan)
 ```
 
 Random effects
 ```{r}
-plm.re <- plm(lwage ~ educ + black + hisp + exper + expersq + married + union +
-                d81 + d82 + d83 + d84 + d85 + d86 + d87,
+plm_re <- plm(lwage ~ educ + black + hisp + exper + expersq + married +
+                union + d81 + d82 + d83 + d84 + d85 + d86 + d87,
               data = wagepan,
               model = "random",
               index = c("nr", "year"))
@@ -98,7 +98,7 @@ plm.re <- plm(lwage ~ educ + black + hisp + exper + expersq + married + union +
 
 Fixed effects
 ```{r}
-plm.fe <- plm(lwage ~ expersq + married + union +
+plm_fe <- plm(lwage ~ expersq + married + union +
                 d81 + d82 + d83 + d84 + d85 + d86 + d87,
               data = wagepan,
               effect = "individual",
@@ -108,10 +108,11 @@ plm.fe <- plm(lwage ~ expersq + married + union +
 
 Table of results (rounded to 3 digits)
 ```{r}
-results <- round(
-  data.frame("Pooled OLS" = lm.1$coefficients[2:8],
-             "Random Effects" = plm.re$coeff[2:8],
-             "Fixed Effects" = c(NA, NA, NA, NA, plm.re$coeff[2:4])
-             ),3)
+results <- data.frame("Pooled OLS" = model_1[["coefficients"]][2:8],
+                      "Random Effects" = plm_re[["coefficients"]][2:8],
+                      "Fixed Effects" = c(NA, NA, NA, NA,
+                                          plm_fe[["coefficients"]][1:3]))
+results <- round(results, 3)
+
 results
 ```
