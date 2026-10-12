@@ -122,7 +122,7 @@ hist(model_residuals, breaks = 20)</code></pre>
 ## 
 ## data:  model_residuals
 ## W = 0.99258, p-value = 0.01031</code></pre>
-<p>The low p-value indicates that the null hypothesis of a normal distribution is not rejected at the 1 percent level.</p>
+<p>With a p-value of about 0.010, the null hypothesis of normally distributed residuals is rejected at the 5 percent level, though only just not at the 1 percent level.</p>
 <ul>
 <li>The <a href="https://en.wikipedia.org/wiki/Anderson%E2%80%93Darling_test" target="_blank">Anderson–Darling test</a> is also a popular normality test. It also has the advantage that it can be applied to other distributions as well. To test for normal distributions in R, the <code>ad.test</code> function of the <code>nortest</code> package can be used:</li>
 </ul>
@@ -134,7 +134,7 @@ ad.test(model_residuals)</code></pre>
 ## 
 ## data:  model_residuals
 ## A = 0.86991, p-value = 0.02559</code></pre>
-<p>The low p-value also indicates that the null hypothesis of a normal distribution is not rejected at the 2.56 percent level.</p>
+<p>The Anderson-Darling test also rejects normality at the 5 percent level, but not at the 1 percent level: its p-value is about 0.026.</p>
 <ul>
 <li>The <a href="https://en.wikipedia.org/wiki/Jarque%E2%80%93Bera_test" target="_blank">Jarque-Bera test</a> tests whether the skewness and kurtosis of a model’s residuals match the expected values for normal distribution. In R the function <code>jarque.bera.test</code> of the <code>tseries</code> packages and the function <code>jarque.test</code> in the <code>moments</code> package are, among others, implementations of this test:</li>
 </ul>
@@ -146,7 +146,7 @@ jarque.bera.test(model_residuals)</code></pre>
 ## 
 ## data:  model_residuals
 ## X-squared = 7.1519, df = 2, p-value = 0.02799</code></pre>
-<p>Again, the low p-value of the Jarque-Bera test indicates that the skewness and kurtosis of the test are not significantly different from their expected values for normal distribution. Thus, the distribution of the model residuals seems statistically not different from a normal distribution.</p>
+<p>The Jarque-Bera test agrees. With a p-value of about 0.028, the skewness and kurtosis of the residuals differ significantly from those of a normal distribution at the 5 percent level, but not at the 1 percent level. So, although the histogram looks bell-shaped, all three tests find some evidence against normally distributed residuals.</p>
 </div>
 <div id="antidotes" class="section level3">
 <h3>Antidotes</h3>
@@ -174,7 +174,7 @@ plot(hetsk_data)</code></pre>
 <p><img src="/methods/teststats_files/figure-html/heterosk_eyeball-1.png" alt="" width="528" /></p>
 <p>By looking at the first row of the above scatter plot we might notice that the absolute errors seem to be larger for higher values of <code>educ</code> and lower for higher values of <code>expersq</code>. This might warrant to test this more formally.</p>
 <ul>
-<li>The <a href="https://en.wikipedia.org/wiki/Breusch%E2%80%93Pagan_test" target="_blank">Breusch-Pagan test</a> is implemented in the function <code>pbtest</code> both of the <code>AER</code> and <code>lmtest</code> package and tests whether the variance of a model’s residuals dependents on the values of the regressors.</li>
+<li>The <a href="https://en.wikipedia.org/wiki/Breusch%E2%80%93Pagan_test" target="_blank">Breusch-Pagan test</a> is implemented in the function <code>bptest</code> both of the <code>AER</code> and <code>lmtest</code> package and tests whether the variance of a model’s residuals depends on the values of the regressors.</li>
 </ul>
 <pre class="r"><code>library(&quot;AER&quot;)
 
