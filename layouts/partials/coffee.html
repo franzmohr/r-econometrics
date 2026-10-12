@@ -1,14 +1,37 @@
 {{/* Articles only: pages at the content root (about, links, *intro) have an empty .Section. */}}
 {{ if .Section }}
+<style>
+  .coffee { text-align: center; padding: 32px 0 40px; }
+  a.bmc-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 36px;
+    padding: 0 14px;
+    border-radius: 6px;
+    background-color: #ffdd00;
+    color: #0d0c22;
+    font-size: 15px;
+    text-decoration: none;
+    box-shadow: 0 1px 2px rgba(190, 190, 190, 0.5);
+    transition: opacity 0.3s, box-shadow 0.3s;
+  }
+  a.bmc-button:hover, a.bmc-button:focus {
+    color: #0d0c22;
+    opacity: 0.85;
+    box-shadow: 0 2px 4px rgba(190, 190, 190, 0.5);
+  }
+  a.bmc-button img { width: 22px; height: 22px; }
+  a.bmc-button span { white-space: nowrap; }
+</style>
 <div class="container">
-  <div class="row right">
-    <div class="sixteen columns center">
-      <div class="center">
-        <p>I hope this article was helpful. If you like, feel free to </p>
-      <!-- Buy me a coffee -->
-      <style>.bmc-button img{width: 35px !important;margin-bottom: 1px !important;box-shadow: none !important;border: none !important;vertical-align: middle !important;}.bmc-button{padding: 7px 10px 7px 10px !important;line-height: 35px !important;height:51px !important;min-width:217px !important;text-decoration: none !important;display:inline-flex !important;color:#ffffff !important;background-color:#000000 !important;border-radius: 5px !important;border: 1px solid transparent !important;padding: 7px 10px 7px 10px !important;font-size: 20px !important;letter-spacing:-0.08px !important;box-shadow: 0px 1px 2px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 1px 2px 2px rgba(190, 190, 190, 0.5) !important;margin: 0 auto !important;font-family:'Lato', sans-serif !important;-webkit-box-sizing: border-box !important;box-sizing: border-box !important;-o-transition: 0.3s all linear !important;-webkit-transition: 0.3s all linear !important;-moz-transition: 0.3s all linear !important;-ms-transition: 0.3s all linear !important;transition: 0.3s all linear !important;}.bmc-button:hover, .bmc-button:active, .bmc-button:focus {-webkit-box-shadow: 0px 1px 2px 2px rgba(190, 190, 190, 0.5) !important;text-decoration: none !important;box-shadow: 0px 1px 2px 2px rgba(190, 190, 190, 0.5) !important;opacity: 0.85 !important;color:#ffffff !important;}</style><link href="https://fonts.googleapis.com/css?family=Lato&subset=latin,latin-ext" rel="stylesheet"><a class="bmc-button" target="_blank" rel="noopener" href="https://buymeacoffee.com/franzmohr"><img src="https://cdn.buymeacoffee.com/buttons/bmc-new-btn-logo.svg" alt="support me with a coffee"><span style="margin-left:15px;font-size:19px !important;">support me with a coffee</span></a>
-
-      </div>
+  <div class="row">
+    <div class="sixteen columns coffee">
+      <p>I hope this article was helpful. If you like, feel free to</p>
+      <a class="bmc-button" target="_blank" rel="noopener" href="https://buymeacoffee.com/franzmohr">
+        <img src="https://cdn.buymeacoffee.com/buttons/bmc-new-btn-logo.svg" alt="">
+        <span>support me with a coffee</span>
+      </a>
     </div>
   </div>
 </div>
