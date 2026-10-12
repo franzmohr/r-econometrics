@@ -49,10 +49,12 @@ with <span class="math inline">\(u_t \sim N(0, \Sigma_u)\)</span> and
 <h2>Application</h2>
 <p>The <code>dfmtools</code> package estimates dynamic factor models as described above using Bayesian inference. It builds the model and hands it to a Gibbs sampler written in C++, which follows the treatment in Chan, Koop, Poirier and Tobias (2019). The package is not on CRAN yet and depends on the <code>bayests</code> package, which has to be installed from GitHub first:</p>
 <pre class="r"><code># install.packages(&quot;remotes&quot;)
-remotes::install_github(&quot;franzmohr/bayests-r&quot;)
-remotes::install_github(&quot;franzmohr/dfmtools&quot;)</code></pre>
+library(&quot;remotes&quot;)
+
+install_github(&quot;franzmohr/bayests-r&quot;)
+install_github(&quot;franzmohr/dfmtools&quot;)</code></pre>
 <p>The following application is a reproduction of exercise 18.4 in the textbook of Chan et al. (2019), where quarterly data on 196 macroeconomic variables is used to extract a common factor for the US. The series come from the FRED-QD database of McCracken and Ng (2020) and cover the period from 1959Q3 to 2015Q3. They are already transformed to be stationary, and the prepared data set is contained in the package. The first series is the growth rate of real GDP, so that the factor moves in the same direction as GDP.</p>
-<pre class="r"><code>library(dfmtools)
+<pre class="r"><code>library(&quot;dfmtools&quot;)
 
 # Load data
 data(&quot;bem_dfmdata&quot;)</code></pre>
@@ -61,8 +63,11 @@ data(&quot;bem_dfmdata&quot;)</code></pre>
 set.seed(123456789)
 
 # Generate the model
-model &lt;- create_dfmodel(x = bem_dfmdata, p = 1, n = 1,
-                        iterations = 5000, burnin = 1000)</code></pre>
+model &lt;- create_dfmodel(x = bem_dfmdata,
+                        p = 1,
+                        n = 1,
+                        iterations = 5000,
+                        burnin = 1000)</code></pre>
 <p>Second, prior information is added to the model with <code>add_priors</code>. The same priors as in Chan et al. (2019) are used. The priors of the loadings <code>lambda</code> and the transition coefficients <code>a</code> are normal with mean zero and are specified as precisions. The arguments <code>u</code> and <code>v</code> contain the shape and rate parameters of the gamma priors of the precisions of the two error terms. Then, <code>add_initial_values</code> adds starting values for the sampler. By default, the loadings start at the values implied by the first principal component of the data.</p>
 <pre class="r"><code>model &lt;- add_priors(model,
                     lambda = list(vinv = 0.01),
@@ -74,21 +79,29 @@ model &lt;- add_initial_values(model)</code></pre>
 <p>Third, posterior draws are obtained with the Gibbs sampler:</p>
 <pre class="r"><code>model &lt;- add_posterior_coefficients(model)</code></pre>
 <p>Fourth, the results are evaluated. The draws of each block of parameters are stored in <code>model$posterior</code>, with one row per draw. Since the whole path of the factor is part of every draw, the posterior median and a credible interval of the factor can be obtained for every period. The following figure compares the factor with the growth rate of real GDP. The factor is measured in the units of the common component of GDP growth, whose variance is much smaller than that of GDP growth itself. Therefore, both series are standardised for the comparison.</p>
-<pre class="r"><code>library(ggplot2)
+<pre class="r"><code>library(&quot;ggplot2&quot;)
 
 # Posterior median and 80 per cent credible interval of the factor
-f &lt;- apply(model$posterior$factors$coeffs, 2, quantile, probs = c(0.1, 0.5, 0.9))
+factor_draws &lt;- model[[&quot;posterior&quot;]][[&quot;factors&quot;]][[&quot;coeffs&quot;]]
+f &lt;- apply(factor_draws, 2, quantile, probs = c(0.1, 0.5, 0.9))
 
 # Standardise the factor by the standard deviation of its median
 f &lt;- (f - mean(f[2, ])) / sd(f[2, ])
 
 temp &lt;- data.frame(date = as.numeric(time(bem_dfmdata)),
-                   lower = f[1, ], median = f[2, ], upper = f[3, ],
-                   gdp = model$data$x[, &quot;GDPC96&quot;])
+                   lower = f[1, ],
+                   median = f[2, ],
+                   upper = f[3, ],
+                   gdp = model[[&quot;data&quot;]][[&quot;x&quot;]][, &quot;GDPC96&quot;])
+
+factor_caption &lt;- paste0(&quot;Both series standardised. Posterior median and &quot;,
+                         &quot;80 per cent credible interval of the factor.&quot;)
 
 ggplot(temp, aes(x = date)) +
   geom_hline(yintercept = 0, colour = &quot;grey50&quot;) +
-  geom_ribbon(aes(ymin = lower, ymax = upper), fill = &quot;steelblue&quot;, alpha = 0.3) +
+  geom_ribbon(aes(ymin = lower, ymax = upper),
+              fill = &quot;steelblue&quot;,
+              alpha = 0.3) +
   geom_line(aes(y = median, colour = &quot;Factor&quot;)) +
   geom_line(aes(y = gdp, colour = &quot;Real GDP growth&quot;), alpha = 0.7) +
   scale_colour_manual(values = c(&quot;steelblue4&quot;, &quot;darkorange&quot;)) +
@@ -96,20 +109,21 @@ ggplot(temp, aes(x = date)) +
   theme(legend.position = &quot;bottom&quot;,
         legend.title = element_blank()) +
   labs(title = &quot;Common factor of 196 US macroeconomic series&quot;,
-       x = NULL, y = NULL,
-       caption = &quot;Both series standardised. Posterior median and 80 per cent credible interval of the factor.&quot;)</code></pre>
+       x = NULL,
+       y = NULL,
+       caption = factor_caption)</code></pre>
 <p><img src="/timeseries/dynamicfactorintro_files/figure-html/factor-1.png" alt="" width="576" /></p>
 <p>The factor closely follows the growth rate of GDP, with a correlation of 0.75, and shows pronounced declines in every recession. It is smoother than GDP growth, since it summarises the movement of many series and leaves their idiosyncratic noise to the error term. This is why the factor can be interpreted as a measure of general economic activity.</p>
 <p>The loadings show, which series are most closely related to the factor. Their posterior means can be obtained from the draws of <code>lambda</code>. Note that the loading of the first series is fixed at one, but it is reported as well, so that the draws contain a value for each series.</p>
-<pre class="r"><code>lambda &lt;- colMeans(model$posterior$lambda$coeffs)
+<pre class="r"><code>lambda &lt;- colMeans(model[[&quot;posterior&quot;]][[&quot;lambda&quot;]][[&quot;coeffs&quot;]])
 names(lambda) &lt;- colnames(bem_dfmdata)
 
 # Series with the largest absolute loadings
 round(lambda[order(abs(lambda), decreasing = TRUE)][1:10], 2)</code></pre>
-<pre><code>##      USPRIV      USGOOD      MANEMP      PAYEMS     DMANEMP      HOANBS 
-##        4.92        4.92        4.85        4.84        4.80        4.64 
-##      UNRATE LNS14000025   IPMANSICS      INDPRO 
-##       -4.61       -4.59        4.55        4.55</code></pre>
+<pre><code>##      USPRIV      USGOOD      MANEMP      PAYEMS     DMANEMP      HOANBS      UNRATE LNS14000025 
+##        4.92        4.92        4.85        4.84        4.80        4.64       -4.61       -4.59 
+##   IPMANSICS      INDPRO 
+##        4.55        4.55</code></pre>
 <p>The largest loadings belong to measures of employment and hours worked, unemployment rates and industrial production, which are the typical coincident indicators of the business cycle. The loadings of the unemployment rates are negative, since unemployment rises when economic activity declines. Since the loading of GDP growth is fixed at one, a loading of almost five means that a series moves about five times as much as GDP growth, measured in standard deviations, when the factor changes. These series are more closely related to the business cycle than GDP growth, which contains more idiosyncratic noise from quarter to quarter.</p>
 <div id="forecasts" class="section level3">
 <h3>Forecasts</h3>
@@ -121,7 +135,8 @@ model &lt;- add_posterior_forecasts(model)</code></pre>
 gdp_pos &lt;- which(colnames(bem_dfmdata) == &quot;GDPC96&quot;)
 
 # Draws of the GDP forecast in normalised units
-fc &lt;- model$posterior$forecast$forecasts[, seq(gdp_pos, 8 * m, by = m)]
+forecast_draws &lt;- model[[&quot;posterior&quot;]][[&quot;forecast&quot;]][[&quot;forecasts&quot;]]
+fc &lt;- forecast_draws[, seq(gdp_pos, 8 * m, by = m)]
 
 # Back to quarterly growth rates in per cent
 gdp &lt;- bem_dfmdata[, &quot;GDPC96&quot;]

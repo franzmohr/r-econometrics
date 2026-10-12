@@ -20,42 +20,47 @@ tags:
 <h2>Introduction</h2>
 <p>As we saw in the <a href="/timeseries/varintro">post on vector autoregressive (VAR) models</a>, traditional VAR models suffer from a so-called <em>curse of dimensionality</em>. Each additional variable adds a further equation and a further lag polynomial to every other equation, so the number of coefficients grows with the square of the number of variables. With the few decades of quarterly data that are usually available this limits a VAR to a handful of variables. Policy makers, however, base their decisions on a much larger set of indicators than a VAR can accommodate, and leaving that information out of the model can distort the results.</p>
 <p><em>Factor-augmented VAR (FAVAR) models</em> address this issue. They summarise the information in a large panel of time series by a small number of <em>factors</em>, which are common drivers of the observed variables, and add these factors to an otherwise standard VAR. The idea behind factors becomes clear when looking at a few measures of economic activity. Growth in GDP, industrial production and private consumption measure different things, but they move together:</p>
-<pre class="r"><code>library(bvartools)
-library(ggplot2)
-library(tidyr)
+<pre class="r"><code>library(&quot;bvartools&quot;)
+library(&quot;ggplot2&quot;)
+library(&quot;scales&quot;)
+library(&quot;tidyr&quot;)
 
 # Download a fixed vintage of the FRED-QD database
-url &lt;- &quot;https://www.stlouisfed.org/-/media/project/frbstl/stlouisfed/research/fred-md/quarterly/2026-09-qd.csv&quot;
-raw &lt;- read.csv(url)
+qd_url &lt;- paste0(&quot;https://www.stlouisfed.org/-/media/project/frbstl/&quot;,
+                 &quot;stlouisfed/research/fred-md/quarterly/2026-09-qd.csv&quot;)
+qd_raw &lt;- read.csv(qd_url)
 
 # The first two rows contain information on the series, the rest the data
-flag &lt;- unlist(raw[1, -1])
-tcode &lt;- unlist(raw[2, -1])
-date &lt;- as.Date(raw[-(1:2), 1], format = &quot;%m/%d/%Y&quot;)
-levels &lt;- as.matrix(raw[-(1:2), -1])
+flag &lt;- unlist(qd_raw[1, -1])
+tcode &lt;- unlist(qd_raw[2, -1])
+dates &lt;- as.Date(qd_raw[-(1:2), 1], format = &quot;%m/%d/%Y&quot;)
+qd_levels &lt;- as.matrix(qd_raw[-(1:2), -1])
 
 # Sample period
-sample &lt;- date &gt;= as.Date(&quot;1960-01-01&quot;) &amp; date &lt;= as.Date(&quot;2007-12-01&quot;)
+in_sample &lt;- dates &gt;= as.Date(&quot;1960-01-01&quot;) &amp; dates &lt;= as.Date(&quot;2007-12-01&quot;)
 
 # Year-on-year growth of three measures of economic activity
-activity &lt;- c(GDPC1 = &quot;GDP&quot;, INDPRO = &quot;Industrial production&quot;,
+activity &lt;- c(GDPC1 = &quot;GDP&quot;,
+              INDPRO = &quot;Industrial production&quot;,
               PCECC96 = &quot;Private consumption&quot;)
-growth &lt;- apply(log(levels[, names(activity)]), 2,
-                function(x) {c(rep(NA, 4), diff(x, lag = 4))})
+growth &lt;- apply(log(qd_levels[, names(activity)]),
+                2,
+                function(x) {return(c(rep(NA, 4), diff(x, lag = 4)))})
 colnames(growth) &lt;- activity
 
-temp &lt;- data.frame(date = date, growth, check.names = FALSE)[sample, ]
+temp &lt;- data.frame(date = dates, growth, check.names = FALSE)[in_sample, ]
 temp &lt;- pivot_longer(temp, cols = -date)
 
 ggplot(temp, aes(x = date, y = value, colour = name)) +
   geom_hline(yintercept = 0) +
   geom_line() +
-  scale_y_continuous(labels = scales::percent_format()) +
+  scale_y_continuous(labels = percent_format()) +
   theme_bw() +
   theme(legend.position = &quot;bottom&quot;,
         legend.title = element_blank()) +
   labs(title = &quot;Measures of economic activity&quot;,
-       x = NULL, y = &quot;Log-growth rate (y-o-y)&quot;,
+       x = NULL,
+       y = &quot;Log-growth rate (y-o-y)&quot;,
        caption = &quot;Source: FRED-QD, vintage 2026-09.&quot;)</code></pre>
 <p><img src="/timeseries/favarintro_files/figure-html/activity-1.png" alt="" width="576" /></p>
 <p>Although each indicator measures a different economic phenomenon, they follow a common pattern. This pattern can be understood as an unobserved process, which drives the observed indicators and which could be labelled <em>economic activity</em>. Estimating such processes is the job of a <a href="/timeseries/dynamicfactorintro">dynamic factor model</a>, and Stock and Watson (2002) showed that a few factors from a large panel of series are useful for forecasting. A FAVAR goes one step further and lets the factors interact with observed variables of interest in a VAR.</p>
@@ -89,21 +94,24 @@ ggplot(temp, aes(x = date, y = value, colour = name)) +
 <p>The first row of the FRED-QD file marks the series that McCracken and Ng (2020) use for factor estimation. These exclude aggregates of other series in the database to avoid double counting. The second row contains a code for the transformation that makes a series stationary. Most of them are first differences or log differences. For prices the database suggests second differences of logs. Since this would treat inflation as non-stationary, which is not what BBE do, prices are used as log differences here, i.e. as inflation rates.</p>
 <pre class="r"><code># Transformations, which are applied to the series
 transform_series &lt;- function(x, code) {
-  switch(as.character(code),
-         &quot;1&quot; = x,                   # Level
-         &quot;2&quot; = c(NA, diff(x)),       # First difference
-         &quot;4&quot; = log(x),              # Log level
-         &quot;5&quot; = c(NA, diff(log(x))), # Log difference
-         &quot;6&quot; = c(NA, diff(log(x))), # Log difference instead of second difference
-         rep(NA, length(x)))        # Codes that are not used here
+  result &lt;- switch(as.character(code),
+                   &quot;1&quot; = x,                   # Level
+                   &quot;2&quot; = c(NA, diff(x)),      # First difference
+                   &quot;4&quot; = log(x),              # Log level
+                   &quot;5&quot; = c(NA, diff(log(x))), # Log difference
+                   # Log difference instead of second difference
+                   &quot;6&quot; = c(NA, diff(log(x))),
+                   rep(NA, length(x)))        # Codes that are not used here
+  return(result)
 }
 
 # Transform all series and select the sample period
-x &lt;- sapply(colnames(levels), function(i) {transform_series(levels[, i], tcode[i])})
-x &lt;- x[sample, ]
+x &lt;- sapply(colnames(qd_levels),
+            function(i) {return(transform_series(qd_levels[, i], tcode[i]))})
+x &lt;- x[in_sample, ]
 
 # Federal funds rate in levels
-ffr &lt;- levels[sample, &quot;FEDFUNDS&quot;]
+ffr &lt;- qd_levels[in_sample, &quot;FEDFUNDS&quot;]
 
 # Informational panel: series for factor estimation without missing values
 panel &lt;- names(flag)[flag == 1 &amp; names(flag) != &quot;FEDFUNDS&quot;]
@@ -113,7 +121,8 @@ x_panel &lt;- scale(x[, panel])</code></pre>
 <p>FRED-QD sorts its series into groups. The slow-moving variables are taken from the groups on national accounts, industrial production, employment and unemployment, prices, as well as earnings and productivity. The remaining groups, which contain housing, orders, interest rates, money and credit, household balance sheets, exchange rates and stock prices, are treated as fast-moving.</p>
 <pre class="r"><code># Names of the series between two series in the database
 series_range &lt;- function(from, to) {
-  colnames(levels)[match(from, colnames(levels)):match(to, colnames(levels))]
+  series &lt;- colnames(qd_levels)
+  return(series[match(from, series):match(to, series)])
 }
 
 slow &lt;- intersect(panel, c(series_range(&quot;GDPC1&quot;, &quot;HWIx&quot;),
@@ -126,8 +135,8 @@ slow &lt;- intersect(panel, c(series_range(&quot;GDPC1&quot;, &quot;HWIx&quot;),
 
 # Principal components of the whole panel and of the slow-moving variables
 pc_all &lt;- prcomp(x_panel)
-f_all &lt;- pc_all$x[, 1:n_factors]
-f_slow &lt;- prcomp(x_panel[, slow])$x[, 1:n_factors]
+f_all &lt;- pc_all[[&quot;x&quot;]][, 1:n_factors]
+f_slow &lt;- prcomp(x_panel[, slow])[[&quot;x&quot;]][, 1:n_factors]
 
 # Remove the direct effect of the federal funds rate
 fit &lt;- lm(f_all ~ f_slow + ffr)
@@ -135,7 +144,7 @@ f &lt;- f_all - outer(ffr, coef(fit)[&quot;ffr&quot;, ])
 colnames(f) &lt;- paste0(&quot;f&quot;, 1:n_factors)
 
 # Share of the variance of the panel explained by each factor
-share &lt;- summary(pc_all)$importance[2, 1:n_factors]</code></pre>
+share &lt;- summary(pc_all)[[&quot;importance&quot;]][2, 1:n_factors]</code></pre>
 <p>The three factors explain 20, 14 and 7 per cent of the variance of the panel. These are substantial shares for a panel that combines real activity, prices, financial markets and survey data.</p>
 </div>
 <div id="the-transition-equation" class="section level3">
@@ -144,8 +153,11 @@ share &lt;- summary(pc_all)$importance[2, 1:n_factors]</code></pre>
 <pre class="r"><code>y &lt;- ts(cbind(f, ffr = ffr), start = c(1960, 1), frequency = 4)
 
 set.seed(20261012)
-model &lt;- create_bvarmodel(y, p = 4, deterministic = &quot;const&quot;,
-                          iterations = 10000, burnin = 2000)
+model &lt;- create_bvarmodel(y,
+                          p = 4,
+                          deterministic = &quot;const&quot;,
+                          iterations = 10000,
+                          burnin = 2000)
 model &lt;- add_priors(model,
                     coef = list(v_i = 1 / 10, v_i_det = 1 / 100),
                     sigma = list(df = 6, scale = 1))
@@ -153,59 +165,80 @@ model &lt;- add_initial_values(model)
 model &lt;- add_posterior_coefficients(model)</code></pre>
 <p>The monetary policy shock is identified recursively by ordering the federal funds rate last. Thus, the factors do not react to the shock in the quarter in which it occurs, while the federal funds rate can react to all factors within the same quarter. This corresponds to the <a href="/timeseries/irf">orthogonalised impulse response</a>, which is calculated by the <code>irf</code> function. The draws of the responses are kept, because they are needed to compute the responses of the series in the panel below. Each draw is rescaled, so that the shock raises the federal funds rate by 25 basis points on impact.</p>
 <pre class="r"><code>responses &lt;- lapply(colnames(y), function(i) {
-  unclass(irf(model, impulse = &quot;ffr&quot;, response = i, n_ahead = 20,
-              type = &quot;oir&quot;, keep_draws = TRUE))
+  result &lt;- irf(model,
+                impulse = &quot;ffr&quot;,
+                response = i,
+                n_ahead = 20,
+                type = &quot;oir&quot;,
+                keep_draws = TRUE)
+  return(unclass(result))
 })
 names(responses) &lt;- colnames(y)
 
 # Rescale each draw to a shock of 25 basis points
 shock_scale &lt;- 0.25 / responses[[&quot;ffr&quot;]][, 1]
-responses &lt;- lapply(responses, function(r) {r * shock_scale})</code></pre>
+responses &lt;- lapply(responses, function(r) {return(r * shock_scale)})</code></pre>
 </div>
 <div id="responses-of-observed-series" class="section level3">
 <h3>Responses of observed series</h3>
 <p>The main advantage of a FAVAR is that the responses of every series in the database can be obtained from the responses of the factors and the federal funds rate. This is what the measurement equation is for: the loadings of a series are estimated by a regression on the factors and the federal funds rate, and its impulse response is the corresponding weighted sum of the responses in the transition equation. The series do not need to be part of the panel, from which the factors are extracted. Real GDP, for example, is an aggregate and therefore excluded from the panel, but its response can still be calculated.</p>
 <p>Since the series enter the model as differences, their responses are cumulated to obtain the response of their levels. Responses of series in logs are multiplied by 100, so that they are percentage deviations.</p>
-<pre class="r"><code>show &lt;- c(GDPC1 = &quot;Real GDP&quot;, INDPRO = &quot;Industrial production&quot;,
-          PAYEMS = &quot;Payroll employment&quot;, UNRATE = &quot;Unemployment rate&quot;,
-          CPIAUCSL = &quot;Consumer prices&quot;, HOUST = &quot;Housing starts&quot;,
-          M2REAL = &quot;Real M2&quot;, S.P.500 = &quot;S&amp;P 500&quot;)
+<pre class="r"><code>show_series &lt;- c(GDPC1 = &quot;Real GDP&quot;,
+                 INDPRO = &quot;Industrial production&quot;,
+                 PAYEMS = &quot;Payroll employment&quot;,
+                 UNRATE = &quot;Unemployment rate&quot;,
+                 CPIAUCSL = &quot;Consumer prices&quot;,
+                 HOUST = &quot;Housing starts&quot;,
+                 M2REAL = &quot;Real M2&quot;,
+                 S.P.500 = &quot;S&amp;P 500&quot;)
 
 # Loadings of the series on the factors and the federal funds rate
-loadings &lt;- coef(lm(x[, names(show)] ~ unclass(y)))[-1, ]
+x_loadings &lt;- coef(lm(x[, names(show_series)] ~ unclass(y)))[-1, ]
 
 # Responses of the series, cumulated to levels
-ir_x &lt;- lapply(names(show), function(i) {
-  r &lt;- Reduce(`+`, Map(function(ir, l) {ir * l}, responses, loadings[, i]))
+ir_x &lt;- lapply(names(show_series), function(i) {
+  weighted &lt;- Map(function(ir, l) {return(ir * l)},
+                  responses,
+                  x_loadings[, i])
+  r &lt;- Reduce(`+`, weighted)
   r &lt;- t(apply(r, 1, cumsum))
   if (tcode[i] != 2) {
     r &lt;- 100 * r
   }
   return(r)
 })
-names(ir_x) &lt;- names(show)
+names(ir_x) &lt;- names(show_series)
 ir_x[[&quot;FEDFUNDS&quot;]] &lt;- responses[[&quot;ffr&quot;]]
 
 # Median and 90 per cent credible intervals
-units &lt;- c(show, FEDFUNDS = &quot;Federal funds rate&quot;)
-units &lt;- paste0(units, ifelse(names(units) %in% c(&quot;UNRATE&quot;, &quot;FEDFUNDS&quot;), &quot; (pp)&quot;, &quot; (%)&quot;))
-names(units) &lt;- c(names(show), &quot;FEDFUNDS&quot;)
+unit_labels &lt;- c(show_series, FEDFUNDS = &quot;Federal funds rate&quot;)
+in_pp &lt;- names(unit_labels) %in% c(&quot;UNRATE&quot;, &quot;FEDFUNDS&quot;)
+unit_labels &lt;- paste0(unit_labels, ifelse(in_pp, &quot; (pp)&quot;, &quot; (%)&quot;))
+names(unit_labels) &lt;- c(names(show_series), &quot;FEDFUNDS&quot;)
+panel_order &lt;- unit_labels[c(&quot;FEDFUNDS&quot;, names(show_series))]
 
 summarise_irf &lt;- function(r, name) {
   q &lt;- apply(r, 2, quantile, probs = c(0.05, 0.5, 0.95))
-  data.frame(variable = name, h = 0:(ncol(r) - 1),
-             lower = q[1, ], median = q[2, ], upper = q[3, ])
+  result &lt;- data.frame(variable = name,
+                       h = 0:(ncol(r) - 1),
+                       lower = q[1, ],
+                       median = q[2, ],
+                       upper = q[3, ])
+  return(result)
 }
-temp &lt;- do.call(rbind, Map(summarise_irf, ir_x, units[names(ir_x)]))
-temp$variable &lt;- factor(temp$variable, levels = units[c(&quot;FEDFUNDS&quot;, names(show))])</code></pre>
+temp &lt;- do.call(rbind, Map(summarise_irf, ir_x, unit_labels[names(ir_x)]))
+temp[[&quot;variable&quot;]] &lt;- factor(temp[[&quot;variable&quot;]], levels = panel_order)</code></pre>
 <pre class="r"><code>ggplot(temp, aes(x = h, y = median)) +
   geom_hline(yintercept = 0, colour = &quot;grey50&quot;) +
-  geom_ribbon(aes(ymin = lower, ymax = upper), fill = &quot;steelblue&quot;, alpha = 0.3) +
+  geom_ribbon(aes(ymin = lower, ymax = upper),
+              fill = &quot;steelblue&quot;,
+              alpha = 0.3) +
   geom_line(colour = &quot;steelblue4&quot;) +
   facet_wrap(~ variable, scales = &quot;free_y&quot;, ncol = 3) +
   theme_bw() +
   labs(title = &quot;Responses to a monetary policy shock of 25 basis points&quot;,
-       x = &quot;Quarters&quot;, y = NULL,
+       x = &quot;Quarters&quot;,
+       y = NULL,
        caption = &quot;Median and 90 per cent credible intervals.&quot;)</code></pre>
 <p><img src="/timeseries/favarintro_files/figure-html/responses-plot-1.png" alt="" width="768" /></p>
 <p>The responses look like what economic theory predicts. After the initial increase the federal funds rate returns to its previous level within about two years. Real activity declines with a lag: real GDP falls by up to 0.21 per cent after 7 quarters and industrial production by up to 0.5 per cent. Payroll employment falls as well and the unemployment rate rises by up to 0.1 percentage points. Housing starts, which are known to be sensitive to interest rates, react quickly and strongly, but recover after about two years and even overshoot. The response of the S&amp;P 500 is less plausible, since stock prices rise after about two years. This is one of the cases, where the responses of individual series should be interpreted with caution, since they depend on how well the few factors capture the series’ dynamics.</p>
@@ -215,11 +248,16 @@ temp$variable &lt;- factor(temp$variable, levels = units[c(&quot;FEDFUNDS&quot;,
 <h3>The price puzzle</h3>
 <p>The response of prices is one of the main motivations behind the FAVAR approach. Small VAR models of monetary policy frequently find that prices <em>rise</em> after a monetary tightening, which is known as the <em>price puzzle</em> (Sims, 1992). A common explanation is that the central bank reacts to information about future inflation, which a small VAR does not contain. A tightening then looks like the cause of the subsequent inflation, which it actually tried to prevent. Adding factors from a large panel provides the model with much of the information that the central bank has at its disposal.</p>
 <p>To illustrate this, the same recursive identification is applied to a small VAR with GDP growth, inflation and the federal funds rate.</p>
-<pre class="r"><code>small &lt;- cbind(gdp = 100 * x[, &quot;GDPC1&quot;], cpi = 100 * x[, &quot;CPIAUCSL&quot;], ffr = ffr)
+<pre class="r"><code>small &lt;- cbind(gdp = 100 * x[, &quot;GDPC1&quot;],
+               cpi = 100 * x[, &quot;CPIAUCSL&quot;],
+               ffr = ffr)
 small &lt;- ts(small, start = c(1960, 1), frequency = 4)
 
-small_model &lt;- create_bvarmodel(small, p = 4, deterministic = &quot;const&quot;,
-                                iterations = 10000, burnin = 2000)
+small_model &lt;- create_bvarmodel(small,
+                                p = 4,
+                                deterministic = &quot;const&quot;,
+                                iterations = 10000,
+                                burnin = 2000)
 small_model &lt;- add_priors(small_model,
                           coef = list(v_i = 1 / 10, v_i_det = 1 / 100),
                           sigma = list(df = 6, scale = 1))
@@ -227,10 +265,20 @@ small_model &lt;- add_initial_values(small_model)
 small_model &lt;- add_posterior_coefficients(small_model)
 
 # Responses of inflation and the federal funds rate
-small_cpi &lt;- unclass(irf(small_model, impulse = &quot;ffr&quot;, response = &quot;cpi&quot;,
-                         n_ahead = 20, type = &quot;oir&quot;, keep_draws = TRUE))
-small_ffr &lt;- unclass(irf(small_model, impulse = &quot;ffr&quot;, response = &quot;ffr&quot;,
-                         n_ahead = 0, type = &quot;oir&quot;, keep_draws = TRUE))
+small_cpi &lt;- irf(small_model,
+                 impulse = &quot;ffr&quot;,
+                 response = &quot;cpi&quot;,
+                 n_ahead = 20,
+                 type = &quot;oir&quot;,
+                 keep_draws = TRUE)
+small_cpi &lt;- unclass(small_cpi)
+small_ffr &lt;- irf(small_model,
+                 impulse = &quot;ffr&quot;,
+                 response = &quot;ffr&quot;,
+                 n_ahead = 0,
+                 type = &quot;oir&quot;,
+                 keep_draws = TRUE)
+small_ffr &lt;- unclass(small_ffr)
 
 # Rescale to 25 basis points and cumulate inflation to the price level
 small_cpi &lt;- t(apply(small_cpi * 0.25 / small_ffr[, 1], 1, cumsum))</code></pre>
@@ -245,7 +293,8 @@ ggplot(temp, aes(x = h, y = median, colour = variable, fill = variable)) +
   theme(legend.position = &quot;bottom&quot;,
         legend.title = element_blank()) +
   labs(title = &quot;Response of consumer prices (%)&quot;,
-       x = &quot;Quarters&quot;, y = NULL,
+       x = &quot;Quarters&quot;,
+       y = NULL,
        caption = &quot;Median and 90 per cent credible intervals.&quot;)</code></pre>
 <p><img src="/timeseries/favarintro_files/figure-html/price-puzzle-1.png" alt="" width="576" /></p>
 <p>Both models show an increase of the price level after the tightening. In the small VAR it is larger and more persistent: after four quarters the median response is 0.06 per cent compared to 0.03 per cent in the FAVAR, and the median falls below zero only after 15 quarters, while in the FAVAR it does so after 8 quarters. The additional information in the factors therefore weakens the price puzzle, although it does not remove it completely. BBE report a similar result for their sample.</p>
@@ -256,7 +305,7 @@ ggplot(temp, aes(x = h, y = median, colour = variable, fill = variable)) +
 <p>The two-step approach is simple and fast, but it has a drawback. The factors are estimates, which are treated as if they were observed in the second step. The credible intervals above therefore do not account for the uncertainty about the factors. BBE address this by a bootstrap procedure and by their Bayesian one-step approach, which draws the factors together with the other parameters of the model, so that the uncertainty about the factors enters the credible intervals. They find that both approaches lead to qualitatively similar results.</p>
 <p>The one-step approach is implemented in the <code>dfmtools</code> package, whose installation is described in the <a href="/timeseries/dynamicfactorintro">post on dynamic factor models</a>. Its Gibbs sampler draws the factors, the loadings, the coefficients of the transition equation and the covariance matrices of both error terms in turn.</p>
 <p>Since the factors are no longer principal components, they need a different normalisation. <code>dfmtools</code> restricts the leading <span class="math inline">\(N \times N\)</span> block of <span class="math inline">\(\lambda^{f}\)</span> to the identity matrix and the corresponding rows of <span class="math inline">\(\lambda^{y}\)</span> to zero. Thus, the first <span class="math inline">\(N\)</span> series of the panel are the factors plus idiosyncratic noise. This makes the order of the panel a substantive choice: the first series should be broad slow-moving measures, since they define the factors. Following the vignette of the package, industrial production, payroll employment and consumer prices are used. They are aggregates and not part of the panel above, so they are added at the beginning. The same is done for the remaining series, whose responses are shown below, since the one-step approach only produces responses for the series of the panel.</p>
-<pre class="r"><code>library(dfmtools)
+<pre class="r"><code>library(&quot;dfmtools&quot;)
 
 # Series that define the factors and further series, whose responses are shown
 identifiers &lt;- c(&quot;INDPRO&quot;, &quot;PAYEMS&quot;, &quot;CPIAUCSL&quot;)
@@ -269,34 +318,51 @@ ffr_one &lt;- ts(cbind(FEDFUNDS = ffr), start = c(1960, 1), frequency = 4)
 # Slow-moving series
 slow_one &lt;- c(identifiers, &quot;GDPC1&quot;, &quot;UNRATE&quot;, slow)</code></pre>
 <p>Instead of cleaning the factors, the distinction between slow-moving and fast-moving variables enters the model as a restriction: the loadings of the slow-moving series on the federal funds rate are set to zero, so that they cannot react to it within the same quarter. Together with the identity block this implies that the factors do not react to the policy rate within the quarter either. The restriction is specified with argument <code>slow</code> of <code>add_priors</code>. The model has the same number of factors and lags as above, and <code>create_favarmodel</code> normalises the series of the panel by default.</p>
-<pre class="r"><code>favar &lt;- create_favarmodel(x = x_one, y = ffr_one, p = 4, n = 3,
-                           iterations = 10000, burnin = 2000)
+<pre class="r"><code>favar &lt;- create_favarmodel(x = x_one,
+                           y = ffr_one,
+                           p = 4,
+                           n = 3,
+                           iterations = 10000,
+                           burnin = 2000)
 favar &lt;- add_priors(favar, slow = slow_one)
 favar &lt;- add_initial_values(favar)
 favar &lt;- add_posterior_coefficients(favar)</code></pre>
 <p>The restriction is implemented as a very tight prior rather than as an exact zero, but the posterior means of the restricted loadings are zero to 7 decimal places, which is exact for all practical purposes.</p>
 <p>The <code>irf</code> method of <code>dfmtools</code> computes the responses of the series in the panel directly from the loadings. As before, the shock is identified recursively with the federal funds rate ordered last and each draw is rescaled to a shock of 25 basis points. Since the panel is normalised, the responses are multiplied by the standard deviation of the respective series to obtain them in their original units.</p>
 <pre class="r"><code># Response of the federal funds rate, used to rescale the shock
-ffr_draws &lt;- unclass(irf(favar, impulse = &quot;FEDFUNDS&quot;, response = &quot;FEDFUNDS&quot;,
-                         n_ahead = 20, keep_draws = TRUE))
+ffr_draws &lt;- irf(favar,
+                 impulse = &quot;FEDFUNDS&quot;,
+                 response = &quot;FEDFUNDS&quot;,
+                 n_ahead = 20,
+                 keep_draws = TRUE)
+ffr_draws &lt;- unclass(ffr_draws)
 one_scale &lt;- 0.25 / ffr_draws[, 1]
-x_scale &lt;- attr(favar$data$x, &quot;scaled:scale&quot;)
+x_scale &lt;- attr(favar[[&quot;data&quot;]][[&quot;x&quot;]], &quot;scaled:scale&quot;)
 
-ir_one &lt;- lapply(names(show), function(i) {
-  r &lt;- unclass(irf(favar, impulse = &quot;FEDFUNDS&quot;, response = i, n_ahead = 20,
-                   cumulative = TRUE, keep_draws = TRUE))
+ir_one &lt;- lapply(names(show_series), function(i) {
+  r &lt;- irf(favar,
+           impulse = &quot;FEDFUNDS&quot;,
+           response = i,
+           n_ahead = 20,
+           cumulative = TRUE,
+           keep_draws = TRUE)
+  r &lt;- unclass(r)
   r &lt;- r * one_scale * x_scale[i]
   if (tcode[i] != 2) {
     r &lt;- 100 * r
   }
   return(r)
 })
-names(ir_one) &lt;- names(show)
+names(ir_one) &lt;- names(show_series)
 ir_one[[&quot;FEDFUNDS&quot;]] &lt;- ffr_draws * one_scale</code></pre>
-<pre class="r"><code>temp &lt;- rbind(
-  cbind(do.call(rbind, Map(summarise_irf, ir_x, units[names(ir_x)])), method = &quot;Two-step&quot;),
-  cbind(do.call(rbind, Map(summarise_irf, ir_one, units[names(ir_one)])), method = &quot;One-step&quot;))
-temp$variable &lt;- factor(temp$variable, levels = units[c(&quot;FEDFUNDS&quot;, names(show))])
+<pre class="r"><code>two_step &lt;- Map(summarise_irf, ir_x, unit_labels[names(ir_x)])
+two_step &lt;- cbind(do.call(rbind, two_step), method = &quot;Two-step&quot;)
+
+one_step &lt;- Map(summarise_irf, ir_one, unit_labels[names(ir_one)])
+one_step &lt;- cbind(do.call(rbind, one_step), method = &quot;One-step&quot;)
+
+temp &lt;- rbind(two_step, one_step)
+temp[[&quot;variable&quot;]] &lt;- factor(temp[[&quot;variable&quot;]], levels = panel_order)
 
 ggplot(temp, aes(x = h, y = median, colour = method, fill = method)) +
   geom_hline(yintercept = 0, colour = &quot;grey50&quot;) +
@@ -307,7 +373,8 @@ ggplot(temp, aes(x = h, y = median, colour = method, fill = method)) +
   theme(legend.position = &quot;bottom&quot;,
         legend.title = element_blank()) +
   labs(title = &quot;Responses to a monetary policy shock of 25 basis points&quot;,
-       x = &quot;Quarters&quot;, y = NULL,
+       x = &quot;Quarters&quot;,
+       y = NULL,
        caption = &quot;Median and 90 per cent credible intervals.&quot;)</code></pre>
 <p><img src="/timeseries/favarintro_files/figure-html/onestep-plot-1.png" alt="" width="768" /></p>
 <p>Both approaches tell the same story. In the one-step model, real GDP falls by up to 0.2 per cent after 6 quarters, compared to 0.21 per cent after 7 quarters in the two-step model, and the other real variables and prices respond very similarly as well. The federal funds rate is somewhat more persistent in the one-step model. The initial increase of consumer prices almost disappears, and the less plausible rise of the S&amp;P 500 is about half as large as in the two-step model. The width of the credible intervals of the series in the panel is between 1.0 and 1.3 times that of the two-step approach. Thus, accounting for the uncertainty about the factors does not change the conclusions in this application.</p>

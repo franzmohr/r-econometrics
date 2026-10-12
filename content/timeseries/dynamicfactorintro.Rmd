@@ -12,7 +12,7 @@ tags:
 ---
 
 ```{r setup, include = FALSE}
-knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+knitr::opts_chunk[["set"]](message = FALSE, warning = FALSE)
 ```
 
 ## Introduction
@@ -65,14 +65,16 @@ The `dfmtools` package estimates dynamic factor models as described above using 
 
 ```{r install, eval = FALSE}
 # install.packages("remotes")
-remotes::install_github("franzmohr/bayests-r")
-remotes::install_github("franzmohr/dfmtools")
+library("remotes")
+
+install_github("franzmohr/bayests-r")
+install_github("franzmohr/dfmtools")
 ```
 
 The following application is a reproduction of exercise 18.4 in the textbook of Chan et al. (2019), where quarterly data on 196 macroeconomic variables is used to extract a common factor for the US. The series come from the FRED-QD database of McCracken and Ng (2020) and cover the period from 1959Q3 to 2015Q3. They are already transformed to be stationary, and the prepared data set is contained in the package. The first series is the growth rate of real GDP, so that the factor moves in the same direction as GDP.
 
 ```{r data}
-library(dfmtools)
+library("dfmtools")
 
 # Load data
 data("bem_dfmdata")
@@ -85,8 +87,11 @@ Following the logic of the `bvartools` package, the estimation process is divide
 set.seed(123456789)
 
 # Generate the model
-model <- create_dfmodel(x = bem_dfmdata, p = 1, n = 1,
-                        iterations = 5000, burnin = 1000)
+model <- create_dfmodel(x = bem_dfmdata,
+                        p = 1,
+                        n = 1,
+                        iterations = 5000,
+                        burnin = 1000)
 ```
 
 Second, prior information is added to the model with `add_priors`. The same priors as in Chan et al. (2019) are used. The priors of the loadings `lambda` and the transition coefficients `a` are normal with mean zero and are specified as precisions. The arguments `u` and `v` contain the shape and rate parameters of the gamma priors of the precisions of the two error terms. Then, `add_initial_values` adds starting values for the sampler. By default, the loadings start at the values implied by the first principal component of the data.
@@ -110,21 +115,29 @@ model <- add_posterior_coefficients(model)
 Fourth, the results are evaluated. The draws of each block of parameters are stored in `model$posterior`, with one row per draw. Since the whole path of the factor is part of every draw, the posterior median and a credible interval of the factor can be obtained for every period. The following figure compares the factor with the growth rate of real GDP. The factor is measured in the units of the common component of GDP growth, whose variance is much smaller than that of GDP growth itself. Therefore, both series are standardised for the comparison.
 
 ```{r factor, fig.width = 6, fig.height = 3.5}
-library(ggplot2)
+library("ggplot2")
 
 # Posterior median and 80 per cent credible interval of the factor
-f <- apply(model$posterior$factors$coeffs, 2, quantile, probs = c(0.1, 0.5, 0.9))
+factor_draws <- model[["posterior"]][["factors"]][["coeffs"]]
+f <- apply(factor_draws, 2, quantile, probs = c(0.1, 0.5, 0.9))
 
 # Standardise the factor by the standard deviation of its median
 f <- (f - mean(f[2, ])) / sd(f[2, ])
 
 temp <- data.frame(date = as.numeric(time(bem_dfmdata)),
-                   lower = f[1, ], median = f[2, ], upper = f[3, ],
-                   gdp = model$data$x[, "GDPC96"])
+                   lower = f[1, ],
+                   median = f[2, ],
+                   upper = f[3, ],
+                   gdp = model[["data"]][["x"]][, "GDPC96"])
+
+factor_caption <- paste0("Both series standardised. Posterior median and ",
+                         "80 per cent credible interval of the factor.")
 
 ggplot(temp, aes(x = date)) +
   geom_hline(yintercept = 0, colour = "grey50") +
-  geom_ribbon(aes(ymin = lower, ymax = upper), fill = "steelblue", alpha = 0.3) +
+  geom_ribbon(aes(ymin = lower, ymax = upper),
+              fill = "steelblue",
+              alpha = 0.3) +
   geom_line(aes(y = median, colour = "Factor")) +
   geom_line(aes(y = gdp, colour = "Real GDP growth"), alpha = 0.7) +
   scale_colour_manual(values = c("steelblue4", "darkorange")) +
@@ -132,12 +145,13 @@ ggplot(temp, aes(x = date)) +
   theme(legend.position = "bottom",
         legend.title = element_blank()) +
   labs(title = "Common factor of 196 US macroeconomic series",
-       x = NULL, y = NULL,
-       caption = "Both series standardised. Posterior median and 80 per cent credible interval of the factor.")
+       x = NULL,
+       y = NULL,
+       caption = factor_caption)
 ```
 
 ```{r numbers, include = FALSE}
-gdp_cor <- cor(temp$median, temp$gdp)
+gdp_cor <- cor(temp[["median"]], temp[["gdp"]])
 ```
 
 The factor closely follows the growth rate of GDP, with a correlation of `r round(gdp_cor, 2)`, and shows pronounced declines in every recession. It is smoother than GDP growth, since it summarises the movement of many series and leaves their idiosyncratic noise to the error term. This is why the factor can be interpreted as a measure of general economic activity.
@@ -145,7 +159,7 @@ The factor closely follows the growth rate of GDP, with a correlation of `r roun
 The loadings show, which series are most closely related to the factor. Their posterior means can be obtained from the draws of `lambda`. Note that the loading of the first series is fixed at one, but it is reported as well, so that the draws contain a value for each series.
 
 ```{r loadings}
-lambda <- colMeans(model$posterior$lambda$coeffs)
+lambda <- colMeans(model[["posterior"]][["lambda"]][["coeffs"]])
 names(lambda) <- colnames(bem_dfmdata)
 
 # Series with the largest absolute loadings
@@ -170,7 +184,8 @@ m <- ncol(bem_dfmdata)
 gdp_pos <- which(colnames(bem_dfmdata) == "GDPC96")
 
 # Draws of the GDP forecast in normalised units
-fc <- model$posterior$forecast$forecasts[, seq(gdp_pos, 8 * m, by = m)]
+forecast_draws <- model[["posterior"]][["forecast"]][["forecasts"]]
+fc <- forecast_draws[, seq(gdp_pos, 8 * m, by = m)]
 
 # Back to quarterly growth rates in per cent
 gdp <- bem_dfmdata[, "GDPC96"]
@@ -182,8 +197,8 @@ round(fc, 2)
 ```
 
 ```{r forecast-numbers, include = FALSE}
-a <- median(model$posterior$a$coeffs)
-f_last <- median(model$posterior$factors$coeffs[, ncol(model$posterior$factors$coeffs)])
+a <- median(model[["posterior"]][["a"]][["coeffs"]])
+f_last <- median(factor_draws[, ncol(factor_draws)])
 ```
 
 The median forecast is close to the average quarterly growth rate of the sample, `r round(100 * mean(gdp), 2)` per cent, at all horizons. The factor is persistent, with a posterior median of the transition coefficient of `r round(a, 2)`, but at the end of the sample it is close to zero, i.e. economic activity was close to its average, so that there is no deviation from average growth to carry forward. The wide credible intervals reflect that the model predicts the whole distribution of GDP growth, including its idiosyncratic part, which the factor does not capture.

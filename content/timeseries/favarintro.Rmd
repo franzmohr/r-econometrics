@@ -15,7 +15,7 @@ tags:
 ---
 
 ```{r setup, include = FALSE}
-knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+knitr::opts_chunk[["set"]](message = FALSE, warning = FALSE)
 ```
 
 ## Introduction
@@ -25,42 +25,47 @@ As we saw in the [post on vector autoregressive (VAR) models](/timeseries/varint
 *Factor-augmented VAR (FAVAR) models* address this issue. They summarise the information in a large panel of time series by a small number of *factors*, which are common drivers of the observed variables, and add these factors to an otherwise standard VAR. The idea behind factors becomes clear when looking at a few measures of economic activity. Growth in GDP, industrial production and private consumption measure different things, but they move together:
 
 ```{r activity, fig.width = 6, fig.height = 3.5}
-library(bvartools)
-library(ggplot2)
-library(tidyr)
+library("bvartools")
+library("ggplot2")
+library("scales")
+library("tidyr")
 
 # Download a fixed vintage of the FRED-QD database
-url <- "https://www.stlouisfed.org/-/media/project/frbstl/stlouisfed/research/fred-md/quarterly/2026-09-qd.csv"
-raw <- read.csv(url)
+qd_url <- paste0("https://www.stlouisfed.org/-/media/project/frbstl/",
+                 "stlouisfed/research/fred-md/quarterly/2026-09-qd.csv")
+qd_raw <- read.csv(qd_url)
 
 # The first two rows contain information on the series, the rest the data
-flag <- unlist(raw[1, -1])
-tcode <- unlist(raw[2, -1])
-date <- as.Date(raw[-(1:2), 1], format = "%m/%d/%Y")
-levels <- as.matrix(raw[-(1:2), -1])
+flag <- unlist(qd_raw[1, -1])
+tcode <- unlist(qd_raw[2, -1])
+dates <- as.Date(qd_raw[-(1:2), 1], format = "%m/%d/%Y")
+qd_levels <- as.matrix(qd_raw[-(1:2), -1])
 
 # Sample period
-sample <- date >= as.Date("1960-01-01") & date <= as.Date("2007-12-01")
+in_sample <- dates >= as.Date("1960-01-01") & dates <= as.Date("2007-12-01")
 
 # Year-on-year growth of three measures of economic activity
-activity <- c(GDPC1 = "GDP", INDPRO = "Industrial production",
+activity <- c(GDPC1 = "GDP",
+              INDPRO = "Industrial production",
               PCECC96 = "Private consumption")
-growth <- apply(log(levels[, names(activity)]), 2,
-                function(x) {c(rep(NA, 4), diff(x, lag = 4))})
+growth <- apply(log(qd_levels[, names(activity)]),
+                2,
+                function(x) {return(c(rep(NA, 4), diff(x, lag = 4)))})
 colnames(growth) <- activity
 
-temp <- data.frame(date = date, growth, check.names = FALSE)[sample, ]
+temp <- data.frame(date = dates, growth, check.names = FALSE)[in_sample, ]
 temp <- pivot_longer(temp, cols = -date)
 
 ggplot(temp, aes(x = date, y = value, colour = name)) +
   geom_hline(yintercept = 0) +
   geom_line() +
-  scale_y_continuous(labels = scales::percent_format()) +
+  scale_y_continuous(labels = percent_format()) +
   theme_bw() +
   theme(legend.position = "bottom",
         legend.title = element_blank()) +
   labs(title = "Measures of economic activity",
-       x = NULL, y = "Log-growth rate (y-o-y)",
+       x = NULL,
+       y = "Log-growth rate (y-o-y)",
        caption = "Source: FRED-QD, vintage 2026-09.")
 ```
 
@@ -108,21 +113,24 @@ The first row of the FRED-QD file marks the series that McCracken and Ng (2020) 
 ```{r data}
 # Transformations, which are applied to the series
 transform_series <- function(x, code) {
-  switch(as.character(code),
-         "1" = x,                   # Level
-         "2" = c(NA, diff(x)),       # First difference
-         "4" = log(x),              # Log level
-         "5" = c(NA, diff(log(x))), # Log difference
-         "6" = c(NA, diff(log(x))), # Log difference instead of second difference
-         rep(NA, length(x)))        # Codes that are not used here
+  result <- switch(as.character(code),
+                   "1" = x,                   # Level
+                   "2" = c(NA, diff(x)),      # First difference
+                   "4" = log(x),              # Log level
+                   "5" = c(NA, diff(log(x))), # Log difference
+                   # Log difference instead of second difference
+                   "6" = c(NA, diff(log(x))),
+                   rep(NA, length(x)))        # Codes that are not used here
+  return(result)
 }
 
 # Transform all series and select the sample period
-x <- sapply(colnames(levels), function(i) {transform_series(levels[, i], tcode[i])})
-x <- x[sample, ]
+x <- sapply(colnames(qd_levels),
+            function(i) {return(transform_series(qd_levels[, i], tcode[i]))})
+x <- x[in_sample, ]
 
 # Federal funds rate in levels
-ffr <- levels[sample, "FEDFUNDS"]
+ffr <- qd_levels[in_sample, "FEDFUNDS"]
 
 # Informational panel: series for factor estimation without missing values
 panel <- names(flag)[flag == 1 & names(flag) != "FEDFUNDS"]
@@ -137,7 +145,8 @@ FRED-QD sorts its series into groups. The slow-moving variables are taken from t
 ```{r slow}
 # Names of the series between two series in the database
 series_range <- function(from, to) {
-  colnames(levels)[match(from, colnames(levels)):match(to, colnames(levels))]
+  series <- colnames(qd_levels)
+  return(series[match(from, series):match(to, series)])
 }
 
 slow <- intersect(panel, c(series_range("GDPC1", "HWIx"),
@@ -153,8 +162,8 @@ n_factors <- 3
 
 # Principal components of the whole panel and of the slow-moving variables
 pc_all <- prcomp(x_panel)
-f_all <- pc_all$x[, 1:n_factors]
-f_slow <- prcomp(x_panel[, slow])$x[, 1:n_factors]
+f_all <- pc_all[["x"]][, 1:n_factors]
+f_slow <- prcomp(x_panel[, slow])[["x"]][, 1:n_factors]
 
 # Remove the direct effect of the federal funds rate
 fit <- lm(f_all ~ f_slow + ffr)
@@ -162,7 +171,7 @@ f <- f_all - outer(ffr, coef(fit)["ffr", ])
 colnames(f) <- paste0("f", 1:n_factors)
 
 # Share of the variance of the panel explained by each factor
-share <- summary(pc_all)$importance[2, 1:n_factors]
+share <- summary(pc_all)[["importance"]][2, 1:n_factors]
 ```
 
 The three factors explain `r round(100 * share[1])`, `r round(100 * share[2])` and `r round(100 * share[3])` per cent of the variance of the panel. These are substantial shares for a panel that combines real activity, prices, financial markets and survey data.
@@ -175,8 +184,11 @@ The cleaned factors and the federal funds rate form the vector of variables in t
 y <- ts(cbind(f, ffr = ffr), start = c(1960, 1), frequency = 4)
 
 set.seed(20261012)
-model <- create_bvarmodel(y, p = 4, deterministic = "const",
-                          iterations = 10000, burnin = 2000)
+model <- create_bvarmodel(y,
+                          p = 4,
+                          deterministic = "const",
+                          iterations = 10000,
+                          burnin = 2000)
 model <- add_priors(model,
                     coef = list(v_i = 1 / 10, v_i_det = 1 / 100),
                     sigma = list(df = 6, scale = 1))
@@ -188,14 +200,19 @@ The monetary policy shock is identified recursively by ordering the federal fund
 
 ```{r irf}
 responses <- lapply(colnames(y), function(i) {
-  unclass(irf(model, impulse = "ffr", response = i, n_ahead = 20,
-              type = "oir", keep_draws = TRUE))
+  result <- irf(model,
+                impulse = "ffr",
+                response = i,
+                n_ahead = 20,
+                type = "oir",
+                keep_draws = TRUE)
+  return(unclass(result))
 })
 names(responses) <- colnames(y)
 
 # Rescale each draw to a shock of 25 basis points
 shock_scale <- 0.25 / responses[["ffr"]][, 1]
-responses <- lapply(responses, function(r) {r * shock_scale})
+responses <- lapply(responses, function(r) {return(r * shock_scale)})
 ```
 
 ### Responses of observed series
@@ -205,56 +222,72 @@ The main advantage of a FAVAR is that the responses of every series in the datab
 Since the series enter the model as differences, their responses are cumulated to obtain the response of their levels. Responses of series in logs are multiplied by 100, so that they are percentage deviations.
 
 ```{r responses}
-show <- c(GDPC1 = "Real GDP", INDPRO = "Industrial production",
-          PAYEMS = "Payroll employment", UNRATE = "Unemployment rate",
-          CPIAUCSL = "Consumer prices", HOUST = "Housing starts",
-          M2REAL = "Real M2", S.P.500 = "S&P 500")
+show_series <- c(GDPC1 = "Real GDP",
+                 INDPRO = "Industrial production",
+                 PAYEMS = "Payroll employment",
+                 UNRATE = "Unemployment rate",
+                 CPIAUCSL = "Consumer prices",
+                 HOUST = "Housing starts",
+                 M2REAL = "Real M2",
+                 S.P.500 = "S&P 500")
 
 # Loadings of the series on the factors and the federal funds rate
-loadings <- coef(lm(x[, names(show)] ~ unclass(y)))[-1, ]
+x_loadings <- coef(lm(x[, names(show_series)] ~ unclass(y)))[-1, ]
 
 # Responses of the series, cumulated to levels
-ir_x <- lapply(names(show), function(i) {
-  r <- Reduce(`+`, Map(function(ir, l) {ir * l}, responses, loadings[, i]))
+ir_x <- lapply(names(show_series), function(i) {
+  weighted <- Map(function(ir, l) {return(ir * l)},
+                  responses,
+                  x_loadings[, i])
+  r <- Reduce(`+`, weighted)
   r <- t(apply(r, 1, cumsum))
   if (tcode[i] != 2) {
     r <- 100 * r
   }
   return(r)
 })
-names(ir_x) <- names(show)
+names(ir_x) <- names(show_series)
 ir_x[["FEDFUNDS"]] <- responses[["ffr"]]
 
 # Median and 90 per cent credible intervals
-units <- c(show, FEDFUNDS = "Federal funds rate")
-units <- paste0(units, ifelse(names(units) %in% c("UNRATE", "FEDFUNDS"), " (pp)", " (%)"))
-names(units) <- c(names(show), "FEDFUNDS")
+unit_labels <- c(show_series, FEDFUNDS = "Federal funds rate")
+in_pp <- names(unit_labels) %in% c("UNRATE", "FEDFUNDS")
+unit_labels <- paste0(unit_labels, ifelse(in_pp, " (pp)", " (%)"))
+names(unit_labels) <- c(names(show_series), "FEDFUNDS")
+panel_order <- unit_labels[c("FEDFUNDS", names(show_series))]
 
 summarise_irf <- function(r, name) {
   q <- apply(r, 2, quantile, probs = c(0.05, 0.5, 0.95))
-  data.frame(variable = name, h = 0:(ncol(r) - 1),
-             lower = q[1, ], median = q[2, ], upper = q[3, ])
+  result <- data.frame(variable = name,
+                       h = 0:(ncol(r) - 1),
+                       lower = q[1, ],
+                       median = q[2, ],
+                       upper = q[3, ])
+  return(result)
 }
-temp <- do.call(rbind, Map(summarise_irf, ir_x, units[names(ir_x)]))
-temp$variable <- factor(temp$variable, levels = units[c("FEDFUNDS", names(show))])
+temp <- do.call(rbind, Map(summarise_irf, ir_x, unit_labels[names(ir_x)]))
+temp[["variable"]] <- factor(temp[["variable"]], levels = panel_order)
 ```
 
 ```{r responses-plot, fig.width = 8, fig.height = 7}
 ggplot(temp, aes(x = h, y = median)) +
   geom_hline(yintercept = 0, colour = "grey50") +
-  geom_ribbon(aes(ymin = lower, ymax = upper), fill = "steelblue", alpha = 0.3) +
+  geom_ribbon(aes(ymin = lower, ymax = upper),
+              fill = "steelblue",
+              alpha = 0.3) +
   geom_line(colour = "steelblue4") +
   facet_wrap(~ variable, scales = "free_y", ncol = 3) +
   theme_bw() +
   labs(title = "Responses to a monetary policy shock of 25 basis points",
-       x = "Quarters", y = NULL,
+       x = "Quarters",
+       y = NULL,
        caption = "Median and 90 per cent credible intervals.")
 ```
 
 ```{r numbers, include = FALSE}
 peak <- function(r) {
   m <- apply(r, 2, median)
-  c(value = min(m), h = unname(which.min(m)) - 1)
+  return(c(value = min(m), h = unname(which.min(m)) - 1))
 }
 gdp <- peak(ir_x[["GDPC1"]])
 ip <- peak(ir_x[["INDPRO"]])
@@ -273,11 +306,16 @@ The response of prices is one of the main motivations behind the FAVAR approach.
 To illustrate this, the same recursive identification is applied to a small VAR with GDP growth, inflation and the federal funds rate.
 
 ```{r small-var}
-small <- cbind(gdp = 100 * x[, "GDPC1"], cpi = 100 * x[, "CPIAUCSL"], ffr = ffr)
+small <- cbind(gdp = 100 * x[, "GDPC1"],
+               cpi = 100 * x[, "CPIAUCSL"],
+               ffr = ffr)
 small <- ts(small, start = c(1960, 1), frequency = 4)
 
-small_model <- create_bvarmodel(small, p = 4, deterministic = "const",
-                                iterations = 10000, burnin = 2000)
+small_model <- create_bvarmodel(small,
+                                p = 4,
+                                deterministic = "const",
+                                iterations = 10000,
+                                burnin = 2000)
 small_model <- add_priors(small_model,
                           coef = list(v_i = 1 / 10, v_i_det = 1 / 100),
                           sigma = list(df = 6, scale = 1))
@@ -285,10 +323,20 @@ small_model <- add_initial_values(small_model)
 small_model <- add_posterior_coefficients(small_model)
 
 # Responses of inflation and the federal funds rate
-small_cpi <- unclass(irf(small_model, impulse = "ffr", response = "cpi",
-                         n_ahead = 20, type = "oir", keep_draws = TRUE))
-small_ffr <- unclass(irf(small_model, impulse = "ffr", response = "ffr",
-                         n_ahead = 0, type = "oir", keep_draws = TRUE))
+small_cpi <- irf(small_model,
+                 impulse = "ffr",
+                 response = "cpi",
+                 n_ahead = 20,
+                 type = "oir",
+                 keep_draws = TRUE)
+small_cpi <- unclass(small_cpi)
+small_ffr <- irf(small_model,
+                 impulse = "ffr",
+                 response = "ffr",
+                 n_ahead = 0,
+                 type = "oir",
+                 keep_draws = TRUE)
+small_ffr <- unclass(small_ffr)
 
 # Rescale to 25 basis points and cumulate inflation to the price level
 small_cpi <- t(apply(small_cpi * 0.25 / small_ffr[, 1], 1, cumsum))
@@ -306,7 +354,8 @@ ggplot(temp, aes(x = h, y = median, colour = variable, fill = variable)) +
   theme(legend.position = "bottom",
         legend.title = element_blank()) +
   labs(title = "Response of consumer prices (%)",
-       x = "Quarters", y = NULL,
+       x = "Quarters",
+       y = NULL,
        caption = "Median and 90 per cent credible intervals.")
 ```
 
@@ -314,7 +363,7 @@ ggplot(temp, aes(x = h, y = median, colour = variable, fill = variable)) +
 small_q <- apply(small_cpi, 2, quantile, probs = c(0.05, 0.5, 0.95))
 
 # First quarter, in which the median response is negative
-turns_negative <- function(q) {which(q[2, -1] < 0)[1]}
+turns_negative <- function(q) {return(which(q[2, -1] < 0)[1])}
 ```
 
 Both models show an increase of the price level after the tightening. In the small VAR it is larger and more persistent: after four quarters the median response is `r round(small_q[2, 5], 2)` per cent compared to `r round(cpi[2, 5], 2)` per cent in the FAVAR, and the median falls below zero only after `r turns_negative(small_q)` quarters, while in the FAVAR it does so after `r turns_negative(cpi)` quarters. The additional information in the factors therefore weakens the price puzzle, although it does not remove it completely. BBE report a similar result for their sample.
@@ -328,7 +377,7 @@ The one-step approach is implemented in the `dfmtools` package, whose installati
 Since the factors are no longer principal components, they need a different normalisation. `dfmtools` restricts the leading $N \times N$ block of $\lambda^{f}$ to the identity matrix and the corresponding rows of $\lambda^{y}$ to zero. Thus, the first $N$ series of the panel are the factors plus idiosyncratic noise. This makes the order of the panel a substantive choice: the first series should be broad slow-moving measures, since they define the factors. Following the vignette of the package, industrial production, payroll employment and consumer prices are used. They are aggregates and not part of the panel above, so they are added at the beginning. The same is done for the remaining series, whose responses are shown below, since the one-step approach only produces responses for the series of the panel.
 
 ```{r onestep-data}
-library(dfmtools)
+library("dfmtools")
 
 # Series that define the factors and further series, whose responses are shown
 identifiers <- c("INDPRO", "PAYEMS", "CPIAUCSL")
@@ -345,15 +394,20 @@ slow_one <- c(identifiers, "GDPC1", "UNRATE", slow)
 Instead of cleaning the factors, the distinction between slow-moving and fast-moving variables enters the model as a restriction: the loadings of the slow-moving series on the federal funds rate are set to zero, so that they cannot react to it within the same quarter. Together with the identity block this implies that the factors do not react to the policy rate within the quarter either. The restriction is specified with argument `slow` of `add_priors`. The model has the same number of factors and lags as above, and `create_favarmodel` normalises the series of the panel by default.
 
 ```{r onestep-model}
-favar <- create_favarmodel(x = x_one, y = ffr_one, p = 4, n = 3,
-                           iterations = 10000, burnin = 2000)
+favar <- create_favarmodel(x = x_one,
+                           y = ffr_one,
+                           p = 4,
+                           n = 3,
+                           iterations = 10000,
+                           burnin = 2000)
 favar <- add_priors(favar, slow = slow_one)
 favar <- add_initial_values(favar)
 favar <- add_posterior_coefficients(favar)
 ```
 
 ```{r onestep-check, include = FALSE}
-lambda_one <- matrix(colMeans(favar$posterior$lambda$coeffs), nrow = length(panel_one))
+lambda_one <- colMeans(favar[["posterior"]][["lambda"]][["coeffs"]])
+lambda_one <- matrix(lambda_one, nrow = length(panel_one))
 slow_max <- max(abs(lambda_one[panel_one %in% slow_one, n_factors + 1]))
 ```
 
@@ -363,29 +417,42 @@ The `irf` method of `dfmtools` computes the responses of the series in the panel
 
 ```{r onestep-irf}
 # Response of the federal funds rate, used to rescale the shock
-ffr_draws <- unclass(irf(favar, impulse = "FEDFUNDS", response = "FEDFUNDS",
-                         n_ahead = 20, keep_draws = TRUE))
+ffr_draws <- irf(favar,
+                 impulse = "FEDFUNDS",
+                 response = "FEDFUNDS",
+                 n_ahead = 20,
+                 keep_draws = TRUE)
+ffr_draws <- unclass(ffr_draws)
 one_scale <- 0.25 / ffr_draws[, 1]
-x_scale <- attr(favar$data$x, "scaled:scale")
+x_scale <- attr(favar[["data"]][["x"]], "scaled:scale")
 
-ir_one <- lapply(names(show), function(i) {
-  r <- unclass(irf(favar, impulse = "FEDFUNDS", response = i, n_ahead = 20,
-                   cumulative = TRUE, keep_draws = TRUE))
+ir_one <- lapply(names(show_series), function(i) {
+  r <- irf(favar,
+           impulse = "FEDFUNDS",
+           response = i,
+           n_ahead = 20,
+           cumulative = TRUE,
+           keep_draws = TRUE)
+  r <- unclass(r)
   r <- r * one_scale * x_scale[i]
   if (tcode[i] != 2) {
     r <- 100 * r
   }
   return(r)
 })
-names(ir_one) <- names(show)
+names(ir_one) <- names(show_series)
 ir_one[["FEDFUNDS"]] <- ffr_draws * one_scale
 ```
 
 ```{r onestep-plot, fig.width = 8, fig.height = 7.5}
-temp <- rbind(
-  cbind(do.call(rbind, Map(summarise_irf, ir_x, units[names(ir_x)])), method = "Two-step"),
-  cbind(do.call(rbind, Map(summarise_irf, ir_one, units[names(ir_one)])), method = "One-step"))
-temp$variable <- factor(temp$variable, levels = units[c("FEDFUNDS", names(show))])
+two_step <- Map(summarise_irf, ir_x, unit_labels[names(ir_x)])
+two_step <- cbind(do.call(rbind, two_step), method = "Two-step")
+
+one_step <- Map(summarise_irf, ir_one, unit_labels[names(ir_one)])
+one_step <- cbind(do.call(rbind, one_step), method = "One-step")
+
+temp <- rbind(two_step, one_step)
+temp[["variable"]] <- factor(temp[["variable"]], levels = panel_order)
 
 ggplot(temp, aes(x = h, y = median, colour = method, fill = method)) +
   geom_hline(yintercept = 0, colour = "grey50") +
@@ -396,14 +463,22 @@ ggplot(temp, aes(x = h, y = median, colour = method, fill = method)) +
   theme(legend.position = "bottom",
         legend.title = element_blank()) +
   labs(title = "Responses to a monetary policy shock of 25 basis points",
-       x = "Quarters", y = NULL,
+       x = "Quarters",
+       y = NULL,
        caption = "Median and 90 per cent credible intervals.")
 ```
 
 ```{r onestep-numbers, include = FALSE}
 gdp_one <- peak(ir_one[["GDPC1"]])
-width <- function(r) {mean(apply(r, 2, quantile, 0.95) - apply(r, 2, quantile, 0.05))}
-width_ratio <- sapply(names(show), function(i) {width(ir_one[[i]]) / width(ir_x[[i]])})
+width <- function(r) {
+  upper <- apply(r, 2, quantile, 0.95)
+  lower <- apply(r, 2, quantile, 0.05)
+  return(mean(upper - lower))
+}
+
+width_ratio <- sapply(names(show_series), function(i) {
+  return(width(ir_one[[i]]) / width(ir_x[[i]]))
+})
 ```
 
 Both approaches tell the same story. In the one-step model, real GDP falls by up to `r abs(round(gdp_one["value"], 2))` per cent after `r gdp_one["h"]` quarters, compared to `r abs(round(gdp["value"], 2))` per cent after `r gdp["h"]` quarters in the two-step model, and the other real variables and prices respond very similarly as well. The federal funds rate is somewhat more persistent in the one-step model. The initial increase of consumer prices almost disappears, and the less plausible rise of the S&P 500 is about half as large as in the two-step model. The width of the credible intervals of the series in the panel is between `r format(round(min(width_ratio), 1), nsmall = 1)` and `r format(round(max(width_ratio), 1), nsmall = 1)` times that of the two-step approach. Thus, accounting for the uncertainty about the factors does not change the conclusions in this application.
