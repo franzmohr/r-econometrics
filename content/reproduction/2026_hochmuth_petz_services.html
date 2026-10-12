@@ -42,39 +42,30 @@ library(&quot;tidyr&quot;)</code></pre>
 library(&quot;eurostat&quot;)
 
 # Eurostat, ECOICOP ver. 2: services, NEIG and goods, 2025 = 100
-hicp_new &lt;- get_eurostat(
-  &quot;prc_hicp_minr&quot;,
-  time_format = &quot;raw&quot;,
-  cache = FALSE,
-  filters = list(
-    geo = &quot;EA&quot;,
-    unit = &quot;I25&quot;,
-    coicop18 = c(&quot;SERV&quot;, &quot;IGD_NNRG&quot;, &quot;GD&quot;)
-  )
-) %&gt;%
-  transmute(
-    month = as.character(time),
-    series = coicop18,
-    index = values
-  ) %&gt;%
+hicp_filters &lt;- list(geo = &quot;EA&quot;,
+                     unit = &quot;I25&quot;,
+                     coicop18 = c(&quot;SERV&quot;, &quot;IGD_NNRG&quot;, &quot;GD&quot;))
+
+hicp_new &lt;- get_eurostat(&quot;prc_hicp_minr&quot;,
+                         time_format = &quot;raw&quot;,
+                         cache = FALSE,
+                         filters = hicp_filters) %&gt;%
+  transmute(month = as.character(time),
+            series = coicop18,
+            index = values) %&gt;%
   filter(month &lt;= &quot;2026-06&quot;)
 
 # ECB, ECOICOP ver. 1: index levels (INX) and annual rates (ANR), 1996-2001
-hicp_old &lt;- get_data(
-  &quot;ICP.M.U2.N.SERV00+IGXE00+GOODS0.4.INX+ANR&quot;,
-  filter = list(startPeriod = &quot;1996-01&quot;, endPeriod = &quot;2001-12&quot;)
-) %&gt;%
-  transmute(
-    month = obstime,
-    series = recode_values(
-      icp_item,
-      &quot;SERV00&quot; ~ &quot;SERV&quot;,
-      &quot;IGXE00&quot; ~ &quot;IGD_NNRG&quot;,
-      &quot;GOODS0&quot; ~ &quot;GD&quot;
-    ),
-    suffix = icp_suffix,
-    value = obsvalue
-  ) %&gt;%
+hicp_old &lt;- get_data(&quot;ICP.M.U2.N.SERV00+IGXE00+GOODS0.4.INX+ANR&quot;,
+                     filter = list(startPeriod = &quot;1996-01&quot;,
+                                   endPeriod = &quot;2001-12&quot;)) %&gt;%
+  transmute(month = obstime,
+            series = recode_values(icp_item,
+                                   &quot;SERV00&quot; ~ &quot;SERV&quot;,
+                                   &quot;IGXE00&quot; ~ &quot;IGD_NNRG&quot;,
+                                   &quot;GOODS0&quot; ~ &quot;GD&quot;),
+            suffix = icp_suffix,
+            value = obsvalue) %&gt;%
   pivot_wider(names_from = suffix, values_from = value)
 
 # Fill a missing index level from the same month a year earlier and the
@@ -83,12 +74,8 @@ hicp_old &lt;- hicp_old %&gt;%
   mutate(calendar_month = substr(month, 6, 7)) %&gt;%
   arrange(series, calendar_month, month) %&gt;%
   group_by(series, calendar_month) %&gt;%
-  mutate(
-    chained = cumprod(
-      if_else(row_number() == 1, INX, 1 + ANR / 100)
-    ),
-    INX = coalesce(INX, chained)
-  ) %&gt;%
+  mutate(chained = cumprod(if_else(row_number() == 1, INX, 1 + ANR / 100)),
+         INX = coalesce(INX, chained)) %&gt;%
   ungroup()
 
 # Back-cast each Eurostat series with the growth of its ECB counterpart
@@ -99,18 +86,16 @@ hicp &lt;- hicp_new %&gt;%
   full_join(hicp_old_index, by = c(&quot;month&quot;, &quot;series&quot;)) %&gt;%
   arrange(series, month) %&gt;%
   group_by(series) %&gt;%
-  mutate(
-    first_month = min(month[!is.na(index)]),
-    index = coalesce(
-      index,
-      index[month == first_month] * old / old[month == first_month]
-    )
-  ) %&gt;%
+  mutate(first_month = min(month[!is.na(index)]),
+         first_index = index[month == first_month],
+         first_old = old[month == first_month],
+         index = coalesce(index, first_index * old / first_old)) %&gt;%
   ungroup()
 
 hicp %&gt;%
-  pivot_wider(id_cols = month, names_from = series,
-                     values_from = index) %&gt;%
+  pivot_wider(id_cols = month,
+              names_from = series,
+              values_from = index) %&gt;%
   select(month, GD, IGD_NNRG, SERV) %&gt;%
   write.csv(&quot;_2026_hochmuth_petz_hicp.csv&quot;, row.names = FALSE)</code></pre>
 <p>The result is in a small file next to this page, so that the post does not change with the next vintage:</p>
@@ -121,139 +106,124 @@ hicp %&gt;%
 # X-13ARIMA-SEATS with the defaults of seasonal, series by series
 hicp &lt;- hicp %&gt;%
   group_by(series) %&gt;%
-  mutate(
-    index_sa = ts(index, start = c(1996, 1), frequency = 12) %&gt;%
-      seas() %&gt;%
-      final() %&gt;%
-      as.numeric()
-  ) %&gt;%
+  mutate(index_sa = ts(index, start = c(1996, 1), frequency = 12) %&gt;%
+           seas() %&gt;%
+           final() %&gt;%
+           as.numeric()) %&gt;%
   ungroup()
 
 # Quarterly averages, dated by the start of the quarter: 1996.25 is 1996 Q2
 prices &lt;- hicp %&gt;%
-  mutate(
-    quarter = as.integer(substr(month, 1, 4)) +
-      (as.integer(substr(month, 6, 7)) - 1) %/% 3 / 4
-  ) %&gt;%
+  mutate(year = as.integer(substr(month, 1, 4)),
+         month_of_year = as.integer(substr(month, 6, 7)),
+         quarter = year + (month_of_year - 1) %/% 3 / 4) %&gt;%
   group_by(series, quarter) %&gt;%
-  summarise(
-    index = mean(index),
-    index_sa = mean(index_sa),
-    .groups = &quot;drop&quot;
-  )</code></pre>
+  summarise(index = mean(index),
+            index_sa = mean(index_sa),
+            .groups = &quot;drop&quot;)</code></pre>
 </div>
 <div id="the-composition-of-euro-area-inflation" class="section level2">
 <h2>The composition of euro area inflation</h2>
 <p>Chart 1 of the brief splits euro area HICP inflation since 2018 into the contributions of energy, food including alcohol and tobacco, NEIG and services. Eurostat publishes these contributions in percentage points as data set <code>prc_hicp_ctr</code>, and the annual rates of headline and core inflation – the overall index excluding energy, food, alcohol and tobacco – are in <code>prc_hicp_minr</code>:</p>
-<pre class="r"><code>contributions &lt;- get_eurostat(
-  &quot;prc_hicp_ctr&quot;,
-  time_format = &quot;raw&quot;,
-  cache = FALSE,
-  filters = list(
-    geo = &quot;EA&quot;,
-    coicop18 = c(&quot;NRG&quot;, &quot;FOOD&quot;, &quot;IGD_NNRG&quot;, &quot;SERV&quot;)
-  )
-)
+<pre class="r"><code>contribution_filters &lt;- list(geo = &quot;EA&quot;,
+                             coicop18 = c(&quot;NRG&quot;, &quot;FOOD&quot;, &quot;IGD_NNRG&quot;, &quot;SERV&quot;))
 
-inflation &lt;- get_eurostat(
-  &quot;prc_hicp_minr&quot;,
-  time_format = &quot;raw&quot;,
-  cache = FALSE,
-  filters = list(
-    geo = &quot;EA&quot;,
-    unit = &quot;RCH_A&quot;,
-    coicop18 = c(&quot;TOTAL&quot;, &quot;TOT_X_NRG_FOOD&quot;)
-  )
-)
+contributions &lt;- get_eurostat(&quot;prc_hicp_ctr&quot;,
+                              time_format = &quot;raw&quot;,
+                              cache = FALSE,
+                              filters = contribution_filters)
+
+inflation_filters &lt;- list(geo = &quot;EA&quot;,
+                          unit = &quot;RCH_A&quot;,
+                          coicop18 = c(&quot;TOTAL&quot;, &quot;TOT_X_NRG_FOOD&quot;))
+
+inflation &lt;- get_eurostat(&quot;prc_hicp_minr&quot;,
+                          time_format = &quot;raw&quot;,
+                          cache = FALSE,
+                          filters = inflation_filters)
 
 # From 2018 to the brief&#39;s last observation
 bind_rows(contributions, inflation) %&gt;%
-  transmute(
-    month = as.character(time),
-    series = coicop18,
-    value = values
-  ) %&gt;%
+  transmute(month = as.character(time),
+            series = coicop18,
+            value = values) %&gt;%
   filter(month &gt;= &quot;2018-01&quot;, month &lt;= &quot;2026-07&quot;) %&gt;%
   pivot_wider(names_from = series, values_from = value) %&gt;%
   select(month, FOOD, IGD_NNRG, NRG, SERV, TOTAL, TOT_X_NRG_FOOD) %&gt;%
   arrange(month) %&gt;%
   write.csv(&quot;_2026_hochmuth_petz_contributions.csv&quot;, row.names = FALSE)</code></pre>
 <p>The contributions add up to headline inflation up to rounding. The bars of a month are stacked upwards from zero where they are positive and downwards where they are negative. All charts on this page share one set of colours, with services always in blue:</p>
-<pre class="r"><code>colours &lt;- c(
-  red = &quot;#C10016&quot;,
-  blue = &quot;#0F4C81&quot;,
-  amber = &quot;#E8A33D&quot;,
-  teal = &quot;#17807A&quot;,
-  ink = &quot;#22282E&quot;,
-  grid = &quot;#DCE1E5&quot;
-)
+<pre class="r"><code>colours &lt;- c(red = &quot;#C10016&quot;,
+             blue = &quot;#0F4C81&quot;,
+             amber = &quot;#E8A33D&quot;,
+             teal = &quot;#17807A&quot;,
+             ink = &quot;#22282E&quot;,
+             grid = &quot;#DCE1E5&quot;)
 
-component_colours &lt;- c(
-  SERV = colours[[&quot;blue&quot;]],
-  IGD_NNRG = colours[[&quot;teal&quot;]],
-  FOOD = colours[[&quot;amber&quot;]],
-  NRG = colours[[&quot;red&quot;]]
-)</code></pre>
+component_colours &lt;- c(SERV = colours[[&quot;blue&quot;]],
+                       IGD_NNRG = colours[[&quot;teal&quot;]],
+                       FOOD = colours[[&quot;amber&quot;]],
+                       NRG = colours[[&quot;red&quot;]])</code></pre>
 <pre class="r"><code>contributions &lt;- read.csv(&quot;_2026_hochmuth_petz_contributions.csv&quot;) %&gt;%
-  mutate(
-    period = as.integer(substr(month, 1, 4)) +
-      (as.integer(substr(month, 6, 7)) - 1) / 12
-  )
+  mutate(year = as.integer(substr(month, 1, 4)),
+         month_of_year = as.integer(substr(month, 6, 7)),
+         period = year + (month_of_year - 1) / 12)
 
 # Stack the positive contributions of a month upwards from zero, the negative
 # ones downwards, services first
 bars &lt;- contributions %&gt;%
-  pivot_longer(
-    c(SERV, IGD_NNRG, FOOD, NRG),
-    names_to = &quot;component&quot;,
-    values_to = &quot;value&quot;
-  ) %&gt;%
-  mutate(
-    component = factor(component, levels = names(component_colours))
-  ) %&gt;%
+  pivot_longer(c(SERV, IGD_NNRG, FOOD, NRG),
+               names_to = &quot;component&quot;,
+               values_to = &quot;value&quot;) %&gt;%
+  mutate(component = factor(component, levels = names(component_colours))) %&gt;%
   arrange(month, component) %&gt;%
   group_by(month, positive = value &gt;= 0) %&gt;%
-  mutate(top = cumsum(value), bottom = top - value) %&gt;%
+  mutate(top = cumsum(value),
+         bottom = top - value) %&gt;%
   ungroup()
 
-plot(
-  NA,
-  xlim = range(contributions[[&quot;period&quot;]]),
-  ylim = c(-4, 12),
-  xlab = &quot;&quot;,
-  ylab = &quot;Contribution to HICP inflation in %&quot;,
-  main = &quot;HICP components&quot;
-)
+plot(NA,
+     xlim = range(contributions[[&quot;period&quot;]]),
+     ylim = c(-4, 12),
+     xlab = &quot;&quot;,
+     ylab = &quot;Contribution to HICP inflation in %&quot;,
+     main = &quot;HICP components&quot;)
 
 grid(col = colours[[&quot;grid&quot;]], lty = 1)
 
-rect(
-  bars[[&quot;period&quot;]] - 0.035, bars[[&quot;bottom&quot;]],
-  bars[[&quot;period&quot;]] + 0.035, bars[[&quot;top&quot;]],
-  col = component_colours[as.character(bars[[&quot;component&quot;]])],
-  border = NA
-)
+rect(bars[[&quot;period&quot;]] - 0.035,
+     bars[[&quot;bottom&quot;]],
+     bars[[&quot;period&quot;]] + 0.035,
+     bars[[&quot;top&quot;]],
+     col = component_colours[as.character(bars[[&quot;component&quot;]])],
+     border = NA)
 
-lines(contributions[[&quot;period&quot;]], contributions[[&quot;TOTAL&quot;]],
-      lwd = 1.5, col = colours[[&quot;ink&quot;]])
+lines(contributions[[&quot;period&quot;]],
+      contributions[[&quot;TOTAL&quot;]],
+      lwd = 1.5,
+      col = colours[[&quot;ink&quot;]])
 
-lines(contributions[[&quot;period&quot;]], contributions[[&quot;TOT_X_NRG_FOOD&quot;]],
-      lwd = 1.5, lty = 2, col = colours[[&quot;ink&quot;]])
+lines(contributions[[&quot;period&quot;]],
+      contributions[[&quot;TOT_X_NRG_FOOD&quot;]],
+      lwd = 1.5,
+      lty = 2,
+      col = colours[[&quot;ink&quot;]])
 
 abline(h = 0, col = colours[[&quot;ink&quot;]])
 
-legend(
-  &quot;topleft&quot;,
-  legend = c(&quot;Energy&quot;, &quot;Food including alcohol and tobacco&quot;,
-             &quot;Non-energy industrial goods&quot;, &quot;Services&quot;,
-             &quot;HICP inflation in %&quot;, &quot;Core inflation in %&quot;),
-  fill = c(rev(component_colours), NA, NA),
-  border = NA,
-  lty = c(NA, NA, NA, NA, 1, 2),
-  col = colours[[&quot;ink&quot;]],
-  bty = &quot;n&quot;,
-  cex = 0.8
-)</code></pre>
+legend(&quot;topleft&quot;,
+       legend = c(&quot;Energy&quot;,
+                  &quot;Food including alcohol and tobacco&quot;,
+                  &quot;Non-energy industrial goods&quot;,
+                  &quot;Services&quot;,
+                  &quot;HICP inflation in %&quot;,
+                  &quot;Core inflation in %&quot;),
+       fill = c(rev(component_colours), NA, NA),
+       border = NA,
+       lty = c(NA, NA, NA, NA, 1, 2),
+       col = colours[[&quot;ink&quot;]],
+       bty = &quot;n&quot;,
+       cex = 0.8)</code></pre>
 <p><img src="/reproduction/2026_hochmuth_petz_services_files/figure-html/chart1-1.png" alt="" width="672" /></p>
 <p>The chart matches the published one. Headline inflation peaked at 10.6% in October 2022, when energy alone contributed 4.44 percentage points. The contribution of services rose more slowly and peaked later, at 2.47 points in July 2023, and has receded more slowly than the others: in July 2026 it still accounted for 1.55 of 2.9 points, more than half of headline inflation, while energy, which had subtracted from inflation for most of 2023 to 2025, was adding 0.94 points again.</p>
 </div>
@@ -263,62 +233,63 @@ legend(
 <pre class="r"><code>relative_prices &lt;- prices %&gt;%
   select(series, quarter, index) %&gt;%
   pivot_wider(names_from = series, values_from = index) %&gt;%
-  pivot_longer(
-    c(IGD_NNRG, GD),
-    names_to = &quot;goods&quot;,
-    values_to = &quot;goods_index&quot;
-  ) %&gt;%
+  pivot_longer(c(IGD_NNRG, GD),
+               names_to = &quot;goods&quot;,
+               values_to = &quot;goods_index&quot;) %&gt;%
   arrange(goods, quarter) %&gt;%
   group_by(goods) %&gt;%
-  mutate(
-    # Four-quarter moving average, indexed to Q1 2000 = 100
-    ratio = SERV / goods_index,
-    price = (ratio + lag(ratio) + lag(ratio, 2) + lag(ratio, 3)) / 4,
-    price = 100 * price / price[quarter == 2000],
 
-    # Log-linear trend fitted over 1996-2019, extrapolated from there
-    trend = exp(predict(
-      lm(log(price) ~ quarter, subset = quarter &lt; 2020),
-      newdata = data.frame(quarter = quarter)
-    )),
-    growth = 100 * coef(
-      lm(log(price) ~ quarter, subset = quarter &lt; 2020)
-    )[[&quot;quarter&quot;]]
-  ) %&gt;%
+  # Four-quarter moving average, indexed to Q1 2000 = 100
+  mutate(ratio = SERV / goods_index,
+         price = (ratio + lag(ratio) + lag(ratio, 2) + lag(ratio, 3)) / 4,
+         price = 100 * price / price[quarter == 2000]) %&gt;%
+
+  # Log-linear trend fitted over 1996-2019, extrapolated from there
+  mutate(trend = exp(predict(lm(log(price) ~ quarter, subset = quarter &lt; 2020),
+                             newdata = data.frame(quarter = quarter))),
+         growth = 100 * coef(lm(log(price) ~ quarter,
+                                subset = quarter &lt; 2020))[[&quot;quarter&quot;]]) %&gt;%
   ungroup()</code></pre>
 <pre class="r"><code>ea_neig &lt;- filter(relative_prices, goods == &quot;IGD_NNRG&quot;)
 ea_goods &lt;- filter(relative_prices, goods == &quot;GD&quot;)
 
-plot(
-  ea_neig[[&quot;quarter&quot;]], ea_neig[[&quot;price&quot;]],
-  type = &quot;l&quot;,
-  lwd = 2,
-  col = colours[[&quot;teal&quot;]],
-  ylim = range(c(relative_prices[[&quot;price&quot;]], relative_prices[[&quot;trend&quot;]]),
-               na.rm = TRUE),
-  xlab = &quot;&quot;,
-  ylab = &quot;Relative price (Q1 2000 = 100)&quot;,
-  main = &quot;Price of services relative to goods (euro area)&quot;
-)
+price_range &lt;- range(c(relative_prices[[&quot;price&quot;]], relative_prices[[&quot;trend&quot;]]),
+                     na.rm = TRUE)
 
-lines(ea_neig[[&quot;quarter&quot;]], ea_neig[[&quot;trend&quot;]],
-      lwd = 2, lty = 2, col = colours[[&quot;teal&quot;]])
+plot(ea_neig[[&quot;quarter&quot;]],
+     ea_neig[[&quot;price&quot;]],
+     type = &quot;l&quot;,
+     lwd = 2,
+     col = colours[[&quot;teal&quot;]],
+     ylim = price_range,
+     xlab = &quot;&quot;,
+     ylab = &quot;Relative price (Q1 2000 = 100)&quot;,
+     main = &quot;Price of services relative to goods (euro area)&quot;)
 
-lines(ea_goods[[&quot;quarter&quot;]], ea_goods[[&quot;price&quot;]],
-      lwd = 2, col = colours[[&quot;amber&quot;]])
+lines(ea_neig[[&quot;quarter&quot;]],
+      ea_neig[[&quot;trend&quot;]],
+      lwd = 2,
+      lty = 2,
+      col = colours[[&quot;teal&quot;]])
 
-lines(ea_goods[[&quot;quarter&quot;]], ea_goods[[&quot;trend&quot;]],
-      lwd = 2, lty = 2, col = colours[[&quot;amber&quot;]])
+lines(ea_goods[[&quot;quarter&quot;]],
+      ea_goods[[&quot;price&quot;]],
+      lwd = 2,
+      col = colours[[&quot;amber&quot;]])
+
+lines(ea_goods[[&quot;quarter&quot;]],
+      ea_goods[[&quot;trend&quot;]],
+      lwd = 2,
+      lty = 2,
+      col = colours[[&quot;amber&quot;]])
 
 abline(h = 100, col = colours[[&quot;ink&quot;]])
 
-legend(
-  &quot;topleft&quot;,
-  legend = c(&quot;Services relative to NEIG&quot;, &quot;Services relative to goods&quot;),
-  col = colours[c(&quot;teal&quot;, &quot;amber&quot;)],
-  lwd = 2,
-  bty = &quot;n&quot;
-)</code></pre>
+legend(&quot;topleft&quot;,
+       legend = c(&quot;Services relative to NEIG&quot;, &quot;Services relative to goods&quot;),
+       col = colours[c(&quot;teal&quot;, &quot;amber&quot;)],
+       lwd = 2,
+       bty = &quot;n&quot;)</code></pre>
 <p><img src="/reproduction/2026_hochmuth_petz_services_files/figure-html/chart2-1.png" alt="" width="672" /></p>
 <p>Before the pandemic services became 1.3% a year more expensive relative to NEIG, and 0.3% relative to overall goods. Both relative prices fell below their trends in 2021 and 2022. The one against overall goods fell much more, because the energy and food prices it includes rose most, and it has made up less of the loss since. In the second quarter of 2026 services relative to NEIG are 3.2% below the extrapolated trend, which the brief puts at 3.5%, and relative to overall goods 5% below it.</p>
 <p>The euro area series is short, so the brief turns to post-war US data to ask whether such a trend survives large shocks. Chart 3 is the price of services relative to commodities in the US consumer price index for all urban consumers (CPI-U), series <code>CUUR0000SAS</code> and <code>CUUR0000SAC</code> of the Bureau of Labor Statistics. FRED, the database of the Federal Reserve Bank of St. Louis, carries both, and the <a href="https://cran.r-project.org/package=alfred"><code>alfred</code></a> package downloads them:</p>
@@ -331,53 +302,46 @@ full_join(us_services, us_commodities, by = &quot;date&quot;) %&gt;%
   mutate(month = format(date, &quot;%Y-%m&quot;)) %&gt;%
 
   # FRED pads the years with quarterly observations with empty months
-  filter(
-    month &gt;= &quot;1947-01&quot;,
-    month &lt;= &quot;2026-06&quot;,
-    !is.na(CUUR0000SAS)
-  ) %&gt;%
+  filter(month &gt;= &quot;1947-01&quot;,
+         month &lt;= &quot;2026-06&quot;,
+         !is.na(CUUR0000SAS)) %&gt;%
   select(month, CUUR0000SAS, CUUR0000SAC) %&gt;%
   write.csv(&quot;_2026_hochmuth_petz_us_cpi.csv&quot;, row.names = FALSE)</code></pre>
 <p>Both indices are published quarterly until 1955 and monthly after that, and October 2025, when the federal government was shut down, is missing. Quarterly averages of what is there take care of both. The trend is fitted over the whole sample:</p>
 <pre class="r"><code>us_relative_price &lt;- read.csv(&quot;_2026_hochmuth_petz_us_cpi.csv&quot;) %&gt;%
 
   # Quarterly averages of the months observed
-  mutate(
-    quarter = as.integer(substr(month, 1, 4)) +
-      (as.integer(substr(month, 6, 7)) - 1) %/% 3 / 4
-  ) %&gt;%
+  mutate(year = as.integer(substr(month, 1, 4)),
+         month_of_year = as.integer(substr(month, 6, 7)),
+         quarter = year + (month_of_year - 1) %/% 3 / 4) %&gt;%
   group_by(quarter) %&gt;%
-  summarise(
-    services = mean(CUUR0000SAS),
-    commodities = mean(CUUR0000SAC)
-  ) %&gt;%
+  summarise(services = mean(CUUR0000SAS),
+            commodities = mean(CUUR0000SAC)) %&gt;%
 
   # Four-quarter moving average, indexed to Q1 2000 = 100
-  mutate(
-    ratio = services / commodities,
-    price = (ratio + lag(ratio) + lag(ratio, 2) + lag(ratio, 3)) / 4,
-    price = 100 * price / price[quarter == 2000]
-  ) %&gt;%
+  mutate(ratio = services / commodities,
+         price = (ratio + lag(ratio) + lag(ratio, 2) + lag(ratio, 3)) / 4,
+         price = 100 * price / price[quarter == 2000]) %&gt;%
 
   # Log-linear trend over the whole sample since 1950
   filter(quarter &gt;= 1950) %&gt;%
-  mutate(
-    trend = exp(fitted(lm(log(price) ~ quarter))),
-    growth = 100 * coef(lm(log(price) ~ quarter))[[&quot;quarter&quot;]]
-  )
+  mutate(trend = exp(fitted(lm(log(price) ~ quarter))),
+         growth = 100 * coef(lm(log(price) ~ quarter))[[&quot;quarter&quot;]])
 
-plot(
-  us_relative_price[[&quot;quarter&quot;]], us_relative_price[[&quot;price&quot;]],
-  type = &quot;l&quot;,
-  lwd = 2,
-  col = colours[[&quot;blue&quot;]],
-  xlab = &quot;&quot;,
-  ylab = &quot;Relative price (Q1 2000 = 100)&quot;,
-  main = &quot;Price of services relative to commodities (USA)&quot;
-)
+plot(us_relative_price[[&quot;quarter&quot;]],
+     us_relative_price[[&quot;price&quot;]],
+     type = &quot;l&quot;,
+     lwd = 2,
+     col = colours[[&quot;blue&quot;]],
+     xlab = &quot;&quot;,
+     ylab = &quot;Relative price (Q1 2000 = 100)&quot;,
+     main = &quot;Price of services relative to commodities (USA)&quot;)
 
-lines(us_relative_price[[&quot;quarter&quot;]], us_relative_price[[&quot;trend&quot;]],
-      lwd = 2, lty = 2, col = colours[[&quot;blue&quot;]])
+lines(us_relative_price[[&quot;quarter&quot;]],
+      us_relative_price[[&quot;trend&quot;]],
+      lwd = 2,
+      lty = 2,
+      col = colours[[&quot;blue&quot;]])
 
 abline(h = 100, col = colours[[&quot;ink&quot;]])</code></pre>
 <p><img src="/reproduction/2026_hochmuth_petz_services_files/figure-html/chart3-1.png" alt="" width="672" /></p>
@@ -391,11 +355,9 @@ abline(h = 100, col = colours[[&quot;ink&quot;]])</code></pre>
   # Log prices of services (s) and of the other index (n), times 100
   y &lt;- prices %&gt;%
     filter(series %in% c(&quot;SERV&quot;, other)) %&gt;%
-    transmute(
-      quarter,
-      series = if_else(series == &quot;SERV&quot;, &quot;s&quot;, &quot;n&quot;),
-      value = 100 * log(index_sa)
-    ) %&gt;%
+    transmute(quarter,
+              series = if_else(series == &quot;SERV&quot;, &quot;s&quot;, &quot;n&quot;),
+              value = 100 * log(index_sa)) %&gt;%
     pivot_wider(names_from = series, values_from = value) %&gt;%
     arrange(quarter) %&gt;%
     mutate(trend = row_number())
@@ -406,33 +368,25 @@ abline(h = 100, col = colours[[&quot;ink&quot;]])</code></pre>
 
   # Stage 2: a VAR(1) in differences, with the lagged gap as exogenous
   # regressor
-  dy &lt;- ts(
-    diff(as.matrix(y[, c(&quot;s&quot;, &quot;n&quot;)])),
-    start = y[[&quot;quarter&quot;]][2],
-    frequency = 4
-  )
+  dy &lt;- ts(diff(as.matrix(y[, c(&quot;s&quot;, &quot;n&quot;)])),
+           start = y[[&quot;quarter&quot;]][2],
+           frequency = 4)
 
-  ect &lt;- ts(
-    matrix(head(gap, -1), dimnames = list(NULL, &quot;ect&quot;)),
-    start = y[[&quot;quarter&quot;]][2],
-    frequency = 4
-  )
+  ect &lt;- ts(matrix(head(gap, -1), dimnames = list(NULL, &quot;ect&quot;)),
+            start = y[[&quot;quarter&quot;]][2],
+            frequency = 4)
 
-  model &lt;- create_bvarmodel(
-    dy,
-    p = 1,
-    exogen = ect,
-    s = 0,
-    deterministic = &quot;const&quot;,
-    iterations = 20000,
-    burnin = 5000
-  )
+  model &lt;- create_bvarmodel(dy,
+                            p = 1,
+                            exogen = ect,
+                            s = 0,
+                            deterministic = &quot;const&quot;,
+                            iterations = 20000,
+                            burnin = 5000)
 
-  model &lt;- add_priors(
-    model,
-    coef = list(v_i = 1, v_i_det = 1),
-    sigma = list(df = 4, scale = 0.01)
-  )
+  model &lt;- add_priors(model,
+                      coef = list(v_i = 1, v_i_det = 1),
+                      sigma = list(df = 4, scale = 0.01))
 
   model &lt;- add_initial_values(model, method = &quot;ols&quot;)
 
@@ -519,27 +473,26 @@ model_goods &lt;- estimate_gap_model(prices, &quot;GD&quot;)</code></pre>
     services &lt;- services + 100 * ds
     other &lt;- other - 100 * dn
 
-    paths[[h]] &lt;- data.frame(
-      h = h,
-      remaining = -100 * z,
-      services = services,
-      other = other
-    )
+    paths[[h]] &lt;- data.frame(h = h,
+                             remaining = -100 * z,
+                             services = services,
+                             other = other)
   }
 
   closure &lt;- bind_rows(paths) %&gt;%
     group_by(h) %&gt;%
-    summarise(
-      lower = quantile(remaining, 0.16),
-      upper = quantile(remaining, 0.84),
-      remaining = median(remaining),
-      services = median(services),
-      other = median(other)
-    )
+    summarise(lower = quantile(remaining, 0.16),
+              upper = quantile(remaining, 0.84),
+              remaining = median(remaining),
+              services = median(services),
+              other = median(other))
 
-  start &lt;- data.frame(
-    h = 0, lower = 100, upper = 100, remaining = 100, services = 0, other = 0
-  )
+  start &lt;- data.frame(h = 0,
+                      lower = 100,
+                      upper = 100,
+                      remaining = 100,
+                      services = 0,
+                      other = 0)
 
   return(bind_rows(start, closure))
 }
@@ -547,89 +500,76 @@ model_goods &lt;- estimate_gap_model(prices, &quot;GD&quot;)</code></pre>
 closure_neig &lt;- gap_closure(model_neig)
 closure_goods &lt;- gap_closure(model_goods)
 
-closure &lt;- bind_rows(
-  neig = closure_neig,
-  goods = closure_goods,
-  .id = &quot;spec&quot;
-)</code></pre>
+closure &lt;- bind_rows(neig = closure_neig,
+                     goods = closure_goods,
+                     .id = &quot;spec&quot;)</code></pre>
 <p>Chart 4 of the paper shows the median of the remaining gap with its 68% credible interval, and the median contributions as bars that start at 100: the services bars point down, because higher services inflation closes the gap, and the NEIG bars point up, because higher NEIG inflation widens it. Where both contributions close the gap, as in the specification with overall goods below, the bars are stacked.</p>
 <pre class="r"><code>plot_closure &lt;- function(closure, label, colour) {
 
   bar_colours &lt;- adjustcolor(c(colours[[&quot;blue&quot;]], colour), 0.45)
 
-  plot(
-    NA,
-    xlim = range(closure[[&quot;h&quot;]]),
-    ylim = range(c(-50, 160, 100 - closure[[&quot;services&quot;]])),
-    xlab = &quot;Quarters after the initial gap&quot;,
-    ylab = &quot;% of initial gap&quot;,
-    main = &quot;What closes the gap?&quot;
-  )
+  plot(NA,
+       xlim = range(closure[[&quot;h&quot;]]),
+       ylim = range(c(-50, 160, 100 - closure[[&quot;services&quot;]])),
+       xlab = &quot;Quarters after the initial gap&quot;,
+       ylab = &quot;% of initial gap&quot;,
+       main = &quot;What closes the gap?&quot;)
 
   grid(col = colours[[&quot;grid&quot;]], lty = 1)
 
   # Contributions with the same sign are stacked, opposite ones start at 100
   services_end &lt;- 100 - closure[[&quot;services&quot;]]
-  other_start &lt;- ifelse(
-    sign(closure[[&quot;other&quot;]]) == sign(closure[[&quot;services&quot;]]),
-    services_end,
-    100
-  )
+  other_start &lt;- ifelse(sign(closure[[&quot;other&quot;]]) == sign(closure[[&quot;services&quot;]]),
+                        services_end,
+                        100)
 
-  rect(
-    closure[[&quot;h&quot;]] - 0.35, 100,
-    closure[[&quot;h&quot;]] + 0.35, services_end,
-    col = bar_colours[1],
-    border = NA
-  )
+  rect(closure[[&quot;h&quot;]] - 0.35,
+       100,
+       closure[[&quot;h&quot;]] + 0.35,
+       services_end,
+       col = bar_colours[1],
+       border = NA)
 
-  rect(
-    closure[[&quot;h&quot;]] - 0.35, other_start,
-    closure[[&quot;h&quot;]] + 0.35, other_start - closure[[&quot;other&quot;]],
-    col = bar_colours[2],
-    border = NA
-  )
+  rect(closure[[&quot;h&quot;]] - 0.35,
+       other_start,
+       closure[[&quot;h&quot;]] + 0.35,
+       other_start - closure[[&quot;other&quot;]],
+       col = bar_colours[2],
+       border = NA)
 
-  polygon(
-    c(closure[[&quot;h&quot;]], rev(closure[[&quot;h&quot;]])),
-    c(closure[[&quot;lower&quot;]], rev(closure[[&quot;upper&quot;]])),
-    col = adjustcolor(colours[[&quot;ink&quot;]], 0.2),
-    border = NA
-  )
+  polygon(c(closure[[&quot;h&quot;]], rev(closure[[&quot;h&quot;]])),
+          c(closure[[&quot;lower&quot;]], rev(closure[[&quot;upper&quot;]])),
+          col = adjustcolor(colours[[&quot;ink&quot;]], 0.2),
+          border = NA)
 
-  lines(closure[[&quot;h&quot;]], closure[[&quot;remaining&quot;]],
-        col = colours[[&quot;red&quot;]], lwd = 2)
+  lines(closure[[&quot;h&quot;]],
+        closure[[&quot;remaining&quot;]],
+        col = colours[[&quot;red&quot;]],
+        lwd = 2)
 
   abline(h = c(0, 100), col = colours[[&quot;ink&quot;]])
 
-  legend(
-    &quot;bottomleft&quot;,
-    legend = c(&quot;Services&quot;, label, &quot;Remaining gap&quot;),
-    fill = c(bar_colours, NA),
-    border = NA,
-    lty = c(NA, NA, 1),
-    col = c(NA, NA, colours[[&quot;red&quot;]]),
-    lwd = 2,
-    bty = &quot;n&quot;
-  )
+  legend(&quot;bottomleft&quot;,
+         legend = c(&quot;Services&quot;, label, &quot;Remaining gap&quot;),
+         fill = c(bar_colours, NA),
+         border = NA,
+         lty = c(NA, NA, 1),
+         col = c(NA, NA, colours[[&quot;red&quot;]]),
+         lwd = 2,
+         bty = &quot;n&quot;)
 
   return(invisible(NULL))
 }</code></pre>
-<pre class="r"><code>plot_closure(
-  closure_neig,
-  label = &quot;NEIG&quot;,
-  colour = colours[[&quot;teal&quot;]]
-)</code></pre>
+<pre class="r"><code>plot_closure(closure_neig, label = &quot;NEIG&quot;, colour = colours[[&quot;teal&quot;]])</code></pre>
 <p><img src="/reproduction/2026_hochmuth_petz_services_files/figure-html/chart4-1.png" alt="" width="672" /></p>
 <p>The chart is close to the published one. The remaining gap falls below 50% between quarters 14 and 15, exactly where the paper puts it, about three and a half years. At quarter 14 services inflation has closed 77 percentage points of the gap and NEIG inflation has widened it by 29, against 76 and 26 in the paper. After ten years 13% of the gap is left, as in the published chart.</p>
 <pre class="r"><code>closure %&gt;%
   filter(spec == &quot;neig&quot;, h %in% c(4, 8, 14, 15, 20, 40)) %&gt;%
   select(h, remaining, lower, upper, services, other) %&gt;%
-  kable(
-    digits = 1,
-    row.names = FALSE,
-    col.names = c(&quot;Quarter&quot;, &quot;Remaining gap&quot;, &quot;16%&quot;, &quot;84%&quot;, &quot;Services&quot;, &quot;NEIG&quot;)
-  )</code></pre>
+  kable(digits = 1,
+        row.names = FALSE,
+        col.names = c(&quot;Quarter&quot;, &quot;Remaining gap&quot;, &quot;16%&quot;, &quot;84%&quot;,
+                      &quot;Services&quot;, &quot;NEIG&quot;))</code></pre>
 <table>
 <thead>
 <tr class="header">
@@ -696,11 +636,7 @@ closure &lt;- bind_rows(
 <div id="overall-goods-instead-of-neig" class="section level2">
 <h2>Overall goods instead of NEIG</h2>
 <p>The same model with the overall goods index adjusts much faster:</p>
-<pre class="r"><code>plot_closure(
-  closure_goods,
-  label = &quot;Goods&quot;,
-  colour = colours[[&quot;amber&quot;]]
-)</code></pre>
+<pre class="r"><code>plot_closure(closure_goods, label = &quot;Goods&quot;, colour = colours[[&quot;amber&quot;]])</code></pre>
 <p><img src="/reproduction/2026_hochmuth_petz_services_files/figure-html/chart4-goods-1.png" alt="" width="672" /></p>
 <p>Half of the gap is closed between quarters 4 and 5, which the paper reports as about five quarters. Here, unlike in the benchmark, both components close the gap, and goods inflation does more of it: at quarter 5 services contribute 17 and goods 41 percentage points, against roughly 15 and 38 in the paper. The goods loading is positive, and its 95% credible interval excludes zero: when services are cheap relative to goods, goods inflation falls. The faster adjustment reflects the energy and food prices in the goods index, which move much more than NEIG prices and return quickly after a shock.</p>
 </div>
