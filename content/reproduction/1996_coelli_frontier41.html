@@ -108,14 +108,14 @@ summary(model)</code></pre>
 ## 0.7464 0.3923 0.7603 0.9298</code></pre>
 <p>The frontier coefficients agree with the maximum likelihood estimates to within a small fraction of a standard error, and their posterior standard deviations are close to the guide’s standard errors of 0.203, 0.048 and 0.045. That is what a flat prior on the coefficients should deliver.</p>
 <p>The variance parameters are a different matter. Translated into FRONTIER’s parameterisation, draw by draw:</p>
-<pre class="r"><code>su2 &lt;- as.numeric(model$posterior$sigma_u$coeffs)^2
-sv2 &lt;- as.numeric(model$posterior$sigma_v$coeffs)^2
+<pre class="r"><code>su2 &lt;- as.numeric(model[[&quot;posterior&quot;]][[&quot;sigma_u&quot;]][[&quot;coeffs&quot;]])^2
+sv2 &lt;- as.numeric(model[[&quot;posterior&quot;]][[&quot;sigma_v&quot;]][[&quot;coeffs&quot;]])^2
 
 sigma_sq &lt;- su2 + sv2
-gamma &lt;- su2 / sigma_sq
+gamma_ratio &lt;- su2 / sigma_sq
 
 rbind(sigma_sq = quantile(sigma_sq, c(0.025, 0.5, 0.975)),
-      gamma = quantile(gamma, c(0.025, 0.5, 0.975)))</code></pre>
+      gamma = quantile(gamma_ratio, c(0.025, 0.5, 0.975)))</code></pre>
 <pre><code>##               2.5%       50%     97.5%
 ## sigma_sq 0.1422667 0.2197297 0.3683003
 ## gamma    0.4217152 0.7573677 0.9245013</code></pre>
@@ -125,7 +125,7 @@ rbind(sigma_sq = quantile(sigma_sq, c(0.025, 0.5, 0.975)),
 <h2>Efficiency</h2>
 <p>The mean efficiency agrees closely:</p>
 <pre class="r"><code>eff &lt;- efficiency(model)
-mean(eff$mean)</code></pre>
+mean(eff[[&quot;mean&quot;]])</code></pre>
 <pre><code>## [1] 0.7463599</code></pre>
 <p>What the Bayesian fit adds is the uncertainty around each firm’s score. The maximum likelihood estimates of efficiency are the conditional expectations of Battese and Coelli (1988), evaluated at the point estimates; the posterior means above are the same expectation, averaged over the uncertainty in the parameters as well, and each comes with a credible interval.</p>
 <pre class="r"><code>plot(model, type = &quot;efficiency&quot;, units = 60)</code></pre>

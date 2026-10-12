@@ -75,14 +75,14 @@ The frontier coefficients agree with the maximum likelihood estimates to within 
 The variance parameters are a different matter. Translated into FRONTIER's parameterisation, draw by draw:
 
 ```{r bayes-gamma}
-su2 <- as.numeric(model$posterior$sigma_u$coeffs)^2
-sv2 <- as.numeric(model$posterior$sigma_v$coeffs)^2
+su2 <- as.numeric(model[["posterior"]][["sigma_u"]][["coeffs"]])^2
+sv2 <- as.numeric(model[["posterior"]][["sigma_v"]][["coeffs"]])^2
 
 sigma_sq <- su2 + sv2
-gamma <- su2 / sigma_sq
+gamma_ratio <- su2 / sigma_sq
 
 rbind(sigma_sq = quantile(sigma_sq, c(0.025, 0.5, 0.975)),
-      gamma = quantile(gamma, c(0.025, 0.5, 0.975)))
+      gamma = quantile(gamma_ratio, c(0.025, 0.5, 0.975)))
 ```
 
 $\sigma^2$ is estimated much as by maximum likelihood, but $\gamma$ is not pinned down: its 95 per cent credible interval runs over half the unit interval. The maximum likelihood standard error of 0.136 says the same, if less plainly, and it is the honest answer for a sample of 60. How the composed error splits into noise and inefficiency is identified only through the asymmetry of the residuals, and 60 residuals do not carry much of it. The posterior median lies a little below $\hat\gamma$ because the posterior is skewed towards the lower values, and a mode and a median of a skewed distribution are not the same point.
@@ -93,7 +93,7 @@ The mean efficiency agrees closely:
 
 ```{r bayes-eff}
 eff <- efficiency(model)
-mean(eff$mean)
+mean(eff[["mean"]])
 ```
 
 What the Bayesian fit adds is the uncertainty around each firm's score. The maximum likelihood estimates of efficiency are the conditional expectations of Battese and Coelli (1988), evaluated at the point estimates; the posterior means above are the same expectation, averaged over the uncertainty in the parameters as well, and each comes with a credible interval.

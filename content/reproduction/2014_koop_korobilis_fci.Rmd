@@ -58,23 +58,24 @@ data("koop")
 `koop$financial` holds the 18 financial series, quarterly from 1970 Q1 to 2013 Q3:
 
 ```{r data-financial}
-colnames(koop$financial)
+colnames(koop[["financial"]])
 ```
 
 Several of them start well after the sample does -- the VIX in 1990, the MOVE index in 1988, the loan officer survey in 1990 -- and are `NA` until they do:
 
 ```{r data-na}
-colSums(is.na(koop$financial))
+colSums(is.na(koop[["financial"]]))
 ```
 
 The macroeconomic block is a list of 96 *real-time vintages* of inflation (`p`), the unemployment rate (`u`) and output (`y`). Each vintage starts in 1970 Q1 and ends one quarter later than the one before it, so `macro[[1]]` ends in 1989 Q4 and `macro[[96]]` in 2013 Q3:
 
 ```{r data-macro}
-length(koop$macro)
+length(koop[["macro"]])
 
-colnames(koop$macro[[96]])
+colnames(koop[["macro"]][[96]])
 
-rbind(first = end(koop$macro[[1]]), last = end(koop$macro[[96]]))
+rbind(first = end(koop[["macro"]][[1]]),
+      last = end(koop[["macro"]][[96]]))
 ```
 
 The full sample index uses `macro[[96]]`. The earlier vintages are what the second exercise runs over.
@@ -84,8 +85,11 @@ The full sample index uses `macro[[96]]`. The earlier vintages are what the seco
 The model follows the workflow of [`bvartools`](https://github.com/franzmohr/bvartools): build the object, add priors, estimate.
 
 ```{r fci-fit}
-model <- create_fcimodel(y = koop$macro[[96]], x = koop$financial,
-                         p = 4, n = 1)
+model <- create_fcimodel(y = koop[["macro"]][[96]],
+                         x = koop[["financial"]],
+                         p = 4,
+                         n = 1)
+
 model <- add_priors(model)
 model <- add_posterior_coefficients(model)
 
@@ -105,7 +109,7 @@ The paper's headline claim concerns the ranking of episodes rather than any sing
 as_quarter <- function(x) {
   yr <- floor(x)
   qtr <- round((x - yr) * 4) + 1
-  paste0(yr, " Q", qtr)
+  return(paste0(yr, " Q", qtr))
 }
 
 ord <- order(-index)[1:8]
@@ -142,15 +146,17 @@ Because the estimator needs no posterior simulation, it can be run recursively a
 Two things change from vintage to vintage. The macro block gets one quarter longer each time, by construction. The financial block does too, informally: since several series start partway through the sample, a series with fewer than two observations over an early vintage's span has no information to contribute and has to be dropped from that vintage's model rather than passed in empty.
 
 ```{r realtime-fit}
-n_vintages <- length(koop$macro)
-realtime <- data.frame(time = numeric(n_vintages), index = numeric(n_vintages))
+n_vintages <- length(koop[["macro"]])
+
+realtime <- data.frame(time = numeric(n_vintages),
+                       index = numeric(n_vintages))
 
 for (i in seq_len(n_vintages)) {
-  y_i <- koop$macro[[i]]
+  y_i <- koop[["macro"]][[i]]
 
   # Keep only the financial series that have started by this vintage.
-  span <- window(koop$financial, start = start(y_i), end = end(y_i))
-  x_i <- koop$financial[, colSums(!is.na(span)) >= 2, drop = FALSE]
+  span <- window(koop[["financial"]], start = start(y_i), end = end(y_i))
+  x_i <- koop[["financial"]][, colSums(!is.na(span)) >= 2, drop = FALSE]
 
   m_i <- create_fcimodel(y = y_i, x = x_i, p = 4, n = 1)
   m_i <- add_priors(m_i)
@@ -158,8 +164,8 @@ for (i in seq_len(n_vintages)) {
 
   # sp500 spans the whole sample, unlike vix, so it fixes the sign here.
   index_i <- fci(m_i, sign_on = "sp500")
-  realtime$time[i] <- end(index_i)[1] + (end(index_i)[2] - 1) / 4
-  realtime$index[i] <- as.numeric(index_i)[length(index_i)]
+  realtime[["time"]][i] <- end(index_i)[1] + (end(index_i)[2] - 1) / 4
+  realtime[["index"]][i] <- as.numeric(index_i)[length(index_i)]
 }
 ```
 
@@ -167,26 +173,37 @@ for (i in seq_len(n_vintages)) {
 
 ```{r realtime-compare, fig.height = 4.5, fig.width = 7}
 index_full <- fci(model, sign_on = "sp500")
-final <- as.numeric(index_full)[match(round(realtime$time, 4),
-                                      round(as.numeric(time(index_full)), 4))]
 
-start_yr <- floor(realtime$time[1])
-start_qtr <- round((realtime$time[1] - start_yr) * 4) + 1
-compared <- ts(cbind(realtime$index, final),
-               start = c(start_yr, start_qtr), frequency = 4)
+realtime_quarters <- round(realtime[["time"]], 4)
+full_quarters <- round(as.numeric(time(index_full)), 4)
+final <- as.numeric(index_full)[match(realtime_quarters, full_quarters)]
 
-ts.plot(compared, col = c("firebrick", "grey30"), lwd = c(1.5, 1),
-        ylab = "Index", xlab = "",
+start_yr <- floor(realtime[["time"]][1])
+start_qtr <- round((realtime[["time"]][1] - start_yr) * 4) + 1
+
+compared <- ts(cbind(realtime[["index"]], final),
+               start = c(start_yr, start_qtr),
+               frequency = 4)
+
+ts.plot(compared,
+        col = c("firebrick", "grey30"),
+        lwd = c(1.5, 1),
+        ylab = "Index",
+        xlab = "",
         main = "Real-time vs. full-sample index")
-legend("topleft", legend = c("Real time", "Full sample"),
-       col = c("firebrick", "grey30"), lwd = c(1.5, 1), bty = "n")
+
+legend("topleft",
+       legend = c("Real time", "Full sample"),
+       col = c("firebrick", "grey30"),
+       lwd = c(1.5, 1),
+       bty = "n")
 ```
 
 ```{r realtime-cor}
-cor(realtime$index, final)
+cor(realtime[["index"]], final)
 ```
 
-A correlation above `r round(cor(realtime$index, final), 2)` between a reading made in real time and its own fully revised counterpart is the case for the index as a monitoring tool. Someone watching it as it was published would have seen essentially the same signal as someone looking back at it today -- including through 2008, where both series reach their most extreme reading in the same quarter, 2008 Q4. That is not automatic for a factor extracted from a drifting model, and it is what makes the index usable for the purpose it was built for.
+A correlation above `r round(cor(realtime[["index"]], final), 2)` between a reading made in real time and its own fully revised counterpart is the case for the index as a monitoring tool. Someone watching it as it was published would have seen essentially the same signal as someone looking back at it today -- including through 2008, where both series reach their most extreme reading in the same quarter, 2008 Q4. That is not automatic for a factor extracted from a drifting model, and it is what makes the index usable for the purpose it was built for.
 
 ## Two deviations from the published replication code
 

@@ -35,16 +35,19 @@ description: "Griffin and Steel (2007) show how to estimate Bayesian stochastic 
 <h2>The data</h2>
 <p>The data set ships with the <a href="https://cran.r-project.org/package=sfaR"><code>sfaR</code></a> package as <code>electricity</code>.</p>
 <pre class="r"><code>library(&quot;bsfa&quot;) # remotes::install_github(&quot;franzmohr/bsfa&quot;)
+library(&quot;knitr&quot;)
 
 data(&quot;electricity&quot;, package = &quot;sfaR&quot;)
 
-d &lt;- data.frame(lc = log(electricity$cost / electricity$fprice),
-                lq = log(electricity$output),
-                lpl = log(electricity$lprice / electricity$fprice),
-                lpk = log(electricity$cprice / electricity$fprice))
-d$q2 &lt;- d$lq^2</code></pre>
+d &lt;- data.frame(lc = log(electricity[[&quot;cost&quot;]] / electricity[[&quot;fprice&quot;]]),
+                lq = log(electricity[[&quot;output&quot;]]),
+                lpl = log(electricity[[&quot;lprice&quot;]] / electricity[[&quot;fprice&quot;]]),
+                lpk = log(electricity[[&quot;cprice&quot;]] / electricity[[&quot;fprice&quot;]]))
+
+d[[&quot;q2&quot;]] &lt;- d[[&quot;lq&quot;]]^2</code></pre>
 <p>Before estimating anything it is worth making sure that these are the data the literature used. Greene (2008, Table 2.5) prints a least squares fit of the same frontier, with the square of log output multiplied by one half:</p>
-<pre class="r"><code>d$hq2 &lt;- d$q2 / 2
+<pre class="r"><code>d[[&quot;hq2&quot;]] &lt;- d[[&quot;q2&quot;]] / 2
+
 round(coef(lm(lc ~ lpk + lpl + lq + hq2, data = d)), 4)</code></pre>
 <pre><code>## (Intercept)         lpk         lpl          lq         hq2 
 ##     -7.2940      0.0748      0.2608      0.3909      0.0624</code></pre>
@@ -94,24 +97,28 @@ exp_model &lt;- add_posterior_coefficients(add_seed(exp_model, 2007))</code></pr
 ##   mean    min median    max 
 ## 0.9185 0.6598 0.9325 0.9770</code></pre>
 <p>Table 1 of the paper reports posterior means and standard deviations. Side by side, with the error variance <span class="math inline">\(\sigma^2\)</span> computed from the draws of <span class="math inline">\(\sigma_v\)</span>:</p>
-<pre class="r"><code>beta &lt;- as.matrix(exp_model$posterior$beta$coeffs)
-lambda &lt;- as.numeric(exp_model$posterior$lambda$coeffs)
-sigmasq &lt;- as.numeric(exp_model$posterior$sigma_v$coeffs)^2
+<pre class="r"><code>beta_draws &lt;- as.matrix(exp_model[[&quot;posterior&quot;]][[&quot;beta&quot;]][[&quot;coeffs&quot;]])
+lambda &lt;- as.numeric(exp_model[[&quot;posterior&quot;]][[&quot;lambda&quot;]][[&quot;coeffs&quot;]])
+sigmasq &lt;- as.numeric(exp_model[[&quot;posterior&quot;]][[&quot;sigma_v&quot;]][[&quot;coeffs&quot;]])^2
 
-draws &lt;- cbind(beta, lambda = lambda, sigmasq = sigmasq)
+draws &lt;- cbind(beta_draws, lambda = lambda, sigmasq = sigmasq)
 
-table1 &lt;- data.frame(
-  parameter = c(&quot;alpha&quot;, &quot;beta1&quot;, &quot;beta2&quot;, &quot;beta3&quot;, &quot;beta4&quot;,
-                &quot;lambda&quot;, &quot;sigmasq&quot;),
-  gs_mean = c(-7.47, 0.4252, 0.2501, 0.0473, 0.02962, 12.23, 0.01332),
-  gs_sd = c(0.3407, 0.04301, 0.06495, 0.06193, 0.002843, 5.207, 0.003836),
-  bsfa_mean = colMeans(draws),
-  bsfa_sd = apply(draws, 2, sd),
-  row.names = NULL
-)
-table1$diff_in_sd &lt;- (table1$bsfa_mean - table1$gs_mean) / table1$gs_sd
+parameters &lt;- c(&quot;alpha&quot;, &quot;beta1&quot;, &quot;beta2&quot;, &quot;beta3&quot;, &quot;beta4&quot;,
+                &quot;lambda&quot;, &quot;sigmasq&quot;)
+gs_mean &lt;- c(-7.47, 0.4252, 0.2501, 0.0473, 0.02962, 12.23, 0.01332)
+gs_sd &lt;- c(0.3407, 0.04301, 0.06495, 0.06193, 0.002843, 5.207, 0.003836)
 
-knitr::kable(table1, digits = c(0, 5, 5, 5, 5, 2))</code></pre>
+table1 &lt;- data.frame(parameter = parameters,
+                     gs_mean = gs_mean,
+                     gs_sd = gs_sd,
+                     bsfa_mean = colMeans(draws),
+                     bsfa_sd = apply(draws, 2, sd),
+                     row.names = NULL)
+
+table1[[&quot;diff_in_sd&quot;]] &lt;- (table1[[&quot;bsfa_mean&quot;]] - table1[[&quot;gs_mean&quot;]]) /
+  table1[[&quot;gs_sd&quot;]]
+
+kable(table1, digits = c(0, 5, 5, 5, 5, 2))</code></pre>
 <table>
 <thead>
 <tr class="header">
@@ -193,11 +200,11 @@ knitr::kable(table1, digits = c(0, 5, 5, 5, 5, 2))</code></pre>
 <h2>Efficiency</h2>
 <p>Because the inefficiency terms are sampled as latent variables, the efficiency of every firm comes out of the sampler as a full posterior distribution rather than as a point predictor.</p>
 <pre class="r"><code>eff &lt;- efficiency(exp_model)
-summary(eff$mean)</code></pre>
+summary(eff[[&quot;mean&quot;]])</code></pre>
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 ##  0.6598  0.9066  0.9325  0.9185  0.9503  0.9770</code></pre>
 <p>The paper also summarises the posterior of the <em>rank</em> of each firm’s efficiency (its Table 2), which is a quantity only a sampler can deliver: for every draw the firms are ranked, and the distribution of each firm’s rank is read off the draws.</p>
-<pre class="r"><code>u &lt;- as.matrix(exp_model$posterior$u$coeffs)
+<pre class="r"><code>u &lt;- as.matrix(exp_model[[&quot;posterior&quot;]][[&quot;u&quot;]][[&quot;coeffs&quot;]])
 
 # A high rank is a high efficiency, as in the paper.
 ranks &lt;- t(apply(-u, 1, rank))
@@ -228,36 +235,45 @@ hn_model &lt;- add_priors(hn_model,
                        sigma = list(shape = 0.001, rate = 0.001),
                        sigma_u = list(r_star = 0.875, shape = 1.001))
 
-c(bsfa = hn_model$priors$rate_u, paper = 1 / 37.5)</code></pre>
+c(bsfa = hn_model[[&quot;priors&quot;]][[&quot;rate_u&quot;]], paper = 1 / 37.5)</code></pre>
 <pre><code>##       bsfa      paper 
 ## 0.02678327 0.02666667</code></pre>
 <pre class="r"><code>hn_model &lt;- add_posterior_coefficients(add_seed(hn_model, 2007),
                                        keep_u = FALSE)</code></pre>
 <p>Table 4 of the paper reports posterior medians and 95 per cent intervals. The precision of the half-normal is <span class="math inline">\(1 / \sigma_u^2\)</span>:</p>
-<pre class="r"><code>beta &lt;- as.matrix(hn_model$posterior$beta$coeffs)
-precision &lt;- 1 / as.numeric(hn_model$posterior$sigma_u$coeffs)^2
-sigmasq &lt;- as.numeric(hn_model$posterior$sigma_v$coeffs)^2
+<pre class="r"><code>beta_draws &lt;- as.matrix(hn_model[[&quot;posterior&quot;]][[&quot;beta&quot;]][[&quot;coeffs&quot;]])
+sigma_u &lt;- as.numeric(hn_model[[&quot;posterior&quot;]][[&quot;sigma_u&quot;]][[&quot;coeffs&quot;]])
+precision &lt;- 1 / sigma_u^2
+sigmasq &lt;- as.numeric(hn_model[[&quot;posterior&quot;]][[&quot;sigma_v&quot;]][[&quot;coeffs&quot;]])^2
 
-draws &lt;- cbind(beta, lambda = precision, sigmasq = sigmasq)
-q &lt;- t(apply(draws, 2, quantile, c(0.5, 0.025, 0.975)))
+draws &lt;- cbind(beta_draws, lambda = precision, sigmasq = sigmasq)
+quantiles_hn &lt;- t(apply(draws, 2, quantile, c(0.5, 0.025, 0.975)))
 
-fmt &lt;- function(m, l, u, digits) {
-  paste0(formatC(m, digits = digits, format = &quot;fg&quot;), &quot; (&quot;,
-         formatC(l, digits = digits, format = &quot;fg&quot;), &quot;, &quot;,
-         formatC(u, digits = digits, format = &quot;fg&quot;), &quot;)&quot;)
+format_interval &lt;- function(m, l, u, digits) {
+  result &lt;- paste0(formatC(m, digits = digits, format = &quot;fg&quot;),
+                   &quot; (&quot;,
+                   formatC(l, digits = digits, format = &quot;fg&quot;),
+                   &quot;, &quot;,
+                   formatC(u, digits = digits, format = &quot;fg&quot;),
+                   &quot;)&quot;)
+  return(result)
 }
 
-table4 &lt;- data.frame(
-  parameter = c(&quot;alpha&quot;, &quot;beta1&quot;, &quot;beta2&quot;, &quot;beta3&quot;, &quot;beta4&quot;,
-                &quot;lambda&quot;, &quot;sigmasq&quot;),
-  paper = c(&quot;-7.4 (-8.0, -6.7)&quot;, &quot;0.41 (0.33, 0.48)&quot;, &quot;0.24 (0.11, 0.37)&quot;,
-            &quot;0.06 (-0.06, 0.19)&quot;, &quot;0.031 (0.025, 0.036)&quot;,
-            &quot;44.5 (20.8, 140.6)&quot;, &quot;0.013 (0.006, 0.021)&quot;),
-  bsfa = fmt(q[, 1], q[, 2], q[, 3], digits = 3),
-  row.names = NULL
-)
+paper_hn &lt;- c(&quot;-7.4 (-8.0, -6.7)&quot;, &quot;0.41 (0.33, 0.48)&quot;, &quot;0.24 (0.11, 0.37)&quot;,
+              &quot;0.06 (-0.06, 0.19)&quot;, &quot;0.031 (0.025, 0.036)&quot;,
+              &quot;44.5 (20.8, 140.6)&quot;, &quot;0.013 (0.006, 0.021)&quot;)
 
-knitr::kable(table4)</code></pre>
+bsfa_hn &lt;- format_interval(quantiles_hn[, 1],
+                           quantiles_hn[, 2],
+                           quantiles_hn[, 3],
+                           digits = 3)
+
+table4 &lt;- data.frame(parameter = parameters,
+                     paper = paper_hn,
+                     bsfa = bsfa_hn,
+                     row.names = NULL)
+
+kable(table4)</code></pre>
 <table>
 <thead>
 <tr class="header">

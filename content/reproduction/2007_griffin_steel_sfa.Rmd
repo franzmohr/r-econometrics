@@ -46,20 +46,23 @@ The data set ships with the [`sfaR`](https://cran.r-project.org/package=sfaR) pa
 
 ```{r setup, message = FALSE}
 library("bsfa") # remotes::install_github("franzmohr/bsfa")
+library("knitr")
 
 data("electricity", package = "sfaR")
 
-d <- data.frame(lc = log(electricity$cost / electricity$fprice),
-                lq = log(electricity$output),
-                lpl = log(electricity$lprice / electricity$fprice),
-                lpk = log(electricity$cprice / electricity$fprice))
-d$q2 <- d$lq^2
+d <- data.frame(lc = log(electricity[["cost"]] / electricity[["fprice"]]),
+                lq = log(electricity[["output"]]),
+                lpl = log(electricity[["lprice"]] / electricity[["fprice"]]),
+                lpk = log(electricity[["cprice"]] / electricity[["fprice"]]))
+
+d[["q2"]] <- d[["lq"]]^2
 ```
 
 Before estimating anything it is worth making sure that these are the data the literature used. Greene (2008, Table 2.5) prints a least squares fit of the same frontier, with the square of log output multiplied by one half:
 
 ```{r ols}
-d$hq2 <- d$q2 / 2
+d[["hq2"]] <- d[["q2"]] / 2
+
 round(coef(lm(lc ~ lpk + lpl + lq + hq2, data = d)), 4)
 ```
 
@@ -94,24 +97,28 @@ summary(exp_model)
 Table 1 of the paper reports posterior means and standard deviations. Side by side, with the error variance $\sigma^2$ computed from the draws of $\sigma_v$:
 
 ```{r exp-table}
-beta <- as.matrix(exp_model$posterior$beta$coeffs)
-lambda <- as.numeric(exp_model$posterior$lambda$coeffs)
-sigmasq <- as.numeric(exp_model$posterior$sigma_v$coeffs)^2
+beta_draws <- as.matrix(exp_model[["posterior"]][["beta"]][["coeffs"]])
+lambda <- as.numeric(exp_model[["posterior"]][["lambda"]][["coeffs"]])
+sigmasq <- as.numeric(exp_model[["posterior"]][["sigma_v"]][["coeffs"]])^2
 
-draws <- cbind(beta, lambda = lambda, sigmasq = sigmasq)
+draws <- cbind(beta_draws, lambda = lambda, sigmasq = sigmasq)
 
-table1 <- data.frame(
-  parameter = c("alpha", "beta1", "beta2", "beta3", "beta4",
-                "lambda", "sigmasq"),
-  gs_mean = c(-7.47, 0.4252, 0.2501, 0.0473, 0.02962, 12.23, 0.01332),
-  gs_sd = c(0.3407, 0.04301, 0.06495, 0.06193, 0.002843, 5.207, 0.003836),
-  bsfa_mean = colMeans(draws),
-  bsfa_sd = apply(draws, 2, sd),
-  row.names = NULL
-)
-table1$diff_in_sd <- (table1$bsfa_mean - table1$gs_mean) / table1$gs_sd
+parameters <- c("alpha", "beta1", "beta2", "beta3", "beta4",
+                "lambda", "sigmasq")
+gs_mean <- c(-7.47, 0.4252, 0.2501, 0.0473, 0.02962, 12.23, 0.01332)
+gs_sd <- c(0.3407, 0.04301, 0.06495, 0.06193, 0.002843, 5.207, 0.003836)
 
-knitr::kable(table1, digits = c(0, 5, 5, 5, 5, 2))
+table1 <- data.frame(parameter = parameters,
+                     gs_mean = gs_mean,
+                     gs_sd = gs_sd,
+                     bsfa_mean = colMeans(draws),
+                     bsfa_sd = apply(draws, 2, sd),
+                     row.names = NULL)
+
+table1[["diff_in_sd"]] <- (table1[["bsfa_mean"]] - table1[["gs_mean"]]) /
+  table1[["gs_sd"]]
+
+kable(table1, digits = c(0, 5, 5, 5, 5, 2))
 ```
 
 The posterior standard deviations agree, allowing for the long right tail of $\lambda$, whose standard deviation is the least stable summary of any here, and so do the means of the parameters that describe the error terms. $\lambda$ is the one to look at first: its posterior is skewed, with a long right tail that the prior leaves in place, so a wrong prior would show up here before anywhere else.
@@ -122,7 +129,7 @@ round(quantile(lambda, c(0.025, 0.5, 0.975)), 2)
 
 The paper reports a median of 10.79 and a 95 per cent interval of $(7.07, 26.75)$.
 
-The frontier coefficients agree to within a small fraction of a posterior standard deviation, with two exceptions of between a quarter and a third of one: the intercept and the coefficient on the labour price. That is more than Monte Carlo error on either side -- the paper's MCMC error on these is of the order of $10^{-3}$, and the effective sample sizes above run into the thousands. But it is not a difference between the samplers either. Greene (2008) fits the same exponential frontier by maximum likelihood and gets 0.270 on the labour price, which with a sample of 123 and flat priors on the coefficients is where the posterior mean should be. `bsfa` gives `r round(table1$bsfa_mean[3], 3)`, the paper 0.250. Something in the paper's data or set-up differs slightly from the listing in `sfaR` -- the firms are also in a different order, as the next section shows -- and it moves those two coefficients a little without touching anything else.
+The frontier coefficients agree to within a small fraction of a posterior standard deviation, with two exceptions of between a quarter and a third of one: the intercept and the coefficient on the labour price. That is more than Monte Carlo error on either side -- the paper's MCMC error on these is of the order of $10^{-3}$, and the effective sample sizes above run into the thousands. But it is not a difference between the samplers either. Greene (2008) fits the same exponential frontier by maximum likelihood and gets 0.270 on the labour price, which with a sample of 123 and flat priors on the coefficients is where the posterior mean should be. `bsfa` gives `r round(table1[["bsfa_mean"]][3], 3)`, the paper 0.250. Something in the paper's data or set-up differs slightly from the listing in `sfaR` -- the firms are also in a different order, as the next section shows -- and it moves those two coefficients a little without touching anything else.
 
 ## Efficiency
 
@@ -130,13 +137,13 @@ Because the inefficiency terms are sampled as latent variables, the efficiency o
 
 ```{r exp-eff}
 eff <- efficiency(exp_model)
-summary(eff$mean)
+summary(eff[["mean"]])
 ```
 
 The paper also summarises the posterior of the *rank* of each firm's efficiency (its Table 2), which is a quantity only a sampler can deliver: for every draw the firms are ranked, and the distribution of each firm's rank is read off the draws.
 
 ```{r exp-ranks}
-u <- as.matrix(exp_model$posterior$u$coeffs)
+u <- as.matrix(exp_model[["posterior"]][["u"]][["coeffs"]])
 
 # A high rank is a high efficiency, as in the paper.
 ranks <- t(apply(-u, 1, rank))
@@ -163,7 +170,7 @@ hn_model <- add_priors(hn_model,
                        sigma = list(shape = 0.001, rate = 0.001),
                        sigma_u = list(r_star = 0.875, shape = 1.001))
 
-c(bsfa = hn_model$priors$rate_u, paper = 1 / 37.5)
+c(bsfa = hn_model[["priors"]][["rate_u"]], paper = 1 / 37.5)
 
 hn_model <- add_posterior_coefficients(add_seed(hn_model, 2007),
                                        keep_u = FALSE)
@@ -172,30 +179,39 @@ hn_model <- add_posterior_coefficients(add_seed(hn_model, 2007),
 Table 4 of the paper reports posterior medians and 95 per cent intervals. The precision of the half-normal is $1 / \sigma_u^2$:
 
 ```{r hn-table}
-beta <- as.matrix(hn_model$posterior$beta$coeffs)
-precision <- 1 / as.numeric(hn_model$posterior$sigma_u$coeffs)^2
-sigmasq <- as.numeric(hn_model$posterior$sigma_v$coeffs)^2
+beta_draws <- as.matrix(hn_model[["posterior"]][["beta"]][["coeffs"]])
+sigma_u <- as.numeric(hn_model[["posterior"]][["sigma_u"]][["coeffs"]])
+precision <- 1 / sigma_u^2
+sigmasq <- as.numeric(hn_model[["posterior"]][["sigma_v"]][["coeffs"]])^2
 
-draws <- cbind(beta, lambda = precision, sigmasq = sigmasq)
-q <- t(apply(draws, 2, quantile, c(0.5, 0.025, 0.975)))
+draws <- cbind(beta_draws, lambda = precision, sigmasq = sigmasq)
+quantiles_hn <- t(apply(draws, 2, quantile, c(0.5, 0.025, 0.975)))
 
-fmt <- function(m, l, u, digits) {
-  paste0(formatC(m, digits = digits, format = "fg"), " (",
-         formatC(l, digits = digits, format = "fg"), ", ",
-         formatC(u, digits = digits, format = "fg"), ")")
+format_interval <- function(m, l, u, digits) {
+  result <- paste0(formatC(m, digits = digits, format = "fg"),
+                   " (",
+                   formatC(l, digits = digits, format = "fg"),
+                   ", ",
+                   formatC(u, digits = digits, format = "fg"),
+                   ")")
+  return(result)
 }
 
-table4 <- data.frame(
-  parameter = c("alpha", "beta1", "beta2", "beta3", "beta4",
-                "lambda", "sigmasq"),
-  paper = c("-7.4 (-8.0, -6.7)", "0.41 (0.33, 0.48)", "0.24 (0.11, 0.37)",
-            "0.06 (-0.06, 0.19)", "0.031 (0.025, 0.036)",
-            "44.5 (20.8, 140.6)", "0.013 (0.006, 0.021)"),
-  bsfa = fmt(q[, 1], q[, 2], q[, 3], digits = 3),
-  row.names = NULL
-)
+paper_hn <- c("-7.4 (-8.0, -6.7)", "0.41 (0.33, 0.48)", "0.24 (0.11, 0.37)",
+              "0.06 (-0.06, 0.19)", "0.031 (0.025, 0.036)",
+              "44.5 (20.8, 140.6)", "0.013 (0.006, 0.021)")
 
-knitr::kable(table4)
+bsfa_hn <- format_interval(quantiles_hn[, 1],
+                           quantiles_hn[, 2],
+                           quantiles_hn[, 3],
+                           digits = 3)
+
+table4 <- data.frame(parameter = parameters,
+                     paper = paper_hn,
+                     bsfa = bsfa_hn,
+                     row.names = NULL)
+
+kable(table4)
 ```
 
 The medians and intervals agree closely. The precision of the inefficiency term comes out a few per cent higher throughout its distribution, which is about as close as the shape of 1.001 against the paper's 1, and a long right tail, allow.

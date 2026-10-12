@@ -42,28 +42,26 @@ set.seed(1234567)
 
 data(&quot;koop&quot;)</code></pre>
 <p><code>koop$financial</code> holds the 18 financial series, quarterly from 1970 Q1 to 2013 Q3:</p>
-<pre class="r"><code>colnames(koop$financial)</code></pre>
-<pre><code>##  [1] &quot;sp500&quot;          &quot;twexmmth&quot;       &quot;oil&quot;            &quot;spread_ted&quot;    
-##  [5] &quot;spread_10_2&quot;    &quot;spread_2_3m&quot;    &quot;spread_comm&quot;    &quot;loanhpi&quot;       
-##  [9] &quot;spread_30_mort&quot; &quot;cmdebt&quot;         &quot;cci&quot;            &quot;move&quot;          
-## [13] &quot;vix&quot;            &quot;totalsl&quot;        &quot;stdscom&quot;        &quot;mich1&quot;         
-## [17] &quot;mich2&quot;          &quot;mich3&quot;</code></pre>
+<pre class="r"><code>colnames(koop[[&quot;financial&quot;]])</code></pre>
+<pre><code>##  [1] &quot;sp500&quot;          &quot;twexmmth&quot;       &quot;oil&quot;            &quot;spread_ted&quot;     &quot;spread_10_2&quot;   
+##  [6] &quot;spread_2_3m&quot;    &quot;spread_comm&quot;    &quot;loanhpi&quot;        &quot;spread_30_mort&quot; &quot;cmdebt&quot;        
+## [11] &quot;cci&quot;            &quot;move&quot;           &quot;vix&quot;            &quot;totalsl&quot;        &quot;stdscom&quot;       
+## [16] &quot;mich1&quot;          &quot;mich2&quot;          &quot;mich3&quot;</code></pre>
 <p>Several of them start well after the sample does – the VIX in 1990, the MOVE index in 1988, the loan officer survey in 1990 – and are <code>NA</code> until they do:</p>
-<pre class="r"><code>colSums(is.na(koop$financial))</code></pre>
-<pre><code>##          sp500       twexmmth            oil     spread_ted    spread_10_2 
-##              0              0             17             47             26 
-##    spread_2_3m    spread_comm        loanhpi spread_30_mort         cmdebt 
-##             26              5             25              5              0 
-##            cci           move            vix        totalsl        stdscom 
-##              0             73             66              0             82 
-##          mich1          mich2          mich3 
-##              0              0              0</code></pre>
+<pre class="r"><code>colSums(is.na(koop[[&quot;financial&quot;]]))</code></pre>
+<pre><code>##          sp500       twexmmth            oil     spread_ted    spread_10_2    spread_2_3m 
+##              0              0             17             47             26             26 
+##    spread_comm        loanhpi spread_30_mort         cmdebt            cci           move 
+##              5             25              5              0              0             73 
+##            vix        totalsl        stdscom          mich1          mich2          mich3 
+##             66              0             82              0              0              0</code></pre>
 <p>The macroeconomic block is a list of 96 <em>real-time vintages</em> of inflation (<code>p</code>), the unemployment rate (<code>u</code>) and output (<code>y</code>). Each vintage starts in 1970 Q1 and ends one quarter later than the one before it, so <code>macro[[1]]</code> ends in 1989 Q4 and <code>macro[[96]]</code> in 2013 Q3:</p>
-<pre class="r"><code>length(koop$macro)</code></pre>
+<pre class="r"><code>length(koop[[&quot;macro&quot;]])</code></pre>
 <pre><code>## [1] 96</code></pre>
-<pre class="r"><code>colnames(koop$macro[[96]])</code></pre>
+<pre class="r"><code>colnames(koop[[&quot;macro&quot;]][[96]])</code></pre>
 <pre><code>## [1] &quot;p&quot; &quot;u&quot; &quot;y&quot;</code></pre>
-<pre class="r"><code>rbind(first = end(koop$macro[[1]]), last = end(koop$macro[[96]]))</code></pre>
+<pre class="r"><code>rbind(first = end(koop[[&quot;macro&quot;]][[1]]),
+      last = end(koop[[&quot;macro&quot;]][[96]]))</code></pre>
 <pre><code>##       [,1] [,2]
 ## first 1989    4
 ## last  2013    3</code></pre>
@@ -72,8 +70,11 @@ data(&quot;koop&quot;)</code></pre>
 <div id="the-index" class="section level2">
 <h2>The index</h2>
 <p>The model follows the workflow of <a href="https://github.com/franzmohr/bvartools"><code>bvartools</code></a>: build the object, add priors, estimate.</p>
-<pre class="r"><code>model &lt;- create_fcimodel(y = koop$macro[[96]], x = koop$financial,
-                         p = 4, n = 1)
+<pre class="r"><code>model &lt;- create_fcimodel(y = koop[[&quot;macro&quot;]][[96]],
+                         x = koop[[&quot;financial&quot;]],
+                         p = 4,
+                         n = 1)
+
 model &lt;- add_priors(model)
 model &lt;- add_posterior_coefficients(model)
 
@@ -86,7 +87,7 @@ abline(h = 0, lty = &quot;dashed&quot;, col = &quot;grey40&quot;)</code></pre>
 <pre class="r"><code>as_quarter &lt;- function(x) {
   yr &lt;- floor(x)
   qtr &lt;- round((x - yr) * 4) + 1
-  paste0(yr, &quot; Q&quot;, qtr)
+  return(paste0(yr, &quot; Q&quot;, qtr))
 }
 
 ord &lt;- order(-index)[1:8]
@@ -139,15 +140,17 @@ round(data.frame(first = loadings[1, ],
 <h2>A real-time index</h2>
 <p>Because the estimator needs no posterior simulation, it can be run recursively at essentially no cost – once per vintage, on nothing but the data that vintage contains. That recursion is the paper’s second exercise and the reason the 96 vintages are in the data set.</p>
 <p>Two things change from vintage to vintage. The macro block gets one quarter longer each time, by construction. The financial block does too, informally: since several series start partway through the sample, a series with fewer than two observations over an early vintage’s span has no information to contribute and has to be dropped from that vintage’s model rather than passed in empty.</p>
-<pre class="r"><code>n_vintages &lt;- length(koop$macro)
-realtime &lt;- data.frame(time = numeric(n_vintages), index = numeric(n_vintages))
+<pre class="r"><code>n_vintages &lt;- length(koop[[&quot;macro&quot;]])
+
+realtime &lt;- data.frame(time = numeric(n_vintages),
+                       index = numeric(n_vintages))
 
 for (i in seq_len(n_vintages)) {
-  y_i &lt;- koop$macro[[i]]
+  y_i &lt;- koop[[&quot;macro&quot;]][[i]]
 
   # Keep only the financial series that have started by this vintage.
-  span &lt;- window(koop$financial, start = start(y_i), end = end(y_i))
-  x_i &lt;- koop$financial[, colSums(!is.na(span)) &gt;= 2, drop = FALSE]
+  span &lt;- window(koop[[&quot;financial&quot;]], start = start(y_i), end = end(y_i))
+  x_i &lt;- koop[[&quot;financial&quot;]][, colSums(!is.na(span)) &gt;= 2, drop = FALSE]
 
   m_i &lt;- create_fcimodel(y = y_i, x = x_i, p = 4, n = 1)
   m_i &lt;- add_priors(m_i)
@@ -155,26 +158,37 @@ for (i in seq_len(n_vintages)) {
 
   # sp500 spans the whole sample, unlike vix, so it fixes the sign here.
   index_i &lt;- fci(m_i, sign_on = &quot;sp500&quot;)
-  realtime$time[i] &lt;- end(index_i)[1] + (end(index_i)[2] - 1) / 4
-  realtime$index[i] &lt;- as.numeric(index_i)[length(index_i)]
+  realtime[[&quot;time&quot;]][i] &lt;- end(index_i)[1] + (end(index_i)[2] - 1) / 4
+  realtime[[&quot;index&quot;]][i] &lt;- as.numeric(index_i)[length(index_i)]
 }</code></pre>
 <p>96 models, one per vintage, in about a second in total. Each entry of <code>realtime$index</code> is a one-off reading: the value the index would have taken in that quarter, estimated with nothing later than that quarter’s data. Lining those up against the same quarters of the full sample index – built with hindsight, and re-signed on <code>sp500</code> for comparability – shows how much the revisions matter. Since <code>sp500</code> orients the index the other way round from <code>vix</code>, the figure below is the mirror image of the one above: here a <em>low</em> value means stressed conditions.</p>
 <pre class="r"><code>index_full &lt;- fci(model, sign_on = &quot;sp500&quot;)
-final &lt;- as.numeric(index_full)[match(round(realtime$time, 4),
-                                      round(as.numeric(time(index_full)), 4))]
 
-start_yr &lt;- floor(realtime$time[1])
-start_qtr &lt;- round((realtime$time[1] - start_yr) * 4) + 1
-compared &lt;- ts(cbind(realtime$index, final),
-               start = c(start_yr, start_qtr), frequency = 4)
+realtime_quarters &lt;- round(realtime[[&quot;time&quot;]], 4)
+full_quarters &lt;- round(as.numeric(time(index_full)), 4)
+final &lt;- as.numeric(index_full)[match(realtime_quarters, full_quarters)]
 
-ts.plot(compared, col = c(&quot;firebrick&quot;, &quot;grey30&quot;), lwd = c(1.5, 1),
-        ylab = &quot;Index&quot;, xlab = &quot;&quot;,
+start_yr &lt;- floor(realtime[[&quot;time&quot;]][1])
+start_qtr &lt;- round((realtime[[&quot;time&quot;]][1] - start_yr) * 4) + 1
+
+compared &lt;- ts(cbind(realtime[[&quot;index&quot;]], final),
+               start = c(start_yr, start_qtr),
+               frequency = 4)
+
+ts.plot(compared,
+        col = c(&quot;firebrick&quot;, &quot;grey30&quot;),
+        lwd = c(1.5, 1),
+        ylab = &quot;Index&quot;,
+        xlab = &quot;&quot;,
         main = &quot;Real-time vs. full-sample index&quot;)
-legend(&quot;topleft&quot;, legend = c(&quot;Real time&quot;, &quot;Full sample&quot;),
-       col = c(&quot;firebrick&quot;, &quot;grey30&quot;), lwd = c(1.5, 1), bty = &quot;n&quot;)</code></pre>
+
+legend(&quot;topleft&quot;,
+       legend = c(&quot;Real time&quot;, &quot;Full sample&quot;),
+       col = c(&quot;firebrick&quot;, &quot;grey30&quot;),
+       lwd = c(1.5, 1),
+       bty = &quot;n&quot;)</code></pre>
 <p><img src="/reproduction/2014_koop_korobilis_fci_files/figure-html/realtime-compare-1.png" alt="" width="672" /></p>
-<pre class="r"><code>cor(realtime$index, final)</code></pre>
+<pre class="r"><code>cor(realtime[[&quot;index&quot;]], final)</code></pre>
 <pre><code>## [1] 0.9346385</code></pre>
 <p>A correlation above 0.93 between a reading made in real time and its own fully revised counterpart is the case for the index as a monitoring tool. Someone watching it as it was published would have seen essentially the same signal as someone looking back at it today – including through 2008, where both series reach their most extreme reading in the same quarter, 2008 Q4. That is not automatic for a factor extracted from a drifting model, and it is what makes the index usable for the purpose it was built for.</p>
 </div>
