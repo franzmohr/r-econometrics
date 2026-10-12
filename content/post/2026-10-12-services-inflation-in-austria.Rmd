@@ -906,6 +906,8 @@ Hochmuth and Petz argue that services inflation in the euro area stays high part
 
 There are also reasons for caution. A straight line fitted to thirty years of data is sensitive to its end points, and the finding that Austria is above its trend depends on the trend not having steepened. And the gap is the residual of a first stage whose uncertainty is not carried over to the second, a simplification of the paper that this post keeps.
 
+A [follow-up post](/2026/10/12/is-services-inflation-a-catch-up-story-everywhere-in-the-euro-area/) estimates the model for all 21 countries of the euro area.
+
 ## References
 
 Engle, R. F., & Granger, C. W. J. (1987). Co-integration and error correction: Representation, estimation, and testing. *Econometrica, 55*(2), 251--276. <https://doi.org/10.2307/1913236>

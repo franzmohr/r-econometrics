@@ -1,0 +1,349 @@
+---
+title: "Is Services Inflation a Catch-Up Story Everywhere in the Euro Area?"
+author: "Franz X. Mohr"
+date: '2026-10-12'
+description: "Hochmuth and Petz (2026) explain persistent services inflation in the euro area with the price of services catching up with that of goods. This post estimates their error correction model for each of the 21 euro area countries to see where the explanation holds."
+tags:
+  - r
+  - bvartools
+  - vecm
+  - error-correction
+  - inflation
+  - relative-prices
+  - hicp
+  - euro-area
+---
+
+
+
+<p><a href="https://www.oenb.at/en/daten-und-forschung/publikationen/publikationsreihen/policy-brief/2026/policy-brief-2026-11.html">Hochmuth and Petz (2026)</a> explain why services inflation in the euro area has come down so slowly: before the pandemic, services became steadily more expensive relative to goods, the surge of goods prices in 2021 and 2022 pushed this relative price far below its trend, and part of today’s services inflation is services prices catching up. In the <a href="/reproduction/2026_hochmuth_petz_services">reproduction of the paper</a> the euro area results hold up, but in <a href="/2026/10/12/how-long-will-services-inflation-in-austria-stay-high/">Austria</a> the story does not fit: the relative price of services is already above its trend. This post estimates the model for all 21 countries of the euro area to find out where the explanation holds and where it does not. The short answer: the mechanism is there almost everywhere, but it explains little of why services inflation has differed so much between countries since 2023.</p>
+<!--more-->
+<div id="the-model" class="section level2">
+<h2>The model</h2>
+<p>Let <span class="math inline">\(s_t\)</span> and <span class="math inline">\(n_t\)</span> be 100 times the log price indices of services and non-energy industrial goods (NEIG) of a country. The relative price of services is assumed to follow a linear trend, from which it deviates only temporarily:</p>
+<p><span class="math display">\[s_t - n_t = \mu + \delta t + z_t.\]</span></p>
+<p>The deviation <span class="math inline">\(z_t\)</span> is the <em>relative-price gap</em>. It is estimated as the residual of an OLS regression on a trend, and enters a Bayesian VECM as error correction term:</p>
+<p><span class="math display">\[\Delta y_t = \kappa + \alpha \hat{z}_{t-1} + \Gamma \Delta y_{t-1} + \varepsilon_t, \quad \Delta y_t = (\Delta s_t, \Delta n_t)&#39;.\]</span></p>
+<p>A negative loading <span class="math inline">\(\alpha_s\)</span> means that services inflation picks up when services are cheap relative to their trend, a positive <span class="math inline">\(\alpha_n\)</span> that NEIG inflation slows. Both close the gap. The priors are those of the paper: standard normal on <span class="math inline">\(\kappa\)</span>, <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\Gamma\)</span>, and <span class="math inline">\(\Sigma \sim IW(4, 0.01 I)\)</span>. The reproduction explains the model and its estimation with <a href="https://github.com/franzmohr/bvartools"><code>bvartools</code></a> in more detail.</p>
+</div>
+<div id="data" class="section level2">
+<h2>Data</h2>
+<p>The data are the monthly HICP indices of services and NEIG from Eurostat data set <code>prc_hicp_minr</code> for the euro area and its 21 members in 2026, including Croatia, which adopted the euro in 2023, and Bulgaria, which followed in 2026. In the current ECOICOP version 2 vintage, the two series start at different dates, the last ones in December 2000, so the sample runs from January 2001 to June 2026 for all countries. That is five years shorter than the paper’s, which starts in 1996. The download also includes the weights of gastronomy and accommodation in services, which come up further below:</p>
+<pre class="r"><code>library(&quot;bvartools&quot;)
+library(&quot;dplyr&quot;)
+library(&quot;ggplot2&quot;)
+library(&quot;ggrepel&quot;)
+library(&quot;knitr&quot;)
+library(&quot;magrittr&quot;)
+library(&quot;seasonal&quot;)
+library(&quot;tibble&quot;)
+library(&quot;tidyr&quot;)</code></pre>
+<pre class="r"><code># The euro area and its 21 members in 2026
+countries &lt;- c(&quot;EA&quot;, &quot;AT&quot;, &quot;BE&quot;, &quot;BG&quot;, &quot;CY&quot;, &quot;DE&quot;, &quot;EE&quot;, &quot;EL&quot;, &quot;ES&quot;, &quot;FI&quot;, &quot;FR&quot;,
+               &quot;HR&quot;, &quot;IE&quot;, &quot;IT&quot;, &quot;LT&quot;, &quot;LU&quot;, &quot;LV&quot;, &quot;MT&quot;, &quot;NL&quot;, &quot;PT&quot;, &quot;SI&quot;, &quot;SK&quot;)
+
+# Eurostat, ECOICOP ver. 2: services and NEIG, 2025 = 100
+index_filters &lt;- list(geo = countries,
+                      unit = &quot;I25&quot;,
+                      coicop18 = c(&quot;SERV&quot;, &quot;IGD_NNRG&quot;))
+
+get_eurostat(&quot;prc_hicp_minr&quot;,
+             time_format = &quot;raw&quot;,
+             cache = FALSE,
+             filters = index_filters) %&gt;%
+  transmute(geo,
+            month = as.character(time),
+            series = coicop18,
+            index = values) %&gt;%
+  filter(month &gt;= &quot;2001-01&quot;, month &lt;= &quot;2026-06&quot;) %&gt;%
+  pivot_wider(names_from = series, values_from = index) %&gt;%
+  select(geo, month, SERV, IGD_NNRG) %&gt;%
+  arrange(geo, month) %&gt;%
+  write.csv(&quot;_2026-10-12-services-inflation-across-the-euro-area-hicp.csv&quot;,
+            row.names = FALSE)
+
+# Weights of services, gastronomy and accommodation in 2026, in per mille
+weight_filters &lt;- list(geo = countries,
+                       coicop18 = c(&quot;SERV&quot;, &quot;CP111&quot;, &quot;CP112&quot;))
+
+get_eurostat(&quot;prc_hicp_iw&quot;,
+             time_format = &quot;raw&quot;,
+             cache = FALSE,
+             filters = weight_filters) %&gt;%
+  filter(time == &quot;2026&quot;) %&gt;%
+  transmute(geo,
+            series = coicop18,
+            weight = values) %&gt;%
+  pivot_wider(names_from = series, values_from = weight) %&gt;%
+  select(geo, SERV, CP111, CP112) %&gt;%
+  arrange(geo) %&gt;%
+  write.csv(&quot;_2026-10-12-services-inflation-across-the-euro-area-weights.csv&quot;,
+            row.names = FALSE)</code></pre>
+<pre class="r"><code>hicp &lt;- read.csv(&quot;_2026-10-12-services-inflation-across-the-euro-area-hicp.csv&quot;)
+weights &lt;- read.csv(
+  &quot;_2026-10-12-services-inflation-across-the-euro-area-weights.csv&quot;)
+
+country_names &lt;- c(EA = &quot;Euro area&quot;, AT = &quot;Austria&quot;, BE = &quot;Belgium&quot;,
+                   BG = &quot;Bulgaria&quot;, CY = &quot;Cyprus&quot;, DE = &quot;Germany&quot;,
+                   EE = &quot;Estonia&quot;, EL = &quot;Greece&quot;, ES = &quot;Spain&quot;,
+                   FI = &quot;Finland&quot;, FR = &quot;France&quot;, HR = &quot;Croatia&quot;,
+                   IE = &quot;Ireland&quot;, IT = &quot;Italy&quot;, LT = &quot;Lithuania&quot;,
+                   LU = &quot;Luxembourg&quot;, LV = &quot;Latvia&quot;, MT = &quot;Malta&quot;,
+                   NL = &quot;Netherlands&quot;, PT = &quot;Portugal&quot;, SI = &quot;Slovenia&quot;,
+                   SK = &quot;Slovakia&quot;)</code></pre>
+<p>As in the paper, each series is seasonally adjusted with X-13ARIMA-SEATS and averaged to quarters. The first stage, the regression of the relative price on a trend over the whole sample, is run country by country:</p>
+<pre class="r"><code>prices &lt;- hicp %&gt;%
+  pivot_longer(c(SERV, IGD_NNRG), names_to = &quot;series&quot;, values_to = &quot;index&quot;) %&gt;%
+  arrange(geo, series, month) %&gt;%
+
+  # X-13ARIMA-SEATS with the defaults of seasonal, series by series
+  group_by(geo, series) %&gt;%
+  mutate(index_sa = ts(index, start = c(2001, 1), frequency = 12) %&gt;%
+           seas() %&gt;%
+           final() %&gt;%
+           as.numeric()) %&gt;%
+  ungroup() %&gt;%
+
+  # Quarterly averages, dated by the start of the quarter: 2001.25 is 2001 Q2
+  mutate(year = as.integer(substr(month, 1, 4)),
+         quarter = year + (as.integer(substr(month, 6, 7)) - 1) %/% 3 / 4) %&gt;%
+  group_by(geo, series, quarter) %&gt;%
+  summarise(index_sa = mean(index_sa), .groups = &quot;drop&quot;) %&gt;%
+  pivot_wider(names_from = series, values_from = index_sa) %&gt;%
+  transmute(geo,
+            quarter,
+            s = 100 * log(SERV),
+            n = 100 * log(IGD_NNRG)) %&gt;%
+
+  # Stage 1: the relative-price gap is the residual of a linear trend
+  group_by(geo) %&gt;%
+  mutate(trend = row_number(),
+         gap = residuals(lm(s - n ~ trend))) %&gt;%
+  ungroup() %&gt;%
+  mutate(country = factor(country_names[geo], levels = country_names))</code></pre>
+</div>
+<div id="the-gaps" class="section level2">
+<h2>The gaps</h2>
+<pre class="r"><code>ggplot(prices, aes(x = quarter, y = gap)) +
+  geom_hline(yintercept = 0) +
+  geom_line(colour = &quot;#0F4C81&quot;, linewidth = 0.6) +
+  facet_wrap(~ country, ncol = 4) +
+  scale_x_continuous(breaks = c(2005, 2015, 2025)) +
+  labs(x = NULL,
+       y = &quot;Relative-price gap in %&quot;,
+       title = &quot;Price of services relative to NEIG, deviation from trend&quot;) +
+  theme_bw()</code></pre>
+<p><img src="/post/2026-10-12-services-inflation-across-the-euro-area_files/figure-html/chart-gaps-1.png" alt="" width="672" /></p>
+<pre class="r"><code># The lowest gap during the shock of 2021 to 2023, and what happened after
+shock &lt;- function(quarter) {quarter &gt;= 2021 &amp; quarter &lt; 2024}
+
+gap_summary &lt;- prices %&gt;%
+  group_by(geo, country) %&gt;%
+  summarise(trough = min(gap[shock(quarter)]),
+            trough_quarter = quarter[shock(quarter)][which.min(gap[shock(quarter)])],
+            latest = last(gap),
+            elapsed = 4 * (last(quarter) - trough_quarter),
+
+            # Annualised inflation since the trough and before 2020, in %
+            services_since = 4 * (last(s) - s[quarter == trough_quarter]) /
+              elapsed,
+            services_before = 4 * mean(diff(s[quarter &lt; 2020])),
+            .groups = &quot;drop&quot;) %&gt;%
+  mutate(closed = latest - trough,
+         excess_services = services_since - services_before)</code></pre>
+<p>Up to 2021, the gaps of the euro area and of most of its western members stayed within a few percent of zero: services became more expensive relative to NEIG at a steady pace. The central and eastern European members and Cyprus saw larger swings in the 2000s, when their price levels were catching up with the rest of the EU. Then, in 2022 and 2023, every gap fell, in the euro area to -3.9%. What happened next differs a lot. In the second quarter of 2026, the gap is positive in 14 of the 21 countries, and most of all in Croatia (11.6%), Cyprus (5.5%) and Austria (4.6%). It is most negative in Ireland (-7.7%), Finland (-5.8%) and Slovakia (-2.6%), where services are still cheap relative to their trend, and in Ireland and Finland getting cheaper still.</p>
+</div>
+<div id="estimation" class="section level2">
+<h2>Estimation</h2>
+<p>The second stage is estimated for each country exactly as in the reproduction. The sampler is run for 5,000 burn-in draws, after which 20,000 are kept:</p>
+<pre class="r"><code>estimate_gap_model &lt;- function(data) {
+
+  dy &lt;- ts(diff(as.matrix(data[, c(&quot;s&quot;, &quot;n&quot;)])),
+           start = data[[&quot;quarter&quot;]][2],
+           frequency = 4)
+
+  ect &lt;- ts(matrix(head(data[[&quot;gap&quot;]], -1), dimnames = list(NULL, &quot;ect&quot;)),
+            start = data[[&quot;quarter&quot;]][2],
+            frequency = 4)
+
+  model &lt;- create_bvarmodel(dy,
+                            p = 1,
+                            exogen = ect,
+                            s = 0,
+                            deterministic = &quot;const&quot;,
+                            iterations = 20000,
+                            burnin = 5000)
+
+  model &lt;- add_priors(model,
+                      coef = list(v_i = 1, v_i_det = 1),
+                      sigma = list(df = 4, scale = 0.01))
+
+  model &lt;- add_initial_values(model, method = &quot;ols&quot;)
+
+  return(add_posterior_coefficients(model))
+}
+
+set.seed(20261012)
+
+models &lt;- prices %&gt;%
+  split(.[[&quot;geo&quot;]]) %&gt;%
+  lapply(estimate_gap_model)</code></pre>
+<p>The draws of the coefficients are in <code>posterior[["a"]][["coeffs"]]</code>, where the coefficient of equation <span class="math inline">\(i\)</span> on regressor <span class="math inline">\(j\)</span> is in column <span class="math inline">\((j - 1) k + i\)</span>. The regressors are the lags of <span class="math inline">\(s\)</span> and <span class="math inline">\(n\)</span>, the error correction term and the constant:</p>
+<pre class="r"><code>draws &lt;- lapply(models, function(model) {
+  a &lt;- as.matrix(model[[&quot;posterior&quot;]][[&quot;a&quot;]][[&quot;coeffs&quot;]])
+  k &lt;- model[[&quot;model&quot;]][[&quot;k&quot;]]
+  data.frame(gamma_ss = a[, 1],
+             gamma_ns = a[, 2],
+             gamma_sn = a[, k + 1],
+             gamma_nn = a[, k + 2],
+             alpha_s = a[, 2 * k + 1],
+             alpha_n = a[, 2 * k + 2])
+}) %&gt;%
+  bind_rows(.id = &quot;geo&quot;)</code></pre>
+<pre class="r"><code>loadings &lt;- draws %&gt;%
+  pivot_longer(c(alpha_s, alpha_n), names_to = &quot;loading&quot;, values_to = &quot;value&quot;) %&gt;%
+  group_by(geo, loading) %&gt;%
+  summarise(median = median(value),
+            lower = quantile(value, 0.025),
+            upper = quantile(value, 0.975),
+            .groups = &quot;drop&quot;) %&gt;%
+  mutate(country = country_names[geo])
+
+# Countries ordered by the services loading
+country_order &lt;- loadings %&gt;%
+  filter(loading == &quot;alpha_s&quot;) %&gt;%
+  arrange(desc(median)) %&gt;%
+  pull(country)
+
+loadings %&gt;%
+  mutate(country = factor(country, levels = country_order),
+         loading = factor(loading,
+                          levels = c(&quot;alpha_s&quot;, &quot;alpha_n&quot;),
+                          labels = c(&quot;Services&quot;, &quot;NEIG&quot;))) %&gt;%
+  ggplot(aes(x = median, y = country, colour = geo == &quot;EA&quot;)) +
+  geom_vline(xintercept = 0) +
+  geom_pointrange(aes(xmin = lower, xmax = upper), size = 0.3) +
+  facet_wrap(~ loading) +
+  scale_colour_manual(values = c(&quot;#0F4C81&quot;, &quot;#C10016&quot;), guide = &quot;none&quot;) +
+  labs(x = &quot;Loading on the relative-price gap (median and 95% interval)&quot;,
+       y = NULL) +
+  theme_bw()</code></pre>
+<p><img src="/post/2026-10-12-services-inflation-across-the-euro-area_files/figure-html/chart-loadings-1.png" alt="" width="672" /></p>
+<p>Services inflation responds to a gap everywhere in the expected direction: the median of <span class="math inline">\(\alpha_s\)</span> is negative in all countries, and in 16 of 21 its 95% interval excludes zero. The response is strongest in Portugal, Malta and Germany, and it cannot be told apart from zero in Finland, Croatia, Austria, Spain and Bulgaria. NEIG inflation, on the other hand, hardly ever responds: its loading is clearly different from zero only in Latvia. Across the euro area, it is services prices that do the adjusting.</p>
+</div>
+<div id="how-fast-do-the-gaps-close" class="section level2">
+<h2>How fast do the gaps close?</h2>
+<p>To translate the loadings into a speed of adjustment, the model is simulated as in the paper, in deviations from a baseline without a gap: starting from <span class="math inline">\(z_0 = -1\)</span> and <span class="math inline">\(\Delta y_0 = 0\)</span>,</p>
+<p><span class="math display">\[\Delta y_h = \alpha z_{h-1} + \Gamma \Delta y_{h-1}, \quad z_h = z_{h-1} + \Delta s_h - \Delta n_h.\]</span></p>
+<p>The function below runs this recursion for all draws of a country at once and returns the remaining gap, in percent of the initial one, for each draw and quarter:</p>
+<pre class="r"><code>remaining_gap &lt;- function(d, horizon = 80) {
+  z &lt;- rep(-1, nrow(d))
+  ds &lt;- rep(0, nrow(d))
+  dn &lt;- rep(0, nrow(d))
+  result &lt;- matrix(NA, nrow(d), horizon)
+
+  for (h in seq_len(horizon)) {
+    ds_new &lt;- d[[&quot;alpha_s&quot;]] * z + d[[&quot;gamma_ss&quot;]] * ds + d[[&quot;gamma_sn&quot;]] * dn
+    dn_new &lt;- d[[&quot;alpha_n&quot;]] * z + d[[&quot;gamma_ns&quot;]] * ds + d[[&quot;gamma_nn&quot;]] * dn
+    ds &lt;- ds_new
+    dn &lt;- dn_new
+    z &lt;- z + ds - dn
+    result[, h] &lt;- -100 * z
+  }
+
+  return(result)
+}
+
+remaining &lt;- draws %&gt;%
+  split(.[[&quot;geo&quot;]]) %&gt;%
+  lapply(remaining_gap)</code></pre>
+<p>The half-life is the first quarter in which no more than half of the gap is left. A draw that does not get there within 20 years counts as 80 quarters, which affects only the upper ends of the intervals of a few countries:</p>
+<pre class="r"><code>half_lives &lt;- lapply(remaining, function(r) {
+  h &lt;- apply(r &lt;= 50, 1, function(x) {if (any(x)) which(x)[1] else 80})
+  data.frame(median = median(h),
+             lower = quantile(h, 0.16),
+             upper = quantile(h, 0.84))
+}) %&gt;%
+  bind_rows(.id = &quot;geo&quot;) %&gt;%
+  mutate(country = country_names[geo])
+
+half_lives %&gt;%
+  mutate(country = reorder(country, -median)) %&gt;%
+  ggplot(aes(x = median, y = country, colour = geo == &quot;EA&quot;)) +
+  geom_pointrange(aes(xmin = lower, xmax = upper), size = 0.3) +
+  scale_colour_manual(values = c(&quot;#0F4C81&quot;, &quot;#C10016&quot;), guide = &quot;none&quot;) +
+  labs(x = &quot;Half-life in quarters (median and 68% interval)&quot;,
+       y = NULL) +
+  theme_bw()</code></pre>
+<p><img src="/post/2026-10-12-services-inflation-across-the-euro-area_files/figure-html/chart-half-lives-1.png" alt="" width="672" /></p>
+<p>For the euro area, half of a gap is gone after 9 quarters. That is faster than the 14 to 15 quarters of the paper and the reproduction, and it is entirely due to the shorter sample: estimated on the data of the reproduction from 2001 instead of 1996, the euro area model also gives a half-life of 9 quarters. How fast a gap closes depends a good deal on the years from which the trend and the adjustment are estimated, which is worth keeping in mind for all numbers below. Across countries, half-lives range from Portugal (5), Germany (6) and Malta (6) quarters to Finland (48), Croatia (25) and Spain (23), with wide intervals for the slow ones.</p>
+</div>
+<div id="did-the-gaps-close-as-the-models-expected" class="section level2">
+<h2>Did the gaps close as the models expected?</h2>
+<p>All gaps hit their low point during the shock of 2021 to 2023. If the models are right, the gaps should since have closed by as much as the simulation implies for the number of quarters that have passed. The median path of each country gives the share of a gap that should be closed after a given number of quarters, which, applied to the gap at its low point, is the expected closure:</p>
+<pre class="r"><code>gap_summary &lt;- gap_summary %&gt;%
+  mutate(expected_remaining = mapply(function(geo, h) {
+           if (h == 0) 100 else median(remaining[[geo]][, h])
+         }, geo, elapsed),
+         expected_closed = -trough * (1 - expected_remaining / 100))</code></pre>
+<pre class="r"><code>gap_summary %&gt;%
+  ggplot(aes(x = expected_closed, y = closed)) +
+  geom_abline(intercept = 0, slope = 1, linetype = &quot;dashed&quot;) +
+  geom_point(aes(colour = geo == &quot;EA&quot;)) +
+  geom_text_repel(aes(label = geo), size = 3, seed = 1) +
+  scale_colour_manual(values = c(&quot;#0F4C81&quot;, &quot;#C10016&quot;), guide = &quot;none&quot;) +
+  labs(x = &quot;Expected closure of the gap since its low point, in pp&quot;,
+       y = &quot;Actual closure, in pp&quot;) +
+  theme_bw()</code></pre>
+<p><img src="/post/2026-10-12-services-inflation-across-the-euro-area_files/figure-html/chart-expected-closure-1.png" alt="" width="672" /></p>
+<p>The dashed line marks closure exactly as expected. Of the 19 countries in which the gap has started to close, it has closed by more than the model expected in all of them, and in Croatia, Cyprus and Austria by far more: their gaps have turned into large positive ones, which the model, whose adjustment slows down as a gap shrinks, cannot produce. In Finland and Ireland, the gaps have widened further since 2023, although their models expected them to close.</p>
+<p>A model that is estimated on the data it is checked against should do better than this. The pattern suggests that the speed of adjustment since 2023 has had more to do with country-specific forces than with the gap itself. A simple cross-country check points the same way. If the gap drove services inflation, countries with a deeper gap should have had more services inflation since, relative to their pre-pandemic average:</p>
+<pre class="r"><code>cross_section &lt;- lm(excess_services ~ trough,
+                    data = filter(gap_summary, geo != &quot;EA&quot;))
+
+gap_summary %&gt;%
+  ggplot(aes(x = trough, y = excess_services)) +
+  geom_smooth(data = filter(gap_summary, geo != &quot;EA&quot;),
+              method = &quot;lm&quot;, formula = y ~ x,
+              colour = &quot;#22282E&quot;, fill = &quot;#DCE1E5&quot;, linewidth = 0.6) +
+  geom_point(aes(colour = geo == &quot;EA&quot;)) +
+  geom_text_repel(aes(label = geo), size = 3, seed = 1) +
+  scale_colour_manual(values = c(&quot;#0F4C81&quot;, &quot;#C10016&quot;), guide = &quot;none&quot;) +
+  labs(x = &quot;Gap at its low point in 2021-2023, in %&quot;,
+       y = &quot;Services inflation since, minus 2001-2019 average, in pp&quot;) +
+  theme_bw()</code></pre>
+<p><img src="/post/2026-10-12-services-inflation-across-the-euro-area_files/figure-html/chart-cross-section-1.png" alt="" width="672" /></p>
+<p>They did, but only weakly. The slope of the regression line across the 21 countries is -0.26 with a standard error of 0.17: a gap that was one percentage point deeper went along with services inflation that was 0.26 points higher per year, a relation that is not statistically reliable with 21 observations. Countries with similar gaps, such as Austria and France, have seen very different services inflation since.</p>
+</div>
+<div id="the-role-of-tourism" class="section level2">
+<h2>The role of tourism</h2>
+<p>In the Austrian post, much of the overshoot of the relative price came from gastronomy, which weighs much more in the Austrian basket than in that of the euro area. Croatia and Cyprus, the two other countries with large positive gaps, are tourism countries as well. Is the size of gastronomy and accommodation in the basket what sets them apart?</p>
+<pre class="r"><code>gap_summary %&gt;%
+  left_join(weights, by = &quot;geo&quot;) %&gt;%
+  mutate(tourism = 100 * (CP111 + CP112) / SERV) %&gt;%
+  ggplot(aes(x = tourism, y = latest)) +
+  geom_hline(yintercept = 0) +
+  geom_point(aes(colour = geo == &quot;EA&quot;)) +
+  geom_text_repel(aes(label = geo), size = 3, seed = 1) +
+  scale_colour_manual(values = c(&quot;#0F4C81&quot;, &quot;#C10016&quot;), guide = &quot;none&quot;) +
+  labs(x = &quot;Gastronomy and accommodation, % of services in 2026&quot;,
+       y = &quot;Relative-price gap in 2026 Q2, in %&quot;) +
+  theme_bw()</code></pre>
+<p><img src="/post/2026-10-12-services-inflation-across-the-euro-area_files/figure-html/chart-tourism-1.png" alt="" width="672" /></p>
+<p>Not on its own. The correlation across countries is 0.26. Austria, Croatia and Cyprus have large shares and large gaps, but Spain, Portugal, Malta and Greece have shares as large and much smaller gaps, and Ireland, with the largest share of all, has the most negative gap. Without Ireland, the correlation rises to 0.58, so tourism-heavy baskets do tend to have larger gaps. Tourism may well have mattered, but a large share of gastronomy and accommodation in the basket is not enough on its own to push services above their trend.</p>
+</div>
+<div id="what-it-means" class="section level2">
+<h2>What it means</h2>
+<ul>
+<li><strong>The mechanism is general.</strong> In most euro area countries, services inflation rises when services are cheap relative to their trend, and it is services prices, not goods prices, that close the gap. In this sense, the explanation of Hochmuth and Petz is not specific to the euro area aggregate.</li>
+<li><strong>It explains little of what happened since 2023.</strong> In almost every country, the gap has closed faster than its own model expected, and in Croatia, Cyprus and Austria it has turned into a large positive gap. Across countries, a deeper gap in 2022 and 2023 went along with only slightly higher services inflation afterwards. Whatever drove the large differences in services inflation since then – wage setting, demand from tourists, administered prices – it was mostly not the relative-price gap.</li>
+<li><strong>The answer depends on the trend.</strong> With a trend fitted from 2001, the euro area gap is 1.2% in the second quarter of 2026 and has closed. With the trend of the paper, fitted from 1996 to 2019 and extrapolated, services in the euro area are still several percent too cheap. The conclusion that a catch-up is still ahead rests on the assumption that the relative price will return to the steeper path of the years before the pandemic.</li>
+</ul>
+<p>There are more reasons for caution. For the central and eastern European members, a linear trend over 25 years is a crude description of a relative price that rises with their income convergence and may flatten as convergence proceeds. The comparison of expected and actual closure is made with models estimated on the same data, which flatters the models, and still they fall short. And 21 countries are few observations for a cross-country regression.</p>
+</div>
+<div id="references" class="section level2">
+<h2>References</h2>
+<p>Engle, R. F., &amp; Granger, C. W. J. (1987). Co-integration and error correction: Representation, estimation, and testing. <em>Econometrica, 55</em>(2), 251–276. <a href="https://doi.org/10.2307/1913236" class="uri">https://doi.org/10.2307/1913236</a></p>
+<p>Hochmuth, P., &amp; Petz, N. (2026). On the persistence of services inflation and the price of services relative to goods. <em>OeNB Policy Brief</em> 2026/11. Oesterreichische Nationalbank. <a href="https://www.oenb.at/en/daten-und-forschung/publikationen/publikationsreihen/policy-brief/2026/policy-brief-2026-11.html" class="uri">https://www.oenb.at/en/daten-und-forschung/publikationen/publikationsreihen/policy-brief/2026/policy-brief-2026-11.html</a></p>
+<p>Sax, C., &amp; Eddelbuettel, D. (2018). Seasonal adjustment by X-13ARIMA-SEATS in R. <em>Journal of Statistical Software, 87</em>(11), 1–17. <a href="https://doi.org/10.18637/jss.v087.i11" class="uri">https://doi.org/10.18637/jss.v087.i11</a></p>
+</div>
