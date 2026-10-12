@@ -70,12 +70,12 @@ ggplot(temp, aes(x = date, y = value, colour = Variable)) +
   labs(title = &quot;Residuals of a linear trend estimation&quot;,
        x = &quot;Quarter&quot;, y = &quot;&quot;)</code></pre>
 <p><img src="/timeseries/economic-cycle-extraction_files/figure-html/trend-1.png" alt="" width="432" /></p>
-<p>This approach is relatively controversial, since it assumes that there is a constant, linear time trend. As we have seen above, this is not very likely given the steady decrease of the trend’s growth rate over time. However, it is still possible to assume a different functional form of the time trend, e.g. a quadratic term, to account for the specifities of a trend. A further disadvantage of this method is that it does only exlude the trend, but not the noise, i.e. the very small fluctuations in the series.</p>
+<p>This approach is relatively controversial, since it assumes that there is a constant, linear time trend. As we have seen above, this is not very likely given the steady decrease of the trend’s growth rate over time. However, it is still possible to assume a different functional form of the time trend, e.g. a quadratic term, to account for the specifities of a trend. A further disadvantage of this method is that it does only exclude the trend, but not the noise, i.e. the very small fluctuations in the series.</p>
 </div>
 <div id="hodrick-prescott-filter" class="section level2">
 <h2>Hodrick-Prescott filter</h2>
-<p>Hodrick and Prescott (1981) developed a filter, which seprates a time series into a trend and cyclical component. In contrast to the linear trend the so-called <em>HP filter</em> estimates a trend, which changes over time. And the degree to which this trend is allowed to change, the smoothing parameter <span class="math inline">\(\lambda\)</span>, is determined manually by the researcher.</p>
-<p>The <code>hpfilter</code> function is contained in the <em>mFilter</em> package and requires the time series and the smoothing parameter. The literature suggests a value of 1600 for quarterly data. However, it is possible to choose a much higher value as well. The follwoing figure plots the values of the cyclical component of real GDP obtained by the HP filter and compares it to the values of a linearly detrended series. The behaviour of both series appears to be quite similar at the beginning of the series.</p>
+<p>Hodrick and Prescott (1981) developed a filter, which separates a time series into a trend and cyclical component. In contrast to the linear trend the so-called <em>HP filter</em> estimates a trend, which changes over time. And the degree to which this trend is allowed to change, the smoothing parameter <span class="math inline">\(\lambda\)</span>, is determined manually by the researcher.</p>
+<p>The <code>hpfilter</code> function is contained in the <em>mFilter</em> package and requires the time series and the smoothing parameter. The literature suggests a value of 1600 for quarterly data. However, it is possible to choose a much higher value as well. The following figure plots the values of the cyclical component of real GDP obtained by the HP filter and compares it to the values of a linearly detrended series. The behaviour of both series appears to be quite similar at the beginning of the series.</p>
 <pre class="r"><code># Load the package
 library(mFilter)
 
@@ -102,7 +102,7 @@ ggplot(temp, aes(x = date, y = value, colour = Variable)) +
   geom_line() +
   theme_classic() +
   labs(title = &quot;HP filter&quot;,
-       x = &quot;Qurarter&quot;, y = &quot;&quot;)</code></pre>
+       x = &quot;Quarter&quot;, y = &quot;&quot;)</code></pre>
 <p><img src="/timeseries/economic-cycle-extraction_files/figure-html/hodrick%20prescott-1.png" alt="" width="432" /></p>
 <p>Although widely used in economics, the HP filter is also heavily criticised for some features. See, for example, a good overview in a <a href="http://bruegel.org/2012/07/blogs-review-hp-filters-and-business-cycles/" target="_blank">Bruegel blog post</a> by Jérémie Cohen-Setton and Yury Yatsynovich and <a href="https://doi.org/10.1162/rest_a_00706" target="_blank">here</a> for the working paper version of a critique by James Hamilton.</p>
 </div>
@@ -139,7 +139,7 @@ ggplot(temp, aes(x = date, y = value, colour = Variable)) +
   geom_line() +
   theme_classic() +
   labs(title = &quot;Hamilton&#39;s alternative to the HP filter&quot;,
-       x = &quot;Qurarter&quot;, y = &quot;&quot;, 
+       x = &quot;Quarter&quot;, y = &quot;&quot;, 
        caption = &quot;Source: Hamilton (2018).&quot;)</code></pre>
 <p><img src="/timeseries/economic-cycle-extraction_files/figure-html/hp%20augmented-1.png" alt="" width="432" /></p>
 </div>
@@ -168,7 +168,7 @@ ggplot(temp, aes(x = date, y = value, colour = Variable)) +
   geom_line() +
   theme_classic() +
   labs(title = &quot;Baxter-King filter&quot;,
-       x = &quot;Qurarter&quot;, y = &quot;&quot;)</code></pre>
+       x = &quot;Quarter&quot;, y = &quot;&quot;)</code></pre>
 <p><img src="/timeseries/economic-cycle-extraction_files/figure-html/baxter%20king-1.png" alt="" width="432" /></p>
 </div>
 <div id="wavelet-filter" class="section level2">
@@ -267,13 +267,13 @@ ggplot(temp, aes(x = date, y = value, colour = Variable)) +
   geom_line() +
   theme_classic() +
   labs(title = &quot;Empirical mode decomposition&quot;,
-       x = &quot;Qurarter&quot;, y = &quot;&quot;)</code></pre>
+       x = &quot;Quarter&quot;, y = &quot;&quot;)</code></pre>
 <p><img src="/timeseries/economic-cycle-extraction_files/figure-html/emd%20plot-1.png" alt="" width="432" /></p>
 <p>Note that the first and last elements are equal to zero. This is because we used the argument <code>boundary = "none"</code>. If we used a different specification, the function would eliminate this boundary effect by extending the original series.</p>
 </div>
 <div id="grant-a.-l.-chan-j.-c.-c.-2017" class="section level2">
 <h2>Grant, A. L., &amp; Chan, J. C. C. (2017)</h2>
-<p>The followning code follows the description in Chan et al. (2019). The MATLAB code can be found on <a href="https://web.ics.purdue.edu/~jltobias/second_edition/Chapter18/chapt18.html" target="_blank">the textbook’s website</a>.</p>
+<p>The following code follows the description in Chan et al. (2019). The MATLAB code can be found on <a href="https://web.ics.purdue.edu/~jltobias/second_edition/Chapter18/chapt18.html" target="_blank">the textbook’s website</a>.</p>
 <p>Priors</p>
 <pre class="r"><code># Rescaled data
 y &lt;- na.omit(data$lgdp) * 100
@@ -320,7 +320,9 @@ s_c_i &lt;- 1 / .5
 # gamma
 gamma &lt;- t(rep(y[1], 2)) # Should be close to first value of the series</code></pre>
 <p>Gibbs sampler</p>
-<pre class="r"><code>iterations &lt;- 11000
+<pre class="r"><code>set.seed(20261012)
+
+iterations &lt;- 11000
 burnin &lt;- 1000
 
 # Data containers for draws
@@ -400,7 +402,7 @@ ggplot(temp, aes(x = date, y = value, colour = Variable)) +
   geom_line() +
   theme_classic() +
   labs(title = &quot;Grant &amp; Chan (2017)&quot;,
-       x = &quot;Qurarter&quot;, y = &quot;&quot;)</code></pre>
+       x = &quot;Quarter&quot;, y = &quot;&quot;)</code></pre>
 <p><img src="/timeseries/economic-cycle-extraction_files/figure-html/unnamed-chunk-4-1.png" alt="" width="672" /></p>
 </div>
 <div id="references" class="section level2">
