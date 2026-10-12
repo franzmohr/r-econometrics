@@ -21,7 +21,7 @@ Euro area services inflation has come down much more slowly than goods inflation
 
 How fast that happens, and whether it happens through higher services inflation or lower goods inflation, is the question of the policy brief's Annex A. It answers it with a small error correction model of services and non-energy industrial goods (NEIG) prices, and finds that half of a gap closes after about three and a half years, mostly through services. With overall goods prices instead of NEIG the gap closes within about five quarters, and mostly through goods.
 
-This post reproduces both results with [`bvartools`](https://github.com/franzmohr/bvartools), together with the brief's two charts of the relative price of services in the euro area and the United States.
+This post reproduces both results with [`bvartools`](https://github.com/franzmohr/bvartools), together with the brief's three descriptive charts: the composition of euro area inflation, and the relative price of services in the euro area and the United States.
 
 <!--more-->
 
@@ -102,6 +102,72 @@ for (i in colnames(hicp)) {
 prices <- aggregate(hicp_sa, nfrequency = 4, FUN = mean)
 colnames(prices) <- c("services", "neig", "goods")
 ```
+
+## The composition of euro area inflation
+
+Chart 1 of the brief splits euro area HICP inflation since 2018 into the contributions of energy, food including alcohol and tobacco, NEIG and services. Eurostat publishes these contributions in percentage points as data set `prc_hicp_ctr`, and the annual rates of headline and core inflation -- the overall index excluding energy, food, alcohol and tobacco -- are in `prc_hicp_minr`:
+
+```{r download-contributions, eval = FALSE}
+# One euro area series per COICOP aggregate from a Eurostat JSON-stat query
+eurostat <- function(dataset, query) {
+  js <- fromJSON(paste0("https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/",
+                        dataset, "?format=JSON&geo=EA&sinceTimePeriod=2018-01&", query))
+  items <- names(sort(unlist(js$dimension$coicop18$category$index)))
+  months <- names(sort(unlist(js$dimension$time$category$index)))
+  x <- matrix(NA_real_, length(months), length(items), dimnames = list(months, items))
+  pos <- as.integer(names(js$value))
+  x[cbind(pos %% length(months) + 1, pos %/% length(months) + 1)] <- unlist(js$value)
+  x
+}
+
+ctr <- eurostat("prc_hicp_ctr", "coicop18=NRG&coicop18=FOOD&coicop18=IGD_NNRG&coicop18=SERV")
+rates <- eurostat("prc_hicp_minr", "unit=RCH_A&coicop18=TOTAL&coicop18=TOT_X_NRG_FOOD")
+months <- intersect(rownames(ctr), rownames(rates))
+months <- months[months <= "2026-07"]   # the brief's last observation
+
+write.csv(data.frame(month = months, ctr[months, ], rates[months, ]),
+          "_2026_hochmuth_petz_contributions.csv", row.names = FALSE)
+```
+
+The contributions add up to headline inflation up to rounding. The bars of a month are stacked upwards from zero where they are positive and downwards where they are negative:
+
+```{r chart1}
+ctr <- read.csv("_2026_hochmuth_petz_contributions.csv")
+date <- seq(2018, by = 1 / 12, length.out = nrow(ctr))
+parts <- as.matrix(ctr[, c("SERV", "IGD_NNRG", "FOOD", "NRG")])
+cols <- c("#8fae7e", "#4aa8b0", "#f3e6c4", "#123d7a")
+
+plot(NA, xlim = range(date), ylim = c(-4, 12), xlab = "",
+     ylab = "Contribution to HICP inflation in %", main = "HICP components")
+grid()
+up <- pmax(parts, 0)
+down <- pmin(parts, 0)
+for (j in seq_len(ncol(parts))) {
+  top <- rowSums(up[, 1:j, drop = FALSE])
+  bottom <- rowSums(down[, 1:j, drop = FALSE])
+  rect(date - 0.035, top - up[, j], date + 0.035, top, col = cols[j], border = NA)
+  rect(date - 0.035, bottom - down[, j], date + 0.035, bottom, col = cols[j], border = NA)
+}
+lines(date, ctr$TOTAL, lwd = 1.5)
+lines(date, ctr$TOT_X_NRG_FOOD, lwd = 1.5, lty = 2)
+abline(h = 0)
+legend("topleft", legend = c("Energy", "Food including alcohol and tobacco",
+                             "Non-energy industrial goods", "Services",
+                             "HICP inflation in %", "Core inflation in %"),
+       fill = c(rev(cols), NA, NA), border = NA, lty = c(NA, NA, NA, NA, 1, 2),
+       bty = "n", cex = 0.8)
+```
+
+```{r chart1-numbers, include = FALSE}
+peak <- which.max(ctr$TOTAL)
+serv_peak <- which.max(ctr$SERV)
+month_name <- function(i) {
+  paste(month.name[as.integer(substr(ctr$month[i], 6, 7))], substr(ctr$month[i], 1, 4))
+}
+last <- nrow(ctr)
+```
+
+The chart matches the published one. Headline inflation peaked at `r ctr$TOTAL[peak]`% in `r month_name(peak)`, when energy alone contributed `r ctr$NRG[peak]` percentage points. The contribution of services rose more slowly and peaked later, at `r ctr$SERV[serv_peak]` points in `r month_name(serv_peak)`, and has receded more slowly than the others: in `r month_name(last)` it still accounted for `r ctr$SERV[last]` of `r ctr$TOTAL[last]` points, more than half of headline inflation, while energy, which had subtracted from inflation for most of 2023 to 2025, was adding `r ctr$NRG[last]` points again.
 
 ## The price of services relative to goods
 

@@ -17,7 +17,7 @@ description: "Hochmuth and Petz (2026) argue that persistent services inflation 
 
 <p>Euro area services inflation has come down much more slowly than goods inflation since its peak in 2023. <a href="https://www.oenb.at/en/daten-und-forschung/publikationen/publikationsreihen/policy-brief/2026/policy-brief-2026-11.html">Hochmuth and Petz (2026)</a> read this partly as a relative-price adjustment. Before the pandemic, services prices rose faster than goods prices along a stable trend, which reflects slower productivity growth in services, income-elastic demand for them and their lower tradability. The surge in goods prices in 2021 and 2022 pushed the price of services relative to goods below that trend, and part of what looks like persistent services inflation is the relative price working its way back.</p>
 <p>How fast that happens, and whether it happens through higher services inflation or lower goods inflation, is the question of the policy brief’s Annex A. It answers it with a small error correction model of services and non-energy industrial goods (NEIG) prices, and finds that half of a gap closes after about three and a half years, mostly through services. With overall goods prices instead of NEIG the gap closes within about five quarters, and mostly through goods.</p>
-<p>This post reproduces both results with <a href="https://github.com/franzmohr/bvartools"><code>bvartools</code></a>, together with the brief’s two charts of the relative price of services in the euro area and the United States.</p>
+<p>This post reproduces both results with <a href="https://github.com/franzmohr/bvartools"><code>bvartools</code></a>, together with the brief’s three descriptive charts: the composition of euro area inflation, and the relative price of services in the euro area and the United States.</p>
 <!--more-->
 <div id="the-model" class="section level2">
 <h2>The model</h2>
@@ -82,6 +82,56 @@ for (i in colnames(hicp)) {
 }
 prices &lt;- aggregate(hicp_sa, nfrequency = 4, FUN = mean)
 colnames(prices) &lt;- c(&quot;services&quot;, &quot;neig&quot;, &quot;goods&quot;)</code></pre>
+</div>
+<div id="the-composition-of-euro-area-inflation" class="section level2">
+<h2>The composition of euro area inflation</h2>
+<p>Chart 1 of the brief splits euro area HICP inflation since 2018 into the contributions of energy, food including alcohol and tobacco, NEIG and services. Eurostat publishes these contributions in percentage points as data set <code>prc_hicp_ctr</code>, and the annual rates of headline and core inflation – the overall index excluding energy, food, alcohol and tobacco – are in <code>prc_hicp_minr</code>:</p>
+<pre class="r"><code># One euro area series per COICOP aggregate from a Eurostat JSON-stat query
+eurostat &lt;- function(dataset, query) {
+  js &lt;- fromJSON(paste0(&quot;https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/&quot;,
+                        dataset, &quot;?format=JSON&amp;geo=EA&amp;sinceTimePeriod=2018-01&amp;&quot;, query))
+  items &lt;- names(sort(unlist(js$dimension$coicop18$category$index)))
+  months &lt;- names(sort(unlist(js$dimension$time$category$index)))
+  x &lt;- matrix(NA_real_, length(months), length(items), dimnames = list(months, items))
+  pos &lt;- as.integer(names(js$value))
+  x[cbind(pos %% length(months) + 1, pos %/% length(months) + 1)] &lt;- unlist(js$value)
+  x
+}
+
+ctr &lt;- eurostat(&quot;prc_hicp_ctr&quot;, &quot;coicop18=NRG&amp;coicop18=FOOD&amp;coicop18=IGD_NNRG&amp;coicop18=SERV&quot;)
+rates &lt;- eurostat(&quot;prc_hicp_minr&quot;, &quot;unit=RCH_A&amp;coicop18=TOTAL&amp;coicop18=TOT_X_NRG_FOOD&quot;)
+months &lt;- intersect(rownames(ctr), rownames(rates))
+months &lt;- months[months &lt;= &quot;2026-07&quot;]   # the brief&#39;s last observation
+
+write.csv(data.frame(month = months, ctr[months, ], rates[months, ]),
+          &quot;_2026_hochmuth_petz_contributions.csv&quot;, row.names = FALSE)</code></pre>
+<p>The contributions add up to headline inflation up to rounding. The bars of a month are stacked upwards from zero where they are positive and downwards where they are negative:</p>
+<pre class="r"><code>ctr &lt;- read.csv(&quot;_2026_hochmuth_petz_contributions.csv&quot;)
+date &lt;- seq(2018, by = 1 / 12, length.out = nrow(ctr))
+parts &lt;- as.matrix(ctr[, c(&quot;SERV&quot;, &quot;IGD_NNRG&quot;, &quot;FOOD&quot;, &quot;NRG&quot;)])
+cols &lt;- c(&quot;#8fae7e&quot;, &quot;#4aa8b0&quot;, &quot;#f3e6c4&quot;, &quot;#123d7a&quot;)
+
+plot(NA, xlim = range(date), ylim = c(-4, 12), xlab = &quot;&quot;,
+     ylab = &quot;Contribution to HICP inflation in %&quot;, main = &quot;HICP components&quot;)
+grid()
+up &lt;- pmax(parts, 0)
+down &lt;- pmin(parts, 0)
+for (j in seq_len(ncol(parts))) {
+  top &lt;- rowSums(up[, 1:j, drop = FALSE])
+  bottom &lt;- rowSums(down[, 1:j, drop = FALSE])
+  rect(date - 0.035, top - up[, j], date + 0.035, top, col = cols[j], border = NA)
+  rect(date - 0.035, bottom - down[, j], date + 0.035, bottom, col = cols[j], border = NA)
+}
+lines(date, ctr$TOTAL, lwd = 1.5)
+lines(date, ctr$TOT_X_NRG_FOOD, lwd = 1.5, lty = 2)
+abline(h = 0)
+legend(&quot;topleft&quot;, legend = c(&quot;Energy&quot;, &quot;Food including alcohol and tobacco&quot;,
+                             &quot;Non-energy industrial goods&quot;, &quot;Services&quot;,
+                             &quot;HICP inflation in %&quot;, &quot;Core inflation in %&quot;),
+       fill = c(rev(cols), NA, NA), border = NA, lty = c(NA, NA, NA, NA, 1, 2),
+       bty = &quot;n&quot;, cex = 0.8)</code></pre>
+<p><img src="/reproduction/2026_hochmuth_petz_services_files/figure-html/chart1-1.png" alt="" width="672" /></p>
+<p>The chart matches the published one. Headline inflation peaked at 10.6% in October 2022, when energy alone contributed 4.44 percentage points. The contribution of services rose more slowly and peaked later, at 2.47 points in July 2023, and has receded more slowly than the others: in July 2026 it still accounted for 1.55 of 2.9 points, more than half of headline inflation, while energy, which had subtracted from inflation for most of 2023 to 2025, was adding 0.94 points again.</p>
 </div>
 <div id="the-price-of-services-relative-to-goods" class="section level2">
 <h2>The price of services relative to goods</h2>
