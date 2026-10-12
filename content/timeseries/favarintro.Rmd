@@ -91,6 +91,8 @@ BBE propose two methods for the estimation of a FAVAR. One is a Bayesian approac
 1. Estimate the space spanned by $f_t$ and $y_t$ by the principal components of $x_t$.
 2. Estimate the transition equation as a VAR, in which the factors from the first step are treated as if they were observed.
 
+The application below uses the two-step procedure first and compares it with the one-step approach at the end.
+
 There is a catch in the first step. The principal components of the whole panel also contain the information of $y_t$, since the panel includes many series that respond to it. BBE's application is the effect of monetary policy, where $y_t$ is the federal funds rate. As in many VAR studies of monetary policy, a recursive identification scheme is used, which assumes that the policy rate reacts to economic conditions within a period, while the economy reacts to a policy shock with a lag. This requires factors that do not respond to the policy rate in the same period, which the principal components of the whole panel do not satisfy.
 
 BBE solve this by splitting the panel into *slow-moving* variables, like output, employment and prices, which are assumed not to react to monetary policy within the same period, and *fast-moving* variables, like asset prices and interest rates, which are allowed to react immediately. The principal components of the slow-moving variables do not depend on the policy rate in the same period by construction. They are used to clean the factors of the whole panel from the direct effect of the policy rate: the factors are regressed on the slow-moving factors and the policy rate, and the part that is explained by the policy rate is removed.
@@ -252,7 +254,7 @@ ggplot(temp, aes(x = h, y = median)) +
 ```{r numbers, include = FALSE}
 peak <- function(r) {
   m <- apply(r, 2, median)
-  c(value = min(m), h = which.min(m) - 1)
+  c(value = min(m), h = unname(which.min(m)) - 1)
 }
 gdp <- peak(ir_x[["GDPC1"]])
 ip <- peak(ir_x[["INDPRO"]])
@@ -317,9 +319,96 @@ turns_negative <- function(q) {which(q[2, -1] < 0)[1]}
 
 Both models show an increase of the price level after the tightening. In the small VAR it is larger and more persistent: after four quarters the median response is `r round(small_q[2, 5], 2)` per cent compared to `r round(cpi[2, 5], 2)` per cent in the FAVAR, and the median falls below zero only after `r turns_negative(small_q)` quarters, while in the FAVAR it does so after `r turns_negative(cpi)` quarters. The additional information in the factors therefore weakens the price puzzle, although it does not remove it completely. BBE report a similar result for their sample.
 
-## Remarks
+## One-step estimation
 
-The two-step approach is simple and fast, but it has a drawback. The factors are estimates, which are treated as if they were observed in the second step. The credible intervals above therefore do not account for the uncertainty about the factors and are too narrow. BBE address this by a bootstrap procedure and by their Bayesian one-step approach, which samples the factors together with the other parameters. They find that both approaches lead to qualitatively similar results.
+The two-step approach is simple and fast, but it has a drawback. The factors are estimates, which are treated as if they were observed in the second step. The credible intervals above therefore do not account for the uncertainty about the factors. BBE address this by a bootstrap procedure and by their Bayesian one-step approach, which draws the factors together with the other parameters of the model, so that the uncertainty about the factors enters the credible intervals. They find that both approaches lead to qualitatively similar results.
+
+The one-step approach is implemented in the `dfmtools` package, whose installation is described in the [post on dynamic factor models](/timeseries/dynamicfactorintro). Its Gibbs sampler draws the factors, the loadings, the coefficients of the transition equation and the covariance matrices of both error terms in turn.
+
+Since the factors are no longer principal components, they need a different normalisation. `dfmtools` restricts the leading $N \times N$ block of $\lambda^{f}$ to the identity matrix and the corresponding rows of $\lambda^{y}$ to zero. Thus, the first $N$ series of the panel are the factors plus idiosyncratic noise. This makes the order of the panel a substantive choice: the first series should be broad slow-moving measures, since they define the factors. Following the vignette of the package, industrial production, payroll employment and consumer prices are used. They are aggregates and not part of the panel above, so they are added at the beginning. The same is done for the remaining series, whose responses are shown below, since the one-step approach only produces responses for the series of the panel.
+
+```{r onestep-data}
+library(dfmtools)
+
+# Series that define the factors and further series, whose responses are shown
+identifiers <- c("INDPRO", "PAYEMS", "CPIAUCSL")
+extra <- c("GDPC1", "UNRATE", "HOUST", "M2REAL")
+panel_one <- c(identifiers, extra, setdiff(panel, c(identifiers, extra)))
+
+x_one <- ts(x[, panel_one], start = c(1960, 1), frequency = 4)
+ffr_one <- ts(cbind(FEDFUNDS = ffr), start = c(1960, 1), frequency = 4)
+
+# Slow-moving series
+slow_one <- c(identifiers, "GDPC1", "UNRATE", slow)
+```
+
+Instead of cleaning the factors, the distinction between slow-moving and fast-moving variables enters the model as a restriction: the loadings of the slow-moving series on the federal funds rate are set to zero, so that they cannot react to it within the same quarter. Together with the identity block this implies that the factors do not react to the policy rate within the quarter either. The restriction is specified with argument `slow` of `add_priors`. The model has the same number of factors and lags as above, and `create_favarmodel` normalises the series of the panel by default.
+
+```{r onestep-model}
+favar <- create_favarmodel(x = x_one, y = ffr_one, p = 4, n = 3,
+                           iterations = 10000, burnin = 2000)
+favar <- add_priors(favar, slow = slow_one)
+favar <- add_initial_values(favar)
+favar <- add_posterior_coefficients(favar)
+```
+
+```{r onestep-check, include = FALSE}
+lambda_one <- matrix(colMeans(favar$posterior$lambda$coeffs), nrow = length(panel_one))
+slow_max <- max(abs(lambda_one[panel_one %in% slow_one, n_factors + 1]))
+```
+
+The restriction is implemented as a very tight prior rather than as an exact zero, but the posterior means of the restricted loadings are zero to `r floor(-log10(slow_max))` decimal places, which is exact for all practical purposes.
+
+The `irf` method of `dfmtools` computes the responses of the series in the panel directly from the loadings. As before, the shock is identified recursively with the federal funds rate ordered last and each draw is rescaled to a shock of 25 basis points. Since the panel is normalised, the responses are multiplied by the standard deviation of the respective series to obtain them in their original units.
+
+```{r onestep-irf}
+# Response of the federal funds rate, used to rescale the shock
+ffr_draws <- unclass(irf(favar, impulse = "FEDFUNDS", response = "FEDFUNDS",
+                         n_ahead = 20, keep_draws = TRUE))
+one_scale <- 0.25 / ffr_draws[, 1]
+x_scale <- attr(favar$data$x, "scaled:scale")
+
+ir_one <- lapply(names(show), function(i) {
+  r <- unclass(irf(favar, impulse = "FEDFUNDS", response = i, n_ahead = 20,
+                   cumulative = TRUE, keep_draws = TRUE))
+  r <- r * one_scale * x_scale[i]
+  if (tcode[i] != 2) {
+    r <- 100 * r
+  }
+  return(r)
+})
+names(ir_one) <- names(show)
+ir_one[["FEDFUNDS"]] <- ffr_draws * one_scale
+```
+
+```{r onestep-plot, fig.width = 8, fig.height = 7.5}
+temp <- rbind(
+  cbind(do.call(rbind, Map(summarise_irf, ir_x, units[names(ir_x)])), method = "Two-step"),
+  cbind(do.call(rbind, Map(summarise_irf, ir_one, units[names(ir_one)])), method = "One-step"))
+temp$variable <- factor(temp$variable, levels = units[c("FEDFUNDS", names(show))])
+
+ggplot(temp, aes(x = h, y = median, colour = method, fill = method)) +
+  geom_hline(yintercept = 0, colour = "grey50") +
+  geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2, colour = NA) +
+  geom_line() +
+  facet_wrap(~ variable, scales = "free_y", ncol = 3) +
+  theme_bw() +
+  theme(legend.position = "bottom",
+        legend.title = element_blank()) +
+  labs(title = "Responses to a monetary policy shock of 25 basis points",
+       x = "Quarters", y = NULL,
+       caption = "Median and 90 per cent credible intervals.")
+```
+
+```{r onestep-numbers, include = FALSE}
+gdp_one <- peak(ir_one[["GDPC1"]])
+width <- function(r) {mean(apply(r, 2, quantile, 0.95) - apply(r, 2, quantile, 0.05))}
+width_ratio <- sapply(names(show), function(i) {width(ir_one[[i]]) / width(ir_x[[i]])})
+```
+
+Both approaches tell the same story. In the one-step model, real GDP falls by up to `r abs(round(gdp_one["value"], 2))` per cent after `r gdp_one["h"]` quarters, compared to `r abs(round(gdp["value"], 2))` per cent after `r gdp["h"]` quarters in the two-step model, and the other real variables and prices respond very similarly as well. The federal funds rate is somewhat more persistent in the one-step model. The initial increase of consumer prices almost disappears, and the less plausible rise of the S&P 500 is about half as large as in the two-step model. The width of the credible intervals of the series in the panel is between `r format(round(min(width_ratio), 1), nsmall = 1)` and `r format(round(max(width_ratio), 1), nsmall = 1)` times that of the two-step approach. Thus, accounting for the uncertainty about the factors does not change the conclusions in this application.
+
+## Remarks
 
 A FAVAR, whose loadings and coefficients vary over time, is used by Koop and Korobilis (2014) to construct an index of financial conditions. Their approach is [reproduced here](/reproduction/2014_koop_korobilis_fci).
 
