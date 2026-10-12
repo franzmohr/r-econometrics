@@ -14,6 +14,11 @@ tags:
 description: "Koop, León-González and Strachan (2011) let the cointegration space of a VECM drift over time and use the model to ask whether the Fisher effect holds in UK data. This post reproduces the paper's time varying cointegrating coefficient and its comparison of model variants by predictive likelihood in R with bvartools."
 ---
 
+```{r setup, include = FALSE}
+# The models' draws take about 1.2 GB each; no need to say so on the page
+options(bayests.size_warning = Inf)
+```
+
 The Fisher hypothesis says that nominal interest rates move one for one with expected inflation, so that the real interest rate is stationary. In a vector error correction model (VECM) of a short-term interest rate $r_t$ and inflation $\pi_t$ it implies a single cointegrating relationship with the vector $(1, -1)'$. Tests of it on long samples give mixed results, and one reason may be that the relationship is not the same throughout: a hypothesis that holds in some decades and fails in others is rejected by a model that insists on one answer for all of them.
 
 Koop, León-González and Strachan (2011) develop a VECM whose cointegration space is allowed to change over time, and use it on exactly this question. The difficulty they solve is not computational but conceptual. The natural extension of a time varying parameter VAR -- letting the cointegrating vectors follow a random walk -- does not work, because only the space spanned by the vectors is identified, and a random walk on a normalised vector says nothing sensible about how that space moves. Their state equation instead implies that the space in one period is centred on the space of the period before, and that its marginal prior is uniform in every period.
@@ -44,6 +49,7 @@ The paper uses quarterly UK data from the IMF's International Financial Statisti
 
 ```{r data, message = FALSE, fig.height = 4.5, fig.width = 7}
 library("bvartools")
+library("knitr")
 
 data("uk_macrodata")
 uk <- uk_macrodata[, c("rs", "Dp")]
@@ -53,7 +59,10 @@ plot(uk, main = "UK Treasury bill rate and inflation")
 ```
 
 ```{r sample, include = FALSE}
-quarter <- function(x) paste0(floor(x + 1e-8), " Q", round((x - floor(x + 1e-8)) * 4) + 1)
+quarter <- function(x) {
+  year <- floor(x + 1e-8)
+  return(paste0(year, " Q", round((x - year) * 4) + 1))
+}
 ```
 
 With one lag of differences the estimation sample runs from `r quarter(time(uk)[3])` to `r quarter(time(uk)[nrow(uk)])`, `r nrow(uk) - 2` observations.
@@ -65,10 +74,10 @@ Appendix A of the paper gives the priors. `bvartools` puts independent priors on
 | Parameter | Paper | `bvartools` |
 |---|---|---|
 | $\rho$ | $U[0.999, 1)$ | `coint = list(rho = 0.9995, rho_min = 0.999, rho_max = 1)` |
-| $a_0$ | $N(0, 2V)$, $V = I$ except $1 - \rho^2$ for $\alpha^*$ | `coef$v_i = 1 / 2`, loadings $1 / (2 (1 - \rho^2))$ |
+| $a_0$ | $N(0, 2V)$, $V = I$ except $1 - \rho^2$ for $\alpha^*$ | `v_i = 1 / 2` in `coef`, loadings $1 / (2 (1 - \rho^2))$ |
 | $Q^{-1}$ | $W(\dim(a) + 2, 0.0001 I)$ | shape $(\dim(a) + 2) / 2$, rate $0.0001 / 2$ |
 | $\lambda_0$, $C^{-1}$ | $N(0, 2)$, $W(3, 0.0001)$ | precision $1/2$, shape $3/2$, rate $0.0001 / 2$ |
-| $h_0$, $W^{-1}$ | $N(0, 2 I)$, $W(n + 2, 0.0001 I)$ | `sigma$v_i = 1 / 8`, `sigma$shape = 2`, `sigma$rate = 4 \times 0.0001 / 2` |
+| $h_0$, $W^{-1}$ | $N(0, 2 I)$, $W(n + 2, 0.0001 I)$ | `v_i = 1 / 8`, `shape = 2` and `rate = 4 \times 0.0001 / 2` in `sigma` |
 
 The last row needs a word. The paper's $h_t$ is the log of a standard deviation, while `bvartools` models the log of a variance, which is twice that. Its prior variance and the variance of its state equation are therefore four times as large.
 
@@ -81,39 +90,64 @@ The paper's preferred model, $(1, 1, 0)$, keeps $A$ constant while the cointegra
 One function sets up both models:
 
 ```{r tvp-vec}
-rho0 <- 0.9995
+rho_0 <- 0.9995
 
-tvp_vec <- function(data, d_omega, d_a, r = 1, iterations = 36000, burnin = 1000) {
+tvp_vec <- function(series, d_omega, d_a, r = 1, iterations = 36000,
+                    burnin = 1000) {
+
   sv <- d_omega == 1
-  model <- create_bvecmodel(data, p = 2, r = r, const = "unrestricted", tvp = TRUE,
+
+  model <- create_bvecmodel(series,
+                            p = 2,
+                            r = r,
+                            const = "unrestricted",
+                            tvp = TRUE,
                             error = if (sv) "sv+covar" else "wishart",
-                            iterations = iterations, burnin = burnin)
-  sigma <- if (sv) {
-    list(mu = 0, v_i = 1 / 8, shape = 2, rate = 4 * 0.0001 / 2,
-         state_variance = 0.001, offset = 1e-8)
+                            iterations = iterations,
+                            burnin = burnin)
+
+  if (sv) {
+    sigma <- list(mu = 0,
+                  v_i = 1 / 8,
+                  shape = 2,
+                  rate = 4 * 0.0001 / 2,
+                  state_variance = 0.001,
+                  offset = 1e-8)
   } else {
-    list(df = "k + 1", scale = 1)
+    sigma <- list(df = "k + 1", scale = 1)
   }
+
   model <- add_priors(model,
-                      coef = list(v_i = 1 / 2, v_i_det = 1 / 2, shape = 1, rate = 1),
-                      coint = list(rho = rho0, rho_min = 0.999, rho_max = 1),
+                      coef = list(v_i = 1 / 2,
+                                  v_i_det = 1 / 2,
+                                  shape = 1,
+                                  rate = 1),
+                      coint = list(rho = rho_0, rho_min = 0.999, rho_max = 1),
                       sigma = sigma)
 
-  k <- ncol(data)
-  n_a <- nrow(model$priors$a$shape)
-  diag(model$priors$a$v_inv)[1:(k * r)] <- 1 / (2 * (1 - rho0^2))
+  # The loadings' prior precision, and the state equation of A
+  k <- ncol(series)
+  prior_a <- model[["priors"]][["a"]]
+  n_a <- nrow(prior_a[["shape"]])
+
+  diag(prior_a[["v_inv"]])[1:(k * r)] <- 1 / (2 * (1 - rho_0^2))
+
   if (d_a == 1) {
-    model$priors$a$shape[] <- (n_a + 2) / 2
-    model$priors$a$rate[] <- 0.0001 / 2
+    prior_a[["shape"]][] <- (n_a + 2) / 2
+    prior_a[["rate"]][] <- 0.0001 / 2
   } else {
-    model$priors$a$shape[] <- 1e6
-    model$priors$a$rate[] <- 1e-6
+    prior_a[["shape"]][] <- 1e6
+    prior_a[["rate"]][] <- 1e-6
   }
+
+  model[["priors"]][["a"]] <- prior_a
+
   if (sv) {
-    model$priors$psi$shape[] <- 3 / 2
-    model$priors$psi$rate[] <- 0.0001 / 2
+    model[["priors"]][["psi"]][["shape"]][] <- 3 / 2
+    model[["priors"]][["psi"]][["rate"]][] <- 0.0001 / 2
   }
-  model
+
+  return(model)
 }
 ```
 
@@ -121,23 +155,34 @@ The paper runs its sampler for 1,000 burn-in draws and keeps the next 36,000. So
 
 ```{r estimate, message = FALSE}
 set.seed(20110816)
-model_110 <- add_posterior_coefficients(add_initial_values(tvp_vec(uk, d_omega = 1, d_a = 0)))
+
+model_110 <- tvp_vec(uk, d_omega = 1, d_a = 0)
+model_110 <- add_initial_values(model_110)
+model_110 <- add_posterior_coefficients(model_110)
 
 set.seed(20110816)
-model_111 <- add_posterior_coefficients(add_initial_values(tvp_vec(uk, d_omega = 1, d_a = 1)))
+
+model_111 <- tvp_vec(uk, d_omega = 1, d_a = 1)
+model_111 <- add_initial_values(model_111)
+model_111 <- add_posterior_coefficients(model_111)
 ```
 
 ## The cointegrating coefficient
 
-The draws of $b_t^*$ are in `posterior$beta$coeffs`, one pair of columns per period, and the normalised coefficient $B_t = \beta_{2,t}^* / \beta_{1,t}^*$ is their ratio. It does not depend on the scale of $b_t^*$, which is not identified.
+The draws of $b_t^*$ are in `posterior[["beta"]][["coeffs"]]`, one pair of columns per period, and the normalised coefficient $B_t = \beta_{2,t}^* / \beta_{1,t}^*$ is their ratio. It does not depend on the scale of $b_t^*$, which is not identified.
 
 ```{r b-ratio}
-b_ratio <- function(model, probs = c(.05, .5, .95)) {
-  beta <- model$posterior$beta$coeffs
-  odd <- seq(1, ncol(beta), by = 2)
-  b <- beta[, odd + 1] / beta[, odd]
-  ts(t(apply(b, 2, quantile, probs = probs)),
-     start = start(model$data$train$y), frequency = 4)
+b_ratio <- function(model, probs = c(0.05, 0.5, 0.95)) {
+
+  beta_draws <- model[["posterior"]][["beta"]][["coeffs"]]
+  odd <- seq(1, ncol(beta_draws), by = 2)
+  b <- beta_draws[, odd + 1] / beta_draws[, odd]
+
+  intervals <- t(apply(b, 2, quantile, probs = probs))
+
+  return(ts(intervals,
+            start = start(model[["data"]][["train"]][["y"]]),
+            frequency = 4))
 }
 
 b_110 <- b_ratio(model_110)
@@ -147,8 +192,13 @@ b_111 <- b_ratio(model_111)
 Fig. 1 of the paper plots the posterior median of $B_t$ and its 90% credible interval for the preferred model:
 
 ```{r fig1, fig.height = 4.5, fig.width = 7}
-ts.plot(b_110, lty = c(2, 1, 2), ylim = c(-7, 0), xlab = "", ylab = expression(B[t]),
+ts.plot(b_110,
+        lty = c(2, 1, 2),
+        ylim = c(-7, 0),
+        xlab = "",
+        ylab = expression(B[t]),
         main = "Model (1, 1, 0), r = 1")
+
 abline(h = -1)
 ```
 
@@ -162,12 +212,22 @@ The path has the shape of the published one. The interval is wide at the start o
 The model in which $A$ drifts as well gives nearly the same path:
 
 ```{r fig1-111, fig.height = 4.5, fig.width = 7}
-ts.plot(b_111, b_110, lty = c(2, 1, 2), col = rep(c("grey60", "black"), each = 3),
-        ylim = c(-7, 0), xlab = "", ylab = expression(B[t]),
+ts.plot(b_111,
+        b_110,
+        lty = c(2, 1, 2),
+        col = rep(c("grey60", "black"), each = 3),
+        ylim = c(-7, 0),
+        xlab = "",
+        ylab = expression(B[t]),
         main = "Models (1, 1, 1) and (1, 1, 0), r = 1")
+
 abline(h = -1)
-legend("bottomleft", legend = c("(1, 1, 1)", "(1, 1, 0)"),
-       col = c("grey60", "black"), lty = 1, bty = "n")
+
+legend("bottomleft",
+       legend = c("(1, 1, 1)", "(1, 1, 0)"),
+       col = c("grey60", "black"),
+       lty = 1,
+       bty = "n")
 ```
 
 ## Predictive likelihoods
@@ -180,39 +240,57 @@ Each term requires the model to be estimated on the data up to $t - 1$. The stat
 
 ```{r lpd-code, eval = FALSE}
 last_period <- function(draws, size) {
-  if (ncol(draws) == size) draws else draws[, ncol(draws) - size + 1:size, drop = FALSE]
+  if (ncol(draws) == size) {
+    return(draws)
+  }
+  return(draws[, ncol(draws) - size + 1:size, drop = FALSE])
 }
 
 # model: a VEC model estimated on the data up to t - 1
 # obs:   the same model created on the data up to t, whose last rows hold
 #        the realised Delta y_t and the regressors of period t
 lpd_bvec <- function(model, obs, tvp_beta, tvp_a) {
-  k <- model$model$k
-  r <- model$model$rank
-  n_obs <- nrow(obs$data$train$y)
-  y <- as.numeric(obs$data$train$y[n_obs, ])
-  w <- as.numeric(obs$data$train$w[n_obs, ])
-  x <- as.numeric(obs$data$train$x[n_obs, ])
-  post <- model$posterior
 
-  a <- last_period(post$a$coeffs, k * (r + length(x)))
+  k <- model[["model"]][["k"]]
+  r <- model[["model"]][["rank"]]
+
+  train <- obs[["data"]][["train"]]
+  n_obs <- nrow(train[["y"]])
+  y <- as.numeric(train[["y"]][n_obs, ])
+  w <- as.numeric(train[["w"]][n_obs, ])
+  x <- as.numeric(train[["x"]][n_obs, ])
+
+  post <- model[["posterior"]]
+
+  # Carry the states one period forward
+  a <- last_period(post[["a"]][["coeffs"]], k * (r + length(x)))
   if (tvp_a) {
-    a <- a + matrix(rnorm(length(a)), nrow(a)) * sqrt(post$a$sigma)
+    a <- a + matrix(rnorm(length(a)), nrow(a)) * sqrt(post[["a"]][["sigma"]])
   }
-  beta <- last_period(post$beta$coeffs, length(w) * r)
-  if (tvp_beta) {
-    beta <- as.numeric(post$beta$rho) * beta + matrix(rnorm(length(beta)), nrow(beta))
-  }
-  prec <- last_period(post$u_sigma_inv$coeffs, k * k)
 
+  beta_draws <- last_period(post[["beta"]][["coeffs"]], length(w) * r)
+  if (tvp_beta) {
+    beta_draws <- as.numeric(post[["beta"]][["rho"]]) * beta_draws +
+      matrix(rnorm(length(beta_draws)), nrow(beta_draws))
+  }
+
+  prec <- last_period(post[["u_sigma_inv"]][["coeffs"]], k * k)
+
+  # Log density of the realised Delta y_t, draw by draw
   ld <- sapply(seq_len(nrow(a)), function(i) {
-    mu <- matrix(a[i, 1:(k * r)], k) %*% crossprod(matrix(beta[i, ], length(w)), w) +
-      matrix(a[i, -(1:(k * r))], k) %*% x
+    alpha <- matrix(a[i, 1:(k * r)], k)
+    beta_i <- matrix(beta_draws[i, ], length(w))
+    gamma_i <- matrix(a[i, -(1:(k * r))], k)
+    mu <- alpha %*% crossprod(beta_i, w) + gamma_i %*% x
+
     p <- matrix(prec[i, ], k)
-    -k / 2 * log(2 * pi) + 0.5 * as.numeric(determinant(p)$modulus) -
-      0.5 * as.numeric(crossprod(y - mu, p %*% (y - mu)))
+    log_det <- as.numeric(determinant(p)[["modulus"]])
+    quad <- as.numeric(crossprod(y - mu, p %*% (y - mu)))
+
+    return(-k / 2 * log(2 * pi) + 0.5 * log_det - 0.5 * quad)
   })
-  max(ld) + log(mean(exp(ld - max(ld))))
+
+  return(max(ld) + log(mean(exp(ld - max(ld)))))
 }
 ```
 
@@ -222,32 +300,38 @@ The results of all models are in a small file next to this page:
 
 ```{r lpl-read}
 lpl <- read.csv("_2011_kls_predlik.csv")
-lpl$label <- paste0("r = ", lpl$r, ", ", lpl$model)
+lpl[["label"]] <- paste0("r = ", lpl[["r"]], ", ", lpl[["model"]])
 
-constant <- lpl[lpl$label %in% c("r = 1, (0,0,0)", "r = 0, (0,0)"), ]
+constant <- lpl[lpl[["label"]] %in% c("r = 1, (0,0,0)", "r = 0, (0,0)"), ]
 constant[, c("label", "paper", "lpl100", "lpl110")]
 ```
 
-Summed over the last 100 observations, the log predictive likelihoods of the two models with constant parameters are `r round(mean(constant$lpl100 - constant$paper))` higher than in the paper. Such models have nothing that could differ between two implementations beyond their priors, which 200 observations make irrelevant, and a gap that large means that the two sums are not over the same observations. Summed over the last 110, they agree with the published values to within `r max(abs(round(constant$lpl110 - constant$paper, 1)))`. The paper's sums therefore appear to run over 110 observations rather than the 100 its footnote states, and the comparison below uses 110.
+Summed over the last 100 observations, the log predictive likelihoods of the two models with constant parameters are `r round(mean(constant[["lpl100"]] - constant[["paper"]]))` higher than in the paper. Such models have nothing that could differ between two implementations beyond their priors, which 200 observations make irrelevant, and a gap that large means that the two sums are not over the same observations. Summed over the last 110, they agree with the published values to within `r max(abs(round(constant[["lpl110"]] - constant[["paper"]], 1)))`. The paper's sums therefore appear to run over 110 observations rather than the 100 its footnote states, and the comparison below uses 110.
 
 ```{r lpl-table}
-fmt <- function(x, se) ifelse(is.na(x), "not estimated", sprintf("%.1f (%.2f)", x, se))
-knitr::kable(data.frame(lpl$r, lpl$model,
-                        fmt(lpl$paper, lpl$paper_nse),
-                        fmt(lpl$lpl110, lpl$lpl110_nse)),
-             col.names = c("$r$", "Model", "Paper", "bvartools"),
-             align = "clrr")
+format_lpl <- function(x, se) {
+  return(ifelse(is.na(x), "not estimated", sprintf("%.1f (%.2f)", x, se)))
+}
+
+lpl_table <- data.frame(lpl[["r"]],
+                        lpl[["model"]],
+                        format_lpl(lpl[["paper"]], lpl[["paper_nse"]]),
+                        format_lpl(lpl[["lpl110"]], lpl[["lpl110_nse"]]))
+
+kable(lpl_table,
+      col.names = c("$r$", "Model", "Paper", "bvartools"),
+      align = "clrr")
 ```
 
 The models are $(d_\Omega, d_\beta, d_a)$ for $r > 0$ and $(d_\Omega, d_\Pi)$ for the VARs in differences, $r = 0$. Numerical standard errors are in brackets.
 
 ```{r lpl-summary}
-est <- lpl[!is.na(lpl$lpl110), ]
-best <- est[order(-est$lpl110), "label"]
-rank_cor <- cor(est$paper, est$lpl110, method = "spearman")
+est <- lpl[!is.na(lpl[["lpl110"]]), ]
+best <- est[order(-est[["lpl110"]]), "label"]
+rank_cor <- cor(est[["paper"]], est[["lpl110"]], method = "spearman")
 ```
 
-The levels are not identical, which is to be expected with priors that are translated rather than copied and with a different sampler, but half of the estimated models are within `r round(median(abs(est$lpl110 - est$paper)), 1)` of the published value. What the paper's conclusions rest on is the ordering, and it is reproduced: the rank correlation between the two columns is `r round(rank_cor, 2)`. The best model is `r best[1]`, followed by `r best[2]` -- the same two as in the paper -- and the seven best models come in exactly the paper's order. All seven have stochastic volatility, which is the feature that matters most. Among them, letting the short-run coefficients drift in addition to the cointegration space lowers the predictive likelihood in both ranks, and a constant cointegration space with stochastic volatility comes in between. The VARs in differences are dominated by the best cointegrated models.
+The levels are not identical, which is to be expected with priors that are translated rather than copied and with a different sampler, but half of the estimated models are within `r round(median(abs(est[["lpl110"]] - est[["paper"]])), 1)` of the published value. What the paper's conclusions rest on is the ordering, and it is reproduced: the rank correlation between the two columns is `r round(rank_cor, 2)`. The best model is `r best[1]`, followed by `r best[2]` -- the same two as in the paper -- and the seven best models come in exactly the paper's order. All seven have stochastic volatility, which is the feature that matters most. Among them, letting the short-run coefficients drift in addition to the cointegration space lowers the predictive likelihood in both ranks, and a constant cointegration space with stochastic volatility comes in between. The VARs in differences are dominated by the best cointegrated models.
 
 The one estimate that should be read with care is that of `r "r = 2, (1,1,1)"`. Its numerical standard error is dominated by a single term, the one for 2008 Q4, when UK interest rates and inflation both fell sharply. An observation that far in the tail of the predictive density leaves its average to a handful of draws, and repeating that one term with different seeds moved it by as much as ten.
 
