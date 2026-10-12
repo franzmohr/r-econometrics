@@ -37,7 +37,7 @@ data <- read.dta13("wiot_full.dta")
 
 ## Value added export ratios in 2004
 
-Timmer et al. (2015) compare different data sets on international input-output tables by calculating value-added exports (VAX) for a series of countries in 2004. VAX is a popular indicator, which measures a contry's domestic value added embodied in final expenditures abroad.
+Timmer et al. (2015) compare different data sets on international input-output tables by calculating value-added exports (VAX) for a series of countries in 2004. VAX is a popular indicator, which measures a country's domestic value added embodied in final expenditures abroad.
 
 In order to calculate VAX the Leontief decomposition is employed. In R this composition is implemented in the `decompr` package. The function `decomp` requires several input arguments: intermediate demand, final demand, a vector of country, a vector of industry and a vector of final outputs. The following code chunks can be used to obtain them.
 
@@ -85,7 +85,7 @@ interm <- temp %>%
 interm <- interm[,-(1:3)]
 ```
 
-Final demadn is obtained with
+Final demand is obtained with
 
 ```{r final}
 # Final demand
@@ -165,9 +165,9 @@ vax <- leon %>%
 vax$row_country <- factor(vax$row_country, levels = vax$row_country)
 ```
 
-The result can be plotted. The folling graph reproduces figure 2 in Timmer et al. (2015).
+The result can be plotted. The following graph reproduces figure 2 in Timmer et al. (2015).
 
-```{r vax_plot, fig.width=5, fig.height=3.5, message = FALSE, warining = FALSE}
+```{r vax_plot, fig.width=5, fig.height=3.5, message = FALSE, warning = FALSE}
 library(ggplot2)
 
 ggplot(vax, aes(x = row_country, y = vax, colour = "a")) +
@@ -193,4 +193,4 @@ Quast, B. A. and V. Kummritz (2015). decompr: Global Value Chain decomposition i
 Timmer, M. P., Dietzenbacher, E., Los, B., Stehrer, R., & de Vries, G. J. (2015). An Illustrated User Guide to the World Input–Output Database: the Case of Global Automotive Production. *Review of International Economics, 23*(3), 575–605. <https://doi.org/10.1111/roie.12178>
 
 
-[^download]: Before you download the data please note that the file has a size of about 250 MB. So make sure you have enought space on your disc before you download it.
+[^download]: Before you download the data please note that the file has a size of about 250 MB. So make sure you have enough space on your disc before you download it.

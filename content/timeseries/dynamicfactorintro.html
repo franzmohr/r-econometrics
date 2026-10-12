@@ -78,7 +78,7 @@ model &lt;- create_dfmodel(x = bem_dfmdata,
 model &lt;- add_initial_values(model)</code></pre>
 <p>Third, posterior draws are obtained with the Gibbs sampler:</p>
 <pre class="r"><code>model &lt;- add_posterior_coefficients(model)</code></pre>
-<p>Fourth, the results are evaluated. The draws of each block of parameters are stored in <code>model$posterior</code>, with one row per draw. Since the whole path of the factor is part of every draw, the posterior median and a credible interval of the factor can be obtained for every period. The following figure compares the factor with the growth rate of real GDP. The factor is measured in the units of the common component of GDP growth, whose variance is much smaller than that of GDP growth itself. Therefore, both series are standardised for the comparison.</p>
+<p>Fourth, the results are evaluated. The draws of each block of parameters are stored in <code>model[["posterior"]]</code>, with one row per draw. Since the whole path of the factor is part of every draw, the posterior median and a credible interval of the factor can be obtained for every period. The following figure compares the factor with the growth rate of real GDP. The factor is measured in the units of the common component of GDP growth, whose variance is much smaller than that of GDP growth itself. Therefore, both series are standardised for the comparison.</p>
 <pre class="r"><code>library(&quot;ggplot2&quot;)
 
 # Posterior median and 80 per cent credible interval of the factor

@@ -55,7 +55,7 @@ set.seed(1234567)
 data("koop")
 ```
 
-`koop$financial` holds the 18 financial series, quarterly from 1970 Q1 to 2013 Q3:
+`koop[["financial"]]` holds the 18 financial series, quarterly from 1970 Q1 to 2013 Q3:
 
 ```{r data-financial}
 colnames(koop[["financial"]])
@@ -169,7 +169,7 @@ for (i in seq_len(n_vintages)) {
 }
 ```
 
-96 models, one per vintage, in about a second in total. Each entry of `realtime$index` is a one-off reading: the value the index would have taken in that quarter, estimated with nothing later than that quarter's data. Lining those up against the same quarters of the full sample index -- built with hindsight, and re-signed on `sp500` for comparability -- shows how much the revisions matter. Since `sp500` orients the index the other way round from `vix`, the figure below is the mirror image of the one above: here a *low* value means stressed conditions.
+96 models, one per vintage, in about a second in total. Each entry of `realtime[["index"]]` is a one-off reading: the value the index would have taken in that quarter, estimated with nothing later than that quarter's data. Lining those up against the same quarters of the full sample index -- built with hindsight, and re-signed on `sp500` for comparability -- shows how much the revisions matter. Since `sp500` orients the index the other way round from `vix`, the figure below is the mirror image of the one above: here a *low* value means stressed conditions.
 
 ```{r realtime-compare, fig.height = 4.5, fig.width = 7}
 index_full <- fci(model, sign_on = "sp500")

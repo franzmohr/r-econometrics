@@ -41,7 +41,7 @@ description: "Koop and Korobilis (2014) extract a financial conditions index fro
 set.seed(1234567)
 
 data(&quot;koop&quot;)</code></pre>
-<p><code>koop$financial</code> holds the 18 financial series, quarterly from 1970 Q1 to 2013 Q3:</p>
+<p><code>koop[["financial"]]</code> holds the 18 financial series, quarterly from 1970 Q1 to 2013 Q3:</p>
 <pre class="r"><code>colnames(koop[[&quot;financial&quot;]])</code></pre>
 <pre><code>##  [1] &quot;sp500&quot;          &quot;twexmmth&quot;       &quot;oil&quot;            &quot;spread_ted&quot;     &quot;spread_10_2&quot;   
 ##  [6] &quot;spread_2_3m&quot;    &quot;spread_comm&quot;    &quot;loanhpi&quot;        &quot;spread_30_mort&quot; &quot;cmdebt&quot;        
@@ -161,7 +161,7 @@ for (i in seq_len(n_vintages)) {
   realtime[[&quot;time&quot;]][i] &lt;- end(index_i)[1] + (end(index_i)[2] - 1) / 4
   realtime[[&quot;index&quot;]][i] &lt;- as.numeric(index_i)[length(index_i)]
 }</code></pre>
-<p>96 models, one per vintage, in about a second in total. Each entry of <code>realtime$index</code> is a one-off reading: the value the index would have taken in that quarter, estimated with nothing later than that quarter’s data. Lining those up against the same quarters of the full sample index – built with hindsight, and re-signed on <code>sp500</code> for comparability – shows how much the revisions matter. Since <code>sp500</code> orients the index the other way round from <code>vix</code>, the figure below is the mirror image of the one above: here a <em>low</em> value means stressed conditions.</p>
+<p>96 models, one per vintage, in about a second in total. Each entry of <code>realtime[["index"]]</code> is a one-off reading: the value the index would have taken in that quarter, estimated with nothing later than that quarter’s data. Lining those up against the same quarters of the full sample index – built with hindsight, and re-signed on <code>sp500</code> for comparability – shows how much the revisions matter. Since <code>sp500</code> orients the index the other way round from <code>vix</code>, the figure below is the mirror image of the one above: here a <em>low</em> value means stressed conditions.</p>
 <pre class="r"><code>index_full &lt;- fci(model, sign_on = &quot;sp500&quot;)
 
 realtime_quarters &lt;- round(realtime[[&quot;time&quot;]], 4)

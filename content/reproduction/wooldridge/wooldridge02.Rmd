@@ -8,7 +8,7 @@ In R the function for basic linear regression models is `lm`, which is short for
 
 Beside the formula, the `lm` function also requires you to specify the data used for the estimation. This can be done in multiple ways, but it is quite common practise to specify a data frame as the *data* argument, e.g. `data = my_data_frame`, which contains the variables that are mentioned in the model formula.
 
-With this knowledge we can already estimate a simple model. In the textbook this is a regression of the variable *salary* on the variable *roe*, where both variables are contained in the *ceosal1* data set. We can access this data set by loading the *wooldridge* data package with `library(wooldridge` and then load the sample with `data("ceosal1")`:
+With this knowledge we can already estimate a simple model. In the textbook this is a regression of the variable *salary* on the variable *roe*, where both variables are contained in the *ceosal1* data set. We can access this data set by loading the *wooldridge* data package with `library("wooldridge")` and then load the sample with `data("ceosal1")`:
 
 ```{r}
 library("wooldridge") # Load the data package
@@ -88,7 +88,7 @@ summary(model_1)
 
 To get the results for table 2.2 redo the script from example 2.3. R does not only save the coefficients, but also some other important values. Type in `names(model_1)` to get a list of variables that are saved under `model_1` as well. Among them are *fitted.values* and *residuals* which represent *salaryhat* and *uhat* from the textbook, respectively.
 
-In order to make a table we generate a data frame with the first two colums containing the first 15 observersations from the original dataset and two additional columns into which we later will paste the estimated values. We define the data frame with
+In order to make a table we generate a data frame with the first two columns containing the first 15 observations from the original dataset and two additional columns into which we later will paste the estimated values. We define the data frame with
 
 ```{r}
 df_1 <- data.frame(roe = ceosal1[["roe"]][1:15],
@@ -97,7 +97,7 @@ df_1 <- data.frame(roe = ceosal1[["roe"]][1:15],
                    uhat = NA)
 ```
 
-`data.frame` is the function which generates the frame. *roe* is the label of the column which is defined as the value of *ceosal1$salary* at the positions 1 to 15, i.e. `[1:15]`. The structure is the same for the following part with *salary*. *salaryhat* and *uhat* are not defined and `NA` (**n**ot **a**vailable) is used to indicate that. `NA` is in general the indicator of missing values in R.
+`data.frame` is the function which generates the frame. *roe* is the label of the column which is defined as the value of `ceosal1[["roe"]]` at the positions 1 to 15, i.e. `[1:15]`. The structure is the same for the following part with *salary*. *salaryhat* and *uhat* are not defined and `NA` (**n**ot **a**vailable) is used to indicate that. `NA` is in general the indicator of missing values in R.
 
 As a next step we paste the fitted values and the residuals from the regression into the data frame. Therefore, we separately paste the first 15 fitted values (`model_1[["fitted.values"]][1:15]`) from the regression into the column *salaryhat* (`df_1[["salaryhat"]]`). The same method applies to the resudials. Finally, display the table with *df_1*
 

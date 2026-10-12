@@ -112,7 +112,7 @@ Third, posterior draws are obtained with the Gibbs sampler:
 model <- add_posterior_coefficients(model)
 ```
 
-Fourth, the results are evaluated. The draws of each block of parameters are stored in `model$posterior`, with one row per draw. Since the whole path of the factor is part of every draw, the posterior median and a credible interval of the factor can be obtained for every period. The following figure compares the factor with the growth rate of real GDP. The factor is measured in the units of the common component of GDP growth, whose variance is much smaller than that of GDP growth itself. Therefore, both series are standardised for the comparison.
+Fourth, the results are evaluated. The draws of each block of parameters are stored in `model[["posterior"]]`, with one row per draw. Since the whole path of the factor is part of every draw, the posterior median and a credible interval of the factor can be obtained for every period. The following figure compares the factor with the growth rate of real GDP. The factor is measured in the units of the common component of GDP growth, whose variance is much smaller than that of GDP growth itself. Therefore, both series are standardised for the comparison.
 
 ```{r factor, fig.width = 6, fig.height = 3.5}
 library("ggplot2")

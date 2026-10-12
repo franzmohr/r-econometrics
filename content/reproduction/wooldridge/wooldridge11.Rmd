@@ -21,7 +21,7 @@ summary(model_11_4)
 
 ### Equation 11.17
 
-To estimate this model we have to calculate the lagged values ourselves. First, I created a vector of the return values from the nyse data set. To create the series with the first lagged returns I omitted the first value in the list of returns of the nyse data set by adding [-1]. But since this causes the length of the resulting series to decrease by one observation, we have to add an NA so that R can estimate the model. I added this NA by creating a list with c() which contains the values from the first lag list "nyse$return[-1]" and put an NA at the end. For the second list of lagged values I proceeded similarly. I omitted the first and second observation from the return list of the nyse data set and added two NAs. The estimation works as usual.
+To estimate this model we have to calculate the lagged values ourselves. First, I turn the returns of the nyse data set into a time series with `ts()`. `lag()` with `-1` and `-2` then shifts the series back by one and two periods, and `cbind()` lines the three series up by period, filling the periods a lag does not cover with `NA`. The estimation works as usual, with `lm()` dropping the incomplete periods.
 
 ```{r}
 # Create lagged values

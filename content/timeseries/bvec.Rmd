@@ -55,7 +55,7 @@ r <- 1 # Set rank
 tt <- ncol(y) # Number of observations
 k <- nrow(y) # Number of endogenous variables
 k_w <- nrow(w) # Number of regressors in error correction term
-# Number of differenced regressors and unrestrictec deterministic terms
+# Number of differenced regressors and unrestricted deterministic terms
 k_x <- nrow(x)
 
 k_alpha <- k * r # Number of elements in alpha

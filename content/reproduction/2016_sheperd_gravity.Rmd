@@ -108,7 +108,7 @@ vcov_02 <- cluster.vcov(lm_table_02, ~ dist)
 coeftest(lm_table_02, vcov. = vcov_02)
 ```
 
-If found the code for the clustered standard errors [here](https://rforpublichealth.blogspot.co.at/2014/10/easy-clustered-standard-errors-in-r.html).
+I found the code for the clustered standard errors [here](https://rforpublichealth.blogspot.co.at/2014/10/easy-clustered-standard-errors-in-r.html).
 
 ## Table 3
 
@@ -158,7 +158,7 @@ coeftest(lm_table_06, vcov. = vcov_06)
 ```
 
 ## Table 7
-Not sure yet
+I am not yet sure that this reproduces Table 7 exactly.
 ```{r, R.options = list(max.print = 50), tidy = TRUE}
 data_table_07 <- services %>%
   filter(sector == "SER") %>%
@@ -312,7 +312,7 @@ coeftest(est_table_12, vcov. = vcov_12)
 
 The coefficients are the same, but the clustered standard errors are not. I am not sure, where this comes from.
 
-# Table 13
+## Table 13
 
 ```{r, R.options = list(max.print = 50), tidy = TRUE}
 services <- mutate(services, ent_cost_both = ent_cost_exp * ent_cost_imp)

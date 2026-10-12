@@ -26,7 +26,7 @@ data("e1")
 income <- e1[, "income"]
 
 # Plot series
-plot(income, main = "West Germain disposable income", ylab = "Billion DM")
+plot(income, main = "West German disposable income", ylab = "Billion DM")
 ```
 
 The series is continuously increasing and, thus, does not fluctuate around a constant mean. Furthermore, if we calculated the variances for an increasing window of periods from the beginning of the series to the end, we would see a constant increase in the estimated values. Therefore, disposable income in levels does not seem to be a stationary series. But how can we make this series stationary? For this it is useful to know that there are two popular models for nonstationary series, trend- and difference-stationary models.[^mathworks]
@@ -65,7 +65,7 @@ In the case of the time series of disposable income it appears that the series i
 # Obtain first log-differences of disposable income
 d_lincome <- diff(log(e1[, "income"])) * 100
 
-# # Plot and add horizontal line at 0
+# Plot and add horizontal line at 0
 plot(d_lincome,
      main = "West German disposable income",
      ylab = "Log growth rate")
@@ -119,7 +119,7 @@ lincome_data <- cbind(lincome, d1_lincome, d2_lincome)
 # Get rid of NAs so that all have same length
 lincome_data <- na.omit(lincome_data)
 
-# Rename columsn
+# Rename columns
 dimnames(lincome_data)[[2]] <- c("level", "diff_1", "diff_2")
 ```
 

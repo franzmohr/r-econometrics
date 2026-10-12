@@ -26,7 +26,7 @@ library(&quot;bvartools&quot;)</code></pre>
 income &lt;- e1[, &quot;income&quot;]
 
 # Plot series
-plot(income, main = &quot;West Germain disposable income&quot;, ylab = &quot;Billion DM&quot;)</code></pre>
+plot(income, main = &quot;West German disposable income&quot;, ylab = &quot;Billion DM&quot;)</code></pre>
 <p><img src="/timeseries/stationarity_files/figure-html/unnamed-chunk-1-1.png" alt="" width="480" /></p>
 <p>The series is continuously increasing and, thus, does not fluctuate around a constant mean. Furthermore, if we calculated the variances for an increasing window of periods from the beginning of the series to the end, we would see a constant increase in the estimated values. Therefore, disposable income in levels does not seem to be a stationary series. But how can we make this series stationary? For this it is useful to know that there are two popular models for nonstationary series, trend- and difference-stationary models.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></p>
 <p><strong>Trend-stationary</strong>: A series is trend-stationary, if it fluctuates around a deterministic trend, to which it reverts in the long run. Subtracting this trend from the original series yields a stationary series. For example, assuming that log disposable income follows a linear trend, we can regress the series on a constant and a linear trend and use the residuals as a candidate for a stationary series:</p>
@@ -50,7 +50,7 @@ abline(h = 0)</code></pre>
 <pre class="r"><code># Obtain first log-differences of disposable income
 d_lincome &lt;- diff(log(e1[, &quot;income&quot;])) * 100
 
-# # Plot and add horizontal line at 0
+# Plot and add horizontal line at 0
 plot(d_lincome,
      main = &quot;West German disposable income&quot;,
      ylab = &quot;Log growth rate&quot;)
@@ -90,7 +90,7 @@ lincome_data &lt;- cbind(lincome, d1_lincome, d2_lincome)
 # Get rid of NAs so that all have same length
 lincome_data &lt;- na.omit(lincome_data)
 
-# Rename columsn
+# Rename columns
 dimnames(lincome_data)[[2]] &lt;- c(&quot;level&quot;, &quot;diff_1&quot;, &quot;diff_2&quot;)</code></pre>
 <p>The <code>tseries</code> package contains the unit root tests that are used here.</p>
 <pre class="r"><code>library(&quot;tseries&quot;)</code></pre>

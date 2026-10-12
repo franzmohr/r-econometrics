@@ -137,7 +137,7 @@ coeftest(lm_table_02, vcov. = vcov_02)</code></pre>
 ## comcol       -0.024507   0.201819  -0.1214  0.90336    
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<p>If found the code for the clustered standard errors <a href="https://rforpublichealth.blogspot.co.at/2014/10/easy-clustered-standard-errors-in-r.html">here</a>.</p>
+<p>I found the code for the clustered standard errors <a href="https://rforpublichealth.blogspot.co.at/2014/10/easy-clustered-standard-errors-in-r.html">here</a>.</p>
 </div>
 <div id="table-3" class="section level2">
 <h2>Table 3</h2>
@@ -226,7 +226,7 @@ coeftest(lm_table_06, vcov. = vcov_06)</code></pre>
 </div>
 <div id="table-7" class="section level2">
 <h2>Table 7</h2>
-<p>Not sure yet</p>
+<p>I am not yet sure that this reproduces Table 7 exactly.</p>
 <pre class="r"><code>data_table_07 &lt;- services %&gt;%
   filter(sector == &quot;SER&quot;) %&gt;%
   select(ln_trade, ln_distance, contig, comlang_off, colony,
@@ -489,8 +489,8 @@ coeftest(est_table_12, vcov. = vcov_12)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <p>The coefficients are the same, but the clustered standard errors are not. I am not sure, where this comes from.</p>
 </div>
-<div id="table-13" class="section level1">
-<h1>Table 13</h1>
+<div id="table-13" class="section level2">
+<h2>Table 13</h2>
 <pre class="r"><code>services &lt;- mutate(services, ent_cost_both = ent_cost_exp * ent_cost_imp)
 
 data_table_13 &lt;- services %&gt;%

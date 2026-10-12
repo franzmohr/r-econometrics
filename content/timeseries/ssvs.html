@@ -68,7 +68,7 @@ a &lt;- matrix(0, m)
 a_v_i_prior &lt;- diag(1 / c(tau1)^2, m) # Inverse of the prior covariance matrix
 
 # Data containers for posterior draws
-iter &lt;- 15000 # Number of total Gibs sampler draws
+iter &lt;- 15000 # Number of total Gibbs sampler draws
 burnin &lt;- 5000 # Number of burn-in draws
 
 store &lt;- iter - burnin

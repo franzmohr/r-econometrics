@@ -6,7 +6,7 @@ date: "2018-02-04"
 
 Chapter 6 in Wooldridge (2013) deals with some more issues that might have an impact on your estimates. Among these are a change in the scale of your variables, so-called beta-factors and the interpretation of variables that appear together with their squared values, i.e. interaction terms.
 
-Before you start, set your working directory, load the `foreign` library and download the data we are going to use in this chapter.
+Before you start, load the `wooldridge` package, which contains the data we are going to use in this chapter, and the `QuantPsyc` package for beta coefficients.
 
 ```{r, message = FALSE}
 library("QuantPsyc")
@@ -83,7 +83,7 @@ curve(beta_hat[1] + beta_hat[4] * x + beta_hat[5] * x^2,
 
 **Example 6.3**
 
-This example looks at interaction terms. I use the <code>with</code> function just to spare the <code>attend$</code>-part before each of the variables. I calculate squared values and the interaction term, estimate both models, print the summary - note that you have to use the <code>print</code> command since R will not return this line of code otherwise - and calculate an F-test via <code>anova</code>. The last line gives thee marginal effect of the attendance rate on the outcome variable.
+This example looks at interaction terms. I calculate squared values and the interaction term within the model formula, estimate both models, print the summary and calculate an F-test via <code>anova</code>. The last line gives the marginal effect of the attendance rate on the outcome variable.
 
 The problem with this coefficient is that there is no standard error for it. This is achieved by demeaning the second variable of the interaction term and estimating the model again.
 
