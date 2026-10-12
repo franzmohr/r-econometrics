@@ -17,7 +17,7 @@ tags:
 <h3>Degree</h3>
 <p>The degree of a node is the number of its connections. The <code>degree</code> function calculates this number for each node of a graph. The node with the highest number is the node with the highest number of connections.</p>
 <pre class="r"><code># Load package
-library(igraph)
+library(&quot;igraph&quot;)
 
 # Obtain degrees
 g_degree &lt;- degree(graph_df)
@@ -27,14 +27,14 @@ g_degree</code></pre>
 ## 12 20 18 11 19 16 16 16 13 14 16 10 17 15 17 12 16 18 13 13 15 15 14 19 15 20</code></pre>
 <p>The degree is of a node is an insteresting metric to identify the most connected nodes of a network. However, if the structure of a network is of interest, the <em>degree distribution</em> can be an informative metric. It describes the relative frequencey of nodes that have different degrees. In that way it is a histogram of degrees.</p>
 <pre class="r"><code>hist(g_degree)</code></pre>
-<p><img src="/networks/network-summary_files/figure-html/unnamed-chunk-3-1.png" width="384" /></p>
+<p><img src="/networks/network-summary_files/figure-html/unnamed-chunk-3-1.png" alt="" width="384" /></p>
 <p>This histogram might not look very informative, which is partly due to the way the artificial network was constructed. However, as the number of nodes of a real life network increases, this distribution can become very imformative. <em>Note that in many cases it is beneficial to obtain the distribution of the log-degree</em>.</p>
 <p>Let’s explore this by looking at a larger network, that can be generated with the <code>igraph</code> package. More precisely, we create a scale-free:</p>
 <pre class="r"><code># From the example of sample_degseq
 
-# Pre-specify the degrees of the nodes according to the 
+# Pre-specify the degrees of the nodes according to the
 # power law
-degs &lt;- sample(1:100, 1000, replace=TRUE, prob = (1:100)^-2)
+degs &lt;- sample(1:100, 1000, replace = TRUE, prob = (1:100)^-2)
 
 # Check if degrees sum up to an even number
 # if not, add 1 to the first node to make the sum even
@@ -50,10 +50,10 @@ deg_large &lt;- degree(g_large)
 
 # Histogram of the degree
 hist(deg_large)</code></pre>
-<p><img src="/networks/network-summary_files/figure-html/unnamed-chunk-4-1.png" width="384" /></p>
+<p><img src="/networks/network-summary_files/figure-html/unnamed-chunk-4-1.png" alt="" width="384" /></p>
 <p>The degree distribution showes that most nodes have less than 10 connections and there are a few with more than 80. If we did not already know that the degree distribution follows a power-law, this might be a sign that we are dealing with such a network. A look at the log-degree distribution might support this suspition as well:</p>
 <pre class="r"><code>hist(log(deg_large))</code></pre>
-<p><img src="/networks/network-summary_files/figure-html/unnamed-chunk-5-1.png" width="384" /></p>
+<p><img src="/networks/network-summary_files/figure-html/unnamed-chunk-5-1.png" alt="" width="384" /></p>
 </div>
 <div id="closeness" class="section level3">
 <h3>Closeness</h3>
@@ -61,10 +61,10 @@ hist(deg_large)</code></pre>
 <pre class="r"><code>g_close &lt;- closeness(graph_df)
 
 round(g_close, 2)</code></pre>
-<pre><code>##    a    b    c    d    e    f    g    h    i    j    k    l    m    n    o    p 
-## 0.02 0.03 0.03 0.02 0.03 0.03 0.03 0.03 0.03 0.03 0.03 0.03 0.03 0.03 0.03 0.03 
-##    q    r    s    t    u    v    w    x    y    z 
-## 0.03 0.03 0.03 0.03 0.03 0.03 0.03 0.03 0.03 0.03</code></pre>
+<pre><code>##    a    b    c    d    e    f    g    h    i    j    k    l    m    n    o    p    q    r    s    t 
+## 0.02 0.03 0.03 0.02 0.03 0.03 0.03 0.03 0.03 0.03 0.03 0.03 0.03 0.03 0.03 0.03 0.03 0.03 0.03 0.03 
+##    u    v    w    x    y    z 
+## 0.03 0.03 0.03 0.03 0.03 0.03</code></pre>
 <p>In constrast to the degree of a node, which describes the number of its direct connections, its closeness provides an idea of how well a node is indirectly connected via other nodes.</p>
 </div>
 <div id="betweenness" class="section level3">
@@ -73,21 +73,21 @@ round(g_close, 2)</code></pre>
 <pre class="r"><code>g_betw &lt;- betweenness(graph_df)
 
 round(g_betw, 2)</code></pre>
-<pre><code>##     a     b     c     d     e     f     g     h     i     j     k     l     m 
-##  3.22  9.75  8.33  1.48  9.76  7.67  6.86  4.60  2.57  4.16  6.56  1.61  5.38 
-##     n     o     p     q     r     s     t     u     v     w     x     y     z 
-##  4.93  6.95  3.85  6.83  8.05  3.81  3.53  5.05  5.72  3.13 11.09  6.21 10.90</code></pre>
+<pre><code>##     a     b     c     d     e     f     g     h     i     j     k     l     m     n     o     p 
+##  3.22  9.75  8.33  1.48  9.76  7.67  6.86  4.60  2.57  4.16  6.56  1.61  5.38  4.93  6.95  3.85 
+##     q     r     s     t     u     v     w     x     y     z 
+##  6.83  8.05  3.81  3.53  5.05  5.72  3.13 11.09  6.21 10.90</code></pre>
 </div>
 <div id="eigenvector-centrality" class="section level3">
 <h3>Eigenvector centrality</h3>
 <p><em>Eigenvector centrality</em> (Bonabeau, 1972) is based on the idea that the importance of a node is recusively related to the importance of the nodes pointing to it. For example, your popularity depends on the popularity of your friends, whose popularity depends on their friends etc. Therefore, this measure is also self-referential in the sense that a node’s centrality depends on the centrality of another node, whose centrality depends the first node. A higher value of eigenvector centrality implies that a node’s neighbours are more prestigious than the neighbours of other nodes.</p>
 <pre class="r"><code>g_eigen &lt;- eigen_centrality(graph_df)
 
-round(g_eigen$vector, 2)</code></pre>
-<pre><code>##    a    b    c    d    e    f    g    h    i    j    k    l    m    n    o    p 
-## 0.59 1.00 0.88 0.59 0.93 0.76 0.79 0.85 0.65 0.72 0.78 0.51 0.89 0.75 0.85 0.59 
-##    q    r    s    t    u    v    w    x    y    z 
-## 0.79 0.89 0.65 0.66 0.76 0.76 0.72 0.91 0.72 1.00</code></pre>
+round(g_eigen[[&quot;vector&quot;]], 2)</code></pre>
+<pre><code>##    a    b    c    d    e    f    g    h    i    j    k    l    m    n    o    p    q    r    s    t 
+## 0.59 1.00 0.88 0.59 0.93 0.76 0.79 0.85 0.65 0.72 0.78 0.51 0.89 0.75 0.85 0.59 0.79 0.89 0.65 0.66 
+##    u    v    w    x    y    z 
+## 0.76 0.76 0.72 0.91 0.72 1.00</code></pre>
 </div>
 <div id="centrality-measures-with-decay-factors" class="section level3">
 <h3>Centrality measures with decay factors</h3>
@@ -107,11 +107,11 @@ round(g_eigen$vector, 2)</code></pre>
 centr_small &lt;- data.frame(degree = g_degree,
                           closeness = g_close,
                           betweenness = g_betw,
-                          eigenvalue = g_eigen$vector)
+                          eigenvalue = g_eigen[[&quot;vector&quot;]])
 
 # Scatterplot matrix
 pairs(centr_small)</code></pre>
-<p><img src="/networks/network-summary_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p><img src="/networks/network-summary_files/figure-html/unnamed-chunk-9-1.png" alt="" width="672" /></p>
 <p>For the small graph the scatterplot matrix of the different centrality measures suggest that they have a linear relationship and, hence, each measure provides more or less the same information. However, this is probably the result of the way the small network was generated in the first place.</p>
 </div>
 <div id="large-network" class="section level3">
@@ -121,11 +121,11 @@ pairs(centr_small)</code></pre>
 centr_large &lt;- data.frame(degree = degree(g_large),
                           closeness = closeness(g_large),
                           betweenness = betweenness(g_large),
-                          eigenvalue = eigen_centrality(g_large)$vector)
+                          eigenvalue = eigen_centrality(g_large)[[&quot;vector&quot;]])
 
 # Scatterplot matrix
 pairs(centr_large)</code></pre>
-<p><img src="/networks/network-summary_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p><img src="/networks/network-summary_files/figure-html/unnamed-chunk-10-1.png" alt="" width="672" /></p>
 <p>For example, although the degree and eigenvalue centrlity exhibit a quite linear relationship, the relationship between degree centrality and closeness seems to be non-linear.</p>
 </div>
 </div>

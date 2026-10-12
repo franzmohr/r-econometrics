@@ -18,17 +18,18 @@ tags:
 <div id="data" class="section level2">
 <h2>Data</h2>
 <p>The <a href="https://www.rug.nl/ggdc/productivity/pwt/" target="_blank">Penn World Table</a> is available on CRAN. Version 10.01 covers 183 countries between 1950 and 2019.</p>
-<pre class="r"><code>library(dplyr)
-library(ggplot2)
-library(frontier) # install.packages(&quot;frontier&quot;)
-library(pwt10)    # install.packages(&quot;pwt10&quot;)
+<pre class="r"><code>library(&quot;dplyr&quot;)
+library(&quot;ggplot2&quot;)
+library(&quot;frontier&quot;) # install.packages(&quot;frontier&quot;)
+library(&quot;pwt10&quot;)    # install.packages(&quot;pwt10&quot;)
 
 data(&quot;pwt10.01&quot;)</code></pre>
 <p>The choice of variables deserves a moment of attention, because the Penn World Table contains several versions of output and capital, which are <em>not</em> interchangeable. Variables at current PPPs – <code>cgdpo</code> for output and <code>cn</code> for the capital stock – are constructed to compare productivity <em>levels across countries at a point in time</em>. Variables at constant prices – <code>rgdpo</code> and <code>rnna</code> – are constructed to compare <em>growth over time</em>. Since the first part of this post ranks countries in a single year, it uses the former pair. The panel model at the end, which looks at the time dimension, uses the latter.</p>
 <p>Labour is measured in efficiency units, i.e. the number of persons engaged <code>emp</code> multiplied by the index of human capital <code>hc</code>. This is the same convention that the Penn World Table itself uses when it calculates total factor productivity.</p>
 <pre class="r"><code>cs &lt;- pwt10.01 %&gt;%
   filter(year == 2019) %&gt;%
-  transmute(country, isocode,
+  transmute(country,
+            isocode,
             gdp = cgdpo,
             capital = cn,
             labour = emp * hc) %&gt;%
@@ -111,21 +112,25 @@ summary(frontier_model)</code></pre>
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <p>The null hypothesis of no inefficiency is clearly rejected. The following graph shows what the two estimators do with the data. The solid line is the estimated frontier, the dashed line is the OLS regression through the cloud.</p>
-<pre class="r"><code>library(ggrepel)
+<pre class="r"><code>library(&quot;ggrepel&quot;)
 
-label_these &lt;- c(&quot;USA&quot;, &quot;DEU&quot;, &quot;CHN&quot;, &quot;IND&quot;, &quot;EGY&quot;, &quot;VEN&quot;, &quot;QAT&quot;, &quot;IRL&quot;, &quot;NGA&quot;, &quot;JPN&quot;, &quot;AUT&quot;)
+label_these &lt;- c(&quot;USA&quot;, &quot;DEU&quot;, &quot;CHN&quot;, &quot;IND&quot;, &quot;EGY&quot;, &quot;VEN&quot;, &quot;QAT&quot;, &quot;IRL&quot;, &quot;NGA&quot;,
+                 &quot;JPN&quot;, &quot;AUT&quot;)
 
 eu &lt;- c(&quot;AUT&quot;, &quot;BEL&quot;, &quot;BGR&quot;, &quot;HRV&quot;, &quot;CYP&quot;, &quot;CZE&quot;, &quot;DNK&quot;, &quot;EST&quot;, &quot;FIN&quot;, &quot;FRA&quot;,
         &quot;DEU&quot;, &quot;GRC&quot;, &quot;HUN&quot;, &quot;IRL&quot;, &quot;ITA&quot;, &quot;LVA&quot;, &quot;LTU&quot;, &quot;LUX&quot;, &quot;MLT&quot;, &quot;NLD&quot;,
         &quot;POL&quot;, &quot;PRT&quot;, &quot;ROU&quot;, &quot;SVK&quot;, &quot;SVN&quot;, &quot;ESP&quot;, &quot;SWE&quot;)
+
+cs_labelled &lt;- filter(cs, isocode %in% label_these)
 
 ggplot(cs, aes(x = log(k), y = log(y))) +
   geom_point(aes(colour = isocode %in% eu), show.legend = FALSE) +
   geom_abline(intercept = coef(frontier_model)[1],
               slope = coef(frontier_model)[2]) +
   geom_smooth(method = &quot;lm&quot;, se = FALSE, linetype = &quot;dashed&quot;) +
-  geom_text_repel(data = filter(cs, isocode %in% label_these),
-                  aes(label = isocode), size = 3) +
+  geom_text_repel(data = cs_labelled,
+                  aes(label = isocode),
+                  size = 3) +
   labs(x = &quot;Log capital per efficiency unit of labour&quot;,
        y = &quot;Log output per efficiency unit of labour&quot;,
        title = &quot;The world production frontier in 2019&quot;,
@@ -136,9 +141,9 @@ ggplot(cs, aes(x = log(k), y = log(y))) +
 <div id="which-countries-are-close-to-the-frontier" class="section level2">
 <h2>Which countries are close to the frontier?</h2>
 <p>The distance of each country to the frontier is translated into an efficiency score between zero and one, where one means that a country produces as much as the best practice in the sample.</p>
-<pre class="r"><code>cs$efficiency &lt;- as.numeric(efficiencies(frontier_model))
+<pre class="r"><code>cs[[&quot;efficiency&quot;]] &lt;- as.numeric(efficiencies(frontier_model))
 
-summary(cs$efficiency)</code></pre>
+summary(cs[[&quot;efficiency&quot;]])</code></pre>
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 ## 0.07707 0.62988 0.72677 0.70578 0.80206 0.93765</code></pre>
 <pre class="r"><code>ranking &lt;- cs %&gt;%
@@ -155,7 +160,7 @@ ggplot(ranking, aes(x = efficiency, y = reorder(isocode, efficiency))) +
   theme_bw()</code></pre>
 <p><img src="/post/2026-09-05-how-efficient-are-countries_files/figure-html/ranking-1.png" alt="" width="624" /></p>
 <p>Egypt, Trinidad and Tobago, Pakistan and Sudan come out on top, while Greece, Ukraine, Haiti and Venezuela are at the other end. This is not the ranking of advanced economies that one might have expected, and it is worth understanding why. The frontier is estimated with a capital elasticity of about 0.72. A country is therefore predicted to produce a lot only if it has a lot of <em>measured</em> capital. Countries that produce a decent amount of output with a small measured capital stock end up close to the frontier, and countries with a large capital stock and moderate output end up far below it. The efficiency scores are, to a large extent, a ranking by the inverse of the capital-output ratio:</p>
-<pre class="r"><code>cor(cs$efficiency, cs$capital / cs$gdp)</code></pre>
+<pre class="r"><code>cor(cs[[&quot;efficiency&quot;]], cs[[&quot;capital&quot;]] / cs[[&quot;gdp&quot;]])</code></pre>
 <pre><code>## [1] -0.7230601</code></pre>
 <p>That is not a flaw in the estimator, but it is a strong reminder of what the model actually measures. Three things are worth keeping in mind.</p>
 <p>First, the model only knows about capital and labour. Natural resources are an unmeasured input, so oil and gas exporters convert a resource endowment into output that the model can only interpret as exceptional efficiency. The same applies to financial centres and entrepôt economies.</p>
@@ -177,13 +182,13 @@ ggplot(ranking, aes(x = efficiency, y = reorder(isocode, efficiency))) +
           &quot;SVK&quot;, &quot;SVN&quot;, &quot;ESP&quot;, &quot;SWE&quot;, &quot;CHE&quot;, &quot;TUR&quot;, &quot;GBR&quot;, &quot;USA&quot;)
 
 oecd_model &lt;- sfa(log(y) ~ log(k), data = filter(cs, isocode %in% oecd))</code></pre>
-<pre><code>## Warning in sfa(log(y) ~ log(k), data = filter(cs, isocode %in% oecd)): the
-## residuals of the OLS estimates are right-skewed; this might indicate that there
-## is no inefficiency or that the model is misspecified</code></pre>
-<pre><code>## Warning in sfa(log(y) ~ log(k), data = filter(cs, isocode %in% oecd)): the
-## parameter &#39;gamma&#39; is close to the boundary of the parameter space [0,1]: this
-## can cause convergence problems and can negatively affect the validity and
-## reliability of statistical tests and might be caused by model misspecification</code></pre>
+<pre><code>## Warning in sfa(log(y) ~ log(k), data = filter(cs, isocode %in% oecd)): the residuals of the OLS
+## estimates are right-skewed; this might indicate that there is no inefficiency or that the model is
+## misspecified</code></pre>
+<pre><code>## Warning in sfa(log(y) ~ log(k), data = filter(cs, isocode %in% oecd)): the parameter &#39;gamma&#39; is
+## close to the boundary of the parameter space [0,1]: this can cause convergence problems and can
+## negatively affect the validity and reliability of statistical tests and might be caused by model
+## misspecification</code></pre>
 <pre class="r"><code>coef(oecd_model)[&quot;gamma&quot;]</code></pre>
 <pre><code>##        gamma 
 ## 1.596242e-05</code></pre>
@@ -192,11 +197,13 @@ oecd_model &lt;- sfa(log(y) ~ log(k), data = filter(cs, isocode %in% oecd))</cod
 <div id="has-the-world-moved-closer-to-best-practice" class="section level2">
 <h2>Has the world moved closer to best practice?</h2>
 <p>The cross section says nothing about the time dimension. For that, the model is estimated on a balanced panel of the years 1990 to 2019, this time with the constant price variables, which are the ones designed for comparisons over time. A linear trend allows the frontier itself to shift.</p>
-<pre class="r"><code>library(plm)
+<pre class="r"><code>library(&quot;plm&quot;)
 
 pan &lt;- pwt10.01 %&gt;%
   filter(year &gt;= 1990, year &lt;= 2019) %&gt;%
-  transmute(country, isocode, year,
+  transmute(country,
+            isocode,
+            year,
             y = rgdpo / (emp * hc),
             k = rnna / (emp * hc)) %&gt;%
   filter(complete.cases(.))
@@ -274,14 +281,12 @@ summary(panel_time)</code></pre>
 ## thus there are 0 observations not in the panel
 ## 
 ## mean efficiency of each year
-##      1990      1991      1992      1993      1994      1995      1996      1997 
-## 0.3993362 0.4071771 0.4150248 0.4228755 0.4307255 0.4385709 0.4464080 0.4542333 
-##      1998      1999      2000      2001      2002      2003      2004      2005 
-## 0.4620433 0.4698344 0.4776033 0.4853468 0.4930615 0.5007445 0.5083926 0.5160030 
-##      2006      2007      2008      2009      2010      2011      2012      2013 
-## 0.5235728 0.5310992 0.5385798 0.5460119 0.5533931 0.5607211 0.5679936 0.5752086 
-##      2014      2015      2016      2017      2018      2019 
-## 0.5823640 0.5894580 0.5964886 0.6034542 0.6103532 0.6171841 
+##      1990      1991      1992      1993      1994      1995      1996      1997      1998      1999 
+## 0.3993362 0.4071771 0.4150248 0.4228755 0.4307255 0.4385709 0.4464080 0.4542333 0.4620433 0.4698344 
+##      2000      2001      2002      2003      2004      2005      2006      2007      2008      2009 
+## 0.4776033 0.4853468 0.4930615 0.5007445 0.5083926 0.5160030 0.5235728 0.5310992 0.5385798 0.5460119 
+##      2010      2011      2012      2013      2014      2015      2016      2017      2018      2019 
+## 0.5533931 0.5607211 0.5679936 0.5752086 0.5823640 0.5894580 0.5964886 0.6034542 0.6103532 0.6171841 
 ## 
 ## mean efficiency: 0.5107754</code></pre>
 <p>The parameter <code>time</code> is positive, which in this parameterisation means that inefficiency declines over the sample period. Average efficiency rises from about 0.40 in 1990 to about 0.62 in 2019, so the typical country has moved closer to best practice.</p>
@@ -290,7 +295,8 @@ summary(panel_time)</code></pre>
 
 ggplot(mean_eff, aes(x = year, y = efficiency)) +
   geom_line() +
-  labs(x = NULL, y = &quot;Mean technical efficiency&quot;,
+  labs(x = NULL,
+       y = &quot;Mean technical efficiency&quot;,
        title = &quot;Average distance to the world frontier&quot;) +
   theme_bw()</code></pre>
 <p><img src="/post/2026-09-05-how-efficient-are-countries_files/figure-html/panel-plot-1.png" alt="" width="576" /></p>
@@ -312,12 +318,13 @@ coef(tfe)[c(&quot;log(k)&quot;, &quot;trend&quot;, &quot;sigmaSq&quot;, &quot;ga
 # serves as the reference category, so its dummy is zero.
 dummies &lt;- cf[grep(&quot;^factor\\(isocode\\)&quot;, names(cf))]
 names(dummies) &lt;- sub(&quot;^factor\\(isocode\\)&quot;, &quot;&quot;, names(dummies))
-reference &lt;- setdiff(levels(pan$isocode), names(dummies))
+reference &lt;- setdiff(levels(pan[[&quot;isocode&quot;]]), names(dummies))
 intercepts &lt;- c(setNames(0, reference), dummies) + cf[&quot;(Intercept)&quot;]
 
 # Net out the country intercept and technical progress
 tfe_frontier &lt;- pan %&gt;%
-  mutate(output_net = log(y) - intercepts[as.character(isocode)] - cf[&quot;trend&quot;] * trend,
+  mutate(output_net = log(y) - intercepts[as.character(isocode)] -
+           cf[&quot;trend&quot;] * trend,
          isocode = as.character(isocode),
          var_colour = ifelse(isocode %in% eu, isocode, &quot;Other&quot;),
          var_colour = factor(var_colour, levels = c(eu, &quot;Other&quot;)),
@@ -326,6 +333,8 @@ tfe_frontier &lt;- pan %&gt;%
   filter(log(k) &gt; 9,
          log(k) &lt; 12.5)
 
+tfe_subtitle &lt;- &quot;A single frontier once the country intercepts are removed&quot;
+
 ggplot(tfe_frontier, aes(x = log(k), y = output_net)) +
   geom_point(aes(colour = var_colour, alpha = var_alpha), size = 0.6) +
   geom_abline(intercept = 0, slope = cf[&quot;log(k)&quot;]) +
@@ -333,7 +342,7 @@ ggplot(tfe_frontier, aes(x = log(k), y = output_net)) +
   labs(x = &quot;Log capital per efficiency unit of labour&quot;,
        y = &quot;Log output, net of country intercept\nand technical progress&quot;,
        title = &quot;The true fixed effects frontier, 1990 to 2019&quot;,
-       subtitle = &quot;A single frontier once the country intercepts are removed&quot;) +
+       subtitle = tfe_subtitle) +
   theme_bw()</code></pre>
 <p><img src="/post/2026-09-05-how-efficient-are-countries_files/figure-html/tfe-plot-1.png" alt="" width="624" /></p>
 <p>Almost all observations lie below the line, and the vertical distance to it is what the model now calls inefficiency. Everything that permanently separates a country from the rest of the world has moved into its intercept, so a country is no longer compared to the world, but to its own best years. What changes completely, therefore, is the efficiency estimates.</p>
@@ -347,11 +356,14 @@ comparison &lt;- pan %&gt;%
   left_join(panel_eff, by = &quot;isocode&quot;)
 
 # Mean efficiency under both specifications
-c(panel = mean(comparison$eff_panel), tfe = mean(comparison$eff_tfe))</code></pre>
+c(panel = mean(comparison[[&quot;eff_panel&quot;]]),
+  tfe = mean(comparison[[&quot;eff_tfe&quot;]]))</code></pre>
 <pre><code>##     panel       tfe 
 ## 0.4594662 0.7831169</code></pre>
 <pre class="r"><code># How similar are the two rankings?
-cor(comparison$eff_panel, comparison$eff_tfe, method = &quot;spearman&quot;)</code></pre>
+cor(comparison[[&quot;eff_panel&quot;]],
+    comparison[[&quot;eff_tfe&quot;]],
+    method = &quot;spearman&quot;)</code></pre>
 <pre><code>## [1] 0.2318624</code></pre>
 <p>The rank correlation between the two sets of scores is low, which means that the two models tell almost different stories about the same data. The countries that led the previous ranking are a good illustration:</p>
 <pre class="r"><code>comparison %&gt;%

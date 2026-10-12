@@ -20,10 +20,10 @@ In an [earlier post on growth accounting](/2018/12/30/an-exercise-in-growth-acco
 The <a href="https://www.rug.nl/ggdc/productivity/pwt/" target="_blank">Penn World Table</a> is available on CRAN. Version 10.01 covers 183 countries between 1950 and 2019.
 
 ```{r data, message = FALSE}
-library(dplyr)
-library(ggplot2)
-library(frontier) # install.packages("frontier")
-library(pwt10)    # install.packages("pwt10")
+library("dplyr")
+library("ggplot2")
+library("frontier") # install.packages("frontier")
+library("pwt10")    # install.packages("pwt10")
 
 data("pwt10.01")
 ```
@@ -35,7 +35,8 @@ Labour is measured in efficiency units, i.e. the number of persons engaged `emp`
 ```{r sample}
 cs <- pwt10.01 %>%
   filter(year == 2019) %>%
-  transmute(country, isocode,
+  transmute(country,
+            isocode,
             gdp = cgdpo,
             capital = cn,
             labour = emp * hc) %>%
@@ -83,21 +84,25 @@ lrtest(frontier_model)
 The null hypothesis of no inefficiency is clearly rejected. The following graph shows what the two estimators do with the data. The solid line is the estimated frontier, the dashed line is the OLS regression through the cloud.
 
 ```{r scatter, message = FALSE, warning = FALSE, fig.width = 6.5, fig.height = 4.5}
-library(ggrepel)
+library("ggrepel")
 
-label_these <- c("USA", "DEU", "CHN", "IND", "EGY", "VEN", "QAT", "IRL", "NGA", "JPN", "AUT")
+label_these <- c("USA", "DEU", "CHN", "IND", "EGY", "VEN", "QAT", "IRL", "NGA",
+                 "JPN", "AUT")
 
 eu <- c("AUT", "BEL", "BGR", "HRV", "CYP", "CZE", "DNK", "EST", "FIN", "FRA",
         "DEU", "GRC", "HUN", "IRL", "ITA", "LVA", "LTU", "LUX", "MLT", "NLD",
         "POL", "PRT", "ROU", "SVK", "SVN", "ESP", "SWE")
+
+cs_labelled <- filter(cs, isocode %in% label_these)
 
 ggplot(cs, aes(x = log(k), y = log(y))) +
   geom_point(aes(colour = isocode %in% eu), show.legend = FALSE) +
   geom_abline(intercept = coef(frontier_model)[1],
               slope = coef(frontier_model)[2]) +
   geom_smooth(method = "lm", se = FALSE, linetype = "dashed") +
-  geom_text_repel(data = filter(cs, isocode %in% label_these),
-                  aes(label = isocode), size = 3) +
+  geom_text_repel(data = cs_labelled,
+                  aes(label = isocode),
+                  size = 3) +
   labs(x = "Log capital per efficiency unit of labour",
        y = "Log output per efficiency unit of labour",
        title = "The world production frontier in 2019",
@@ -110,9 +115,9 @@ ggplot(cs, aes(x = log(k), y = log(y))) +
 The distance of each country to the frontier is translated into an efficiency score between zero and one, where one means that a country produces as much as the best practice in the sample.
 
 ```{r effic}
-cs$efficiency <- as.numeric(efficiencies(frontier_model))
+cs[["efficiency"]] <- as.numeric(efficiencies(frontier_model))
 
-summary(cs$efficiency)
+summary(cs[["efficiency"]])
 ```
 
 ```{r ranking, fig.width = 6.5, fig.height = 5}
@@ -133,7 +138,7 @@ ggplot(ranking, aes(x = efficiency, y = reorder(isocode, efficiency))) +
 Egypt, Trinidad and Tobago, Pakistan and Sudan come out on top, while Greece, Ukraine, Haiti and Venezuela are at the other end. This is not the ranking of advanced economies that one might have expected, and it is worth understanding why. The frontier is estimated with a capital elasticity of about 0.72. A country is therefore predicted to produce a lot only if it has a lot of *measured* capital. Countries that produce a decent amount of output with a small measured capital stock end up close to the frontier, and countries with a large capital stock and moderate output end up far below it. The efficiency scores are, to a large extent, a ranking by the inverse of the capital-output ratio:
 
 ```{r cor-ky}
-cor(cs$efficiency, cs$capital / cs$gdp)
+cor(cs[["efficiency"]], cs[["capital"]] / cs[["gdp"]])
 ```
 
 That is not a flaw in the estimator, but it is a strong reminder of what the model actually measures. Three things are worth keeping in mind.
@@ -174,11 +179,13 @@ The estimate of $\gamma$ is practically zero and the function warns that the OLS
 The cross section says nothing about the time dimension. For that, the model is estimated on a balanced panel of the years 1990 to 2019, this time with the constant price variables, which are the ones designed for comparisons over time. A linear trend allows the frontier itself to shift.
 
 ```{r panel-data, message = FALSE}
-library(plm)
+library("plm")
 
 pan <- pwt10.01 %>%
   filter(year >= 1990, year <= 2019) %>%
-  transmute(country, isocode, year,
+  transmute(country,
+            isocode,
+            year,
             y = rgdpo / (emp * hc),
             k = rnna / (emp * hc)) %>%
   filter(complete.cases(.))
@@ -221,7 +228,8 @@ mean_eff <- data.frame(year = 1990:2019,
 
 ggplot(mean_eff, aes(x = year, y = efficiency)) +
   geom_line() +
-  labs(x = NULL, y = "Mean technical efficiency",
+  labs(x = NULL,
+       y = "Mean technical efficiency",
        title = "Average distance to the world frontier") +
   theme_bw()
 ```
@@ -249,12 +257,13 @@ cf <- coef(tfe)
 # serves as the reference category, so its dummy is zero.
 dummies <- cf[grep("^factor\\(isocode\\)", names(cf))]
 names(dummies) <- sub("^factor\\(isocode\\)", "", names(dummies))
-reference <- setdiff(levels(pan$isocode), names(dummies))
+reference <- setdiff(levels(pan[["isocode"]]), names(dummies))
 intercepts <- c(setNames(0, reference), dummies) + cf["(Intercept)"]
 
 # Net out the country intercept and technical progress
 tfe_frontier <- pan %>%
-  mutate(output_net = log(y) - intercepts[as.character(isocode)] - cf["trend"] * trend,
+  mutate(output_net = log(y) - intercepts[as.character(isocode)] -
+           cf["trend"] * trend,
          isocode = as.character(isocode),
          var_colour = ifelse(isocode %in% eu, isocode, "Other"),
          var_colour = factor(var_colour, levels = c(eu, "Other")),
@@ -263,6 +272,8 @@ tfe_frontier <- pan %>%
   filter(log(k) > 9,
          log(k) < 12.5)
 
+tfe_subtitle <- "A single frontier once the country intercepts are removed"
+
 ggplot(tfe_frontier, aes(x = log(k), y = output_net)) +
   geom_point(aes(colour = var_colour, alpha = var_alpha), size = 0.6) +
   geom_abline(intercept = 0, slope = cf["log(k)"]) +
@@ -270,7 +281,7 @@ ggplot(tfe_frontier, aes(x = log(k), y = output_net)) +
   labs(x = "Log capital per efficiency unit of labour",
        y = "Log output, net of country intercept\nand technical progress",
        title = "The true fixed effects frontier, 1990 to 2019",
-       subtitle = "A single frontier once the country intercepts are removed") +
+       subtitle = tfe_subtitle) +
   theme_bw()
 ```
 
@@ -287,10 +298,13 @@ comparison <- pan %>%
   left_join(panel_eff, by = "isocode")
 
 # Mean efficiency under both specifications
-c(panel = mean(comparison$eff_panel), tfe = mean(comparison$eff_tfe))
+c(panel = mean(comparison[["eff_panel"]]),
+  tfe = mean(comparison[["eff_tfe"]]))
 
 # How similar are the two rankings?
-cor(comparison$eff_panel, comparison$eff_tfe, method = "spearman")
+cor(comparison[["eff_panel"]],
+    comparison[["eff_tfe"]],
+    method = "spearman")
 ```
 
 The rank correlation between the two sets of scores is low, which means that the two models tell almost different stories about the same data. The countries that led the previous ranking are a good illustration:

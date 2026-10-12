@@ -12,20 +12,21 @@ description: "A short introduction to data visualisation in R using the ggplot2 
 
 
 
-<p>A major challenge in data analysis is to summarise and present data with informative graphs. The <code>ggplot2</code> package was specifically designed to help with this task. Since it is a very powerful and well documented package<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>, this introduction will only focus on its basic syntax, so that the user gets a better understanding of how to read the supporting material on the internet.</p>
+<p>A major challenge in data analysis is to summarize and present data with informative graphs. The <code>ggplot2</code> package was specifically designed to help with this task. Since it is a very powerful and well documented package<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>, this introduction will only focus on its basic syntax, so that the user gets a better understanding of how to read the supporting material on the internet.</p>
 <p>ggplot graphs are built with some kind of blocks, which usually start with the function <code>ggplot</code>. Its first argument contains the data object and the second argument is a further function called <code>aes</code>.<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a> It controls, which columns of the data frame are used for the axes, colours, shapes of the data points and further features of the graph. The remaining blocks are separated by plus <code>+</code> signs and – if not specified otherwise – take the information from the first block and add a certain aspect to the graph, for example additional lines or data points. To understand what this all means, let us look at some basic examples.</p>
-<pre class="r"><code>library(ggplot2)
-library(pwt9)
-data &lt;- pwt9.0
-data_aut &lt;- data[data$isocode == &quot;AUT&quot;,]</code></pre>
+<pre class="r"><code>library(&quot;ggplot2&quot;)
+library(&quot;pwt9&quot;)
+
+pwt &lt;- pwt9.0
+data_aut &lt;- pwt[pwt[[&quot;isocode&quot;]] == &quot;AUT&quot;, ]</code></pre>
 <div id="line-plots" class="section level2">
 <h2>Line plots</h2>
 <p>In order to plot the time series of the Austrian GDP per capita we use the following code:</p>
-<pre class="r"><code>data_aut &lt;- cbind(data_aut, &quot;GDP.pc&quot; = data_aut$rgdpe / data_aut$pop)
+<pre class="r"><code>data_aut &lt;- cbind(data_aut, &quot;GDP.pc&quot; = data_aut[[&quot;rgdpe&quot;]] / data_aut[[&quot;pop&quot;]])
 
 ggplot(data_aut, aes(x = year, y = GDP.pc)) +
   geom_line()</code></pre>
-<p><img src="/rbasics/ggplotintro_files/figure-html/unnamed-chunk-1-1.png" width="384" /></p>
+<p><img src="/rbasics/ggplotintro_files/figure-html/unnamed-chunk-1-1.png" alt="" width="384" /></p>
 <p>After the execution of the line the graph should appear in the lower right window of RStudio. If not, just click on the tab <em>Plots</em> in that window and you should see it.</p>
 <p>The first block in the line you just executed – <code>ggplot(data_aut, aes(x = year, y = GDP.pc))</code> – tells R that it should use the data frame <code>data_aut</code> as the main source of data for everything that follows. And the <code>aes</code> function tells R that the column <em>year</em> in <code>data_aut</code> should be used to map the data on the x axis and the corresponding values in column <em>GDP.pc</em> should be used to map the data on the y axis.</p>
 <p>The second block – <code>geom_line()</code> – does not require any further specifications, because all the necessary information was specified in the first block. It just adds the line to the graph. To see that more clearly, you could just execute the first block and notice that only an empty graph with predefined x- and y-axes – that have the range of the actual data – is displayed. The only thing missing is the line of the time series. Therefore, it is necessary to add the second block.</p>
@@ -38,17 +39,22 @@ g + geom_line()</code></pre>
 <pre class="r"><code># Specify the data and rescale the values of the y axis
 ggplot(data_aut, aes(x = year, y = GDP.pc / 1000)) +
   geom_line() + # Add a line to the plot
-  labs(title = &quot;GDP per Capita (Austria)&quot;, # Add a title
-       caption = &quot;Source: Penn World Table 9.0.&quot;, # Add a caption at the bottom
-       x = &quot;Year&quot;, y = &quot;Thousand Dollars&quot;) +  # Rename the title of the x-axis
+  # Add a title, a caption at the bottom and rename the titles of the axes
+  labs(title = &quot;GDP per Capita (Austria)&quot;,
+       caption = &quot;Source: Penn World Table 9.0.&quot;,
+       x = &quot;Year&quot;,
+       y = &quot;Thousand Dollars&quot;) +
   theme_classic() # Usa a predefined theme of the graph</code></pre>
-<p><img src="/rbasics/ggplotintro_files/figure-html/unnamed-chunk-3-1.png" width="384" /></p>
+<p><img src="/rbasics/ggplotintro_files/figure-html/unnamed-chunk-3-1.png" alt="" width="384" /></p>
 <p>If you wanted to compare the evolution of GDP per capita across Austria, France, Germany and Switzerland as calculated in the last section, you could basically use the same code. The only thing we have to change would be that we use a different data source – <code>data_multi</code> – and to add <code>colour = country</code> as an additional argument to the <code>aes</code> function. This tells R that it has to separate the GDP per capita values per year according to the name in the column <em>Country</em> in the <code>data_multi</code> data frame.</p>
-<pre class="r"><code>data_multi &lt;- data[data$country%in%c(&quot;Austria&quot;, &quot;France&quot;, &quot;Germany&quot;, &quot;Switzerland&quot;),]
-data_multi &lt;- cbind(data_multi, &quot;GDP.pc&quot; = data_multi$rgdpe/data_multi$pop)
+<pre class="r"><code>countries &lt;- c(&quot;Austria&quot;, &quot;France&quot;, &quot;Germany&quot;, &quot;Switzerland&quot;)
+
+data_multi &lt;- pwt[pwt[[&quot;country&quot;]] %in% countries, ]
+data_multi &lt;- cbind(data_multi,
+                    &quot;GDP.pc&quot; = data_multi[[&quot;rgdpe&quot;]] / data_multi[[&quot;pop&quot;]])
 
 # Specify the data and rescale the values of the y axis
-ggplot(data_multi, aes(x = year, y = GDP.pc / 1000, colour = country)) + 
+ggplot(data_multi, aes(x = year, y = GDP.pc / 1000, colour = country)) +
   geom_line() + # Add a line to the plot
   # The function labs allows to add and change labels like a title
   labs(title = &quot;GDP per Capita&quot;,
@@ -58,10 +64,10 @@ ggplot(data_multi, aes(x = year, y = GDP.pc / 1000, colour = country)) +
   theme_classic() + # Usa a predefined theme of the graph
   # theme() changes further features of a graph.
   theme(axis.title.y = element_blank()) # Here: delete the title of the y axis</code></pre>
-<p><img src="/rbasics/ggplotintro_files/figure-html/unnamed-chunk-4-1.png" width="384" /></p>
+<p><img src="/rbasics/ggplotintro_files/figure-html/unnamed-chunk-4-1.png" alt="" width="384" /></p>
 <p>If you do not want to use colours, but instead prefer different line types to separate the countries’ values, this can be done by replacing the <code>colour</code> argument with <code>linetype</code>. Furthermore, you can rename the title of the legend with the <code>scale_abc_xyz</code> function by specifying the <code>name</code> argument, i.e. <code>scale_linetype_discrete(name = "Country")</code> in this example.</p>
 <pre class="r"><code># Specify the data and rescale the values of the y axis
-ggplot(data_multi, aes(x = year, y = GDP.pc / 1000, linetype = country)) + 
+ggplot(data_multi, aes(x = year, y = GDP.pc / 1000, linetype = country)) +
   geom_line() + # Add a line to the plot
   labs(title = &quot;GDP per Capita&quot;, # Add a title
        subtitle = &quot;In thousand Dollars&quot;, # Add a subtitle
@@ -70,17 +76,18 @@ ggplot(data_multi, aes(x = year, y = GDP.pc / 1000, linetype = country)) +
   scale_linetype_discrete(name = &quot;Country&quot;) + # Change title of the legend
   theme_classic() + # Usa a predefined theme of the graph
   theme(axis.title.y = element_blank()) # Delete the title of the y axis</code></pre>
-<p><img src="/rbasics/ggplotintro_files/figure-html/unnamed-chunk-5-1.png" width="384" /></p>
+<p><img src="/rbasics/ggplotintro_files/figure-html/unnamed-chunk-5-1.png" alt="" width="384" /></p>
 </div>
 <div id="bar-charts" class="section level2">
 <h2>Bar charts</h2>
 <p>Another popular type of graphs are bar charts, which can be useful when the share of single components in an aggregate are of interest. In the following example a new data frame is created, which contains real GDP values for Austria, France, Germany and Switzerland from the year 2000 until 2013. Afterwards the bar chart is created. Again, nearly the same code as in the previous sub-section is used.</p>
-<pre class="r"><code>library(dplyr)
+<pre class="r"><code>library(&quot;dplyr&quot;)
 
 # Extract data
-data_gdp &lt;- data %&gt;% 
+data_gdp &lt;- pwt %&gt;%
   filter(country %in% c(&quot;Austria&quot;, &quot;France&quot;, &quot;Germany&quot;, &quot;Switzerland&quot;),
-         year &gt;= 2000, year &lt;= 2013) %&gt;% 
+         year &gt;= 2000,
+         year &lt;= 2013) %&gt;%
   select(year, country, rgdpe) %&gt;% # Select the relevant columns
   rename(Year = year, Country = country, GDP = rgdpe) # Rename columns
 
@@ -93,10 +100,10 @@ ggplot(data_gdp, aes(x = Year, y = GDP / 1000, fill = Country)) +
        caption = &quot;Source: Penn World Table 9.0.&quot;, # Add a caption
        x = &quot;Year&quot;) +  # Rename the title of the x-axis
   # Change the standard set of colours used to fill the bars
-  scale_fill_brewer(palette = &quot;Set1&quot;) + 
+  scale_fill_brewer(palette = &quot;Set1&quot;) +
   theme_classic() + # Usa a predefined theme of the graph
   theme(axis.title.y = element_blank()) # Delete the title of the y axis)</code></pre>
-<p><img src="/rbasics/ggplotintro_files/figure-html/unnamed-chunk-6-1.png" width="384" /></p>
+<p><img src="/rbasics/ggplotintro_files/figure-html/unnamed-chunk-6-1.png" alt="" width="384" /></p>
 <p>The only differences are:</p>
 <ul>
 <li>A new data source, <code>data_gdp</code>, is used.</li>
@@ -112,37 +119,44 @@ ggplot(data_gdp, aes(x = Year, y = GDP / 1000, fill = Country)) +
 <p>Looking at the resulting data frame with <code>data_hc</code> we notice that there are some cells which contain the value <code>NA</code>. This means that these values are <strong>n</strong>ot <strong>a</strong>vailable. When plotting the data, <code>ggplot</code> will notice these data points, omit them from the sample and give a warning that they were removed. In order to avoid this warning, the missing values can be manually dropped with the function <code>na.omit</code>.</p>
 <pre class="r"><code># Prepare data
 # Use the pwt data frame and extract observations from 2014
-data_hc &lt;- data %&gt;% filter(year == 2014) %&gt;% 
+data_hc &lt;- pwt %&gt;%
+  filter(year == 2014) %&gt;%
   # Calculate GDP per worker and add it to the existing data frame
-  mutate(GDP.worker = rgdpe / emp) %&gt;% 
+  mutate(GDP.worker = rgdpe / emp) %&gt;%
   select(country, GDP.worker, hc) %&gt;% # Select the relevant columns
   rename(Country = country, Human.Capital = hc) # Rename columns
 
 data_hc &lt;- na.omit(data_hc) # Omit NA values</code></pre>
 <p>The scatterplot is created in a similar manner as the graphs created above. The first function contains the data frame <code>data_hc</code> with the data and the function <code>aes</code> specifies that the columns <em>Human.Capital</em> and <em>GDP.worker</em> contain data on the position of the points on the x- and y-axis, respectively. The second function, <code>geom_point()</code>, introduces the points of the scatterplot. The argument <code>title</code> contains the character <code>\n</code>, which indicates, that at this point a new line should be started. This results in a plot title that has two lines and the break occurs at the position of the <code>\n</code> sign.</p>
 <pre class="r"><code># Specify the data and rescale the values of the y axis
-ggplot(data_hc, aes(x = Human.Capital, y = GDP.worker)) + 
+ggplot(data_hc, aes(x = Human.Capital, y = GDP.worker)) +
   geom_point() + # Add points of the scatterplot
-  labs(title = &quot;Relationship between human capital\nand output per worker&quot;, # Add title
-       caption = &quot;Source: Penn World Table 9.0.&quot;, # Add a caption
-       x = &quot;Human capital&quot;, y = &quot;Output per worker&quot;) +  # Rename axes titles
+  # Add a title and a caption and rename the titles of the axes
+  labs(title = &quot;Relationship between human capital\nand output per worker&quot;,
+       caption = &quot;Source: Penn World Table 9.0.&quot;,
+       x = &quot;Human capital&quot;,
+       y = &quot;Output per worker&quot;) +
   theme_classic() # Usa a predefined theme of the graph</code></pre>
-<p><img src="/rbasics/ggplotintro_files/figure-html/unnamed-chunk-8-1.png" width="384" /></p>
+<p><img src="/rbasics/ggplotintro_files/figure-html/unnamed-chunk-8-1.png" alt="" width="384" /></p>
 <p>The plot implies that there is a positive correlation between human capital and output per worker, but output per worker seems to become more dispersed as the value of human capital increases. One solution to this issue might be to take the (natural) logarithm of output per worker and plot the graph again. The functions, which are required for this step, are already familiar. But instead of plotting the graph immediately, it is saved as an object named <code>g</code>, which is plotted afterwards by executing <code>g</code>.</p>
 <pre class="r"><code># Adjust data
-data_hc_log &lt;- data_hc %&gt;% # Use the data_hc data frame
-  mutate(GDP.worker = log(GDP.worker)) # Replace GDP per worker with its natural logarithm
+# Use the data_hc data frame and replace GDP per worker with its natural
+# logarithm
+data_hc_log &lt;- data_hc %&gt;%
+  mutate(GDP.worker = log(GDP.worker))
 
 # Create graph and save it as object g without plotting
-g &lt;- ggplot(data_hc_log, aes(x = Human.Capital, y = GDP.worker)) + 
+g &lt;- ggplot(data_hc_log, aes(x = Human.Capital, y = GDP.worker)) +
   geom_point() + # Add points of the scatterplot
-  labs(title = &quot;Relationship between human capital\nand output per worker&quot;, # Add title
-       caption = &quot;Source: Penn World Table 9.0.&quot;, # Add a caption
-       x = &quot;Human capital&quot;, y = &quot;Log of output per worker&quot;) +  # Rename axes titles
+  # Add a title and a caption and rename the titles of the axes
+  labs(title = &quot;Relationship between human capital\nand output per worker&quot;,
+       caption = &quot;Source: Penn World Table 9.0.&quot;,
+       x = &quot;Human capital&quot;,
+       y = &quot;Log of output per worker&quot;) +
   theme_classic() # Usa a predefined theme of the graph
 
 g # Plot graph</code></pre>
-<p><img src="/rbasics/ggplotintro_files/figure-html/unnamed-chunk-9-1.png" width="384" /></p>
+<p><img src="/rbasics/ggplotintro_files/figure-html/unnamed-chunk-9-1.png" alt="" width="384" /></p>
 <p>The positive relationship in the graph appears more clearly now, although the effect seems to weaken as the value of human capital increases, which might indicate decreasing marginal returns of human capital in terms of GDP per worker. But that is not important here.</p>
 </div>
 <div class="footnotes footnotes-end-of-document">

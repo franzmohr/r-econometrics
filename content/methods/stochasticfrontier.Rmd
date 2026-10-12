@@ -22,16 +22,16 @@ Consider the following artificial sample of 300 firms, which use a single input 
 set.seed(1234)
 
 # Number of firms
-N <- 300
+n_firms <- 300
 
 # Log input
-lx <- log(runif(N, 5, 100))
+lx <- log(runif(n_firms, 5, 100))
 
 # Symmetric noise, e.g. weather, measurement error or luck
-v <- rnorm(N, 0, .15)
+v <- rnorm(n_firms, 0, .15)
 
 # One-sided inefficiency term, which can only be positive
-u <- abs(rnorm(N, 0, .35))
+u <- abs(rnorm(n_firms, 0, .35))
 
 # Log output
 ly <- 1 + .6 * lx + v - u
@@ -42,13 +42,14 @@ sim <- data.frame(ly = ly, lx = lx)
 The sample was generated from the relationship $ly_i = 1 + 0.6 lx_i + v_i - u_i$, where $v_i$ is a standard error term, which can be positive or negative, and $u_i$ is a term that is *never negative*. The latter pushes every firm below the line, which describes the maximum attainable output. The following graph shows the sample together with the true frontier and the OLS regression line.
 
 ```{r sim-plot, message = FALSE, fig.width = 4.5, fig.height = 4, fig.align = 'center'}
-library(ggplot2)
+library("ggplot2")
 
 ggplot(sim, aes(x = lx, y = ly)) +
   geom_point() +
   geom_abline(intercept = 1, slope = .6) +
   geom_smooth(method = "lm", se = FALSE, linetype = "dashed") +
-  labs(x = "Log input", y = "Log output",
+  labs(x = "Log input",
+       y = "Log output",
        title = "Frontier (solid) and OLS (dashed)") +
   theme_bw()
 ```
@@ -74,7 +75,7 @@ which is estimated by $E[\exp(-u_i) | v_i - u_i]$ as proposed by Jondrow et al. 
 The *frontier* package of Arne Henningsen provides the function `sfa`, which is an R implementation of Tim Coelli's FRONTIER 4.1 program. Applied to the artificial sample from above it gives
 
 ```{r sim-sfa, message = FALSE}
-library(frontier) # install.packages("frontier")
+library("frontier") # install.packages("frontier")
 
 sim_sfa <- sfa(ly ~ lx, data = sim)
 
@@ -129,7 +130,8 @@ summary(as.numeric(eff))
 
 ggplot(data.frame(eff = as.numeric(eff)), aes(x = eff)) +
   geom_histogram(bins = 15) +
-  labs(x = "Technical efficiency", y = "Number of firms") +
+  labs(x = "Technical efficiency",
+       y = "Number of firms") +
   theme_bw()
 ```
 
@@ -144,7 +146,7 @@ The frontier and the inefficiency effects are estimated in a single step. This a
 The *frontier* package also contains a data set of 43 smallholder rice producers in the Philippines, which were observed between 1990 and 1997. It is the example, which is used in Coelli et al. (2005). Panel data have to be prepared with the `pdata.frame` function of the *plm* package, where the first variable identifies the farmer and the second the time period.
 
 ```{r rice-data, message = FALSE}
-library(plm) # install.packages("plm")
+library("plm") # install.packages("plm")
 
 data("riceProdPhil")
 
@@ -165,9 +167,9 @@ The coefficients of the `z` variables require some attention, because they descr
 Since the model allows the mean of the inefficiency term to differ across observations, the efficiency estimates also vary over time. The output above reports the mean efficiency for each of the eight years. The individual estimates can be added to the data in the order of the observations, which is convenient for further analysis:
 
 ```{r rice-effic}
-rice_panel$efficiency <- efficiencies(rice, asInData = TRUE)
+rice_panel[["efficiency"]] <- efficiencies(rice, asInData = TRUE)
 
-summary(as.numeric(rice_panel$efficiency))
+summary(as.numeric(rice_panel[["efficiency"]]))
 ```
 
 ## Cost frontiers
@@ -175,11 +177,12 @@ summary(as.numeric(rice_panel$efficiency))
 So far, inefficiency reduced output. In a cost function it works the other way round, because an inefficient firm has *higher* costs than necessary. This only requires to set the argument `ineffDecrease = FALSE`, which flips the sign of the one-sided error term.
 
 ```{r rice-cost}
-rice_panel$cost <- rice_panel$LABOR * rice_panel$LABORP +
-  rice_panel$NPK * rice_panel$NPKP
+rice_panel[["cost"]] <- rice_panel[["LABOR"]] * rice_panel[["LABORP"]] +
+  rice_panel[["NPK"]] * rice_panel[["NPKP"]]
 
 rice_cost <- sfa(log(cost) ~ log(PROD) + log(AREA) + log(LABORP) + log(NPKP),
-                 data = rice_panel, ineffDecrease = FALSE)
+                 data = rice_panel,
+                 ineffDecrease = FALSE)
 
 summary(rice_cost)
 ```

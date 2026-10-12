@@ -21,29 +21,30 @@ tags:
 set.seed(1234)
 
 # Number of firms
-N &lt;- 300
+n_firms &lt;- 300
 
 # Log input
-lx &lt;- log(runif(N, 5, 100))
+lx &lt;- log(runif(n_firms, 5, 100))
 
 # Symmetric noise, e.g. weather, measurement error or luck
-v &lt;- rnorm(N, 0, .15)
+v &lt;- rnorm(n_firms, 0, .15)
 
 # One-sided inefficiency term, which can only be positive
-u &lt;- abs(rnorm(N, 0, .35))
+u &lt;- abs(rnorm(n_firms, 0, .35))
 
 # Log output
 ly &lt;- 1 + .6 * lx + v - u
 
 sim &lt;- data.frame(ly = ly, lx = lx)</code></pre>
 <p>The sample was generated from the relationship <span class="math inline">\(ly_i = 1 + 0.6 lx_i + v_i - u_i\)</span>, where <span class="math inline">\(v_i\)</span> is a standard error term, which can be positive or negative, and <span class="math inline">\(u_i\)</span> is a term that is <em>never negative</em>. The latter pushes every firm below the line, which describes the maximum attainable output. The following graph shows the sample together with the true frontier and the OLS regression line.</p>
-<pre class="r"><code>library(ggplot2)
+<pre class="r"><code>library(&quot;ggplot2&quot;)
 
 ggplot(sim, aes(x = lx, y = ly)) +
   geom_point() +
   geom_abline(intercept = 1, slope = .6) +
   geom_smooth(method = &quot;lm&quot;, se = FALSE, linetype = &quot;dashed&quot;) +
-  labs(x = &quot;Log input&quot;, y = &quot;Log output&quot;,
+  labs(x = &quot;Log input&quot;,
+       y = &quot;Log output&quot;,
        title = &quot;Frontier (solid) and OLS (dashed)&quot;) +
   theme_bw()</code></pre>
 <p><img src="/methods/stochasticfrontier_files/figure-html/sim-plot-1.png" alt="" width="432" style="display: block; margin: auto;" /></p>
@@ -64,7 +65,7 @@ which is estimated by <span class="math inline">\(E[\exp(-u_i) | v_i - u_i]\)</s
 <div id="estimation-in-r" class="section level2">
 <h2>Estimation in R</h2>
 <p>The <em>frontier</em> package of Arne Henningsen provides the function <code>sfa</code>, which is an R implementation of Tim Coelli’s FRONTIER 4.1 program. Applied to the artificial sample from above it gives</p>
-<pre class="r"><code>library(frontier) # install.packages(&quot;frontier&quot;)
+<pre class="r"><code>library(&quot;frontier&quot;) # install.packages(&quot;frontier&quot;)
 
 sim_sfa &lt;- sfa(ly ~ lx, data = sim)
 
@@ -73,8 +74,8 @@ summary(sim_sfa)</code></pre>
 ## Inefficiency decreases the endogenous variable (as in a production function)
 ## The dependent variable is logged
 ## Iterative ML estimation terminated after 6 iterations:
-## log likelihood values and parameters of two successive iterations
-## are within the tolerance limit
+## cannot find a parameter vector that results in a log-likelihood value
+## larger than the log-likelihood value obtained in the previous step
 ## 
 ## final maximum likelihood estimates
 ##             Estimate Std. Error z value  Pr(&gt;|z|)    
@@ -161,7 +162,8 @@ summary(as.numeric(eff))</code></pre>
 ##  0.3513  0.6772  0.7585  0.7406  0.8428  0.9374</code></pre>
 <pre class="r"><code>ggplot(data.frame(eff = as.numeric(eff)), aes(x = eff)) +
   geom_histogram(bins = 15) +
-  labs(x = &quot;Technical efficiency&quot;, y = &quot;Number of firms&quot;) +
+  labs(x = &quot;Technical efficiency&quot;,
+       y = &quot;Number of firms&quot;) +
   theme_bw()</code></pre>
 <p><img src="/methods/stochasticfrontier_files/figure-html/front41-effic-1.png" alt="" width="432" style="display: block; margin: auto;" /></p>
 <p>The distribution of these estimates is what makes the approach attractive for applied work. It does not only say how efficient the average firm is, but also which firms could increase their output most without using more inputs. However, the individual estimates are predictions of an unobserved random variable and, therefore, relatively imprecise. They should be interpreted with care, especially when they are used to rank firms.</p>
@@ -173,7 +175,7 @@ summary(as.numeric(eff))</code></pre>
 <span class="math display">\[u_i \sim N^+(\mathbf{z}_i^\prime \delta, \sigma_u^2).\]</span>
 The frontier and the inefficiency effects are estimated in a single step. This avoids the inconsistencies of the older two-step approach, where the estimated efficiencies are regressed on <span class="math inline">\(\mathbf{z}\)</span> in a second regression.</p>
 <p>The <em>frontier</em> package also contains a data set of 43 smallholder rice producers in the Philippines, which were observed between 1990 and 1997. It is the example, which is used in Coelli et al. (2005). Panel data have to be prepared with the <code>pdata.frame</code> function of the <em>plm</em> package, where the first variable identifies the farmer and the second the time period.</p>
-<pre class="r"><code>library(plm) # install.packages(&quot;plm&quot;)
+<pre class="r"><code>library(&quot;plm&quot;) # install.packages(&quot;plm&quot;)
 
 data(&quot;riceProdPhil&quot;)
 
@@ -192,14 +194,14 @@ summary(rice)</code></pre>
 ## 
 ## final maximum likelihood estimates
 ##                Estimate Std. Error z value  Pr(&gt;|z|)    
-## (Intercept)   -1.051760   0.252990 -4.1573 3.220e-05 ***
-## log(AREA)      0.379767   0.059976  6.3319 2.421e-10 ***
+## (Intercept)   -1.051760   0.252989 -4.1573 3.220e-05 ***
+## log(AREA)      0.379767   0.059976  6.3320 2.420e-10 ***
 ## log(LABOR)     0.321029   0.061125  5.2520 1.505e-07 ***
-## log(NPK)       0.263797   0.034458  7.6555 1.926e-14 ***
-## Z_(Intercept) -2.746459   8.499206 -0.3231    0.7466    
+## log(NPK)       0.263797   0.034458  7.6555 1.925e-14 ***
+## Z_(Intercept) -2.746459   8.499194 -0.3231    0.7466    
 ## Z_EDYRS       -0.028610   0.215997 -0.1325    0.8946    
-## Z_BANRAT      -3.635528   8.096598 -0.4490    0.6534    
-## sigmaSq        1.666588   3.695879  0.4509    0.6520    
+## Z_BANRAT      -3.635528   8.096581 -0.4490    0.6534    
+## sigmaSq        1.666588   3.695875  0.4509    0.6520    
 ## gamma          0.978799   0.045203 21.6536 &lt; 2.2e-16 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
@@ -218,20 +220,21 @@ summary(rice)</code></pre>
 ## mean efficiency: 0.784927</code></pre>
 <p>The coefficients of the <code>z</code> variables require some attention, because they describe the effect on <em>inefficiency</em> and not on efficiency. A negative coefficient means that the variable reduces inefficiency and, therefore, <em>increases</em> output. Both estimates are negative, which would suggest that better educated farmers and farmers with a larger share of upland fields operate closer to the frontier. However, neither of them is significantly different from zero. With 43 farmers and explanatory variables, which hardly change over time, this is a fairly common outcome. It is a useful reminder that the inefficiency effects model identifies the <span class="math inline">\(\delta\)</span> parameters from the <em>asymmetry</em> of the residuals, which is a much weaker source of information than the variation that identifies the coefficients of the frontier itself.</p>
 <p>Since the model allows the mean of the inefficiency term to differ across observations, the efficiency estimates also vary over time. The output above reports the mean efficiency for each of the eight years. The individual estimates can be added to the data in the order of the observations, which is convenient for further analysis:</p>
-<pre class="r"><code>rice_panel$efficiency &lt;- efficiencies(rice, asInData = TRUE)
+<pre class="r"><code>rice_panel[[&quot;efficiency&quot;]] &lt;- efficiencies(rice, asInData = TRUE)
 
-summary(as.numeric(rice_panel$efficiency))</code></pre>
+summary(as.numeric(rice_panel[[&quot;efficiency&quot;]]))</code></pre>
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 ##  0.1399  0.7255  0.8311  0.7849  0.8874  0.9585</code></pre>
 </div>
 <div id="cost-frontiers" class="section level2">
 <h2>Cost frontiers</h2>
 <p>So far, inefficiency reduced output. In a cost function it works the other way round, because an inefficient firm has <em>higher</em> costs than necessary. This only requires to set the argument <code>ineffDecrease = FALSE</code>, which flips the sign of the one-sided error term.</p>
-<pre class="r"><code>rice_panel$cost &lt;- rice_panel$LABOR * rice_panel$LABORP +
-  rice_panel$NPK * rice_panel$NPKP
+<pre class="r"><code>rice_panel[[&quot;cost&quot;]] &lt;- rice_panel[[&quot;LABOR&quot;]] * rice_panel[[&quot;LABORP&quot;]] +
+  rice_panel[[&quot;NPK&quot;]] * rice_panel[[&quot;NPKP&quot;]]
 
 rice_cost &lt;- sfa(log(cost) ~ log(PROD) + log(AREA) + log(LABORP) + log(NPKP),
-                 data = rice_panel, ineffDecrease = FALSE)
+                 data = rice_panel,
+                 ineffDecrease = FALSE)
 
 summary(rice_cost)</code></pre>
 <pre><code>## Error Components Frontier (see Battese &amp; Coelli 1992)

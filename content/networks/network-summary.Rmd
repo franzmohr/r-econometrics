@@ -18,18 +18,18 @@ For this illustration I use the artificial data set generated in my <a href="htt
 set.seed(12345)
 
 # Generate data
-raw <- data.frame(byer = rep(letters, 1, each = 26),
-                  sllr = rep(letters, 26),
-                  con = rnorm(26 * 26)^2) # Calculate arbitrary weights
+links <- data.frame(byer = rep(letters, 1, each = 26),
+                    sllr = rep(letters, 26),
+                    con = rnorm(26 * 26)^2) # Calculate arbitrary weights
 
 # Drop connections with oneself
-raw <- raw[raw$byer != raw$sllr,]
+links <- links[links[["byer"]] != links[["sllr"]], ]
 
 # Only keep strong connections
-raw <- raw[abs(raw$con) > 1,]
+links <- links[abs(links[["con"]]) > 1, ]
 
-library(igraph) # Load package
-graph_df <- graph_from_data_frame(raw, directed = FALSE)
+library("igraph") # Load package
+graph_df <- graph_from_data_frame(links, directed = FALSE)
 ```
 
 
@@ -39,7 +39,7 @@ The degree of a node is the number of its connections. The `degree` function cal
 
 ```{r}
 # Load package
-library(igraph)
+library("igraph")
 
 # Obtain degrees
 g_degree <- degree(graph_df)
@@ -60,9 +60,9 @@ Let's explore this by looking at a larger network, that can be generated with th
 ```{r, fig.height=3.5, fig.width=4}
 # From the example of sample_degseq
 
-# Pre-specify the degrees of the nodes according to the 
+# Pre-specify the degrees of the nodes according to the
 # power law
-degs <- sample(1:100, 1000, replace=TRUE, prob = (1:100)^-2)
+degs <- sample(1:100, 1000, replace = TRUE, prob = (1:100)^-2)
 
 # Check if degrees sum up to an even number
 # if not, add 1 to the first node to make the sum even
@@ -117,7 +117,7 @@ round(g_betw, 2)
 ```{r}
 g_eigen <- eigen_centrality(graph_df)
 
-round(g_eigen$vector, 2)
+round(g_eigen[["vector"]], 2)
 ```
 
 ### Centrality measures with decay factors
@@ -140,7 +140,7 @@ To conclude this post, let's look at the relationships between the different net
 centr_small <- data.frame(degree = g_degree,
                           closeness = g_close,
                           betweenness = g_betw,
-                          eigenvalue = g_eigen$vector)
+                          eigenvalue = g_eigen[["vector"]])
 
 # Scatterplot matrix
 pairs(centr_small)
@@ -157,7 +157,7 @@ Looking at the scatterplot matrix of the centrality measures of the larger netwo
 centr_large <- data.frame(degree = degree(g_large),
                           closeness = closeness(g_large),
                           betweenness = betweenness(g_large),
-                          eigenvalue = eigen_centrality(g_large)$vector)
+                          eigenvalue = eigen_centrality(g_large)[["vector"]])
 
 # Scatterplot matrix
 pairs(centr_large)
