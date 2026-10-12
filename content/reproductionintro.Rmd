@@ -12,6 +12,8 @@ Coelli, T. J. (1996). [A guide to FRONTIER Version 4.1: A computer program for s
 
 Griffin, J. E., & Steel, M. F. J. (2007). [Bayesian stochastic frontier analysis using WinBUGS](/reproduction/2007_griffin_steel_sfa). *Journal of Productivity Analysis* 27, 163-176.
 
+Hochmuth, P., & Petz, N. (2026). [On the persistence of services inflation and the price of services relative to goods](/reproduction/2026_hochmuth_petz_services). *OeNB Policy Brief* 2026/11.
+
 Koop, G., & Korobilis, D. (2014). [A new index of financial conditions](/reproduction/2014_koop_korobilis_fci). *European Economic Review* 71, 101-116.
 
 Koop, G., León-González, R., & Strachan, R. W. (2011). [Bayesian inference in a time varying cointegration model](/reproduction/2011_koop_leongonzalez_strachan_tvcoint). *Journal of Econometrics* 165, 210-220.

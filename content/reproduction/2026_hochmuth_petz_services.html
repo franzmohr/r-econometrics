@@ -1,0 +1,314 @@
+---
+title: "Reproduction: Hochmuth, P., & Petz, N. (2026). On the persistence of services inflation and the price of services relative to goods."
+author: "Franz X. Mohr"
+date: "2026-10-12"
+tags:
+  - r
+  - bvartools
+  - vecm
+  - error-correction
+  - inflation
+  - relative-prices
+  - hicp
+description: "Hochmuth and Petz (2026) argue that persistent services inflation in the euro area is partly the price of services catching up with its long-run trend relative to goods. This post reproduces their error correction model, the speed at which the relative-price gap closes and the split of that adjustment between services and goods inflation in R with bvartools."
+---
+
+
+
+<p>Euro area services inflation has come down much more slowly than goods inflation since its peak in 2023. Hochmuth and Petz (2026) read this partly as a relative-price adjustment. Before the pandemic, services prices rose faster than goods prices along a stable trend, which reflects slower productivity growth in services, income-elastic demand for them and their lower tradability. The surge in goods prices in 2021 and 2022 pushed the price of services relative to goods below that trend, and part of what looks like persistent services inflation is the relative price working its way back.</p>
+<p>How fast that happens, and whether it happens through higher services inflation or lower goods inflation, is the question of the policy brief’s Annex A. It answers it with a small error correction model of services and non-energy industrial goods (NEIG) prices, and finds that half of a gap closes after about three and a half years, mostly through services. With overall goods prices instead of NEIG the gap closes within about five quarters, and mostly through goods.</p>
+<p>This post reproduces both results with <a href="https://github.com/franzmohr/bvartools"><code>bvartools</code></a>.</p>
+<!--more-->
+<div id="the-model" class="section level2">
+<h2>The model</h2>
+<p>Let <span class="math inline">\(s_t = 100 \ln P^s_t\)</span> and <span class="math inline">\(n_t = 100 \ln P^n_t\)</span> be the log price indices of services and NEIG. The paper fixes the cointegrating vector at <span class="math inline">\(\beta = (1, -1)&#39;\)</span>, so that <span class="math inline">\(\beta&#39; y_t = s_t - n_t\)</span> is the log relative price of services, and assumes that it follows a linear trend:</p>
+<p><span class="math display">\[s_t - n_t = \mu + \delta t + z_t,\]</span></p>
+<p>where <span class="math inline">\(z_t\)</span> is stationary. The trend allows the two price indices to grow at different rates in the long run, and <span class="math inline">\(z_t\)</span> is the deviation from it, the <em>relative-price gap</em>.</p>
+<p>The model is estimated in two stages. The first is an OLS regression of the relative price on a constant and a trend, whose residual <span class="math inline">\(\hat{z}_t\)</span> is the estimated gap. The second is a VECM that uses <span class="math inline">\(\hat{z}_{t-1}\)</span> as its error correction term,</p>
+<p><span class="math display">\[\Delta y_t = \kappa + \alpha \hat{z}_{t-1} + \Gamma \Delta y_{t-1} + \varepsilon_t, \quad \varepsilon_t \sim N(0, \Sigma),\]</span></p>
+<p>with <span class="math inline">\(\Delta y_t = (\Delta s_t, \Delta n_t)&#39;\)</span>. The loadings <span class="math inline">\(\alpha = (\alpha_s, \alpha_n)&#39;\)</span> say how services and NEIG inflation respond to a gap. The paper puts independent standard normal priors on <span class="math inline">\(\kappa\)</span>, <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\Gamma\)</span>, and an inverse Wishart prior on <span class="math inline">\(\Sigma \sim IW(4, 0.01 I)\)</span>.</p>
+<p>Since <span class="math inline">\(\hat{z}_{t-1}\)</span> is data once the first stage is done, the second stage is a VAR(1) in <span class="math inline">\(\Delta y_t\)</span> with one exogenous regressor, which is how it is estimated below.</p>
+</div>
+<div id="the-data" class="section level2">
+<h2>The data</h2>
+<p>The paper uses monthly harmonised indices of consumer prices (HICP) for the euro area (changing composition) from Eurostat data set <code>prc_hicp_minr</code>, from January 1996 to June 2026. They are seasonally adjusted with X-13ARIMA-SEATS from the <a href="https://cran.r-project.org/package=seasonal"><code>seasonal</code></a> package and averaged to quarters.</p>
+<p>The data set is the first that Eurostat publishes under the new ECOICOP version 2, and the vintage of October 2026 has no euro area index before December 1999, although the paper says it started in January 1996 when it was downloaded in August. The ECB Data Portal still has the old ECOICOP version 1 indices, which start in 1996, so the missing months are filled in with their month-on-month growth rates. The ECB’s NEIG index itself has a hole from January 1997 to November 2000, which its published annual rates of change fill: <span class="math inline">\(P_t = P_{t-12} (1 + \pi^{yoy}_t / 100)\)</span>. Since those rates have only one decimal, each year rebuilt that way is off by at most 0.05%.</p>
+<pre class="r"><code>library(&quot;jsonlite&quot;)
+
+# Eurostat, ECOICOP ver. 2: services, NEIG and goods, 2025 = 100
+url &lt;- paste0(&quot;https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/&quot;,
+              &quot;prc_hicp_minr?format=JSON&amp;geo=EA&amp;unit=I25&quot;,
+              &quot;&amp;coicop18=SERV&amp;coicop18=IGD_NNRG&amp;coicop18=GD&quot;)
+js &lt;- fromJSON(url)
+items &lt;- names(sort(unlist(js$dimension$coicop18$category$index)))
+months &lt;- names(sort(unlist(js$dimension$time$category$index)))
+hicp &lt;- matrix(NA_real_, length(months), length(items), dimnames = list(months, items))
+pos &lt;- as.integer(names(js$value))   # JSON-stat: item position * months + month position
+hicp[cbind(pos %% length(months) + 1, pos %/% length(months) + 1)] &lt;- unlist(js$value)
+hicp &lt;- hicp[months &lt;= &quot;2026-06&quot;, ]
+
+# ECB, ECOICOP ver. 1: index levels (INX) and annual rates (ANR) for 1996 to 2001
+ecb &lt;- function(item, suffix) {
+  x &lt;- read.csv(paste0(&quot;https://data-api.ecb.europa.eu/service/data/ICP/M.U2.N.&quot;,
+                       item, &quot;.4.&quot;, suffix,
+                       &quot;?format=csvdata&amp;detail=dataonly&amp;startPeriod=1996-01&amp;endPeriod=2001-12&quot;))
+  setNames(x$OBS_VALUE, x$TIME_PERIOD)
+}
+early &lt;- rownames(hicp)[rownames(hicp) &lt;= &quot;2001-12&quot;]
+for (i in items) {
+  item &lt;- c(SERV = &quot;SERV00&quot;, IGD_NNRG = &quot;IGXE00&quot;, GD = &quot;GOODS0&quot;)[[i]]
+  old &lt;- ecb(item, &quot;INX&quot;)[early]
+  anr &lt;- ecb(item, &quot;ANR&quot;)
+  names(old) &lt;- early
+  for (j in which(is.na(old))) {
+    old[j] &lt;- old[j - 12] * (1 + anr[[early[j]]] / 100)
+  }
+  first &lt;- min(which(!is.na(hicp[, i])))
+  hicp[1:(first - 1), i] &lt;- hicp[first, i] * old[1:(first - 1)] / old[first]
+}
+
+write.csv(data.frame(month = rownames(hicp), hicp), &quot;_2026_hochmuth_petz_hicp.csv&quot;,
+          row.names = FALSE)</code></pre>
+<p>The result is in a small file next to this page, so that the post does not change with the next vintage:</p>
+<pre class="r"><code>library(&quot;seasonal&quot;)
+
+hicp &lt;- read.csv(&quot;_2026_hochmuth_petz_hicp.csv&quot;)
+hicp &lt;- ts(hicp[, c(&quot;SERV&quot;, &quot;IGD_NNRG&quot;, &quot;GD&quot;)], start = c(1996, 1), frequency = 12)
+
+# X-13ARIMA-SEATS with the defaults of seasonal, then quarterly averages
+hicp_sa &lt;- hicp
+for (i in colnames(hicp)) {
+  hicp_sa[, i] &lt;- final(seas(hicp[, i]))
+}
+prices &lt;- aggregate(hicp_sa, nfrequency = 4, FUN = mean)
+colnames(prices) &lt;- c(&quot;services&quot;, &quot;neig&quot;, &quot;goods&quot;)</code></pre>
+<p>The relative price of services rose along a steady trend before the pandemic, against NEIG at more than one percent a year, and fell below it during the inflation surge:</p>
+<pre class="r"><code>rel &lt;- 100 * log(prices[, &quot;services&quot;] / prices[, c(&quot;neig&quot;, &quot;goods&quot;)])
+colnames(rel) &lt;- c(&quot;Services relative to NEIG&quot;, &quot;Services relative to goods&quot;)
+plot(rel, main = &quot;Log relative price of services (x 100)&quot;, xlab = &quot;&quot;)</code></pre>
+<p><img src="/reproduction/2026_hochmuth_petz_services_files/figure-html/relative-price-1.png" alt="" width="672" /></p>
+</div>
+<div id="estimation" class="section level2">
+<h2>Estimation</h2>
+<p>A function sets up both stages for either price index, so that the benchmark and the specification with overall goods prices share the code. The first stage is <code>lm</code>. In the second, <code>create_bvarmodel</code> takes <span class="math inline">\(\hat{z}_{t-1}\)</span> as an exogenous variable <code>exogen</code> with no further lags, <code>s = 0</code>, and <code>add_priors</code> sets the paper’s priors directly: a precision <code>v_i = 1</code> is a standard normal prior with mean zero, and <code>sigma = list(df = 4, scale = 0.01)</code> is the inverse Wishart with four degrees of freedom and scale matrix <span class="math inline">\(0.01 I\)</span>. The sampler is run for 5,000 burn-in draws, and the next 20,000 are kept.</p>
+<pre class="r"><code>library(&quot;bvartools&quot;)
+
+estimate_gap_model &lt;- function(prices, other) {
+  y &lt;- 100 * log(prices[, c(&quot;services&quot;, other)])
+  colnames(y) &lt;- c(&quot;s&quot;, &quot;n&quot;)
+
+  # Stage 1: the relative-price gap
+  rel &lt;- y[, &quot;s&quot;] - y[, &quot;n&quot;]
+  trend &lt;- seq_along(rel)
+  z &lt;- ts(residuals(lm(rel ~ trend)), start = start(rel), frequency = 4)
+
+  # Stage 2: a VAR(1) in differences with the lagged gap as exogenous regressor
+  dy &lt;- diff(y)
+  ect &lt;- window(stats::lag(z, -1), start = start(dy), end = end(dy))
+  ect &lt;- ts(matrix(ect, dimnames = list(NULL, &quot;ect&quot;)), start = start(dy), frequency = 4)
+
+  model &lt;- create_bvarmodel(dy, p = 1, exogen = ect, s = 0, deterministic = &quot;const&quot;,
+                            iterations = 20000, burnin = 5000)
+  model &lt;- add_priors(model,
+                      coef = list(v_i = 1, v_i_det = 1),
+                      sigma = list(df = 4, scale = 0.01))
+  model &lt;- add_initial_values(model, method = &quot;ols&quot;)
+  add_posterior_coefficients(model)
+}
+
+set.seed(20261012)
+model_neig &lt;- estimate_gap_model(prices, &quot;neig&quot;)
+model_goods &lt;- estimate_gap_model(prices, &quot;goods&quot;)</code></pre>
+<pre class="r"><code>summary(model_neig)</code></pre>
+<pre><code>## 
+## Bayesian VAR model with p = 1 and s = 0 
+## 
+## Endogenous variables: s, n
+## 
+## Variable: s 
+## 
+##               Mean         SD     Naive SD Time-series SD         2.5%
+## s.l1    0.53666848 0.07921922 5.601645e-04   5.736318e-04  0.382674732
+## n.l1    0.12547532 0.06243646 4.414924e-04   4.414924e-04  0.004790073
+## ect.l0 -0.03260893 0.01081947 7.650522e-05   7.816906e-05 -0.053804521
+## const   0.22135600 0.04045902 2.860885e-04   2.916030e-04  0.142265357
+##                50%       97.5%  
+## s.l1    0.53679984  0.69342784 *
+## n.l1    0.12559394  0.24943503 *
+## ect.l0 -0.03253197 -0.01133798 *
+## const   0.22148148  0.30079275 *
+## 
+## Variable: n 
+## 
+##               Mean         SD     Naive SD Time-series SD        2.5%
+## s.l1   -0.01716661 0.10361707 7.326833e-04   7.295326e-04 -0.21867790
+## n.l1    0.71552294 0.08140224 5.756007e-04   5.756007e-04  0.55511285
+## ect.l0 -0.01020764 0.01401152 9.907643e-05   9.907643e-05 -0.03745045
+## const   0.07280600 0.05308072 3.753374e-04   3.766556e-04 -0.03114290
+##                50%      97.5%  
+## s.l1   -0.01763009 0.18614143  
+## n.l1    0.71593500 0.87242371 *
+## ect.l0 -0.01018564 0.01759145  
+## const   0.07304980 0.17663529  
+## 
+## Variance-covariance matrix:
+## 
+##           Mean          SD     Naive SD Time-series SD        2.5%        50%
+## s_s 0.02752135 0.003643497 2.576342e-05   2.667543e-05 0.021308232 0.02718972
+## s_n 0.01466575 0.003599254 2.545057e-05   2.627168e-05 0.008223902 0.01445134
+## n_n 0.04637967 0.006205077 4.387652e-05   4.578056e-05 0.035763049 0.04578956
+##          97.5%  
+## s_s 0.03559597 *
+## s_n 0.02235043 *
+## n_n 0.05998577 *</code></pre>
+<p>A gap below trend, <span class="math inline">\(\hat{z}_{t-1} &lt; 0\)</span>, raises services inflation: <span class="math inline">\(\alpha_s\)</span> is negative and its credible interval excludes zero. The loading of NEIG inflation is negative as well, but smaller and not clearly different from zero. Since a gap closes when services inflation exceeds NEIG inflation, the NEIG response works against the adjustment.</p>
+</div>
+<div id="how-fast-does-the-gap-close" class="section level2">
+<h2>How fast does the gap close?</h2>
+<p>To isolate the adjustment the paper simulates the model in deviations from a baseline without a gap. The intercepts and the errors then drop out, and from <span class="math inline">\(z_0 = -1\)</span> and <span class="math inline">\(\Delta y_0 = 0\)</span> the system evolves as</p>
+<p><span class="math display">\[\Delta y_h = \alpha z_{h-1} + \Gamma \Delta y_{h-1}, \quad z_h = z_{h-1} + \Delta s_h - \Delta n_h, \quad h = 1, \ldots, H.\]</span></p>
+<p>An initial gap of <span class="math inline">\(-1\)</span> means that services are about 1% cheaper relative to NEIG than their trend implies. The cumulative contributions of services and NEIG inflation to closing it, in percent of the initial gap, are</p>
+<p><span class="math display">\[C_{s,h} = 100 \sum_{j=1}^{h} \Delta s_j, \quad C_{n,h} = -100 \sum_{j=1}^{h} \Delta n_j,\]</span></p>
+<p>and <span class="math inline">\(100 + 100 z_h = 100 - C_{s,h} - C_{n,h}\)</span> is what remains of the gap after <span class="math inline">\(h\)</span> quarters.</p>
+<p>The draws of the coefficients are in <code>posterior$a$coeffs</code>. Each row is one draw of <span class="math inline">\(vec(A)\)</span>, where <span class="math inline">\(A\)</span> has one row per equation and one column per regressor, in the order <code>summary</code> prints them. The recursion is run for all draws at once:</p>
+<pre class="r"><code>gap_closure &lt;- function(model, horizon = 40) {
+  draws &lt;- as.matrix(model$posterior$a$coeffs)
+  k &lt;- model$model$k
+  # Regressors: the lags of s and n, the error correction term, the constant
+  coef &lt;- function(eq, reg) draws[, (reg - 1) * k + eq]
+
+  alpha &lt;- cbind(coef(1, 3), coef(2, 3))
+  gamma &lt;- list(coef(1, 1), coef(1, 2), coef(2, 1), coef(2, 2))
+
+  z &lt;- rep(-1, nrow(draws))
+  ds &lt;- dn &lt;- rep(0, nrow(draws))
+  services &lt;- other &lt;- remaining &lt;- matrix(NA_real_, nrow(draws), horizon)
+  for (h in 1:horizon) {
+    ds_new &lt;- alpha[, 1] * z + gamma[[1]] * ds + gamma[[2]] * dn
+    dn_new &lt;- alpha[, 2] * z + gamma[[3]] * ds + gamma[[4]] * dn
+    ds &lt;- ds_new
+    dn &lt;- dn_new
+    z &lt;- z + ds - dn
+    services[, h] &lt;- 100 * ds
+    other[, h] &lt;- -100 * dn
+    remaining[, h] &lt;- -100 * z
+  }
+
+  data.frame(h = 0:horizon,
+             remaining = c(100, apply(remaining, 2, median)),
+             lower = c(100, apply(remaining, 2, quantile, probs = 0.16)),
+             upper = c(100, apply(remaining, 2, quantile, probs = 0.84)),
+             services = c(0, apply(t(apply(services, 1, cumsum)), 2, median)),
+             other = c(0, apply(t(apply(other, 1, cumsum)), 2, median)))
+}
+
+closure_neig &lt;- gap_closure(model_neig)
+closure_goods &lt;- gap_closure(model_goods)</code></pre>
+<p>Chart 4 of the paper shows the median of the remaining gap with its 68% credible interval, and the median contributions as bars that start at 100: the services bars point down, because higher services inflation closes the gap, and the NEIG bars point up, because higher NEIG inflation widens it. Where both contributions close the gap, as in the specification with overall goods below, the bars are stacked.</p>
+<pre class="r"><code>plot_closure &lt;- function(x, label) {
+  plot(NA, xlim = range(x$h), ylim = range(c(-50, 160, 100 - x$services)),
+       xlab = &quot;Quarters after the initial gap&quot;, ylab = &quot;% of initial gap&quot;,
+       main = &quot;What closes the gap?&quot;)
+  grid()
+  # Contributions with the same sign are stacked, opposite ones start at 100
+  base &lt;- ifelse(sign(x$other) == sign(x$services), 100 - x$services, 100)
+  rect(x$h - 0.35, 100, x$h + 0.35, 100 - x$services, col = &quot;#f3e6c4&quot;, border = NA)
+  rect(x$h - 0.35, base, x$h + 0.35, base - x$other, col = &quot;#9fd3d6&quot;, border = NA)
+  polygon(c(x$h, rev(x$h)), c(x$lower, rev(x$upper)),
+          col = adjustcolor(&quot;#5a7fb8&quot;, 0.35), border = NA)
+  lines(x$h, x$remaining, col = &quot;#123d7a&quot;, lwd = 2)
+  abline(h = c(0, 100))
+  legend(&quot;bottomleft&quot;, legend = c(&quot;Services&quot;, label, &quot;Remaining gap&quot;),
+         fill = c(&quot;#f3e6c4&quot;, &quot;#9fd3d6&quot;, NA), border = NA, lty = c(NA, NA, 1),
+         col = c(NA, NA, &quot;#123d7a&quot;), lwd = 2, bty = &quot;n&quot;)
+}</code></pre>
+<pre class="r"><code>plot_closure(closure_neig, &quot;NEIG&quot;)</code></pre>
+<p><img src="/reproduction/2026_hochmuth_petz_services_files/figure-html/chart4-1.png" alt="" width="672" /></p>
+<p>The chart is close to the published one. The remaining gap falls below 50% between quarters 14 and 15, exactly where the paper puts it, about three and a half years. At quarter 14 services inflation has closed 77 percentage points of the gap and NEIG inflation has widened it by 29, against 76 and 26 in the paper. After ten years 13% of the gap is left, as in the published chart.</p>
+<pre class="r"><code>knitr::kable(closure_neig[closure_neig$h %in% c(4, 8, 14, 15, 20, 40), ],
+             digits = 1, row.names = FALSE,
+             col.names = c(&quot;Quarter&quot;, &quot;Remaining gap&quot;, &quot;16%&quot;, &quot;84%&quot;, &quot;Services&quot;, &quot;NEIG&quot;))</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="right">Quarter</th>
+<th align="right">Remaining gap</th>
+<th align="right">16%</th>
+<th align="right">84%</th>
+<th align="right">Services</th>
+<th align="right">NEIG</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">4</td>
+<td align="right">86.3</td>
+<td align="right">78.6</td>
+<td align="right">94.1</td>
+<td align="right">20.7</td>
+<td align="right">-7.0</td>
+</tr>
+<tr class="even">
+<td align="right">8</td>
+<td align="right">70.5</td>
+<td align="right">55.1</td>
+<td align="right">86.7</td>
+<td align="right">46.2</td>
+<td align="right">-16.6</td>
+</tr>
+<tr class="odd">
+<td align="right">14</td>
+<td align="right">51.6</td>
+<td align="right">30.7</td>
+<td align="right">76.5</td>
+<td align="right">77.4</td>
+<td align="right">-29.0</td>
+</tr>
+<tr class="even">
+<td align="right">15</td>
+<td align="right">49.0</td>
+<td align="right">27.7</td>
+<td align="right">75.0</td>
+<td align="right">81.7</td>
+<td align="right">-30.8</td>
+</tr>
+<tr class="odd">
+<td align="right">20</td>
+<td align="right">37.7</td>
+<td align="right">16.7</td>
+<td align="right">67.9</td>
+<td align="right">99.9</td>
+<td align="right">-38.3</td>
+</tr>
+<tr class="even">
+<td align="right">40</td>
+<td align="right">13.3</td>
+<td align="right">2.1</td>
+<td align="right">45.8</td>
+<td align="right">140.0</td>
+<td align="right">-54.6</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="overall-goods-instead-of-neig" class="section level2">
+<h2>Overall goods instead of NEIG</h2>
+<p>The same model with the overall goods index adjusts much faster:</p>
+<pre class="r"><code>plot_closure(closure_goods, &quot;Goods&quot;)</code></pre>
+<p><img src="/reproduction/2026_hochmuth_petz_services_files/figure-html/chart4-goods-1.png" alt="" width="672" /></p>
+<p>Half of the gap is closed between quarters 4 and 5, which the paper reports as about five quarters. Here, unlike in the benchmark, both components close the gap, and goods inflation does more of it: at quarter 5 services contribute 17 and goods 41 percentage points, against roughly 15 and 38 in the paper. The goods loading is positive, and its 95% credible interval excludes zero: when services are cheap relative to goods, goods inflation falls. The faster adjustment reflects the energy and food prices in the goods index, which move much more than NEIG prices and return quickly after a shock.</p>
+</div>
+<div id="deviations-from-the-paper" class="section level2">
+<h2>Deviations from the paper</h2>
+<ul>
+<li><strong>Data before 2000.</strong> The current vintage of <code>prc_hicp_minr</code> starts in December 1999 for the euro area, so the first four years are back-cast from the ECB’s ECOICOP version 1 indices, and the NEIG index for 1997 to 2000 from its annual rates.</li>
+<li><strong>Data vintage.</strong> The data were downloaded on 12 October 2026 rather than 10 August, so the most recent quarters may include revisions.</li>
+<li><strong>Trend sample.</strong> The paper does not say over which sample the trend of the first stage is estimated. The whole sample, 1996 Q1 to 2026 Q2, reproduces its results. The 1996 to 2019 trend that the paper’s Chart 2 draws instead gives a half-life of 26 to 27 quarters for NEIG and 6 to 7 for goods.</li>
+</ul>
+</div>
+<div id="references" class="section level2">
+<h2>References</h2>
+<p>Hochmuth, P., &amp; Petz, N. (2026). On the persistence of services inflation and the price of services relative to goods. <em>OeNB Policy Brief</em> 2026/11. Oesterreichische Nationalbank.</p>
+<p>Engle, R. F., &amp; Granger, C. W. J. (1987). Co-integration and error correction: Representation, estimation, and testing. <em>Econometrica, 55</em>(2), 251–276. <a href="https://doi.org/10.2307/1913236" class="uri">https://doi.org/10.2307/1913236</a></p>
+<p>Sax, C., &amp; Eddelbuettel, D. (2018). Seasonal adjustment by X-13ARIMA-SEATS in R. <em>Journal of Statistical Software, 87</em>(11), 1–17. <a href="https://doi.org/10.18637/jss.v087.i11" class="uri">https://doi.org/10.18637/jss.v087.i11</a></p>
+</div>
