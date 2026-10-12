@@ -62,12 +62,13 @@ plot.ts(series, main = "Artificial time series")
 library(bvartools)
 
 # Generate basic model
-mod <- gen_var(series,
-               p = 1,
-               deterministic = "none",
-               structural = TRUE,
-               iterations = 5000,
-               burnin = 2000)
+mod <- create_bvarmodel(series,
+                        p = 1,
+                        deterministic = "none",
+                        structural = TRUE,
+                        error = "gamma",
+                        iterations = 5000,
+                        burnin = 2000)
 ```
 
 ## Prior specification
@@ -80,15 +81,17 @@ mod_w_prior <- add_priors(mod,
 
 ## Draw posteriors
 
-```{r, message=FALSE, warning = FALSE, results='hide'}
-post <- draw_posterior(mod_w_prior)
+```{r, message=FALSE, warning = FALSE}
+mod_w_prior <- add_initial_values(mod_w_prior, method = "ols")
+
+post <- add_posterior_coefficients(mod_w_prior)
 ```
 
 ## Evaluation
 
 ### Summary statistics
 
-```{r, message=FALSE, warning = FALSE}
+```{r, message=FALSE, warning = FALSE, R.options = list(digits = 4)}
 summary(post)
 ```
 
@@ -113,7 +116,10 @@ plot(post, type = "boxplot")
 ### Forecasts
 
 ```{r, message=FALSE, warning = FALSE}
-pred_svar <- predict(post, "S1", n.ahead = 10)
+post <- add_forecast_input(post, n_ahead = 10)
+post <- add_posterior_forecasts(post)
+
+pred_svar <- predict(post, n_ahead = 10)
 
 plot(pred_svar)
 ```
@@ -122,7 +128,7 @@ plot(pred_svar)
 ### Impulse response functions
 
 ```{r, message=FALSE, warning = FALSE}
-irf_svar <- irf(post, n.ahead = 10, impulse = "S1", response = "S3", type = "sir")
+irf_svar <- irf(post, n_ahead = 10, impulse = "S1", response = "S3", type = "sir")
 
 plot(irf_svar)
 ```
@@ -130,7 +136,7 @@ plot(irf_svar)
 ### Variance decomposition
 
 ```{r, message=FALSE, warning = FALSE}
-fevd_svar <- fevd(post, n.ahead = 10, response = "S3", type = "sir")
+fevd_svar <- fevd(post, n_ahead = 10, response = "S3", type = "sir")
 
 plot(fevd_svar)
 ```

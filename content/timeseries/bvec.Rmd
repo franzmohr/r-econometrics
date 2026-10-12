@@ -18,7 +18,7 @@ This post provides the code to set up and estimate a basic Bayesian vector error
 
 To illustrate the estimation process, the dataset E6 from Lütkepohl (2007) is used, which contains data on German long-term interest rates and inflation from 1972Q2 to 1998Q4.
 
-```{r data, fig.align='center', fig.height=5, fig.width=4.5}
+```{r data, message=FALSE, fig.align='center', fig.height=5, fig.width=4.5}
 library(bvartools)
 
 data("e6")
@@ -26,14 +26,14 @@ data("e6")
 plot(e6) # Plot the series
 ```
 
-The `gen_vec` function produces the inputs `Y`, `W` and `X` for the BVEC estimator, where `Y` is the matrix of dependent variables, `W` is a matrix of potentially cointegrated regressors, and `X` is the matrix of non-cointegration regressors.
+The `create_bvecmodel` function produces an object of class `bvecmodel`, whose element `data$train` contains the inputs `y`, `w` and `x` for the BVEC estimator, where `y` is the matrix of dependent variables, `w` is a matrix of potentially cointegrated regressors, and `x` is the matrix of non-cointegration regressors. The matrices contain one row per period. Since the sampler below is written for matrices with one column per period, they are transposed.
 
 ```{r}
-data <- gen_vec(e6, p = 4, r = 1, const = "unrestricted", season = "unrestricted")
+model <- create_bvecmodel(e6, p = 4, r = 1, const = "unrestricted", seasonal = "unrestricted")
 
-y <- t(data$data$Y)
-w <- t(data$data$W)
-x <- t(data$data$X)
+y <- t(model$data$train$y)
+w <- t(model$data$train$w)
+x <- t(model$data$train$x)
 ```
 
 ## Estimation
@@ -58,9 +58,9 @@ k_beta <- k_w * r # Number of elements in beta
 k_gamma <- k * k_x
 
 # Set uninformative priors
-# ...for non-cointegration parameters
-a_mu_prior <- matrix(0, k_x * k) # Vector of prior parameter means
-a_v_i_prior <- diag(0, k_x * k) # Inverse of the prior covariance matrix
+# ...for loadings and non-cointegration parameters
+a_mu_prior <- matrix(0, k_alpha + k_gamma) # Vector of prior parameter means
+a_v_i_prior <- diag(0, k_alpha + k_gamma) # Inverse of the prior covariance matrix
 
 # ...for cointegration parameters
 v_i <- 0
@@ -157,42 +157,51 @@ The `bvec` function can be used to collect output of the Gibbs sampler in a stan
 k_nondet <- (k_x - 4) * k
 
 # Generate bvec object
-bvec_est <- bvec(y = data$data$Y, w = data$data$W,
-                 x = data$data$X[, 1:6],
-                 x_d = data$data$X[, 7:10],
-                 Pi = draws_pi,
-               Gamma = draws_gamma[1:k_nondet,],
-               C = draws_gamma[(k_nondet + 1):nrow(draws_gamma),],
-               Sigma = draws_sigma)
+bvec_est <- bvec(y = model$data$train$y,
+                 w = model$data$train$w,
+                 x = model$data$train$x[, 1:6],
+                 x_d = model$data$train$x[, 7:10],
+                 r = 1,
+                 alpha = draws_alpha,
+                 beta = draws_beta,
+                 Gamma = draws_gamma[1:k_nondet, ],
+                 C = draws_gamma[(k_nondet + 1):nrow(draws_gamma), ],
+                 Sigma = draws_sigma)
 ```
+
+The error correction term is described by the draws of `alpha` and `beta` and not by those of `Pi`, since the latter cannot be decomposed into the former.
 
 Posterior draws can be thinned with function `thin`:
 
 ```{r thin}
-bvec_est <- thin_posterior(bvec_est, thin = 5)
+bvec_est <- thin(bvec_est, thin = 5)
 ```
 
-The function `bvec_to_bvar` can be used to transform the VEC model into a VAR in levels:
+The function `vec_to_var` can be used to transform the VEC model into a VAR in levels:
 
 ```{r vec2var}
-bvar_form <- bvec_to_bvar(bvec_est)
+bvar_form <- vec_to_var(bvec_est)
 ```
 
 ## Forecasts
 
-```{r forecast, , fig.width=5.5, fig.height=5.5}
-bvar_pred <- predict(bvar_form, n.ahead = 10, new_d = bvar_form$x[3 + 1:10, 9:12])
+Forecasts are obtained in two steps. First, function `add_forecast_input` generates the data of the forecast periods. Values of deterministic terms such as the seasonal dummies can be provided in its argument `deterministic`. If they are not provided, the function tries to obtain them from the model. Second, function `add_posterior_forecasts` simulates the forecasts.
 
-plot(bvar_pred)
+```{r forecast, fig.width=5.5, fig.height=4}
+bvar_form <- add_forecast_input(bvar_form, n_ahead = 10)
+bvar_form <- add_posterior_forecasts(bvar_form)
+
+bvar_pred <- predict(bvar_form, n_ahead = 10)
+
+plot(bvar_pred, n_pre = 20)
 ```
-
 
 ## Impulse response analysis
 
 Impulse responses for VECs can be constructed from their VAR respresentations.
 
 ```{r feir, fig.width=5.5, fig.height=4.5}
-IR <- irf(bvar_form, impulse = "R", response = "Dp", n.ahead = 20)
+IR <- irf(bvar_form, impulse = "R", response = "Dp", n_ahead = 20)
 
 plot(IR, main = "Forecast Error Impulse Response", xlab = "Year", ylab = "Response")
 ```
@@ -200,7 +209,7 @@ plot(IR, main = "Forecast Error Impulse Response", xlab = "Year", ylab = "Respon
 ### Orthogonalised impulse response
 
 ```{r oir, fig.width=5.5, fig.height=4.5}
-OIR <- irf(bvar_form, impulse = "R", response = "Dp", n.ahead = 20, type = "oir")
+OIR <- irf(bvar_form, impulse = "R", response = "Dp", n_ahead = 20, type = "oir")
 
 plot(OIR, main = "Orthogonalised Impulse Response", xlab = "Year", ylab = "Response")
 ```
@@ -208,7 +217,7 @@ plot(OIR, main = "Orthogonalised Impulse Response", xlab = "Year", ylab = "Respo
 ### Generalised impulse response
 
 ```{r gir, fig.width=5.5, fig.height=4.5}
-GIR <- irf(bvar_form, impulse = "R", response = "Dp", n.ahead = 20, type = "gir")
+GIR <- irf(bvar_form, impulse = "R", response = "Dp", n_ahead = 20, type = "gir")
 
 plot(GIR, main = "Generalised Impulse Response", xlab = "Year", ylab = "Response")
 ```
@@ -216,7 +225,7 @@ plot(GIR, main = "Generalised Impulse Response", xlab = "Year", ylab = "Response
 ### Forecast error variance decomposition
 
 ```{r fevd, fig.width=5.5, fig.height=4.5}
-bvec_fevd <- fevd(bvar_form, response = "Dp", n.ahead = 20)
+bvec_fevd <- fevd(bvar_form, response = "Dp", n_ahead = 20)
 
 plot(bvec_fevd, main = "FEVD of inflation")
 ```

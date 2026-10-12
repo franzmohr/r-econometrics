@@ -14,7 +14,7 @@ tags:
 
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
-<p>This post provides the code to set up and estimate a basic Bayesian vector error correction (BVEC) model with the <code>bvartools</code> package. The presented Gibbs sampler is based on the approach of Koop et al. (2010), who propose a prior on the cointegration space.</p>
+<p>This post provides the code to set up and estimate a basic Bayesian vector error correction (BVEC) model with the <code>bvartools</code> package. The presented Gibbs sampler is based on the approach of Koop et al. (2010), who propose a prior on the cointegration space.</p>
 </div>
 <div id="data" class="section level2">
 <h2>Data</h2>
@@ -24,13 +24,13 @@ tags:
 data(&quot;e6&quot;)
 
 plot(e6) # Plot the series</code></pre>
-<p><img src="/timeseries/bvec_files/figure-html/data-1.png" width="432" style="display: block; margin: auto;" /></p>
-<p>The <code>gen_vec</code> function produces the inputs <code>Y</code>, <code>W</code> and <code>X</code> for the BVEC estimator, where <code>Y</code> is the matrix of dependent variables, <code>W</code> is a matrix of potentially cointegrated regressors, and <code>X</code> is the matrix of non-cointegration regressors.</p>
-<pre class="r"><code>data &lt;- gen_vec(e6, p = 4, r = 1, const = &quot;unrestricted&quot;, season = &quot;unrestricted&quot;)
+<p><img src="/timeseries/bvec_files/figure-html/data-1.png" alt="" width="432" style="display: block; margin: auto;" /></p>
+<p>The <code>create_bvecmodel</code> function produces an object of class <code>bvecmodel</code>, whose element <code>data$train</code> contains the inputs <code>y</code>, <code>w</code> and <code>x</code> for the BVEC estimator, where <code>y</code> is the matrix of dependent variables, <code>w</code> is a matrix of potentially cointegrated regressors, and <code>x</code> is the matrix of non-cointegration regressors. The matrices contain one row per period. Since the sampler below is written for matrices with one column per period, they are transposed.</p>
+<pre class="r"><code>model &lt;- create_bvecmodel(e6, p = 4, r = 1, const = &quot;unrestricted&quot;, seasonal = &quot;unrestricted&quot;)
 
-y &lt;- t(data$data$Y)
-w &lt;- t(data$data$W)
-x &lt;- t(data$data$X)</code></pre>
+y &lt;- t(model$data$train$y)
+w &lt;- t(model$data$train$w)
+x &lt;- t(model$data$train$x)</code></pre>
 </div>
 <div id="estimation" class="section level2">
 <h2>Estimation</h2>
@@ -53,9 +53,9 @@ k_beta &lt;- k_w * r # Number of elements in beta
 k_gamma &lt;- k * k_x
 
 # Set uninformative priors
-# ...for non-cointegration parameters
-a_mu_prior &lt;- matrix(0, k_x * k) # Vector of prior parameter means
-a_v_i_prior &lt;- diag(0, k_x * k) # Inverse of the prior covariance matrix
+# ...for loadings and non-cointegration parameters
+a_mu_prior &lt;- matrix(0, k_alpha + k_gamma) # Vector of prior parameter means
+a_v_i_prior &lt;- diag(0, k_alpha + k_gamma) # Inverse of the prior covariance matrix
 
 # ...for cointegration parameters
 v_i &lt;- 0
@@ -119,12 +119,9 @@ Gamma &lt;- round(Gamma, 3) # Round values
 dimnames(Gamma) &lt;- list(dimnames(y)[[1]], dimnames(x)[[1]]) # Rename matrix dimensions
 
 round(Gamma, 3) # Print</code></pre>
-<pre><code>##      d.R.l1 d.Dp.l1 d.R.l2 d.Dp.l2 d.R.l3 d.Dp.l3 const season.1 season.2
-## d.R   0.267  -0.187 -0.017  -0.207  0.225  -0.099 0.002    0.001    0.009
-## d.Dp  0.074  -0.383  0.000  -0.421  0.025  -0.361 0.011   -0.034   -0.018
-##      season.3
-## d.R     0.000
-## d.Dp   -0.017</code></pre>
+<pre><code>##      d.R.l01 d.Dp.l01 d.R.l02 d.Dp.l02 d.R.l03 d.Dp.l03 const season.1 season.2 season.3
+## d.R    0.267   -0.187  -0.017   -0.207   0.225   -0.099 0.002    0.001    0.009    0.000
+## d.Dp   0.074   -0.383   0.000   -0.421   0.025   -0.361 0.011   -0.034   -0.018   -0.017</code></pre>
 <pre class="r"><code>beta &lt;- rowMeans(t(t(draws_beta) / t(draws_beta)[, 1])) # Obtain means for every row
 beta &lt;- matrix(beta, k_w) # Transform mean vector into a matrix
 beta &lt;- round(beta, 3) # Round values
@@ -151,52 +148,60 @@ Sigma # Print</code></pre>
 k_nondet &lt;- (k_x - 4) * k
 
 # Generate bvec object
-bvec_est &lt;- bvec(y = data$data$Y, w = data$data$W,
-                 x = data$data$X[, 1:6],
-                 x_d = data$data$X[, 7:10],
-                 Pi = draws_pi,
-               Gamma = draws_gamma[1:k_nondet,],
-               C = draws_gamma[(k_nondet + 1):nrow(draws_gamma),],
-               Sigma = draws_sigma)</code></pre>
+bvec_est &lt;- bvec(y = model$data$train$y,
+                 w = model$data$train$w,
+                 x = model$data$train$x[, 1:6],
+                 x_d = model$data$train$x[, 7:10],
+                 r = 1,
+                 alpha = draws_alpha,
+                 beta = draws_beta,
+                 Gamma = draws_gamma[1:k_nondet, ],
+                 C = draws_gamma[(k_nondet + 1):nrow(draws_gamma), ],
+                 Sigma = draws_sigma)</code></pre>
+<p>The error correction term is described by the draws of <code>alpha</code> and <code>beta</code> and not by those of <code>Pi</code>, since the latter cannot be decomposed into the former.</p>
 <p>Posterior draws can be thinned with function <code>thin</code>:</p>
-<pre class="r"><code>bvec_est &lt;- thin_posterior(bvec_est, thin = 5)</code></pre>
-<p>The function <code>bvec_to_bvar</code> can be used to transform the VEC model into a VAR in levels:</p>
-<pre class="r"><code>bvar_form &lt;- bvec_to_bvar(bvec_est)</code></pre>
+<pre class="r"><code>bvec_est &lt;- thin(bvec_est, thin = 5)</code></pre>
+<p>The function <code>vec_to_var</code> can be used to transform the VEC model into a VAR in levels:</p>
+<pre class="r"><code>bvar_form &lt;- vec_to_var(bvec_est)</code></pre>
 </div>
 <div id="forecasts" class="section level2">
 <h2>Forecasts</h2>
-<pre class="r"><code>bvar_pred &lt;- predict(bvar_form, n.ahead = 10, new_d = bvar_form$x[3 + 1:10, 9:12])
+<p>Forecasts are obtained in two steps. First, function <code>add_forecast_input</code> generates the data of the forecast periods. Values of deterministic terms such as the seasonal dummies can be provided in its argument <code>deterministic</code>. If they are not provided, the function tries to obtain them from the model. Second, function <code>add_posterior_forecasts</code> simulates the forecasts.</p>
+<pre class="r"><code>bvar_form &lt;- add_forecast_input(bvar_form, n_ahead = 10)
+bvar_form &lt;- add_posterior_forecasts(bvar_form)
 
-plot(bvar_pred)</code></pre>
-<p><img src="/timeseries/bvec_files/figure-html/forecast,%20-1.png" width="528" /></p>
+bvar_pred &lt;- predict(bvar_form, n_ahead = 10)
+
+plot(bvar_pred, n_pre = 20)</code></pre>
+<p><img src="/timeseries/bvec_files/figure-html/forecast-1.png" alt="" width="528" /><img src="/timeseries/bvec_files/figure-html/forecast-2.png" alt="" width="528" /></p>
 </div>
 <div id="impulse-response-analysis" class="section level2">
 <h2>Impulse response analysis</h2>
 <p>Impulse responses for VECs can be constructed from their VAR respresentations.</p>
-<pre class="r"><code>IR &lt;- irf(bvar_form, impulse = &quot;R&quot;, response = &quot;Dp&quot;, n.ahead = 20)
+<pre class="r"><code>IR &lt;- irf(bvar_form, impulse = &quot;R&quot;, response = &quot;Dp&quot;, n_ahead = 20)
 
 plot(IR, main = &quot;Forecast Error Impulse Response&quot;, xlab = &quot;Year&quot;, ylab = &quot;Response&quot;)</code></pre>
-<p><img src="/timeseries/bvec_files/figure-html/feir-1.png" width="528" /></p>
+<p><img src="/timeseries/bvec_files/figure-html/feir-1.png" alt="" width="528" /></p>
 <div id="orthogonalised-impulse-response" class="section level3">
 <h3>Orthogonalised impulse response</h3>
-<pre class="r"><code>OIR &lt;- irf(bvar_form, impulse = &quot;R&quot;, response = &quot;Dp&quot;, n.ahead = 20, type = &quot;oir&quot;)
+<pre class="r"><code>OIR &lt;- irf(bvar_form, impulse = &quot;R&quot;, response = &quot;Dp&quot;, n_ahead = 20, type = &quot;oir&quot;)
 
 plot(OIR, main = &quot;Orthogonalised Impulse Response&quot;, xlab = &quot;Year&quot;, ylab = &quot;Response&quot;)</code></pre>
-<p><img src="/timeseries/bvec_files/figure-html/oir-1.png" width="528" /></p>
+<p><img src="/timeseries/bvec_files/figure-html/oir-1.png" alt="" width="528" /></p>
 </div>
 <div id="generalised-impulse-response" class="section level3">
 <h3>Generalised impulse response</h3>
-<pre class="r"><code>GIR &lt;- irf(bvar_form, impulse = &quot;R&quot;, response = &quot;Dp&quot;, n.ahead = 20, type = &quot;gir&quot;)
+<pre class="r"><code>GIR &lt;- irf(bvar_form, impulse = &quot;R&quot;, response = &quot;Dp&quot;, n_ahead = 20, type = &quot;gir&quot;)
 
 plot(GIR, main = &quot;Generalised Impulse Response&quot;, xlab = &quot;Year&quot;, ylab = &quot;Response&quot;)</code></pre>
-<p><img src="/timeseries/bvec_files/figure-html/gir-1.png" width="528" /></p>
+<p><img src="/timeseries/bvec_files/figure-html/gir-1.png" alt="" width="528" /></p>
 </div>
 <div id="forecast-error-variance-decomposition" class="section level3">
 <h3>Forecast error variance decomposition</h3>
-<pre class="r"><code>bvec_fevd &lt;- fevd(bvar_form, response = &quot;Dp&quot;, n.ahead = 20)
+<pre class="r"><code>bvec_fevd &lt;- fevd(bvar_form, response = &quot;Dp&quot;, n_ahead = 20)
 
 plot(bvec_fevd, main = &quot;FEVD of inflation&quot;)</code></pre>
-<p><img src="/timeseries/bvec_files/figure-html/fevd-1.png" width="528" /></p>
+<p><img src="/timeseries/bvec_files/figure-html/fevd-1.png" alt="" width="528" /></p>
 </div>
 </div>
 <div id="references" class="section level2">

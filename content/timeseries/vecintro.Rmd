@@ -27,7 +27,7 @@ Note that $\Pi$ is assumed to be of reduced rank, which means that $\alpha$ is a
 
 To illustrate the estimation of VECMs in R, we use dataset E6 from Lütkepohl (2007), which contains quarterly, seasonally unadjusted time series for German long-term interest and inflation rates from 1972Q2 to 1998Q4. It comes with the `bvartools` package.
 
-```{r data, fig.height=4.5, fig.width=5}
+```{r data, message=FALSE, fig.height=4.5, fig.width=5}
 library(bvartools) # Load the package, which contains the data
 data("e6") # Load data
 plot(e6) # Plot data
@@ -96,9 +96,9 @@ Using the `tsDyn` package, estimates of the coefficients can be obtained in the 
 library(tsDyn)
 
 # Obtain constant and seasonal dummies
-seas <- gen_vec(data = e6, p = 4, r = 1, const = "unrestricted", seasonal = "unrestricted")
-# Lag order p is 4 since gen_vec assumes that p corresponds to VAR form
-seas <- seas$data$X[, 7:10]
+seas <- create_bvecmodel(e6, p = 4, r = 1, const = "unrestricted", seasonal = "unrestricted")
+# Lag order p is 4 since create_bvecmodel assumes that p corresponds to VAR form
+seas <- seas$data$train$x[, 7:10]
 
 # Estimate
 est_tsdyn <- VECM(e6, lag = 3, r = 1, include = "none", estim = "ML", exogen = seas)

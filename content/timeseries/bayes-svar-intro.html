@@ -2,7 +2,7 @@
 title: "Bayesian Inference of Structural Vector Autoregressions (SVAR) with the `bvartools` package"
 author: "Franz X. Mohr"
 date: "2023-09-11"
-lastmod: "2023-09-11" 
+lastmod: "2026-10-12" 
 tags:
   - r
   - var
@@ -50,19 +50,20 @@ dimnames(series)[[2]] &lt;- c(&quot;S1&quot;, &quot;S2&quot;, &quot;S3&quot;) # 
 
 # Plot the series
 plot.ts(series, main = &quot;Artificial time series&quot;)</code></pre>
-<p><img src="/timeseries/bayes-svar-intro_files/figure-html/unnamed-chunk-1-1.png" width="480" style="display: block; margin: auto;" /></p>
+<p><img src="/timeseries/bayes-svar-intro_files/figure-html/unnamed-chunk-1-1.png" alt="" width="480" style="display: block; margin: auto;" /></p>
 </div>
 <div id="model-generation" class="section level2">
 <h2>Model generation</h2>
 <pre class="r"><code>library(bvartools)
 
 # Generate basic model
-mod &lt;- gen_var(series,
-               p = 1,
-               deterministic = &quot;none&quot;,
-               structural = TRUE,
-               iterations = 5000,
-               burnin = 2000)</code></pre>
+mod &lt;- create_bvarmodel(series,
+                        p = 1,
+                        deterministic = &quot;none&quot;,
+                        structural = TRUE,
+                        error = &quot;gamma&quot;,
+                        iterations = 5000,
+                        burnin = 2000)</code></pre>
 </div>
 <div id="prior-specification" class="section level2">
 <h2>Prior specification</h2>
@@ -72,7 +73,9 @@ mod &lt;- gen_var(series,
 </div>
 <div id="draw-posteriors" class="section level2">
 <h2>Draw posteriors</h2>
-<pre class="r"><code>post &lt;- draw_posterior(mod_w_prior)</code></pre>
+<pre class="r"><code>mod_w_prior &lt;- add_initial_values(mod_w_prior, method = &quot;ols&quot;)
+
+post &lt;- add_posterior_coefficients(mod_w_prior)</code></pre>
 </div>
 <div id="evaluation" class="section level2">
 <h2>Evaluation</h2>
@@ -82,52 +85,47 @@ mod &lt;- gen_var(series,
 <pre><code>## 
 ## Bayesian SVAR model with p = 1 
 ## 
-## Model:
-## 
-## y ~ S1.01 + S2.01 + S3.01 + S1 + S2 + S3
+## Endogenous variables: S1, S2, S3
 ## 
 ## Variable: S1 
 ## 
-##         Mean      SD  Naive SD Time-series SD    2.5%    50%  97.5%
-## S1.01 0.3293 0.02966 0.0004195      0.0004195 0.27280 0.3294 0.3884
-## S2.01 0.1118 0.04009 0.0005670      0.0005670 0.03324 0.1115 0.1908
-## S3.01 0.6810 0.04188 0.0005923      0.0005923 0.59815 0.6812 0.7624
-## S1    1.0000 0.00000 0.0000000      0.0000000 1.00000 1.0000 1.0000
-## S2    0.0000 0.00000 0.0000000      0.0000000 0.00000 0.0000 0.0000
-## S3    0.0000 0.00000 0.0000000      0.0000000 0.00000 0.0000 0.0000
+##         Mean      SD  Naive SD Time-series SD    2.5%    50%  97.5%  
+## S1.l1 0.3293 0.02931 0.0004146      0.0004462 0.27127 0.3289 0.3875 *
+## S2.l1 0.1125 0.04041 0.0005714      0.0005714 0.03299 0.1129 0.1922 *
+## S3.l1 0.6807 0.04105 0.0005806      0.0005806 0.60108 0.6804 0.7626 *
+## S1    1.0000 0.00000 0.0000000      0.0000000 1.00000 1.0000 1.0000 *
+## S2    0.0000 0.00000 0.0000000      0.0000000 0.00000 0.0000 0.0000  
+## S3    0.0000 0.00000 0.0000000      0.0000000 0.00000 0.0000 0.0000  
 ## 
 ## Variable: S2 
 ## 
-##          Mean      SD  Naive SD Time-series SD      2.5%     50%  97.5%
-## S1.01 0.05776 0.03355 0.0004745      0.0004745 -0.006956 0.05779 0.1239
-## S2.01 0.30951 0.04081 0.0005771      0.0005771  0.230628 0.30994 0.3895
-## S3.01 0.63676 0.05263 0.0007443      0.0007443  0.537193 0.63656 0.7400
-## S1    0.18192 0.04636 0.0006556      0.0006556  0.092993 0.18148 0.2728
-## S2    1.00000 0.00000 0.0000000      0.0000000  1.000000 1.00000 1.0000
-## S3    0.00000 0.00000 0.0000000      0.0000000  0.000000 0.00000 0.0000
+##          Mean      SD  Naive SD Time-series SD      2.5%     50%  97.5%  
+## S1.l1 0.05834 0.03334 0.0004715      0.0004715 -0.007253 0.05793 0.1257  
+## S2.l1 0.31065 0.04071 0.0005757      0.0005757  0.233159 0.30901 0.3926 *
+## S3.l1 0.63546 0.05282 0.0007470      0.0007695  0.533515 0.63427 0.7389 *
+## S1    0.18132 0.04546 0.0006429      0.0006623  0.093218 0.18069 0.2716 *
+## S2    1.00000 0.00000 0.0000000      0.0000000  1.000000 1.00000 1.0000 *
+## S3    0.00000 0.00000 0.0000000      0.0000000  0.000000 0.00000 0.0000  
 ## 
 ## Variable: S3 
 ## 
-##           Mean      SD  Naive SD Time-series SD     2.5%      50%   97.5%
-## S1.01  0.25778 0.03293 0.0004657      0.0004657  0.19234  0.25788  0.3200
-## S2.01  0.16723 0.04260 0.0006024      0.0006024  0.08265  0.16773  0.2490
-## S3.01  0.19244 0.05762 0.0008148      0.0008148  0.07971  0.19282  0.3057
-## S1     0.05055 0.04507 0.0006374      0.0005991 -0.03931  0.05031  0.1371
-## S2    -0.31257 0.04345 0.0006145      0.0006145 -0.39792 -0.31234 -0.2277
-## S3     1.00000 0.00000 0.0000000      0.0000000  1.00000  1.00000  1.0000
+##           Mean      SD  Naive SD Time-series SD     2.5%      50%   97.5%  
+## S1.l1  0.25716 0.03311 0.0004682      0.0004582  0.19305  0.25673  0.3228 *
+## S2.l1  0.16797 0.04150 0.0005869      0.0005869  0.08465  0.16852  0.2463 *
+## S3.l1  0.19279 0.05879 0.0008314      0.0008314  0.07859  0.19242  0.3108 *
+## S1     0.05137 0.04562 0.0006452      0.0006452 -0.03864  0.05162  0.1399  
+## S2    -0.31421 0.04384 0.0006200      0.0007002 -0.39941 -0.31465 -0.2264 *
+## S3     1.00000 0.00000 0.0000000      0.0000000  1.00000  1.00000  1.0000 *
 ## 
 ## Variance-covariance matrix:
 ## 
-##         Mean      SD  Naive SD Time-series SD   2.5%    50% 97.5%
-## S1_S1 0.9880 0.06301 0.0008911      0.0009084 0.8745 0.9836 1.125
-## S1_S2 0.0000 0.00000 0.0000000      0.0000000 0.0000 0.0000 0.000
-## S1_S3 0.0000 0.00000 0.0000000      0.0000000 0.0000 0.0000 0.000
-## S2_S1 0.0000 0.00000 0.0000000      0.0000000 0.0000 0.0000 0.000
-## S2_S2 1.0375 0.06675 0.0009440      0.0009440 0.9135 1.0349 1.174
-## S2_S3 0.0000 0.00000 0.0000000      0.0000000 0.0000 0.0000 0.000
-## S3_S1 0.0000 0.00000 0.0000000      0.0000000 0.0000 0.0000 0.000
-## S3_S2 0.0000 0.00000 0.0000000      0.0000000 0.0000 0.0000 0.000
-## S3_S3 0.9862 0.06326 0.0008947      0.0009085 0.8692 0.9831 1.120</code></pre>
+##         Mean      SD  Naive SD Time-series SD   2.5%    50% 97.5%  
+## S1_S1 0.9862 0.06224 0.0008802      0.0008630 0.8735 0.9838 1.119 *
+## S1_S2 0.0000 0.00000 0.0000000      0.0000000 0.0000 0.0000 0.000  
+## S1_S3 0.0000 0.00000 0.0000000      0.0000000 0.0000 0.0000 0.000  
+## S2_S2 1.0372 0.06554 0.0009269      0.0009269 0.9195 1.0333 1.175 *
+## S2_S3 0.0000 0.00000 0.0000000      0.0000000 0.0000 0.0000 0.000  
+## S3_S3 0.9864 0.06228 0.0008807      0.0009067 0.8711 0.9842 1.116 *</code></pre>
 <p>Compare with actual values</p>
 <pre class="r"><code>solve(B) %*% A_1</code></pre>
 <pre><code>##         [,1]     [,2]     [,3]
@@ -144,28 +142,31 @@ mod &lt;- gen_var(series,
 <h3>Plotting posterior distributions</h3>
 <p>t</p>
 <pre class="r"><code>plot(post, type = &quot;boxplot&quot;)</code></pre>
-<p><img src="/timeseries/bayes-svar-intro_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p><img src="/timeseries/bayes-svar-intro_files/figure-html/unnamed-chunk-8-1.png" alt="" width="672" /><img src="/timeseries/bayes-svar-intro_files/figure-html/unnamed-chunk-8-2.png" alt="" width="672" /><img src="/timeseries/bayes-svar-intro_files/figure-html/unnamed-chunk-8-3.png" alt="" width="672" /></p>
 </div>
 <div id="forecasts" class="section level3">
 <h3>Forecasts</h3>
-<pre class="r"><code>pred_svar &lt;- predict(post, &quot;S1&quot;, n.ahead = 10)
+<pre class="r"><code>post &lt;- add_forecast_input(post, n_ahead = 10)
+post &lt;- add_posterior_forecasts(post)
+
+pred_svar &lt;- predict(post, n_ahead = 10)
 
 plot(pred_svar)</code></pre>
-<p><img src="/timeseries/bayes-svar-intro_files/figure-html/unnamed-chunk-9-1.png" width="672" /><img src="/timeseries/bayes-svar-intro_files/figure-html/unnamed-chunk-9-2.png" width="672" /><img src="/timeseries/bayes-svar-intro_files/figure-html/unnamed-chunk-9-3.png" width="672" /></p>
+<p><img src="/timeseries/bayes-svar-intro_files/figure-html/unnamed-chunk-9-1.png" alt="" width="672" /><img src="/timeseries/bayes-svar-intro_files/figure-html/unnamed-chunk-9-2.png" alt="" width="672" /><img src="/timeseries/bayes-svar-intro_files/figure-html/unnamed-chunk-9-3.png" alt="" width="672" /></p>
 </div>
 <div id="impulse-response-functions" class="section level3">
 <h3>Impulse response functions</h3>
-<pre class="r"><code>irf_svar &lt;- irf(post, n.ahead = 10, impulse = &quot;S1&quot;, response = &quot;S3&quot;, type = &quot;sir&quot;)
+<pre class="r"><code>irf_svar &lt;- irf(post, n_ahead = 10, impulse = &quot;S1&quot;, response = &quot;S3&quot;, type = &quot;sir&quot;)
 
 plot(irf_svar)</code></pre>
-<p><img src="/timeseries/bayes-svar-intro_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p><img src="/timeseries/bayes-svar-intro_files/figure-html/unnamed-chunk-10-1.png" alt="" width="672" /></p>
 </div>
 <div id="variance-decomposition" class="section level3">
 <h3>Variance decomposition</h3>
-<pre class="r"><code>fevd_svar &lt;- fevd(post, n.ahead = 10, response = &quot;S3&quot;, type = &quot;sir&quot;)
+<pre class="r"><code>fevd_svar &lt;- fevd(post, n_ahead = 10, response = &quot;S3&quot;, type = &quot;sir&quot;)
 
 plot(fevd_svar)</code></pre>
-<p><img src="/timeseries/bayes-svar-intro_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p><img src="/timeseries/bayes-svar-intro_files/figure-html/unnamed-chunk-11-1.png" alt="" width="672" /></p>
 </div>
 </div>
 <div id="compare-with-frequentist-results" class="section level2">
@@ -201,7 +202,7 @@ freq_var_a</code></pre>
 <pre class="r"><code>freq_var_irf &lt;- irf(freq_var_a, n.ahead = 10, impulse = &quot;S1&quot;, response = &quot;S3&quot;)
 
 plot(freq_var_irf)</code></pre>
-<p><img src="/timeseries/bayes-svar-intro_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<p><img src="/timeseries/bayes-svar-intro_files/figure-html/unnamed-chunk-14-1.png" alt="" width="672" /></p>
 </div>
 </div>
 <div id="literature" class="section level2">
