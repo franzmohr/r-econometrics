@@ -14,7 +14,7 @@ description: "Hochmuth and Petz (2026) argue that persistent services inflation 
 ---
 
 ```{r setup, include = FALSE}
-knitr::opts_chunk$set(fig.height = 4.5, fig.width = 7)
+knitr::opts_chunk[["set"]](fig.height = 4.5, fig.width = 7)
 ```
 
 This post reproduces results from [Hochmuth and Petz (2026)](https://www.oenb.at/en/daten-und-forschung/publikationen/publikationsreihen/policy-brief/2026/policy-brief-2026-11.html) with [`bvartools`](https://github.com/franzmohr/bvartools), including the brief's three descriptive charts: the composition of euro area inflation, and the relative price of services in the euro area and the United States.
@@ -56,16 +56,16 @@ as_matrix <- function(value, month, series) {
 x <- get_eurostat("prc_hicp_minr", time_format = "raw", cache = FALSE,
                   filters = list(geo = "EA", unit = "I25",
                                  coicop18 = c("SERV", "IGD_NNRG", "GD")))
-hicp <- as_matrix(x$values, x$time, x$coicop18)
+hicp <- as_matrix(x[["values"]], x[["time"]], x[["coicop18"]])
 hicp <- hicp[rownames(hicp) <= "2026-06", ]
 
 # ECB, ECOICOP ver. 1: index levels (INX) and annual rates (ANR) for 1996 to 2001
 x <- get_data("ICP.M.U2.N.SERV00+IGXE00+GOODS0.4.INX+ANR",
               filter = list(startPeriod = "1996-01", endPeriod = "2001-12"))
-inx <- as_matrix(x$obsvalue[x$icp_suffix == "INX"], x$obstime[x$icp_suffix == "INX"],
-                 x$icp_item[x$icp_suffix == "INX"])
-anr <- as_matrix(x$obsvalue[x$icp_suffix == "ANR"], x$obstime[x$icp_suffix == "ANR"],
-                 x$icp_item[x$icp_suffix == "ANR"])
+inx <- x[x[["icp_suffix"]] == "INX", ]
+anr <- x[x[["icp_suffix"]] == "ANR", ]
+inx <- as_matrix(inx[["obsvalue"]], inx[["obstime"]], inx[["icp_item"]])
+anr <- as_matrix(anr[["obsvalue"]], anr[["obstime"]], anr[["icp_item"]])
 
 early <- rownames(hicp)[rownames(hicp) <= "2001-12"]
 for (i in colnames(hicp)) {
@@ -109,8 +109,8 @@ ctr <- get_eurostat("prc_hicp_ctr", time_format = "raw", cache = FALSE,
 rates <- get_eurostat("prc_hicp_minr", time_format = "raw", cache = FALSE,
                       filters = list(geo = "EA", unit = "RCH_A",
                                      coicop18 = c("TOTAL", "TOT_X_NRG_FOOD")))
-ctr <- as_matrix(ctr$values, ctr$time, ctr$coicop18)
-rates <- as_matrix(rates$values, rates$time, rates$coicop18)
+ctr <- as_matrix(ctr[["values"]], ctr[["time"]], ctr[["coicop18"]])
+rates <- as_matrix(rates[["values"]], rates[["time"]], rates[["coicop18"]])
 
 # From 2018 to the brief's last observation
 months <- intersect(rownames(ctr), rownames(rates))
@@ -145,8 +145,8 @@ for (j in seq_len(ncol(parts))) {
   rect(date - 0.035, top - up[, j], date + 0.035, top, col = cols[j], border = NA)
   rect(date - 0.035, bottom - down[, j], date + 0.035, bottom, col = cols[j], border = NA)
 }
-lines(date, ctr$TOTAL, lwd = 1.5, col = colours[["ink"]])
-lines(date, ctr$TOT_X_NRG_FOOD, lwd = 1.5, lty = 2, col = colours[["ink"]])
+lines(date, ctr[["TOTAL"]], lwd = 1.5, col = colours[["ink"]])
+lines(date, ctr[["TOT_X_NRG_FOOD"]], lwd = 1.5, lty = 2, col = colours[["ink"]])
 abline(h = 0, col = colours[["ink"]])
 legend("topleft", legend = c("Energy", "Food including alcohol and tobacco",
                              "Non-energy industrial goods", "Services",
@@ -156,15 +156,15 @@ legend("topleft", legend = c("Energy", "Food including alcohol and tobacco",
 ```
 
 ```{r chart1-numbers, include = FALSE}
-peak <- which.max(ctr$TOTAL)
-serv_peak <- which.max(ctr$SERV)
+peak <- which.max(ctr[["TOTAL"]])
+serv_peak <- which.max(ctr[["SERV"]])
 month_name <- function(i) {
-  paste(month.name[as.integer(substr(ctr$month[i], 6, 7))], substr(ctr$month[i], 1, 4))
+  paste(month.name[as.integer(substr(ctr[["month"]][i], 6, 7))], substr(ctr[["month"]][i], 1, 4))
 }
 last <- nrow(ctr)
 ```
 
-The chart matches the published one. Headline inflation peaked at `r ctr$TOTAL[peak]`% in `r month_name(peak)`, when energy alone contributed `r ctr$NRG[peak]` percentage points. The contribution of services rose more slowly and peaked later, at `r ctr$SERV[serv_peak]` points in `r month_name(serv_peak)`, and has receded more slowly than the others: in `r month_name(last)` it still accounted for `r ctr$SERV[last]` of `r ctr$TOTAL[last]` points, more than half of headline inflation, while energy, which had subtracted from inflation for most of 2023 to 2025, was adding `r ctr$NRG[last]` points again.
+The chart matches the published one. Headline inflation peaked at `r ctr[["TOTAL"]][peak]`% in `r month_name(peak)`, when energy alone contributed `r ctr[["NRG"]][peak]` percentage points. The contribution of services rose more slowly and peaked later, at `r ctr[["SERV"]][serv_peak]` points in `r month_name(serv_peak)`, and has receded more slowly than the others: in `r month_name(last)` it still accounted for `r ctr[["SERV"]][last]` of `r ctr[["TOTAL"]][last]` points, more than half of headline inflation, while energy, which had subtracted from inflation for most of 2023 to 2025, was adding `r ctr[["NRG"]][last]` points again.
 
 ## The price of services relative to goods
 
@@ -189,7 +189,7 @@ ea_goods <- relative_price(prices_nsa[, "SERV"], prices_nsa[, "GD"], fit_end = 2
 ```
 
 ```{r chart2}
-ts.plot(ea_neig$price, ea_neig$trend, ea_goods$price, ea_goods$trend,
+ts.plot(ea_neig[["price"]], ea_neig[["trend"]], ea_goods[["price"]], ea_goods[["trend"]],
         col = rep(colours[c("teal", "amber")], each = 2), lty = c(1, 2, 1, 2), lwd = 2,
         xlab = "", ylab = "Relative price (Q1 2000 = 100)",
         main = "Price of services relative to goods (euro area)")
@@ -199,10 +199,10 @@ legend("topleft", legend = c("Services relative to NEIG", "Services relative to 
 ```
 
 ```{r chart2-gap, include = FALSE}
-gap <- function(x) round(100 * (tail(x$price, 1) / tail(x$trend, 1) - 1), 1)
+gap <- function(x) round(100 * (tail(x[["price"]], 1) / tail(x[["trend"]], 1) - 1), 1)
 ```
 
-Before the pandemic services became `r round(ea_neig$growth, 1)`% a year more expensive relative to NEIG, and `r round(ea_goods$growth, 1)`% relative to overall goods. Both relative prices fell below their trends in 2021 and 2022. The one against overall goods fell much more, because the energy and food prices it includes rose most, and it has made up less of the loss since. In the second quarter of 2026 services relative to NEIG are `r -gap(ea_neig)`% below the extrapolated trend, which the brief puts at 3.5%, and relative to overall goods `r -gap(ea_goods)`% below it.
+Before the pandemic services became `r round(ea_neig[["growth"]], 1)`% a year more expensive relative to NEIG, and `r round(ea_goods[["growth"]], 1)`% relative to overall goods. Both relative prices fell below their trends in 2021 and 2022. The one against overall goods fell much more, because the energy and food prices it includes rose most, and it has made up less of the loss since. In the second quarter of 2026 services relative to NEIG are `r -gap(ea_neig)`% below the extrapolated trend, which the brief puts at 3.5%, and relative to overall goods `r -gap(ea_goods)`% below it.
 
 The euro area series is short, so the brief turns to post-war US data to ask whether such a trend survives large shocks. Chart 3 is the price of services relative to commodities in the US consumer price index for all urban consumers (CPI-U), series `CUUR0000SAS` and `CUUR0000SAC` of the Bureau of Labor Statistics. FRED, the database of the Federal Reserve Bank of St. Louis, carries both, and the [`alfred`](https://cran.r-project.org/package=alfred) package downloads them:
 
@@ -211,8 +211,8 @@ library("alfred")
 
 us <- merge(get_fred_series("CUUR0000SAS", "CUUR0000SAS"),
             get_fred_series("CUUR0000SAC", "CUUR0000SAC"), by = "date")
-us$month <- format(us$date, "%Y-%m")
-us <- us[us$month >= "1947-01" & us$month <= "2026-06" & !is.na(us$CUUR0000SAS),
+us[["month"]] <- format(us[["date"]], "%Y-%m")
+us <- us[us[["month"]] >= "1947-01" & us[["month"]] <= "2026-06" & !is.na(us[["CUUR0000SAS"]]),
          c("month", "CUUR0000SAS", "CUUR0000SAC")]   # FRED pads the quarterly years
 
 write.csv(us, "_2026_hochmuth_petz_us_cpi.csv", row.names = FALSE)
@@ -223,20 +223,20 @@ Both indices are published quarterly until 1955 and monthly after that, and Octo
 ```{r chart3}
 us <- read.csv("_2026_hochmuth_petz_us_cpi.csv")
 months <- format(seq(as.Date("1947-01-01"), as.Date("2026-06-01"), by = "month"), "%Y-%m")
-us <- ts(as.matrix(us[match(months, us$month), c("CUUR0000SAS", "CUUR0000SAC")]),
+us <- ts(as.matrix(us[match(months, us[["month"]]), c("CUUR0000SAS", "CUUR0000SAC")]),
          start = c(1947, 1), frequency = 12)
 us_q <- aggregate(us, nfrequency = 4, FUN = function(x) mean(x, na.rm = TRUE))
 us_q <- window(us_q, start = c(1949, 4))   # the first moving average ends in 1950 Q1
 us_rel <- relative_price(us_q[, "CUUR0000SAS"], us_q[, "CUUR0000SAC"])
 
-ts.plot(window(us_rel$price, start = 1950), window(us_rel$trend, start = 1950),
+ts.plot(window(us_rel[["price"]], start = 1950), window(us_rel[["trend"]], start = 1950),
         col = colours[["blue"]], lty = c(1, 2), lwd = 2, xlab = "",
         ylab = "Relative price (Q1 2000 = 100)",
         main = "Price of services relative to commodities (USA)")
 abline(h = 100, col = colours[["ink"]])
 ```
 
-Over seventy years US services became `r round(us_rel$growth, 1)`% a year more expensive relative to commodities, and the relative price never strayed far from that trend: not in the commodity price shocks of the 1970s, not in the oil price swings of the 2000s and not in 2021 and 2022. The recent surge pushed it further below the trend than at any other time since 1950, by almost ten percent, and it has since returned to within three percent of it, which is what the brief expects of the euro area as well. As the brief points out, the two charts are not directly comparable, since the US series compares services with commodities rather than with goods.
+Over seventy years US services became `r round(us_rel[["growth"]], 1)`% a year more expensive relative to commodities, and the relative price never strayed far from that trend: not in the commodity price shocks of the 1970s, not in the oil price swings of the 2000s and not in 2021 and 2022. The recent surge pushed it further below the trend than at any other time since 1950, by almost ten percent, and it has since returned to within three percent of it, which is what the brief expects of the euro area as well. As the brief points out, the two charts are not directly comparable, since the US series compares services with commodities rather than with goods.
 
 ## Estimation
 
@@ -295,8 +295,8 @@ The draws of the coefficients are in `posterior$a$coeffs`. Each row is one draw 
 
 ```{r gap-closure}
 gap_closure <- function(model, horizon = 40) {
-  draws <- as.matrix(model$posterior$a$coeffs)
-  k <- model$model$k
+  draws <- as.matrix(model[["posterior"]][["a"]][["coeffs"]])
+  k <- model[["model"]][["k"]]
   # Regressors: the lags of s and n, the error correction term, the constant
   coef <- function(eq, reg) draws[, (reg - 1) * k + eq]
 
@@ -334,17 +334,17 @@ Chart 4 of the paper shows the median of the remaining gap with its 68% credible
 ```{r chart4-function}
 plot_closure <- function(x, label, colour) {
   bars <- adjustcolor(c(colours[["blue"]], colour), 0.45)
-  plot(NA, xlim = range(x$h), ylim = range(c(-50, 160, 100 - x$services)),
+  plot(NA, xlim = range(x[["h"]]), ylim = range(c(-50, 160, 100 - x[["services"]])),
        xlab = "Quarters after the initial gap", ylab = "% of initial gap",
        main = "What closes the gap?")
   grid(col = colours[["grid"]], lty = 1)
   # Contributions with the same sign are stacked, opposite ones start at 100
-  base <- ifelse(sign(x$other) == sign(x$services), 100 - x$services, 100)
-  rect(x$h - 0.35, 100, x$h + 0.35, 100 - x$services, col = bars[1], border = NA)
-  rect(x$h - 0.35, base, x$h + 0.35, base - x$other, col = bars[2], border = NA)
-  polygon(c(x$h, rev(x$h)), c(x$lower, rev(x$upper)),
+  base <- ifelse(sign(x[["other"]]) == sign(x[["services"]]), 100 - x[["services"]], 100)
+  rect(x[["h"]] - 0.35, 100, x[["h"]] + 0.35, 100 - x[["services"]], col = bars[1], border = NA)
+  rect(x[["h"]] - 0.35, base, x[["h"]] + 0.35, base - x[["other"]], col = bars[2], border = NA)
+  polygon(c(x[["h"]], rev(x[["h"]])), c(x[["lower"]], rev(x[["upper"]])),
           col = adjustcolor(colours[["ink"]], 0.2), border = NA)
-  lines(x$h, x$remaining, col = colours[["red"]], lwd = 2)
+  lines(x[["h"]], x[["remaining"]], col = colours[["red"]], lwd = 2)
   abline(h = c(0, 100), col = colours[["ink"]])
   legend("bottomleft", legend = c("Services", label, "Remaining gap"),
          fill = c(bars, NA), border = NA, lty = c(NA, NA, 1),
@@ -357,16 +357,16 @@ plot_closure(closure_neig, "NEIG", colours[["teal"]])
 ```
 
 ```{r half-life, include = FALSE}
-half_life <- function(x) x$h[which(x$remaining <= 50)[1]]
+half_life <- function(x) x[["h"]][which(x[["remaining"]] <= 50)[1]]
 hl_neig <- half_life(closure_neig)
 hl_goods <- half_life(closure_goods)
-at <- function(x, h) round(x[x$h == h, c("remaining", "services", "other")])
+at <- function(x, h) round(x[x[["h"]] == h, c("remaining", "services", "other")])
 ```
 
-The chart is close to the published one. The remaining gap falls below 50% between quarters `r hl_neig - 1` and `r hl_neig`, exactly where the paper puts it, about three and a half years. At quarter `r hl_neig - 1` services inflation has closed `r at(closure_neig, hl_neig - 1)$services` percentage points of the gap and NEIG inflation has widened it by `r -at(closure_neig, hl_neig - 1)$other`, against 76 and 26 in the paper. After ten years `r at(closure_neig, 40)$remaining`% of the gap is left, as in the published chart.
+The chart is close to the published one. The remaining gap falls below 50% between quarters `r hl_neig - 1` and `r hl_neig`, exactly where the paper puts it, about three and a half years. At quarter `r hl_neig - 1` services inflation has closed `r at(closure_neig, hl_neig - 1)[["services"]]` percentage points of the gap and NEIG inflation has widened it by `r -at(closure_neig, hl_neig - 1)[["other"]]`, against 76 and 26 in the paper. After ten years `r at(closure_neig, 40)[["remaining"]]`% of the gap is left, as in the published chart.
 
 ```{r table-neig}
-knitr::kable(closure_neig[closure_neig$h %in% c(4, 8, 14, 15, 20, 40), ],
+knitr::kable(closure_neig[closure_neig[["h"]] %in% c(4, 8, 14, 15, 20, 40), ],
              digits = 1, row.names = FALSE,
              col.names = c("Quarter", "Remaining gap", "16%", "84%", "Services", "NEIG"))
 ```
@@ -379,7 +379,7 @@ The same model with the overall goods index adjusts much faster:
 plot_closure(closure_goods, "Goods", colours[["amber"]])
 ```
 
-Half of the gap is closed between quarters `r hl_goods - 1` and `r hl_goods`, which the paper reports as about five quarters. Here, unlike in the benchmark, both components close the gap, and goods inflation does more of it: at quarter `r hl_goods` services contribute `r at(closure_goods, hl_goods)$services` and goods `r at(closure_goods, hl_goods)$other` percentage points, against roughly 15 and 38 in the paper. The goods loading is positive, and its 95% credible interval excludes zero: when services are cheap relative to goods, goods inflation falls. The faster adjustment reflects the energy and food prices in the goods index, which move much more than NEIG prices and return quickly after a shock.
+Half of the gap is closed between quarters `r hl_goods - 1` and `r hl_goods`, which the paper reports as about five quarters. Here, unlike in the benchmark, both components close the gap, and goods inflation does more of it: at quarter `r hl_goods` services contribute `r at(closure_goods, hl_goods)[["services"]]` and goods `r at(closure_goods, hl_goods)[["other"]]` percentage points, against roughly 15 and 38 in the paper. The goods loading is positive, and its 95% credible interval excludes zero: when services are cheap relative to goods, goods inflation falls. The faster adjustment reflects the energy and food prices in the goods index, which move much more than NEIG prices and return quickly after a shock.
 
 ## Deviations from the paper
 

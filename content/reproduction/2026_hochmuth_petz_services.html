@@ -43,16 +43,16 @@ as_matrix &lt;- function(value, month, series) {
 x &lt;- get_eurostat(&quot;prc_hicp_minr&quot;, time_format = &quot;raw&quot;, cache = FALSE,
                   filters = list(geo = &quot;EA&quot;, unit = &quot;I25&quot;,
                                  coicop18 = c(&quot;SERV&quot;, &quot;IGD_NNRG&quot;, &quot;GD&quot;)))
-hicp &lt;- as_matrix(x$values, x$time, x$coicop18)
+hicp &lt;- as_matrix(x[[&quot;values&quot;]], x[[&quot;time&quot;]], x[[&quot;coicop18&quot;]])
 hicp &lt;- hicp[rownames(hicp) &lt;= &quot;2026-06&quot;, ]
 
 # ECB, ECOICOP ver. 1: index levels (INX) and annual rates (ANR) for 1996 to 2001
 x &lt;- get_data(&quot;ICP.M.U2.N.SERV00+IGXE00+GOODS0.4.INX+ANR&quot;,
               filter = list(startPeriod = &quot;1996-01&quot;, endPeriod = &quot;2001-12&quot;))
-inx &lt;- as_matrix(x$obsvalue[x$icp_suffix == &quot;INX&quot;], x$obstime[x$icp_suffix == &quot;INX&quot;],
-                 x$icp_item[x$icp_suffix == &quot;INX&quot;])
-anr &lt;- as_matrix(x$obsvalue[x$icp_suffix == &quot;ANR&quot;], x$obstime[x$icp_suffix == &quot;ANR&quot;],
-                 x$icp_item[x$icp_suffix == &quot;ANR&quot;])
+inx &lt;- x[x[[&quot;icp_suffix&quot;]] == &quot;INX&quot;, ]
+anr &lt;- x[x[[&quot;icp_suffix&quot;]] == &quot;ANR&quot;, ]
+inx &lt;- as_matrix(inx[[&quot;obsvalue&quot;]], inx[[&quot;obstime&quot;]], inx[[&quot;icp_item&quot;]])
+anr &lt;- as_matrix(anr[[&quot;obsvalue&quot;]], anr[[&quot;obstime&quot;]], anr[[&quot;icp_item&quot;]])
 
 early &lt;- rownames(hicp)[rownames(hicp) &lt;= &quot;2001-12&quot;]
 for (i in colnames(hicp)) {
@@ -89,8 +89,8 @@ colnames(prices) &lt;- c(&quot;services&quot;, &quot;neig&quot;, &quot;goods&quo
 rates &lt;- get_eurostat(&quot;prc_hicp_minr&quot;, time_format = &quot;raw&quot;, cache = FALSE,
                       filters = list(geo = &quot;EA&quot;, unit = &quot;RCH_A&quot;,
                                      coicop18 = c(&quot;TOTAL&quot;, &quot;TOT_X_NRG_FOOD&quot;)))
-ctr &lt;- as_matrix(ctr$values, ctr$time, ctr$coicop18)
-rates &lt;- as_matrix(rates$values, rates$time, rates$coicop18)
+ctr &lt;- as_matrix(ctr[[&quot;values&quot;]], ctr[[&quot;time&quot;]], ctr[[&quot;coicop18&quot;]])
+rates &lt;- as_matrix(rates[[&quot;values&quot;]], rates[[&quot;time&quot;]], rates[[&quot;coicop18&quot;]])
 
 # From 2018 to the brief&#39;s last observation
 months &lt;- intersect(rownames(ctr), rownames(rates))
@@ -118,8 +118,8 @@ for (j in seq_len(ncol(parts))) {
   rect(date - 0.035, top - up[, j], date + 0.035, top, col = cols[j], border = NA)
   rect(date - 0.035, bottom - down[, j], date + 0.035, bottom, col = cols[j], border = NA)
 }
-lines(date, ctr$TOTAL, lwd = 1.5, col = colours[[&quot;ink&quot;]])
-lines(date, ctr$TOT_X_NRG_FOOD, lwd = 1.5, lty = 2, col = colours[[&quot;ink&quot;]])
+lines(date, ctr[[&quot;TOTAL&quot;]], lwd = 1.5, col = colours[[&quot;ink&quot;]])
+lines(date, ctr[[&quot;TOT_X_NRG_FOOD&quot;]], lwd = 1.5, lty = 2, col = colours[[&quot;ink&quot;]])
 abline(h = 0, col = colours[[&quot;ink&quot;]])
 legend(&quot;topleft&quot;, legend = c(&quot;Energy&quot;, &quot;Food including alcohol and tobacco&quot;,
                              &quot;Non-energy industrial goods&quot;, &quot;Services&quot;,
@@ -147,7 +147,7 @@ relative_price &lt;- function(services, goods, fit_end = Inf) {
 prices_nsa &lt;- aggregate(hicp, nfrequency = 4, FUN = mean)
 ea_neig &lt;- relative_price(prices_nsa[, &quot;SERV&quot;], prices_nsa[, &quot;IGD_NNRG&quot;], fit_end = 2020)
 ea_goods &lt;- relative_price(prices_nsa[, &quot;SERV&quot;], prices_nsa[, &quot;GD&quot;], fit_end = 2020)</code></pre>
-<pre class="r"><code>ts.plot(ea_neig$price, ea_neig$trend, ea_goods$price, ea_goods$trend,
+<pre class="r"><code>ts.plot(ea_neig[[&quot;price&quot;]], ea_neig[[&quot;trend&quot;]], ea_goods[[&quot;price&quot;]], ea_goods[[&quot;trend&quot;]],
         col = rep(colours[c(&quot;teal&quot;, &quot;amber&quot;)], each = 2), lty = c(1, 2, 1, 2), lwd = 2,
         xlab = &quot;&quot;, ylab = &quot;Relative price (Q1 2000 = 100)&quot;,
         main = &quot;Price of services relative to goods (euro area)&quot;)
@@ -161,21 +161,21 @@ legend(&quot;topleft&quot;, legend = c(&quot;Services relative to NEIG&quot;, &q
 
 us &lt;- merge(get_fred_series(&quot;CUUR0000SAS&quot;, &quot;CUUR0000SAS&quot;),
             get_fred_series(&quot;CUUR0000SAC&quot;, &quot;CUUR0000SAC&quot;), by = &quot;date&quot;)
-us$month &lt;- format(us$date, &quot;%Y-%m&quot;)
-us &lt;- us[us$month &gt;= &quot;1947-01&quot; &amp; us$month &lt;= &quot;2026-06&quot; &amp; !is.na(us$CUUR0000SAS),
+us[[&quot;month&quot;]] &lt;- format(us[[&quot;date&quot;]], &quot;%Y-%m&quot;)
+us &lt;- us[us[[&quot;month&quot;]] &gt;= &quot;1947-01&quot; &amp; us[[&quot;month&quot;]] &lt;= &quot;2026-06&quot; &amp; !is.na(us[[&quot;CUUR0000SAS&quot;]]),
          c(&quot;month&quot;, &quot;CUUR0000SAS&quot;, &quot;CUUR0000SAC&quot;)]   # FRED pads the quarterly years
 
 write.csv(us, &quot;_2026_hochmuth_petz_us_cpi.csv&quot;, row.names = FALSE)</code></pre>
 <p>Both indices are published quarterly until 1955 and monthly after that, and October 2025, when the federal government was shut down, is missing. Quarterly averages of what is there take care of both. The trend is fitted over the whole sample:</p>
 <pre class="r"><code>us &lt;- read.csv(&quot;_2026_hochmuth_petz_us_cpi.csv&quot;)
 months &lt;- format(seq(as.Date(&quot;1947-01-01&quot;), as.Date(&quot;2026-06-01&quot;), by = &quot;month&quot;), &quot;%Y-%m&quot;)
-us &lt;- ts(as.matrix(us[match(months, us$month), c(&quot;CUUR0000SAS&quot;, &quot;CUUR0000SAC&quot;)]),
+us &lt;- ts(as.matrix(us[match(months, us[[&quot;month&quot;]]), c(&quot;CUUR0000SAS&quot;, &quot;CUUR0000SAC&quot;)]),
          start = c(1947, 1), frequency = 12)
 us_q &lt;- aggregate(us, nfrequency = 4, FUN = function(x) mean(x, na.rm = TRUE))
 us_q &lt;- window(us_q, start = c(1949, 4))   # the first moving average ends in 1950 Q1
 us_rel &lt;- relative_price(us_q[, &quot;CUUR0000SAS&quot;], us_q[, &quot;CUUR0000SAC&quot;])
 
-ts.plot(window(us_rel$price, start = 1950), window(us_rel$trend, start = 1950),
+ts.plot(window(us_rel[[&quot;price&quot;]], start = 1950), window(us_rel[[&quot;trend&quot;]], start = 1950),
         col = colours[[&quot;blue&quot;]], lty = c(1, 2), lwd = 2, xlab = &quot;&quot;,
         ylab = &quot;Relative price (Q1 2000 = 100)&quot;,
         main = &quot;Price of services relative to commodities (USA)&quot;)
@@ -253,8 +253,8 @@ model_goods &lt;- estimate_gap_model(prices, &quot;goods&quot;)</code></pre>
 <p>and <span class="math inline">\(100 + 100 z_h = 100 - C_{s,h} - C_{n,h}\)</span> is what remains of the gap after <span class="math inline">\(h\)</span> quarters.</p>
 <p>The draws of the coefficients are in <code>posterior$a$coeffs</code>. Each row is one draw of <span class="math inline">\(vec(A)\)</span>, where <span class="math inline">\(A\)</span> has one row per equation and one column per regressor, in the order <code>summary</code> prints them. The recursion is run for all draws at once:</p>
 <pre class="r"><code>gap_closure &lt;- function(model, horizon = 40) {
-  draws &lt;- as.matrix(model$posterior$a$coeffs)
-  k &lt;- model$model$k
+  draws &lt;- as.matrix(model[[&quot;posterior&quot;]][[&quot;a&quot;]][[&quot;coeffs&quot;]])
+  k &lt;- model[[&quot;model&quot;]][[&quot;k&quot;]]
   # Regressors: the lags of s and n, the error correction term, the constant
   coef &lt;- function(eq, reg) draws[, (reg - 1) * k + eq]
 
@@ -288,17 +288,17 @@ closure_goods &lt;- gap_closure(model_goods)</code></pre>
 <p>Chart 4 of the paper shows the median of the remaining gap with its 68% credible interval, and the median contributions as bars that start at 100: the services bars point down, because higher services inflation closes the gap, and the NEIG bars point up, because higher NEIG inflation widens it. Where both contributions close the gap, as in the specification with overall goods below, the bars are stacked.</p>
 <pre class="r"><code>plot_closure &lt;- function(x, label, colour) {
   bars &lt;- adjustcolor(c(colours[[&quot;blue&quot;]], colour), 0.45)
-  plot(NA, xlim = range(x$h), ylim = range(c(-50, 160, 100 - x$services)),
+  plot(NA, xlim = range(x[[&quot;h&quot;]]), ylim = range(c(-50, 160, 100 - x[[&quot;services&quot;]])),
        xlab = &quot;Quarters after the initial gap&quot;, ylab = &quot;% of initial gap&quot;,
        main = &quot;What closes the gap?&quot;)
   grid(col = colours[[&quot;grid&quot;]], lty = 1)
   # Contributions with the same sign are stacked, opposite ones start at 100
-  base &lt;- ifelse(sign(x$other) == sign(x$services), 100 - x$services, 100)
-  rect(x$h - 0.35, 100, x$h + 0.35, 100 - x$services, col = bars[1], border = NA)
-  rect(x$h - 0.35, base, x$h + 0.35, base - x$other, col = bars[2], border = NA)
-  polygon(c(x$h, rev(x$h)), c(x$lower, rev(x$upper)),
+  base &lt;- ifelse(sign(x[[&quot;other&quot;]]) == sign(x[[&quot;services&quot;]]), 100 - x[[&quot;services&quot;]], 100)
+  rect(x[[&quot;h&quot;]] - 0.35, 100, x[[&quot;h&quot;]] + 0.35, 100 - x[[&quot;services&quot;]], col = bars[1], border = NA)
+  rect(x[[&quot;h&quot;]] - 0.35, base, x[[&quot;h&quot;]] + 0.35, base - x[[&quot;other&quot;]], col = bars[2], border = NA)
+  polygon(c(x[[&quot;h&quot;]], rev(x[[&quot;h&quot;]])), c(x[[&quot;lower&quot;]], rev(x[[&quot;upper&quot;]])),
           col = adjustcolor(colours[[&quot;ink&quot;]], 0.2), border = NA)
-  lines(x$h, x$remaining, col = colours[[&quot;red&quot;]], lwd = 2)
+  lines(x[[&quot;h&quot;]], x[[&quot;remaining&quot;]], col = colours[[&quot;red&quot;]], lwd = 2)
   abline(h = c(0, 100), col = colours[[&quot;ink&quot;]])
   legend(&quot;bottomleft&quot;, legend = c(&quot;Services&quot;, label, &quot;Remaining gap&quot;),
          fill = c(bars, NA), border = NA, lty = c(NA, NA, 1),
@@ -307,7 +307,7 @@ closure_goods &lt;- gap_closure(model_goods)</code></pre>
 <pre class="r"><code>plot_closure(closure_neig, &quot;NEIG&quot;, colours[[&quot;teal&quot;]])</code></pre>
 <p><img src="/reproduction/2026_hochmuth_petz_services_files/figure-html/chart4-1.png" alt="" width="672" /></p>
 <p>The chart is close to the published one. The remaining gap falls below 50% between quarters 14 and 15, exactly where the paper puts it, about three and a half years. At quarter 14 services inflation has closed 77 percentage points of the gap and NEIG inflation has widened it by 29, against 76 and 26 in the paper. After ten years 13% of the gap is left, as in the published chart.</p>
-<pre class="r"><code>knitr::kable(closure_neig[closure_neig$h %in% c(4, 8, 14, 15, 20, 40), ],
+<pre class="r"><code>knitr::kable(closure_neig[closure_neig[[&quot;h&quot;]] %in% c(4, 8, 14, 15, 20, 40), ],
              digits = 1, row.names = FALSE,
              col.names = c(&quot;Quarter&quot;, &quot;Remaining gap&quot;, &quot;16%&quot;, &quot;84%&quot;, &quot;Services&quot;, &quot;NEIG&quot;))</code></pre>
 <table>
