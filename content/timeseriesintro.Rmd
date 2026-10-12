@@ -43,7 +43,7 @@ Multivariate models contain multiple dependent variables and they are the workho
 * [Impulse response analysis](/timeseries/irf)
 * [Vector error correction models (VECM)](/timeseries/vecintro)
 * [Dynamic factor models (DFM)](/timeseries/dynamicfactorintro)
-* Factor augmented vector autoregressive models (FAVAR)
+* [Factor-augmented vector autoregression (FAVAR)](/timeseries/favarintro)
 
 **Bayesian inference of multivariate models**
 
