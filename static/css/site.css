@@ -62,6 +62,20 @@
     overflow-x: auto;
 }
 
+/** Code at a size that fits R's output width *********************************/
+/*
+ * .Rprofile has R wrap knitted output at 100 characters. At the browser's
+ * 16px monospace only about 90 fit the 874px a code block has inside the
+ * 940px article column, so R output split in two. At 14px 100 characters fit,
+ * and a coda summary keeps its quantiles on the same line as the other
+ * statistics. Narrower screens scroll the block, see above.
+ */
+.li-body pre,
+.li-body pre code {
+    font-size: 14px;
+    line-height: 1.45;
+}
+
 .li-body .li-article table {
     display: block;
     max-width: 100%;
