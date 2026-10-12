@@ -2,29 +2,30 @@
 title: "An Introduction to Dynamic Factor Models"
 author: "Franz X. Mohr"
 date: "2021-04-25"
-lastmod: "2021-04-25" 
-description: "The post provides a short introduction to the concept of dynamic factor models and how they can be estimated in R."
+lastmod: "2026-10-12"
+description: "The post provides a short introduction to the concept of dynamic factor models and how they can be estimated in R with the dfmtools package."
 tags:
   - r
   - dfm
-  - bvartools
+  - dfmtools
+  - factor-model
 ---
 
 
 
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
-<p>For some macroeconomic applications it might be interesting to see whether a set of obserable variables depends on common drivers. The estimation of such common factors can be done using so-called <em>factor analytical models</em>, which have the form</p>
+<p>For some macroeconomic applications it might be interesting to see whether a set of observable variables depends on common drivers. The estimation of such common factors can be done using so-called <em>factor analytical models</em>, which have the form</p>
 <p><span class="math display">\[x_t = \lambda f_t + u_t,\]</span></p>
 <p>where <span class="math inline">\(x_t\)</span> is an <span class="math inline">\(M\)</span>-dimensional vector of observable variables, <span class="math inline">\(f_t\)</span> is an <span class="math inline">\(N \times 1\)</span> vector of unobserved factors, <span class="math inline">\(\lambda\)</span> is an <span class="math inline">\(M \times N\)</span> matrix of factor loadings and <span class="math inline">\(u_t\)</span> is an error term.</p>
 <p>The above model is static in the sense that it does not allow for autocorrelation of the factors. However, for time series applications it is common to model the factors by assuming an autoregressive process:</p>
-<p><span class="math display">\[f_t = A_1 f_{t-1} + ... + A_p f_{t-p} + v_t,\]</span>
-where <span class="math inline">\(A_i\)</span> is the <span class="math inline">\(N \times N\)</span> coefficient matrix correponding to the <span class="math inline">\(i\)</span>th lag of factor <span class="math inline">\(f_t\)</span> and <span class="math inline">\(v_t\)</span> is an error term. This makes the model more dynamic and, hence, the approach is called <em>dynamic factor model</em> (DFM).</p>
-<p>A basic DFM consists of two equation: First, the <em>measurement equation</em> (the first equation above), which describes the relationship between the observed variables and the factors. Second, the <em>transition equation</em> (the second equation above) describing the intertemporal relationships between the factors.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></p>
-<p>To ensure that DMFs can be estiamted from a mathematical perspective, some identifying assumptions need to be made. A popular approach is to assume that the covariance matrices of the error terms <span class="math inline">\(u_t\)</span> and <span class="math inline">\(v_t\)</span> are diagonal, so that they only include the variances of the variables. Furthermore, the matrix of factor loadings <span class="math inline">\(\lambda\)</span> is assumed to be lower triangular with ones on the main diagonal. For example, the measurement equation of a DFM with <span class="math inline">\(M\)</span> observable variables and 2 factors could be written as:</p>
+<p><span class="math display">\[f_t = A_1 f_{t-1} + \dots + A_p f_{t-p} + v_t,\]</span></p>
+<p>where <span class="math inline">\(A_i\)</span> is the <span class="math inline">\(N \times N\)</span> coefficient matrix corresponding to the <span class="math inline">\(i\)</span>th lag of factor <span class="math inline">\(f_t\)</span> and <span class="math inline">\(v_t\)</span> is an error term. This makes the model more dynamic and, hence, the approach is called <em>dynamic factor model</em> (DFM).</p>
+<p>A basic DFM consists of two equations: First, the <em>measurement equation</em> (the first equation above), which describes the relationship between the observed variables and the factors. Second, the <em>transition equation</em> (the second equation above), which describes the intertemporal relationships between the factors.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></p>
+<p>To ensure that DFMs can be estimated, some identifying assumptions are necessary. Since the factors are unobserved, only the product <span class="math inline">\(\lambda f_t\)</span> can be estimated, and any rescaling or rotation of the factors could be offset by the loadings. A popular approach is to assume that the covariance matrices of the error terms <span class="math inline">\(u_t\)</span> and <span class="math inline">\(v_t\)</span> are diagonal, so that they only include the variances of the variables. Furthermore, the leading <span class="math inline">\(N \times N\)</span> block of the matrix of factor loadings <span class="math inline">\(\lambda\)</span> is assumed to be lower triangular with ones on the main diagonal. For example, the measurement equation of a DFM with <span class="math inline">\(M\)</span> observable variables and 2 factors could be written as:</p>
 <p><span class="math display">\[
 \begin{pmatrix} x_{1,t} \\ x_{2,t} \\ x_{3,t} \\ \vdots \\ x_{M,t} \end{pmatrix} =
-\begin{bmatrix} 1 &amp; 0 \\ \lambda_{21} &amp; 1 \\ \lambda_{31} &amp; \lambda_{32} \\ \vdots &amp; \vdots \\ \lambda_{M1} &amp; \lambda_{M2} \end{bmatrix} 
+\begin{bmatrix} 1 &amp; 0 \\ \lambda_{21} &amp; 1 \\ \lambda_{31} &amp; \lambda_{32} \\ \vdots &amp; \vdots \\ \lambda_{M1} &amp; \lambda_{M2} \end{bmatrix}
 \begin{pmatrix} f_{1,t} \\ f_{2,t}  \end{pmatrix} +
 u_t
 \]</span>
@@ -34,45 +35,127 @@ with <span class="math inline">\(u_t \sim N(0, \Sigma_u)\)</span> and
 \sigma_{u, 11}^{2} &amp; 0 &amp; \dots  &amp; 0 \\
 0 &amp; \sigma_{u, 22}^{2} &amp; \ddots &amp; \vdots \\
 \vdots &amp; \ddots &amp; \ddots &amp; \vdots \\
-0 &amp; \dots &amp; \dots &amp; \sigma_{u, MM}^{2} 
+0 &amp; \dots &amp; \dots &amp; \sigma_{u, MM}^{2}
 \end{bmatrix}.\]</span></p>
-<p>The corresponding transistion equation would have the usual form of a VAR(<span class="math inline">\(p\)</span>) with <span class="math inline">\(v_t \sim N(0, \Sigma_v)\)</span> and
-<span class="math inline">\(\Sigma_v = \begin{bmatrix} \sigma_{v, 11}^{2} &amp; 0 \\ 0 &amp; \sigma_{v, 22}^{2} \end{bmatrix}.\)</span></p>
+<p>The corresponding transition equation would have the usual form of a VAR(<span class="math inline">\(p\)</span>) with <span class="math inline">\(v_t \sim N(0, \Sigma_v)\)</span> and
+<span class="math inline">\(\Sigma_v =
+\begin{bmatrix}
+\sigma_{v, 11}^{2} &amp; 0  \\
+0 &amp; \sigma_{v, 22}^{2}
+\end{bmatrix}.\)</span></p>
+<p>The restriction on the loadings also gives the factors an interpretation. The first variable in <span class="math inline">\(x_t\)</span> loads on the first factor with a coefficient of one and on no other factor, so that the first factor moves in the same direction as the first variable. The order of the variables is therefore a choice of the researcher, which matters for the interpretation of the results.</p>
 </div>
 <div id="application" class="section level2">
 <h2>Application</h2>
-<p>Since version 0.2.0 the <code>bvartools</code>package can be used to estimate dynamic factor models as described above using Bayesian inference. The implementation follows the Matlab code privided in the online annex to the textbook of Chan, Koop, Poirier and Tobias (2019). The following application is a reproduction of exercise 18.4 in the textbook, where quarterly time series data on 196 macroeconomic variables is used to extract a common factor for the US. The prepared data set is contained in the package.</p>
-<pre class="r"><code># Load package
-library(bvartools)
+<p>The <code>dfmtools</code> package estimates dynamic factor models as described above using Bayesian inference. It builds the model and hands it to a Gibbs sampler written in C++, which follows the treatment in Chan, Koop, Poirier and Tobias (2019). The package is not on CRAN yet and depends on the <code>bayests</code> package, which has to be installed from GitHub first:</p>
+<pre class="r"><code># install.packages(&quot;remotes&quot;)
+remotes::install_github(&quot;franzmohr/bayests-r&quot;)
+remotes::install_github(&quot;franzmohr/dfmtools&quot;)</code></pre>
+<p>The following application is a reproduction of exercise 18.4 in the textbook of Chan et al. (2019), where quarterly data on 196 macroeconomic variables is used to extract a common factor for the US. The series come from the FRED-QD database of McCracken and Ng (2020) and cover the period from 1959Q3 to 2015Q3. They are already transformed to be stationary, and the prepared data set is contained in the package. The first series is the growth rate of real GDP, so that the factor moves in the same direction as GDP.</p>
+<pre class="r"><code>library(dfmtools)
 
 # Load data
 data(&quot;bem_dfmdata&quot;)</code></pre>
-<p>Following the logic of the <code>bvartools</code> package, the estimation process is divided into four parts. First, using <code>gen_dfm</code> an object is created, which contains all information required by the estimation algorithm. For the current application we set the number of factors to 1 and the number of lags in the transition equation to 1 as well.</p>
-<pre class="r"><code># Generate input for estimation
-object &lt;- gen_dfm(x = bem_dfmdata, p = 1, n = 1, iterations = 5000, burnin = 1000)</code></pre>
-<p>Second, <code>add_priors</code> is used to add prior information to the model object. We use the same priors that as in Chan et al. (2019).</p>
-<pre class="r"><code># Priors
-object &lt;- add_priors(object,
-                     lambda = list(v_i = .01),
-                     a = list(v_i = .01),
-                     sigma_v = list(shape = 5, rate = 4),
-                     sigma_u = list(shape = 5, rate = 4))</code></pre>
-<p>Third, we obtain posterior draws, where the researcher can either implement her own algorithm or use the simple Gibbs sampler that comes with the package. For this application, the built-in sampler is used:</p>
-<pre class="r"><code># Procude posterior draws
-object &lt;- draw_posterior(object)</code></pre>
-<pre><code>## Estimating models...</code></pre>
-<p>Forth, evaluate the results. Currently, the package only allows to plot the factors:</p>
-<pre class="r"><code>plot(object)</code></pre>
-<p><img src="/timeseries/dynamicfactorintro_files/figure-html/oir-1.png" width="528" /></p>
+<p>Following the logic of the <code>bvartools</code> package, the estimation process is divided into four steps. First, <code>create_dfmodel</code> creates an object, which contains all information required by the estimation algorithm. For the current application the number of factors <code>n</code> is set to 1 and the number of lags in the transition equation <code>p</code> to 1 as well. By default, the function normalises every series to have mean zero and unit variance, so that the loadings are comparable across series.</p>
+<pre class="r"><code># Make the draws reproducible
+set.seed(123456789)
+
+# Generate the model
+model &lt;- create_dfmodel(x = bem_dfmdata, p = 1, n = 1,
+                        iterations = 5000, burnin = 1000)</code></pre>
+<p>Second, prior information is added to the model with <code>add_priors</code>. The same priors as in Chan et al. (2019) are used. The priors of the loadings <code>lambda</code> and the transition coefficients <code>a</code> are normal with mean zero and are specified as precisions. The arguments <code>u</code> and <code>v</code> contain the shape and rate parameters of the gamma priors of the precisions of the two error terms. Then, <code>add_initial_values</code> adds starting values for the sampler. By default, the loadings start at the values implied by the first principal component of the data.</p>
+<pre class="r"><code>model &lt;- add_priors(model,
+                    lambda = list(vinv = 0.01),
+                    a = list(vinv = 0.01),
+                    u = list(shape = 5, rate = 4),
+                    v = list(shape = 5, rate = 4))
+
+model &lt;- add_initial_values(model)</code></pre>
+<p>Third, posterior draws are obtained with the Gibbs sampler:</p>
+<pre class="r"><code>model &lt;- add_posterior_coefficients(model)</code></pre>
+<p>Fourth, the results are evaluated. The draws of each block of parameters are stored in <code>model$posterior</code>, with one row per draw. Since the whole path of the factor is part of every draw, the posterior median and a credible interval of the factor can be obtained for every period. The following figure compares the factor with the growth rate of real GDP. The factor is measured in the units of the common component of GDP growth, whose variance is much smaller than that of GDP growth itself. Therefore, both series are standardised for the comparison.</p>
+<pre class="r"><code>library(ggplot2)
+
+# Posterior median and 80 per cent credible interval of the factor
+f &lt;- apply(model$posterior$factors$coeffs, 2, quantile, probs = c(0.1, 0.5, 0.9))
+
+# Standardise the factor by the standard deviation of its median
+f &lt;- (f - mean(f[2, ])) / sd(f[2, ])
+
+temp &lt;- data.frame(date = as.numeric(time(bem_dfmdata)),
+                   lower = f[1, ], median = f[2, ], upper = f[3, ],
+                   gdp = model$data$x[, &quot;GDPC96&quot;])
+
+ggplot(temp, aes(x = date)) +
+  geom_hline(yintercept = 0, colour = &quot;grey50&quot;) +
+  geom_ribbon(aes(ymin = lower, ymax = upper), fill = &quot;steelblue&quot;, alpha = 0.3) +
+  geom_line(aes(y = median, colour = &quot;Factor&quot;)) +
+  geom_line(aes(y = gdp, colour = &quot;Real GDP growth&quot;), alpha = 0.7) +
+  scale_colour_manual(values = c(&quot;steelblue4&quot;, &quot;darkorange&quot;)) +
+  theme_bw() +
+  theme(legend.position = &quot;bottom&quot;,
+        legend.title = element_blank()) +
+  labs(title = &quot;Common factor of 196 US macroeconomic series&quot;,
+       x = NULL, y = NULL,
+       caption = &quot;Both series standardised. Posterior median and 80 per cent credible interval of the factor.&quot;)</code></pre>
+<p><img src="/timeseries/dynamicfactorintro_files/figure-html/factor-1.png" alt="" width="576" /></p>
+<p>The factor closely follows the growth rate of GDP, with a correlation of 0.75, and shows pronounced declines in every recession. It is smoother than GDP growth, since it summarises the movement of many series and leaves their idiosyncratic noise to the error term. This is why the factor can be interpreted as a measure of general economic activity.</p>
+<p>The loadings show, which series are most closely related to the factor. Their posterior means can be obtained from the draws of <code>lambda</code>. Note that the loading of the first series is fixed at one, but it is reported as well, so that the draws contain a value for each series.</p>
+<pre class="r"><code>lambda &lt;- colMeans(model$posterior$lambda$coeffs)
+names(lambda) &lt;- colnames(bem_dfmdata)
+
+# Series with the largest absolute loadings
+round(lambda[order(abs(lambda), decreasing = TRUE)][1:10], 2)</code></pre>
+<pre><code>##      USPRIV      USGOOD      MANEMP      PAYEMS     DMANEMP      HOANBS 
+##        4.92        4.92        4.85        4.84        4.80        4.64 
+##      UNRATE LNS14000025   IPMANSICS      INDPRO 
+##       -4.61       -4.59        4.55        4.55</code></pre>
+<p>The largest loadings belong to measures of employment and hours worked, unemployment rates and industrial production, which are the typical coincident indicators of the business cycle. The loadings of the unemployment rates are negative, since unemployment rises when economic activity declines. Since the loading of GDP growth is fixed at one, a loading of almost five means that a series moves about five times as much as GDP growth, measured in standard deviations, when the factor changes. These series are more closely related to the business cycle than GDP growth, which contains more idiosyncratic noise from quarter to quarter.</p>
+<div id="forecasts" class="section level3">
+<h3>Forecasts</h3>
+<p>Forecasts of a DFM are obtained in the same way as for a VAR model in <code>bvartools</code>. <code>add_forecast_input</code> sets the forecast horizon and <code>add_posterior_forecasts</code> simulates the forecasts. For each draw, the transition equation is used to produce a path of the factor, from which the forecasts of the observed variables are obtained with the loadings.</p>
+<pre class="r"><code>model &lt;- add_forecast_input(model, n_ahead = 8)
+model &lt;- add_posterior_forecasts(model)</code></pre>
+<p>The forecasts of all variables are stored in a single matrix, where the variables of the first period ahead are followed by those of the second period and so on. The following code extracts the forecast of GDP growth and transforms it back to the original units of the series.</p>
+<pre class="r"><code>m &lt;- ncol(bem_dfmdata)
+gdp_pos &lt;- which(colnames(bem_dfmdata) == &quot;GDPC96&quot;)
+
+# Draws of the GDP forecast in normalised units
+fc &lt;- model$posterior$forecast$forecasts[, seq(gdp_pos, 8 * m, by = m)]
+
+# Back to quarterly growth rates in per cent
+gdp &lt;- bem_dfmdata[, &quot;GDPC96&quot;]
+fc &lt;- 100 * (fc * sd(gdp) + mean(gdp))
+
+fc &lt;- t(apply(fc, 2, quantile, probs = c(0.1, 0.5, 0.9)))
+rownames(fc) &lt;- paste0(&quot;h = &quot;, 1:8)
+round(fc, 2)</code></pre>
+<pre><code>##         10%  50%  90%
+## h = 1 -0.23 0.74 1.69
+## h = 2 -0.22 0.75 1.76
+## h = 3 -0.22 0.75 1.75
+## h = 4 -0.24 0.74 1.73
+## h = 5 -0.19 0.78 1.77
+## h = 6 -0.22 0.78 1.79
+## h = 7 -0.29 0.76 1.73
+## h = 8 -0.27 0.73 1.72</code></pre>
+<p>The median forecast is close to the average quarterly growth rate of the sample, 0.75 per cent, at all horizons. The factor is persistent, with a posterior median of the transition coefficient of 0.75, but at the end of the sample it is close to zero, i.e. economic activity was close to its average, so that there is no deviation from average growth to carry forward. The wide credible intervals reflect that the model predicts the whole distribution of GDP growth, including its idiosyncratic part, which the factor does not capture.</p>
+</div>
+</div>
+<div id="extensions" class="section level2">
+<h2>Extensions</h2>
+<p>The <code>dfmtools</code> package also estimates models with stochastic volatility in the error terms and time varying loadings and transition coefficients, which are set with the arguments <code>error = "sv"</code> and <code>tvp = TRUE</code> of <code>create_dfmodel</code>. These are illustrated in the package vignette <em>Drifting loadings and changing volatility</em>.</p>
+<p>A dynamic factor model can also be combined with a VAR of observed variables, which results in a <a href="/timeseries/favarintro">factor-augmented vector autoregressive model</a>. Such models are estimated with the function <code>create_favarmodel</code>.</p>
 </div>
 <div id="references" class="section level2">
 <h2>References</h2>
-<p>Chan, J., Koop, G., Poirier, D. J., &amp; Tobias, J. L. (2019). <em>Bayesian Econometric Methods</em> (2nd ed.). Cambridge: University Press.</p>
+<p>Chan, J., Koop, G., Poirier, D. J., &amp; Tobias, J. L. (2019). <em>Bayesian Econometric Methods</em> (2nd ed.). Cambridge: Cambridge University Press.</p>
 <p>Lütkepohl, H. (2007). <em>New introduction to multiple time series analysis</em> (2nd ed.). Berlin: Springer.</p>
+<p>McCracken, M. W., &amp; Ng, S. (2020). FRED-QD: A quarterly database for macroeconomic research. <em>NBER Working Paper 26872</em>. <a href="https://doi.org/10.3386/w26872">https://doi.org/10.3386/w26872</a></p>
 </div>
-<div class="footnotes">
+<div class="footnotes footnotes-end-of-document">
 <hr />
 <ol>
-<li id="fn1"><p>Note that the terms measurement and transition equation refer to the close relationshipo of the approach to so-called <em>state space models</em>.<a href="#fnref1" class="footnote-back">↩</a></p></li>
+<li id="fn1"><p>The terms measurement and transition equation stem from the close relationship of the approach to so-called <em>state space models</em>.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>

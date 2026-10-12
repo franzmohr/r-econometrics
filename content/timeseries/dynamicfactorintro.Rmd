@@ -2,17 +2,22 @@
 title: "An Introduction to Dynamic Factor Models"
 author: "Franz X. Mohr"
 date: "2021-04-25"
-lastmod: "`r Sys.Date()`" 
-description: "The post provides a short introduction to the concept of dynamic factor models and how they can be estimated in R."
+lastmod: "`r Sys.Date()`"
+description: "The post provides a short introduction to the concept of dynamic factor models and how they can be estimated in R with the dfmtools package."
 tags:
   - r
   - dfm
-  - bvartools
+  - dfmtools
+  - factor-model
 ---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+```
 
 ## Introduction
 
-For some macroeconomic applications it might be interesting to see whether a set of obserable variables depends on common drivers. The estimation of such common factors can be done using so-called *factor analytical models*, which have the form
+For some macroeconomic applications it might be interesting to see whether a set of observable variables depends on common drivers. The estimation of such common factors can be done using so-called *factor analytical models*, which have the form
 
 $$x_t = \lambda f_t + u_t,$$
 
@@ -20,18 +25,19 @@ where $x_t$ is an $M$-dimensional vector of observable variables, $f_t$ is an $N
 
 The above model is static in the sense that it does not allow for autocorrelation of the factors. However, for time series applications it is common to model the factors by assuming an autoregressive process:
 
-$$f_t = A_1 f_{t-1} + ... + A_p f_{t-p} + v_t,$$
-where $A_i$ is the $N \times N$ coefficient matrix correponding to the $i$th lag of factor $f_t$ and $v_t$ is an error term. This makes the model more dynamic and, hence, the approach is called *dynamic factor model* (DFM).
+$$f_t = A_1 f_{t-1} + \dots + A_p f_{t-p} + v_t,$$
 
-A basic DFM consists of two equation: First, the *measurement equation* (the first equation above), which describes the relationship between the observed variables and the factors. Second, the *transition equation* (the second equation above) describing the intertemporal relationships between the factors.[^statespace]
+where $A_i$ is the $N \times N$ coefficient matrix corresponding to the $i$th lag of factor $f_t$ and $v_t$ is an error term. This makes the model more dynamic and, hence, the approach is called *dynamic factor model* (DFM).
 
-[^statespace]: Note that the terms measurement and transition equation refer to the close relationshipo of the approach to so-called *state space models*.
+A basic DFM consists of two equations: First, the *measurement equation* (the first equation above), which describes the relationship between the observed variables and the factors. Second, the *transition equation* (the second equation above), which describes the intertemporal relationships between the factors.[^statespace]
 
-To ensure that DMFs can be estiamted from a mathematical perspective, some identifying assumptions need to be made. A popular approach is to assume that the covariance matrices of the error terms $u_t$ and $v_t$ are diagonal, so that they only include the variances of the variables. Furthermore, the matrix of factor loadings $\lambda$ is assumed to be lower triangular with ones on the main diagonal. For example, the measurement equation of a DFM with $M$ observable variables and 2 factors could be written as:
+[^statespace]: The terms measurement and transition equation stem from the close relationship of the approach to so-called *state space models*.
+
+To ensure that DFMs can be estimated, some identifying assumptions are necessary. Since the factors are unobserved, only the product $\lambda f_t$ can be estimated, and any rescaling or rotation of the factors could be offset by the loadings. A popular approach is to assume that the covariance matrices of the error terms $u_t$ and $v_t$ are diagonal, so that they only include the variances of the variables. Furthermore, the leading $N \times N$ block of the matrix of factor loadings $\lambda$ is assumed to be lower triangular with ones on the main diagonal. For example, the measurement equation of a DFM with $M$ observable variables and 2 factors could be written as:
 
 $$
 \begin{pmatrix} x_{1,t} \\ x_{2,t} \\ x_{3,t} \\ \vdots \\ x_{M,t} \end{pmatrix} =
-\begin{bmatrix} 1 & 0 \\ \lambda_{21} & 1 \\ \lambda_{31} & \lambda_{32} \\ \vdots & \vdots \\ \lambda_{M1} & \lambda_{M2} \end{bmatrix} 
+\begin{bmatrix} 1 & 0 \\ \lambda_{21} & 1 \\ \lambda_{31} & \lambda_{32} \\ \vdots & \vdots \\ \lambda_{M1} & \lambda_{M2} \end{bmatrix}
 \begin{pmatrix} f_{1,t} \\ f_{2,t}  \end{pmatrix} +
 u_t
 $$
@@ -41,61 +47,157 @@ $$\Sigma_u =
 \sigma_{u, 11}^{2} & 0 & \dots  & 0 \\
 0 & \sigma_{u, 22}^{2} & \ddots & \vdots \\
 \vdots & \ddots & \ddots & \vdots \\
-0 & \dots & \dots & \sigma_{u, MM}^{2} 
+0 & \dots & \dots & \sigma_{u, MM}^{2}
 \end{bmatrix}.$$
 
-The corresponding transistion equation would have the usual form of a VAR($p$) with $v_t \sim N(0, \Sigma_v)$ and
+The corresponding transition equation would have the usual form of a VAR($p$) with $v_t \sim N(0, \Sigma_v)$ and
 $\Sigma_v =
 \begin{bmatrix}
 \sigma_{v, 11}^{2} & 0  \\
-0 & \sigma_{v, 22}^{2}  
+0 & \sigma_{v, 22}^{2}
 \end{bmatrix}.$
+
+The restriction on the loadings also gives the factors an interpretation. The first variable in $x_t$ loads on the first factor with a coefficient of one and on no other factor, so that the first factor moves in the same direction as the first variable. The order of the variables is therefore a choice of the researcher, which matters for the interpretation of the results.
 
 ## Application
 
-Since version 0.2.0 the `bvartools`package can be used to estimate dynamic factor models as described above using Bayesian inference. The implementation follows the Matlab code privided in the online annex to the textbook of Chan, Koop, Poirier and Tobias (2019). The following application is a reproduction of exercise 18.4 in the textbook, where quarterly time series data on 196 macroeconomic variables is used to extract a common factor for the US. The prepared data set is contained in the package.
+The `dfmtools` package estimates dynamic factor models as described above using Bayesian inference. It builds the model and hands it to a Gibbs sampler written in C++, which follows the treatment in Chan, Koop, Poirier and Tobias (2019). The package is not on CRAN yet and depends on the `bayests` package, which has to be installed from GitHub first:
 
-```{r}
-# Load package
-library(bvartools)
+```{r install, eval = FALSE}
+# install.packages("remotes")
+remotes::install_github("franzmohr/bayests-r")
+remotes::install_github("franzmohr/dfmtools")
+```
+
+The following application is a reproduction of exercise 18.4 in the textbook of Chan et al. (2019), where quarterly data on 196 macroeconomic variables is used to extract a common factor for the US. The series come from the FRED-QD database of McCracken and Ng (2020) and cover the period from 1959Q3 to 2015Q3. They are already transformed to be stationary, and the prepared data set is contained in the package. The first series is the growth rate of real GDP, so that the factor moves in the same direction as GDP.
+
+```{r data}
+library(dfmtools)
 
 # Load data
 data("bem_dfmdata")
 ```
 
-Following the logic of the `bvartools` package, the estimation process is divided into four parts. First, using `gen_dfm` an object is created, which contains all information required by the estimation algorithm. For the current application we set the number of factors to 1 and the number of lags in the transition equation to 1 as well.
+Following the logic of the `bvartools` package, the estimation process is divided into four steps. First, `create_dfmodel` creates an object, which contains all information required by the estimation algorithm. For the current application the number of factors `n` is set to 1 and the number of lags in the transition equation `p` to 1 as well. By default, the function normalises every series to have mean zero and unit variance, so that the loadings are comparable across series.
 
-```{r}
-# Generate input for estimation
-object <- gen_dfm(x = bem_dfmdata, p = 1, n = 1, iterations = 5000, burnin = 1000)
+```{r model}
+# Make the draws reproducible
+set.seed(123456789)
+
+# Generate the model
+model <- create_dfmodel(x = bem_dfmdata, p = 1, n = 1,
+                        iterations = 5000, burnin = 1000)
 ```
 
-Second, `add_priors` is used to add prior information to the model object. We use the same priors that as in Chan et al. (2019).
+Second, prior information is added to the model with `add_priors`. The same priors as in Chan et al. (2019) are used. The priors of the loadings `lambda` and the transition coefficients `a` are normal with mean zero and are specified as precisions. The arguments `u` and `v` contain the shape and rate parameters of the gamma priors of the precisions of the two error terms. Then, `add_initial_values` adds starting values for the sampler. By default, the loadings start at the values implied by the first principal component of the data.
 
-```{r}
-# Priors
-object <- add_priors(object,
-                     lambda = list(v_i = .01),
-                     a = list(v_i = .01),
-                     sigma_v = list(shape = 5, rate = 4),
-                     sigma_u = list(shape = 5, rate = 4))
+```{r priors}
+model <- add_priors(model,
+                    lambda = list(vinv = 0.01),
+                    a = list(vinv = 0.01),
+                    u = list(shape = 5, rate = 4),
+                    v = list(shape = 5, rate = 4))
+
+model <- add_initial_values(model)
 ```
 
-Third, we obtain posterior draws, where the researcher can either implement her own algorithm or use the simple Gibbs sampler that comes with the package. For this application, the built-in sampler is used:
+Third, posterior draws are obtained with the Gibbs sampler:
 
-```{r}
-# Procude posterior draws
-object <- draw_posterior(object)
+```{r posterior}
+model <- add_posterior_coefficients(model)
 ```
 
-Forth, evaluate the results. Currently, the package only allows to plot the factors:
+Fourth, the results are evaluated. The draws of each block of parameters are stored in `model$posterior`, with one row per draw. Since the whole path of the factor is part of every draw, the posterior median and a credible interval of the factor can be obtained for every period. The following figure compares the factor with the growth rate of real GDP. The factor is measured in the units of the common component of GDP growth, whose variance is much smaller than that of GDP growth itself. Therefore, both series are standardised for the comparison.
 
-```{r oir, fig.width=5.5, fig.height=4}
-plot(object)
+```{r factor, fig.width = 6, fig.height = 3.5}
+library(ggplot2)
+
+# Posterior median and 80 per cent credible interval of the factor
+f <- apply(model$posterior$factors$coeffs, 2, quantile, probs = c(0.1, 0.5, 0.9))
+
+# Standardise the factor by the standard deviation of its median
+f <- (f - mean(f[2, ])) / sd(f[2, ])
+
+temp <- data.frame(date = as.numeric(time(bem_dfmdata)),
+                   lower = f[1, ], median = f[2, ], upper = f[3, ],
+                   gdp = model$data$x[, "GDPC96"])
+
+ggplot(temp, aes(x = date)) +
+  geom_hline(yintercept = 0, colour = "grey50") +
+  geom_ribbon(aes(ymin = lower, ymax = upper), fill = "steelblue", alpha = 0.3) +
+  geom_line(aes(y = median, colour = "Factor")) +
+  geom_line(aes(y = gdp, colour = "Real GDP growth"), alpha = 0.7) +
+  scale_colour_manual(values = c("steelblue4", "darkorange")) +
+  theme_bw() +
+  theme(legend.position = "bottom",
+        legend.title = element_blank()) +
+  labs(title = "Common factor of 196 US macroeconomic series",
+       x = NULL, y = NULL,
+       caption = "Both series standardised. Posterior median and 80 per cent credible interval of the factor.")
 ```
+
+```{r numbers, include = FALSE}
+gdp_cor <- cor(temp$median, temp$gdp)
+```
+
+The factor closely follows the growth rate of GDP, with a correlation of `r round(gdp_cor, 2)`, and shows pronounced declines in every recession. It is smoother than GDP growth, since it summarises the movement of many series and leaves their idiosyncratic noise to the error term. This is why the factor can be interpreted as a measure of general economic activity.
+
+The loadings show, which series are most closely related to the factor. Their posterior means can be obtained from the draws of `lambda`. Note that the loading of the first series is fixed at one, but it is reported as well, so that the draws contain a value for each series.
+
+```{r loadings}
+lambda <- colMeans(model$posterior$lambda$coeffs)
+names(lambda) <- colnames(bem_dfmdata)
+
+# Series with the largest absolute loadings
+round(lambda[order(abs(lambda), decreasing = TRUE)][1:10], 2)
+```
+
+The largest loadings belong to measures of employment and hours worked, unemployment rates and industrial production, which are the typical coincident indicators of the business cycle. The loadings of the unemployment rates are negative, since unemployment rises when economic activity declines. Since the loading of GDP growth is fixed at one, a loading of almost five means that a series moves about five times as much as GDP growth, measured in standard deviations, when the factor changes. These series are more closely related to the business cycle than GDP growth, which contains more idiosyncratic noise from quarter to quarter.
+
+### Forecasts
+
+Forecasts of a DFM are obtained in the same way as for a VAR model in `bvartools`. `add_forecast_input` sets the forecast horizon and `add_posterior_forecasts` simulates the forecasts. For each draw, the transition equation is used to produce a path of the factor, from which the forecasts of the observed variables are obtained with the loadings.
+
+```{r forecasts}
+model <- add_forecast_input(model, n_ahead = 8)
+model <- add_posterior_forecasts(model)
+```
+
+The forecasts of all variables are stored in a single matrix, where the variables of the first period ahead are followed by those of the second period and so on. The following code extracts the forecast of GDP growth and transforms it back to the original units of the series.
+
+```{r gdp-forecast}
+m <- ncol(bem_dfmdata)
+gdp_pos <- which(colnames(bem_dfmdata) == "GDPC96")
+
+# Draws of the GDP forecast in normalised units
+fc <- model$posterior$forecast$forecasts[, seq(gdp_pos, 8 * m, by = m)]
+
+# Back to quarterly growth rates in per cent
+gdp <- bem_dfmdata[, "GDPC96"]
+fc <- 100 * (fc * sd(gdp) + mean(gdp))
+
+fc <- t(apply(fc, 2, quantile, probs = c(0.1, 0.5, 0.9)))
+rownames(fc) <- paste0("h = ", 1:8)
+round(fc, 2)
+```
+
+```{r forecast-numbers, include = FALSE}
+a <- median(model$posterior$a$coeffs)
+f_last <- median(model$posterior$factors$coeffs[, ncol(model$posterior$factors$coeffs)])
+```
+
+The median forecast is close to the average quarterly growth rate of the sample, `r round(100 * mean(gdp), 2)` per cent, at all horizons. The factor is persistent, with a posterior median of the transition coefficient of `r round(a, 2)`, but at the end of the sample it is close to zero, i.e. economic activity was close to its average, so that there is no deviation from average growth to carry forward. The wide credible intervals reflect that the model predicts the whole distribution of GDP growth, including its idiosyncratic part, which the factor does not capture.
+
+## Extensions
+
+The `dfmtools` package also estimates models with stochastic volatility in the error terms and time varying loadings and transition coefficients, which are set with the arguments `error = "sv"` and `tvp = TRUE` of `create_dfmodel`. These are illustrated in the package vignette *Drifting loadings and changing volatility*.
+
+A dynamic factor model can also be combined with a VAR of observed variables, which results in a [factor-augmented vector autoregressive model](/timeseries/favarintro). Such models are estimated with the function `create_favarmodel`.
 
 ## References
 
-Chan, J., Koop, G., Poirier, D. J., & Tobias, J. L. (2019). *Bayesian Econometric Methods* (2nd ed.). Cambridge: University Press.
+Chan, J., Koop, G., Poirier, D. J., & Tobias, J. L. (2019). *Bayesian Econometric Methods* (2nd ed.). Cambridge: Cambridge University Press.
 
 Lütkepohl, H. (2007). *New introduction to multiple time series analysis* (2nd ed.). Berlin: Springer.
+
+McCracken, M. W., & Ng, S. (2020). FRED-QD: A quarterly database for macroeconomic research. *NBER Working Paper 26872*. [https://doi.org/10.3386/w26872](https://doi.org/10.3386/w26872)
