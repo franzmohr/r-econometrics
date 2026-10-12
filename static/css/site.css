@@ -82,6 +82,39 @@
     overflow-x: auto;
 }
 
+/*
+ * Display equations are laid out by MathJax at their natural width, and a
+ * system of equations or a matrix is wider than a phone. Scroll the equation
+ * rather than the page. MathJax 2 wraps each one in .MJXc-display; hiding the
+ * vertical overflow keeps a scrollbar from appearing for subpixel rounding.
+ */
+.li-body .MJXc-display {
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+/*
+ * Reference lists print DOIs and URLs as link text, which has no spaces to
+ * wrap at. Let a link break anywhere once it would overflow its line.
+ */
+.li-body .li-article a {
+    overflow-wrap: anywhere;
+}
+
+/* The same for file paths and other long inline code outside code blocks. */
+.li-body :not(pre) > code {
+    overflow-wrap: anywhere;
+}
+
+/*
+ * knitr gives figures a fixed width attribute, and section pages show them in
+ * article summaries outside .li-article. Scale them down to the column.
+ */
+.li-body img {
+    max-width: 100%;
+    height: auto;
+}
+
 @media only screen and (max-width: 767px) {
     .li-body pre {
         padding: 16px;
