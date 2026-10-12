@@ -105,15 +105,17 @@ months &lt;- months[months &lt;= &quot;2026-07&quot;]   # the brief&#39;s last o
 
 write.csv(data.frame(month = months, ctr[months, ], rates[months, ]),
           &quot;_2026_hochmuth_petz_contributions.csv&quot;, row.names = FALSE)</code></pre>
-<p>The contributions add up to headline inflation up to rounding. The bars of a month are stacked upwards from zero where they are positive and downwards where they are negative:</p>
+<p>The contributions add up to headline inflation up to rounding. The bars of a month are stacked upwards from zero where they are positive and downwards where they are negative. All charts on this page share one set of colours, with services always in blue:</p>
+<pre class="r"><code>colours &lt;- c(red = &quot;#C10016&quot;, blue = &quot;#0F4C81&quot;, amber = &quot;#E8A33D&quot;, teal = &quot;#17807A&quot;,
+             ink = &quot;#22282E&quot;, grid = &quot;#DCE1E5&quot;)</code></pre>
 <pre class="r"><code>ctr &lt;- read.csv(&quot;_2026_hochmuth_petz_contributions.csv&quot;)
 date &lt;- seq(2018, by = 1 / 12, length.out = nrow(ctr))
 parts &lt;- as.matrix(ctr[, c(&quot;SERV&quot;, &quot;IGD_NNRG&quot;, &quot;FOOD&quot;, &quot;NRG&quot;)])
-cols &lt;- c(&quot;#8fae7e&quot;, &quot;#4aa8b0&quot;, &quot;#f3e6c4&quot;, &quot;#123d7a&quot;)
+cols &lt;- colours[c(&quot;blue&quot;, &quot;teal&quot;, &quot;amber&quot;, &quot;red&quot;)]
 
 plot(NA, xlim = range(date), ylim = c(-4, 12), xlab = &quot;&quot;,
      ylab = &quot;Contribution to HICP inflation in %&quot;, main = &quot;HICP components&quot;)
-grid()
+grid(col = colours[[&quot;grid&quot;]], lty = 1)
 up &lt;- pmax(parts, 0)
 down &lt;- pmin(parts, 0)
 for (j in seq_len(ncol(parts))) {
@@ -122,14 +124,14 @@ for (j in seq_len(ncol(parts))) {
   rect(date - 0.035, top - up[, j], date + 0.035, top, col = cols[j], border = NA)
   rect(date - 0.035, bottom - down[, j], date + 0.035, bottom, col = cols[j], border = NA)
 }
-lines(date, ctr$TOTAL, lwd = 1.5)
-lines(date, ctr$TOT_X_NRG_FOOD, lwd = 1.5, lty = 2)
-abline(h = 0)
+lines(date, ctr$TOTAL, lwd = 1.5, col = colours[[&quot;ink&quot;]])
+lines(date, ctr$TOT_X_NRG_FOOD, lwd = 1.5, lty = 2, col = colours[[&quot;ink&quot;]])
+abline(h = 0, col = colours[[&quot;ink&quot;]])
 legend(&quot;topleft&quot;, legend = c(&quot;Energy&quot;, &quot;Food including alcohol and tobacco&quot;,
                              &quot;Non-energy industrial goods&quot;, &quot;Services&quot;,
                              &quot;HICP inflation in %&quot;, &quot;Core inflation in %&quot;),
        fill = c(rev(cols), NA, NA), border = NA, lty = c(NA, NA, NA, NA, 1, 2),
-       bty = &quot;n&quot;, cex = 0.8)</code></pre>
+       col = colours[[&quot;ink&quot;]], bty = &quot;n&quot;, cex = 0.8)</code></pre>
 <p><img src="/reproduction/2026_hochmuth_petz_services_files/figure-html/chart1-1.png" alt="" width="672" /></p>
 <p>The chart matches the published one. Headline inflation peaked at 10.6% in October 2022, when energy alone contributed 4.44 percentage points. The contribution of services rose more slowly and peaked later, at 2.47 points in July 2023, and has receded more slowly than the others: in July 2026 it still accounted for 1.55 of 2.9 points, more than half of headline inflation, while energy, which had subtracted from inflation for most of 2023 to 2025, was adding 0.94 points again.</p>
 </div>
@@ -152,12 +154,12 @@ prices_nsa &lt;- aggregate(hicp, nfrequency = 4, FUN = mean)
 ea_neig &lt;- relative_price(prices_nsa[, &quot;SERV&quot;], prices_nsa[, &quot;IGD_NNRG&quot;], fit_end = 2020)
 ea_goods &lt;- relative_price(prices_nsa[, &quot;SERV&quot;], prices_nsa[, &quot;GD&quot;], fit_end = 2020)</code></pre>
 <pre class="r"><code>ts.plot(ea_neig$price, ea_neig$trend, ea_goods$price, ea_goods$trend,
-        col = rep(c(&quot;#123d7a&quot;, &quot;#d9b56b&quot;), each = 2), lty = c(1, 2, 1, 2), lwd = 2,
+        col = rep(colours[c(&quot;teal&quot;, &quot;amber&quot;)], each = 2), lty = c(1, 2, 1, 2), lwd = 2,
         xlab = &quot;&quot;, ylab = &quot;Relative price (Q1 2000 = 100)&quot;,
         main = &quot;Price of services relative to goods (euro area)&quot;)
-abline(h = 100)
+abline(h = 100, col = colours[[&quot;ink&quot;]])
 legend(&quot;topleft&quot;, legend = c(&quot;Services relative to NEIG&quot;, &quot;Services relative to goods&quot;),
-       col = c(&quot;#123d7a&quot;, &quot;#d9b56b&quot;), lwd = 2, bty = &quot;n&quot;)</code></pre>
+       col = colours[c(&quot;teal&quot;, &quot;amber&quot;)], lwd = 2, bty = &quot;n&quot;)</code></pre>
 <p><img src="/reproduction/2026_hochmuth_petz_services_files/figure-html/chart2-1.png" alt="" width="672" /></p>
 <p>Before the pandemic services became 1.3% a year more expensive relative to NEIG, and 0.3% relative to overall goods. Both relative prices fell below their trends in 2021 and 2022. The one against overall goods fell much more, because the energy and food prices it includes rose most, and it has made up less of the loss since. In the second quarter of 2026 services relative to NEIG are 3.2% below the extrapolated trend, which the brief puts at 3.5%, and relative to overall goods 5% below it.</p>
 <p>The euro area series is short, so the brief turns to post-war US data to ask whether such a trend survives large shocks. Chart 3 is the price of services relative to commodities in the US consumer price index for all urban consumers (CPI-U), series <code>CUUR0000SAS</code> and <code>CUUR0000SAC</code> of the Bureau of Labor Statistics. Its public API returns at most ten years per request:</p>
@@ -195,10 +197,10 @@ us_q &lt;- window(us_q, start = c(1949, 4))   # the first moving average ends in
 us_rel &lt;- relative_price(us_q[, &quot;CUUR0000SAS&quot;], us_q[, &quot;CUUR0000SAC&quot;])
 
 ts.plot(window(us_rel$price, start = 1950), window(us_rel$trend, start = 1950),
-        col = &quot;#123d7a&quot;, lty = c(1, 2), lwd = 2, xlab = &quot;&quot;,
+        col = colours[[&quot;blue&quot;]], lty = c(1, 2), lwd = 2, xlab = &quot;&quot;,
         ylab = &quot;Relative price (Q1 2000 = 100)&quot;,
         main = &quot;Price of services relative to commodities (USA)&quot;)
-abline(h = 100)</code></pre>
+abline(h = 100, col = colours[[&quot;ink&quot;]])</code></pre>
 <p><img src="/reproduction/2026_hochmuth_petz_services_files/figure-html/chart3-1.png" alt="" width="672" /></p>
 <p>Over seventy years US services became 1.5% a year more expensive relative to commodities, and the relative price never strayed far from that trend: not in the commodity price shocks of the 1970s, not in the oil price swings of the 2000s and not in 2021 and 2022. The recent surge pushed it further below the trend than at any other time since 1950, by almost ten percent, and it has since returned to within three percent of it, which is what the brief expects of the euro area as well. As the brief points out, the two charts are not directly comparable, since the US series compares services with commodities rather than with goods.</p>
 </div>
@@ -319,24 +321,25 @@ model_goods &lt;- estimate_gap_model(prices, &quot;goods&quot;)</code></pre>
 closure_neig &lt;- gap_closure(model_neig)
 closure_goods &lt;- gap_closure(model_goods)</code></pre>
 <p>Chart 4 of the paper shows the median of the remaining gap with its 68% credible interval, and the median contributions as bars that start at 100: the services bars point down, because higher services inflation closes the gap, and the NEIG bars point up, because higher NEIG inflation widens it. Where both contributions close the gap, as in the specification with overall goods below, the bars are stacked.</p>
-<pre class="r"><code>plot_closure &lt;- function(x, label) {
+<pre class="r"><code>plot_closure &lt;- function(x, label, colour) {
+  bars &lt;- adjustcolor(c(colours[[&quot;blue&quot;]], colour), 0.45)
   plot(NA, xlim = range(x$h), ylim = range(c(-50, 160, 100 - x$services)),
        xlab = &quot;Quarters after the initial gap&quot;, ylab = &quot;% of initial gap&quot;,
        main = &quot;What closes the gap?&quot;)
-  grid()
+  grid(col = colours[[&quot;grid&quot;]], lty = 1)
   # Contributions with the same sign are stacked, opposite ones start at 100
   base &lt;- ifelse(sign(x$other) == sign(x$services), 100 - x$services, 100)
-  rect(x$h - 0.35, 100, x$h + 0.35, 100 - x$services, col = &quot;#f3e6c4&quot;, border = NA)
-  rect(x$h - 0.35, base, x$h + 0.35, base - x$other, col = &quot;#9fd3d6&quot;, border = NA)
+  rect(x$h - 0.35, 100, x$h + 0.35, 100 - x$services, col = bars[1], border = NA)
+  rect(x$h - 0.35, base, x$h + 0.35, base - x$other, col = bars[2], border = NA)
   polygon(c(x$h, rev(x$h)), c(x$lower, rev(x$upper)),
-          col = adjustcolor(&quot;#5a7fb8&quot;, 0.35), border = NA)
-  lines(x$h, x$remaining, col = &quot;#123d7a&quot;, lwd = 2)
-  abline(h = c(0, 100))
+          col = adjustcolor(colours[[&quot;ink&quot;]], 0.2), border = NA)
+  lines(x$h, x$remaining, col = colours[[&quot;red&quot;]], lwd = 2)
+  abline(h = c(0, 100), col = colours[[&quot;ink&quot;]])
   legend(&quot;bottomleft&quot;, legend = c(&quot;Services&quot;, label, &quot;Remaining gap&quot;),
-         fill = c(&quot;#f3e6c4&quot;, &quot;#9fd3d6&quot;, NA), border = NA, lty = c(NA, NA, 1),
-         col = c(NA, NA, &quot;#123d7a&quot;), lwd = 2, bty = &quot;n&quot;)
+         fill = c(bars, NA), border = NA, lty = c(NA, NA, 1),
+         col = c(NA, NA, colours[[&quot;red&quot;]]), lwd = 2, bty = &quot;n&quot;)
 }</code></pre>
-<pre class="r"><code>plot_closure(closure_neig, &quot;NEIG&quot;)</code></pre>
+<pre class="r"><code>plot_closure(closure_neig, &quot;NEIG&quot;, colours[[&quot;teal&quot;]])</code></pre>
 <p><img src="/reproduction/2026_hochmuth_petz_services_files/figure-html/chart4-1.png" alt="" width="672" /></p>
 <p>The chart is close to the published one. The remaining gap falls below 50% between quarters 14 and 15, exactly where the paper puts it, about three and a half years. At quarter 14 services inflation has closed 77 percentage points of the gap and NEIG inflation has widened it by 29, against 76 and 26 in the paper. After ten years 13% of the gap is left, as in the published chart.</p>
 <pre class="r"><code>knitr::kable(closure_neig[closure_neig$h %in% c(4, 8, 14, 15, 20, 40), ],
@@ -408,7 +411,7 @@ closure_goods &lt;- gap_closure(model_goods)</code></pre>
 <div id="overall-goods-instead-of-neig" class="section level2">
 <h2>Overall goods instead of NEIG</h2>
 <p>The same model with the overall goods index adjusts much faster:</p>
-<pre class="r"><code>plot_closure(closure_goods, &quot;Goods&quot;)</code></pre>
+<pre class="r"><code>plot_closure(closure_goods, &quot;Goods&quot;, colours[[&quot;amber&quot;]])</code></pre>
 <p><img src="/reproduction/2026_hochmuth_petz_services_files/figure-html/chart4-goods-1.png" alt="" width="672" /></p>
 <p>Half of the gap is closed between quarters 4 and 5, which the paper reports as about five quarters. Here, unlike in the benchmark, both components close the gap, and goods inflation does more of it: at quarter 5 services contribute 17 and goods 41 percentage points, against roughly 15 and 38 in the paper. The goods loading is positive, and its 95% credible interval excludes zero: when services are cheap relative to goods, goods inflation falls. The faster adjustment reflects the energy and food prices in the goods index, which move much more than NEIG prices and return quickly after a shock.</p>
 </div>

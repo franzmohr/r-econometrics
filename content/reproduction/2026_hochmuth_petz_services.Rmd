@@ -129,17 +129,22 @@ write.csv(data.frame(month = months, ctr[months, ], rates[months, ]),
           "_2026_hochmuth_petz_contributions.csv", row.names = FALSE)
 ```
 
-The contributions add up to headline inflation up to rounding. The bars of a month are stacked upwards from zero where they are positive and downwards where they are negative:
+The contributions add up to headline inflation up to rounding. The bars of a month are stacked upwards from zero where they are positive and downwards where they are negative. All charts on this page share one set of colours, with services always in blue:
+
+```{r colours}
+colours <- c(red = "#C10016", blue = "#0F4C81", amber = "#E8A33D", teal = "#17807A",
+             ink = "#22282E", grid = "#DCE1E5")
+```
 
 ```{r chart1}
 ctr <- read.csv("_2026_hochmuth_petz_contributions.csv")
 date <- seq(2018, by = 1 / 12, length.out = nrow(ctr))
 parts <- as.matrix(ctr[, c("SERV", "IGD_NNRG", "FOOD", "NRG")])
-cols <- c("#8fae7e", "#4aa8b0", "#f3e6c4", "#123d7a")
+cols <- colours[c("blue", "teal", "amber", "red")]
 
 plot(NA, xlim = range(date), ylim = c(-4, 12), xlab = "",
      ylab = "Contribution to HICP inflation in %", main = "HICP components")
-grid()
+grid(col = colours[["grid"]], lty = 1)
 up <- pmax(parts, 0)
 down <- pmin(parts, 0)
 for (j in seq_len(ncol(parts))) {
@@ -148,14 +153,14 @@ for (j in seq_len(ncol(parts))) {
   rect(date - 0.035, top - up[, j], date + 0.035, top, col = cols[j], border = NA)
   rect(date - 0.035, bottom - down[, j], date + 0.035, bottom, col = cols[j], border = NA)
 }
-lines(date, ctr$TOTAL, lwd = 1.5)
-lines(date, ctr$TOT_X_NRG_FOOD, lwd = 1.5, lty = 2)
-abline(h = 0)
+lines(date, ctr$TOTAL, lwd = 1.5, col = colours[["ink"]])
+lines(date, ctr$TOT_X_NRG_FOOD, lwd = 1.5, lty = 2, col = colours[["ink"]])
+abline(h = 0, col = colours[["ink"]])
 legend("topleft", legend = c("Energy", "Food including alcohol and tobacco",
                              "Non-energy industrial goods", "Services",
                              "HICP inflation in %", "Core inflation in %"),
        fill = c(rev(cols), NA, NA), border = NA, lty = c(NA, NA, NA, NA, 1, 2),
-       bty = "n", cex = 0.8)
+       col = colours[["ink"]], bty = "n", cex = 0.8)
 ```
 
 ```{r chart1-numbers, include = FALSE}
@@ -193,12 +198,12 @@ ea_goods <- relative_price(prices_nsa[, "SERV"], prices_nsa[, "GD"], fit_end = 2
 
 ```{r chart2}
 ts.plot(ea_neig$price, ea_neig$trend, ea_goods$price, ea_goods$trend,
-        col = rep(c("#123d7a", "#d9b56b"), each = 2), lty = c(1, 2, 1, 2), lwd = 2,
+        col = rep(colours[c("teal", "amber")], each = 2), lty = c(1, 2, 1, 2), lwd = 2,
         xlab = "", ylab = "Relative price (Q1 2000 = 100)",
         main = "Price of services relative to goods (euro area)")
-abline(h = 100)
+abline(h = 100, col = colours[["ink"]])
 legend("topleft", legend = c("Services relative to NEIG", "Services relative to goods"),
-       col = c("#123d7a", "#d9b56b"), lwd = 2, bty = "n")
+       col = colours[c("teal", "amber")], lwd = 2, bty = "n")
 ```
 
 ```{r chart2-gap, include = FALSE}
@@ -248,10 +253,10 @@ us_q <- window(us_q, start = c(1949, 4))   # the first moving average ends in 19
 us_rel <- relative_price(us_q[, "CUUR0000SAS"], us_q[, "CUUR0000SAC"])
 
 ts.plot(window(us_rel$price, start = 1950), window(us_rel$trend, start = 1950),
-        col = "#123d7a", lty = c(1, 2), lwd = 2, xlab = "",
+        col = colours[["blue"]], lty = c(1, 2), lwd = 2, xlab = "",
         ylab = "Relative price (Q1 2000 = 100)",
         main = "Price of services relative to commodities (USA)")
-abline(h = 100)
+abline(h = 100, col = colours[["ink"]])
 ```
 
 Over seventy years US services became `r round(us_rel$growth, 1)`% a year more expensive relative to commodities, and the relative price never strayed far from that trend: not in the commodity price shocks of the 1970s, not in the oil price swings of the 2000s and not in 2021 and 2022. The recent surge pushed it further below the trend than at any other time since 1950, by almost ten percent, and it has since returned to within three percent of it, which is what the brief expects of the euro area as well. As the brief points out, the two charts are not directly comparable, since the US series compares services with commodities rather than with goods.
@@ -350,27 +355,28 @@ closure_goods <- gap_closure(model_goods)
 Chart 4 of the paper shows the median of the remaining gap with its 68% credible interval, and the median contributions as bars that start at 100: the services bars point down, because higher services inflation closes the gap, and the NEIG bars point up, because higher NEIG inflation widens it. Where both contributions close the gap, as in the specification with overall goods below, the bars are stacked.
 
 ```{r chart4-function}
-plot_closure <- function(x, label) {
+plot_closure <- function(x, label, colour) {
+  bars <- adjustcolor(c(colours[["blue"]], colour), 0.45)
   plot(NA, xlim = range(x$h), ylim = range(c(-50, 160, 100 - x$services)),
        xlab = "Quarters after the initial gap", ylab = "% of initial gap",
        main = "What closes the gap?")
-  grid()
+  grid(col = colours[["grid"]], lty = 1)
   # Contributions with the same sign are stacked, opposite ones start at 100
   base <- ifelse(sign(x$other) == sign(x$services), 100 - x$services, 100)
-  rect(x$h - 0.35, 100, x$h + 0.35, 100 - x$services, col = "#f3e6c4", border = NA)
-  rect(x$h - 0.35, base, x$h + 0.35, base - x$other, col = "#9fd3d6", border = NA)
+  rect(x$h - 0.35, 100, x$h + 0.35, 100 - x$services, col = bars[1], border = NA)
+  rect(x$h - 0.35, base, x$h + 0.35, base - x$other, col = bars[2], border = NA)
   polygon(c(x$h, rev(x$h)), c(x$lower, rev(x$upper)),
-          col = adjustcolor("#5a7fb8", 0.35), border = NA)
-  lines(x$h, x$remaining, col = "#123d7a", lwd = 2)
-  abline(h = c(0, 100))
+          col = adjustcolor(colours[["ink"]], 0.2), border = NA)
+  lines(x$h, x$remaining, col = colours[["red"]], lwd = 2)
+  abline(h = c(0, 100), col = colours[["ink"]])
   legend("bottomleft", legend = c("Services", label, "Remaining gap"),
-         fill = c("#f3e6c4", "#9fd3d6", NA), border = NA, lty = c(NA, NA, 1),
-         col = c(NA, NA, "#123d7a"), lwd = 2, bty = "n")
+         fill = c(bars, NA), border = NA, lty = c(NA, NA, 1),
+         col = c(NA, NA, colours[["red"]]), lwd = 2, bty = "n")
 }
 ```
 
 ```{r chart4}
-plot_closure(closure_neig, "NEIG")
+plot_closure(closure_neig, "NEIG", colours[["teal"]])
 ```
 
 ```{r half-life, include = FALSE}
@@ -393,7 +399,7 @@ knitr::kable(closure_neig[closure_neig$h %in% c(4, 8, 14, 15, 20, 40), ],
 The same model with the overall goods index adjusts much faster:
 
 ```{r chart4-goods}
-plot_closure(closure_goods, "Goods")
+plot_closure(closure_goods, "Goods", colours[["amber"]])
 ```
 
 Half of the gap is closed between quarters `r hl_goods - 1` and `r hl_goods`, which the paper reports as about five quarters. Here, unlike in the benchmark, both components close the gap, and goods inflation does more of it: at quarter `r hl_goods` services contribute `r at(closure_goods, hl_goods)$services` and goods `r at(closure_goods, hl_goods)$other` percentage points, against roughly 15 and 38 in the paper. The goods loading is positive, and its 95% credible interval excludes zero: when services are cheap relative to goods, goods inflation falls. The faster adjustment reflects the energy and food prices in the goods index, which move much more than NEIG prices and return quickly after a shock.
